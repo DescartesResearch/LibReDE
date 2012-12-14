@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Java
+Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.ipopt.java
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: edu.kit.ipd.descartes.redeem.ipopt.java.IpoptActivator
+Require-Bundle: org.eclipse.core.runtime,
+ com.sun.jna;bundle-version="3.2.7"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

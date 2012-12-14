@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Estimation
+Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.estimation
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: edu.kit.ipd.descartes.redeem.bayesplusplus.java;bundle-version="1.0.0",
+ edu.kit.ipd.descartes.linalg;bundle-version="1.0.0"

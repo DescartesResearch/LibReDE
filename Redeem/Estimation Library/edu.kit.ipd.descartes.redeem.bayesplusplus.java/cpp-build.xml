@@ -1,0 +1,21 @@
+<project name="edu.kit.ipd.descartes.redeem.backend.kalman" default="build" basedir=".">	
+	
+	<property name="bayesplusplus.dir" value="C:/Users/spinner/Git/redeem/Redeem/Third-Party Libraries/bayesplusplus" />
+	<property name="make.executable" value="mingw32-make" />
+	<property name="boost.root" value="C:\mingw64\boost_1_51_0" />
+	<property name="gcc.version" value="mingw-4.7.2" />
+	<property name="bjam.toolset" value="gcc" />
+	<property name="bayesplusplus.lib.dir" location="${bayesplusplus.dir}/target/BayesFilter/${bjam.toolset}-${gcc.version}/release/link-static" />
+	<property name="bayesplusplus.include.dir" location="${bayesplusplus.dir}" />
+	
+	
+	<target name="build">
+		<exec executable="${make.executable}" dir="./native">
+			<env key="BOOST_ROOT" value="${boost.root}" />
+			<env key="BAYES_PLUS_PLUS_INCLUDES" value="${bayesplusplus.include.dir}" />
+			<env key="BAYES_PLUS_PLUS_LIB" value="${bayesplusplus.lib.dir}" />
+			<env key="BUILD_DIR" value="../build" />
+		</exec>
+		<copy file="./build/BayesPlusPlus.dll" todir="${basedir}"></copy>
+	</target>
+</project>

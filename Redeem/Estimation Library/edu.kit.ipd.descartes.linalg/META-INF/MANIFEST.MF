@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Linalg
+Bundle-SymbolicName: edu.kit.ipd.descartes.linalg
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: cern.colt;bundle-version="1.2.0"
+Export-Package: edu.kit.ipd.descartes.linalg,
+ edu.kit.ipd.descartes.linalg.storage

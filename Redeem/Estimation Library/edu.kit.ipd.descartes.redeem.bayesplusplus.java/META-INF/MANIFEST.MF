@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Java
+Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.bayesplusplus.java
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: com.sun.jna;bundle-version="3.2.7",
+ edu.kit.ipd.descartes.linalg;bundle-version="1.0.0",
+ org.eclipse.core.runtime;bundle-version="3.8.0"
+Export-Package: edu.kit.ipd.descartes.redeem.bayesplusplus
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: edu.kit.ipd.descartes.redeem.bayesplusplus.BayesPlusPlusBundleActivator
