@@ -1,0 +1,12 @@
+<project name="edu.kit.ipd.descartes.redeem.nnls" default="build" basedir=".">	
+
+	<property name="make.executable" value="mingw32-make" />
+
+	<target name="build">
+		<exec executable="${make.executable}" dir="./fortran">
+			<arg line="" />
+			<env key="BUILD_DIR" value="../build" />
+		</exec>
+		<copy file="./build/NNLS.dll" todir="${basedir}"></copy>
+	</target>
+</project>
