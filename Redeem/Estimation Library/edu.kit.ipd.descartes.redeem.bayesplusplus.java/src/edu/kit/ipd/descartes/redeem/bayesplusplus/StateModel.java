@@ -1,5 +1,7 @@
 package edu.kit.ipd.descartes.redeem.bayesplusplus;
 
+import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Vector.*;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
@@ -19,13 +21,12 @@ public abstract class StateModel {
 
 		@Override
 		public Pointer execute(Pointer x) {
-			Vector currentState = Vector.create(stateSize);
-			currentState.readFrom(new NativeDoubleStorage(x));
+			Vector currentState = vector(stateSize, new NativeDoubleStorage(x));
 			
 			Vector nextState = nextState(currentState);
 			calculateJacobi(currentState);
 			
-			nextState.writeTo(new NativeDoubleStorage(vecBuffer));			
+			nextState.toDoubleStorage(new NativeDoubleStorage(vecBuffer));			
 			return vecBuffer;
 		}		
 	}
@@ -39,11 +40,11 @@ public abstract class StateModel {
 		nativeModel = BayesPlusPlusLibrary.INSTANCE.create_linrz_predict_model(stateSize, stateSize, new FFunction());
 		
 		Pointer buffer = NativeHelper.allocateDoubleArray(stateSize);
-		stateNoiseCovariance.writeTo(new NativeDoubleStorage(buffer));
+		stateNoiseCovariance.toDoubleStorage(new NativeDoubleStorage(buffer));
 		BayesPlusPlusLibrary.INSTANCE.set_q(nativeModel, buffer, stateSize);
 		
 		matBuffer = NativeHelper.allocateDoubleArray(stateSize*stateSize);
-		stateNoiseCoupling.writeTo(new NativeDoubleStorage(buffer));
+		stateNoiseCoupling.toDoubleStorage(new NativeDoubleStorage(buffer));
 		BayesPlusPlusLibrary.INSTANCE.set_G(nativeModel, buffer, stateSize);
 	}
 	
@@ -52,7 +53,7 @@ public abstract class StateModel {
 	public abstract void calculateJacobi(Vector currentState);
 	
 	public void setJacobi(Matrix jacobi) {
-		jacobi.writeTo(new NativeDoubleStorage(matBuffer));
+		jacobi.toDoubleStorage(new NativeDoubleStorage(matBuffer));
 		BayesPlusPlusLibrary.INSTANCE.set_Fx(nativeModel, matBuffer, stateSize);
 	}
 	

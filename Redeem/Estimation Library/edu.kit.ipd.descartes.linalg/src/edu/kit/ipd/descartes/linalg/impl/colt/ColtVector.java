@@ -1,17 +1,24 @@
 package edu.kit.ipd.descartes.linalg.impl.colt;
 
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.colt.matrix.linalg.Algebra;
+import cern.jet.math.Functions;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.linalg.VectorInitializer;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class ColtVector extends Vector {
-	
+
+	private static final Algebra ALG = new Algebra();
+
 	protected static class FlatArrayVector extends DenseDoubleMatrix1D {
 
 		public FlatArrayVector(int rows) {
 			super(rows);
-		}		
-		
+		}
+
 		public FlatArrayVector(int size, double[] elements, int zero, int stride) {
 			super(size, elements, zero, stride);
 		}
@@ -19,31 +26,68 @@ public class ColtVector extends Vector {
 		public void readFrom(DoubleStorage storage) {
 			storage.read(elements);
 		}
-		
+
 		public void writeTo(DoubleStorage storage) {
 			storage.write(elements);
 		}
-	
+
+		@Override
+		public DoubleMatrix1D like(int size) {
+			return new FlatArrayVector(size);
+		}
+
+		@Override
+		public DoubleMatrix2D like2D(int rows, int columns) {
+			return new ColtMatrix.FlatArrayMatrix(rows, columns);
+		}
+
 	}
-	
+
 	protected FlatArrayVector content;
-	
+
 	protected ColtVector(FlatArrayVector content) {
 		this.content = content;
 	}
-	
+
 	public ColtVector(int rows) {
 		content = new FlatArrayVector(rows);
 	}
-	
-	@Override
-	public void assign(double... d) {
-		content.assign(d);		
+
+	public ColtVector(int rows, double fill) {
+		content = new FlatArrayVector(rows);
+		content.assign(fill);
 	}
-	
-	@Override
-	public void set(int row, double value) {
-		content.set(row, value);		
+
+	public ColtVector(double... values) {
+		content = new FlatArrayVector(values.length);
+		content.assign(values);
+	}
+
+	public ColtVector(int rows, DoubleStorage storage) {
+		content = new FlatArrayVector(rows);
+		content.readFrom(storage);
+	}
+
+	public ColtVector(int rows, VectorInitializer init) {
+		content = new FlatArrayVector(rows);
+		for (int i = 0; i < rows; i++) {
+			content.setQuick(i, init.cell(i));
+		}
+	}
+
+	public ColtVector(Vector[] vectors) {
+		int rows = 0;
+		for (int i = 0; i < vectors.length; i++) {
+			rows += vectors[i].rows();
+		}
+		content = new FlatArrayVector(rows);
+		int offset = 0;
+		for (int i = 0; i < vectors.length; i++) {
+			int len = vectors[i].rows();
+			content.viewPart(offset, len).assign(
+					((ColtVector) vectors[i]).content);
+			offset += len;
+		}
 	}
 
 	@Override
@@ -52,25 +96,78 @@ public class ColtVector extends Vector {
 	}
 
 	@Override
-	public int rowCount() {
+	public int rows() {
 		return content.size();
 	}
-	
+
 	@Override
-	public double multiply(Vector b) {
-		return content.zDotProduct(((ColtVector)b).content);
+	public Vector plus(Vector a) {
+		FlatArrayVector res = (FlatArrayVector) content.copy();
+		res.assign(((ColtVector) a).content, Functions.plus);
+		return new ColtVector(res);
 	}
-	
+
 	@Override
-	public void mapMultiplyToSelf(double d) {
+	public Vector plus(double d) {
+		ColtVector result = new ColtVector(this.rows());
 		for (int i = 0; i < content.size(); i++) {
-			content.setQuick(i, content.getQuick(i) * d);
+			result.content.setQuick(i, content.getQuick(i) + d);
 		}
+		return result;
 	}
-	
+
 	@Override
-	public double sum() {
+	public Vector minus(Vector a) {
+		FlatArrayVector res = (FlatArrayVector) content.copy();
+		res.assign(((ColtVector) a).content, Functions.minus);
+		return new ColtVector(res);
+	}
+
+	@Override
+	public Vector minus(double d) {
+		ColtVector result = new ColtVector(this.rows());
+		for (int i = 0; i < content.size(); i++) {
+			result.content.setQuick(i, content.getQuick(i) - d);
+		}
+		return result;
+	}
+
+	@Override
+	public double multipliedBy(Vector b) {
+		return content.zDotProduct(((ColtVector) b).content);
+	}
+
+	@Override
+	public Vector times(double d) {
+		ColtVector result = new ColtVector(this.rows());
+		for (int i = 0; i < content.size(); i++) {
+			result.content.setQuick(i, content.getQuick(i) * d);
+		}
+		return result;
+	}
+
+	@Override
+	protected Vector abs() {
+		ColtVector result = new ColtVector(this.rows());
+		for (int i = 0; i < content.size(); i++) {
+			result.content.setQuick(i, Math.abs(content.getQuick(i)));
+		}
+		return result;
+	}
+
+	@Override
+	protected double sum() {
 		return content.zSum();
+	}
+
+	@Override
+	protected double norm1() {
+		return ALG.norm1(content);
+	}
+
+	@Override
+	protected double norm2() {
+		return ALG.norm2(content);
 	}
 
 	@Override
@@ -79,15 +176,10 @@ public class ColtVector extends Vector {
 	}
 
 	@Override
-	public void readFrom(DoubleStorage storage) {
-		content.readFrom(storage);
+	public void toDoubleStorage(DoubleStorage storage) {
+		content.writeTo(storage);
 	}
 
-	@Override
-	public void writeTo(DoubleStorage storage) {
-		content.writeTo(storage);		
-	}
-	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

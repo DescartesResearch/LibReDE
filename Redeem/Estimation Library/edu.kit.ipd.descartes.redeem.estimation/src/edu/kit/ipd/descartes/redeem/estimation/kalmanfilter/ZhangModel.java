@@ -1,7 +1,12 @@
 package edu.kit.ipd.descartes.redeem.estimation.kalmanfilter;
 
+import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Vector.*;
+
 import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.MatrixInitializer;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.linalg.VectorInitializer;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.MeasurementModel;
 
 public class ZhangModel extends MeasurementModel {
@@ -20,82 +25,84 @@ public class ZhangModel extends MeasurementModel {
 	}
 
 	@Override
-	public Vector nextObservation(Vector currentState, Vector...additionalInformation) {
+	public Vector nextObservation(final Vector currentState, final Vector...additionalInformation) {
 		if (additionalInformation.length < 1) {
 			throw new IllegalArgumentException("Throughput information is missing.");
 		}
 		
-		Vector currentThroughput = additionalInformation[0];
+		final Vector currentThroughput = additionalInformation[0];
 		
-		Vector output = Vector.create(getObservationSize());
-		for (int i = 0; i < output.rowCount(); i++) {
-			output.set(i, 0.0);
-		}
-
-		for (int i = 0; i < numResources; i++) {
-			double u = calculateUtilization(i, currentState, currentThroughput);
-			double u1 = 1 - u;
-
-			for (int j = 0; j < numWorkloadClasses; j++) {
-				output.set(j, getServiceDemand(i, j, currentState) / u1);
+		final Vector currentUtilization = vector(numResources, new VectorInitializer() {		
+			@Override
+			public double cell(int row) {
+				return calculateUtilization(row, currentState, currentThroughput);
 			}
-			output.set(numWorkloadClasses + i, u);
-		}
-
-		return output;
+		});
+		
+		final Vector currentResponseTimes = vector(numWorkloadClasses, new VectorInitializer() {			
+			@Override
+			public double cell(int row) {
+				double sumRT = 0.0;
+				for (int i = 0; i < numResources; i++) {
+					sumRT += getServiceDemand(i, row, currentState) / (1 - currentUtilization.get(i));
+				}
+				return sumRT;
+			}
+		});
+		
+		return vector(currentResponseTimes, currentUtilization);
 	}
 
 	@Override
-	public void calculateJacobi(Vector currentState, Vector...additionalInformation) {
+	public void calculateJacobi(final Vector currentState, final Vector...additionalInformation) {
 		if (additionalInformation.length < 1) {
 			throw new IllegalArgumentException("Throughput information is missing.");
 		}
 		
-		Vector currentThroughput = additionalInformation[0];		
+		final Vector currentThroughput = additionalInformation[0];
 		
-		Matrix jacobi = Matrix.create(numResources + numWorkloadClasses, numResources * numWorkloadClasses);
-		for (int focusedResource = 0; focusedResource < numResources; focusedResource++) {
-			double u = calculateUtilization(focusedResource, currentState, currentThroughput);
-
-			double u1 = 1 - u;
-			double u2 = u1 * u1;
-
-			for (int cls1 = 0; cls1 < numWorkloadClasses; cls1++) {
-				for (int cls2 = 0; cls2 < numWorkloadClasses; cls2++) {
+		final Vector currentUtilization = vector(numResources, new VectorInitializer() {		
+			@Override
+			public double cell(int row) {
+				return calculateUtilization(row, currentState, currentThroughput);
+			}
+		});
+		
+		Matrix jacobi = matrix(numResources + numWorkloadClasses, numResources * numWorkloadClasses, new MatrixInitializer() {			
+			@Override
+			public double cell(int row, int column) {
+				int res1 = row - numWorkloadClasses;
+				int cls1 = row;				
+				int res2 = column / numWorkloadClasses;
+				int cls2 = column % numWorkloadClasses;
+				
+				if (row < numWorkloadClasses) {				
+					double u = currentUtilization.get(res2);
+					double u1 = 1 - u;
+					double u2 = u1 * u1;
+					
 					double R = 0.0;
 					for (int res = 0; res < numResources; res++) {
 						double lambda = currentThroughput.get(cls2);
 						double D = getServiceDemand(res, cls1, currentState);
 						int P = numProcessors[res];
 
-						if ((res == focusedResource) && (cls1 == cls2)) {
+						if ((res == res2) && (cls1 == cls2)) {
 							R += (u1 + lambda * D / P) / u2;
 						} else {
 							R += (lambda * D / P) / u2;
 						}
 					}
-
-					int row = cls1;
-					int col = focusedResource * numWorkloadClasses + cls2;
-
-					jacobi.set(row, col, R);
-				}
-			}
-
-			for (int res = 0; res < numResources; res++) {
-				for (int cls = 0; cls < numWorkloadClasses; cls++) {
-
-					int row = numWorkloadClasses + res;
-					int col = focusedResource * numWorkloadClasses + cls;
-
-					if (res == focusedResource) {
-						jacobi.set(row, col, currentThroughput.get(cls) / numProcessors[res]);
+					return R;					
+				} else {
+					if (res1 == res2) {
+						return currentThroughput.get(cls2) / numProcessors[res1];
 					} else {
-						jacobi.set(row, col, 0);
+						return 0;
 					}
-				}
+				}				
 			}
-		}
+		});
 		
 		setJacobi(jacobi);
 	}

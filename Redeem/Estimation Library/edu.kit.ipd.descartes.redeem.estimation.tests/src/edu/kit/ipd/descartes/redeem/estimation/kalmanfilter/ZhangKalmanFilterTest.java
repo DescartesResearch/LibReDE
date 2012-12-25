@@ -1,6 +1,8 @@
 package edu.kit.ipd.descartes.redeem.estimation.kalmanfilter;
 
 import static org.junit.Assert.*;
+import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Vector.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,25 +34,19 @@ public class ZhangKalmanFilterTest {
 	public void testFilter1WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
 		
-		Matrix demands = Matrix.create(1, 1);
-		demands.set(0, 0, 0.05);
+		Matrix demands = matrix(row(0.05));
 		generator.setDemands(demands);
 		
-		Vector stateNoiseCovariance = Vector.create(1);
-		stateNoiseCovariance.assign(1.0);
-		Matrix stateNoiseCoupling = Matrix.create(1, 1);
-		stateNoiseCoupling.assign(new double[][] {{1}});
+		Vector stateNoiseCovariance = vector(1.0);
+		Matrix stateNoiseCoupling = matrix(row(1));
 		ConstantStateModel stateModel = new ConstantStateModel(1, stateNoiseCovariance, stateNoiseCoupling);
 		
 		
-		Vector observeNoise = Vector.create(1);
-		observeNoise.assign(0.0001);
+		Vector observeNoise = vector(0.0001);
 		ZhangModel zhangModel = new ZhangModel(1, 1, new int[] { 1 }, observeNoise);
 		
-		Vector initialEstimate = Vector.create(1);
-		initialEstimate.assign(0.1);
-		Matrix initialCovariance = Matrix.create(1, 1);
-		initialCovariance.assign(new double[][] {{0.01}});
+		Vector initialEstimate = vector(0.1);
+		Matrix initialCovariance = matrix(row(0.01));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter(1, initialEstimate, initialCovariance);
 		
@@ -61,9 +57,9 @@ public class ZhangKalmanFilterTest {
 			
 			filter.predict(stateModel);
 			
-			Vector observation = Vector.create(2);
-			observation.set(0, ob.getMeanResponseTime().get(0));
-			observation.set(1, ob.getMeanUtilization().get(0));
+			Vector observation = vector(
+					ob.getMeanResponseTime().get(0), 
+					ob.getMeanUtilization().get(0));
 			
 			filter.observe(zhangModel, observation, ob.getMeanThroughput());
 			
@@ -73,7 +69,7 @@ public class ZhangKalmanFilterTest {
 			estimates[i] = vec.get(0);
 		}
 		
-		assertEquals(0.05, Descriptive.mean(new DoubleArrayList(estimates)), 0.0001);
+		assertEquals(1.05, Descriptive.mean(new DoubleArrayList(estimates)), 0.0001);
 	}
 
 }

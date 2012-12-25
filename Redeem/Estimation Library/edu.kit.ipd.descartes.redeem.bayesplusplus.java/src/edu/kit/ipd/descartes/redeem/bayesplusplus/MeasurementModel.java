@@ -1,5 +1,8 @@
 package edu.kit.ipd.descartes.redeem.bayesplusplus;
 
+import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Vector.*;
+
 import com.sun.jna.Pointer;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
@@ -17,13 +20,12 @@ public abstract class MeasurementModel {
 
 		@Override
 		public Pointer execute(Pointer x) {
-			Vector currentState = Vector.create(stateSize);
-			currentState.readFrom(new NativeDoubleStorage(x));
+			Vector currentState = vector(stateSize, new NativeDoubleStorage(x));
 			
 			Vector nextObservation = nextObservation(currentState, currentAdditionalInfo);
 			calculateJacobi(currentState, currentAdditionalInfo);
 			
-			nextObservation.writeTo(new NativeDoubleStorage(vecBuffer));			
+			nextObservation.toDoubleStorage(new NativeDoubleStorage(vecBuffer));			
 			return vecBuffer;
 		}
 		
@@ -44,7 +46,7 @@ public abstract class MeasurementModel {
 		nativeModel = BayesPlusPlusLibrary.INSTANCE.create_linrz_uncorrelated_observe_model(stateSize, observationSize, new HFunction());
 		
 		Pointer buffer = NativeHelper.allocateDoubleArray(observationSize);
-		observeNoiseCovariance.writeTo(new NativeDoubleStorage(buffer));
+		observeNoiseCovariance.toDoubleStorage(new NativeDoubleStorage(buffer));
 		BayesPlusPlusLibrary.INSTANCE.set_Zv(nativeModel, buffer, observationSize);
 	}	
 
@@ -65,7 +67,7 @@ public abstract class MeasurementModel {
 	}
 	
 	public void setJacobi(Matrix jacobi) {
-		jacobi.writeTo(new NativeDoubleStorage(matBuffer));
+		jacobi.toDoubleStorage(new NativeDoubleStorage(matBuffer));
 		BayesPlusPlusLibrary.INSTANCE.set_Hx(nativeModel, matBuffer, stateSize, observationSize);
 	}
 	

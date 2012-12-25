@@ -1,5 +1,8 @@
 package edu.kit.ipd.descartes.redeem.bayesplusplus;
 
+import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Vector.*;
+
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 
@@ -20,9 +23,9 @@ public class ExtendedKalmanFilter {
 		nativeScheme = BayesPlusPlusLibrary.INSTANCE.create_covariance_scheme(stateSize);
 		
 		stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
-		initialState.writeTo(new NativeDoubleStorage(stateBuffer));
+		initialState.toDoubleStorage(new NativeDoubleStorage(stateBuffer));
 		Pointer matBuffer = NativeHelper.allocateDoubleArray(stateSize*stateSize);
-		initialCovariance.writeTo(new NativeDoubleStorage(matBuffer));
+		initialCovariance.toDoubleStorage(new NativeDoubleStorage(matBuffer));
 		
 		BayesPlusPlusLibrary.INSTANCE.init_kalman(nativeScheme, stateBuffer, matBuffer, stateSize);		
 	}
@@ -34,20 +37,18 @@ public class ExtendedKalmanFilter {
 	public void observe(MeasurementModel measurementModel, Vector observation, Vector...additionalInfo) {
 		measurementModel.setAdditionalInformation(additionalInfo);
 		
-		Pointer buffer = NativeHelper.allocateDoubleArray(observation.rowCount());
-		observation.writeTo(new NativeDoubleStorage(buffer));
-		BayesPlusPlusLibrary.INSTANCE.observe(nativeScheme, measurementModel.getNativeModel(), buffer, observation.rowCount());
+		Pointer buffer = NativeHelper.allocateDoubleArray(observation.rows());
+		observation.toDoubleStorage(new NativeDoubleStorage(buffer));
+		BayesPlusPlusLibrary.INSTANCE.observe(nativeScheme, measurementModel.getNativeModel(), buffer, observation.rows());
 	}
 	
 	public void update() {
 		BayesPlusPlusLibrary.INSTANCE.update(nativeScheme);
 	}
 	
-	public Vector getCurrentEstimate() {
-		Vector estimate = Vector.create(stateSize);		
+	public Vector getCurrentEstimate() {		
 		BayesPlusPlusLibrary.INSTANCE.get_x(nativeScheme, stateBuffer);
-		estimate.readFrom(new NativeDoubleStorage(stateBuffer));
-		return estimate;
+		return vector(stateSize, new NativeDoubleStorage(stateBuffer));
 	}
 	
 	public void dispose() {

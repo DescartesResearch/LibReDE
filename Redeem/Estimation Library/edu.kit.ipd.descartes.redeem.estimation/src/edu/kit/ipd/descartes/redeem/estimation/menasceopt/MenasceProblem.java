@@ -11,29 +11,29 @@ public class MenasceProblem {
 	
 	private double f(Matrix x, int r) {
 		double sum = 0.0;
-		for (int i = 0; i < x.rowCount(); i++) {			
-			sum += x.get(i, r) / x.rowVector(i).multiply(throughput);
+		for (int i = 0; i < x.rows(); i++) {			
+			sum += x.get(i, r) / x.row(i).multipliedBy(throughput);
 		}		
 		double diff = measuredRespTimes.get(r) - sum;
 		return diff*diff;
 	}
 	
 	private double dev(Matrix x, int r) {
-		double[] sigma = new double[x.rowCount()];
-		double[] sigmaSqr = new double[x.rowCount()];
+		double[] sigma = new double[x.rows()];
+		double[] sigmaSqr = new double[x.rows()];
 		
 		for (int i = 0; i < sigma.length; i++) {
-			sigma[i] = x.rowVector(i).multiply(throughput);
+			sigma[i] = x.row(i).multipliedBy(throughput);
 			sigmaSqr[i] = sigma[i] * sigma[i];
 		}
 		
 		double alpha = measuredRespTimes.get(r);
-		for (int i = 0; i < x.rowCount(); i++) {
+		for (int i = 0; i < x.rows(); i++) {
 			alpha -= x.get(i, r) / sigma[i];
 		}
 		
-		for (int i = 0; i < x.rowCount(); i++) {
-			for (int j = 0; j < x.columnCount(); j++) {
+		for (int i = 0; i < x.rows(); i++) {
+			for (int j = 0; j < x.columns(); j++) {
 				if (j == r) {
 					double result = x.get(i, r)	* throughput.get(j)	/ sigmaSqr[i] + 1 / sigma[i];		
 				} else {
@@ -46,12 +46,12 @@ public class MenasceProblem {
 	}
 	
 	private double dev2(Matrix x, int r) {
-		double[] sigma = new double[x.rowCount()];
-		double[] sigma2 = new double[x.rowCount()];
-		double[] sigma3 = new double[x.rowCount()];
+		double[] sigma = new double[x.rows()];
+		double[] sigma2 = new double[x.rows()];
+		double[] sigma3 = new double[x.rows()];
 		
-		for (int i = 0; i < x.rowCount(); i++) {
-			for (int j = 0; j < x.columnCount(); j++) {
+		for (int i = 0; i < x.rows(); i++) {
+			for (int j = 0; j < x.columns(); j++) {
 				for (int k = 0; k <= i; k++) {
 					for (int l = 0; l <= j; l++) {
 						if (i == k) {
@@ -66,7 +66,7 @@ public class MenasceProblem {
 					}
 				}				
 			}
-			sigma[i] = x.rowVector(i).multiply(throughput);
+			sigma[i] = x.row(i).multipliedBy(throughput);
 			sigma2[i] = sigma[i] * sigma[i];
 			sigma3[i] = sigma2[i] * sigma[i];
 		}

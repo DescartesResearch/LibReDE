@@ -1,9 +1,13 @@
 package edu.kit.ipd.descartes.redeem.estimation.testutils;
 
+import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Vector.*;
+
 import java.util.Random;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.linalg.VectorInitializer;
 
 public class ObservationDataGenerator {
 	
@@ -53,60 +57,67 @@ public class ObservationDataGenerator {
 	}
 
 	public void setDemands(Matrix demands) {
-		if (demands.rowCount() != numWorkloadClasses) {
+		if (demands.rows() != numWorkloadClasses) {
 			throw new IllegalArgumentException("Row count of demands does not match number of workload classes.");
 		}
-		if (demands.columnCount() != numResources) {
+		if (demands.columns() != numResources) {
 			throw new IllegalArgumentException("Column count of demands does not match number of resources.");
 		}
 		this.demands = demands;
 	}
 	
 	public Observation nextObservation() {		
-		Vector wheights = Vector.create(numWorkloadClasses);
-		for (int i = 0; i < numWorkloadClasses; i++) {
-			wheights.set(i, 1.0 - randWheights.nextDouble() * workloadMixVariation);
-		}
-		double totalWheight = wheights.sum();
-		wheights.mapMultiplyToSelf(totalWheight);
-		
-		Vector weightedTotalDemand = Vector.create(numResources);
-		int bottleneckResource = -1;
-		double maxWeightedDemand = 0.0;
-		
-		for (int r = 0; r < numResources; r++) {
-			double demand = wheights.multiply(demands.columnVector(r));
-			weightedTotalDemand.set(r, demand);
-			if (demand > maxWeightedDemand) {
-				maxWeightedDemand = demand;
-				bottleneckResource = r;
-			}			
-		}
-		
-		double maxUtil = randUtil.nextDouble() * (upperUtilizationBound - lowerUtilizationBound) + lowerUtilizationBound;
-		
-		double totalThroughput = maxUtil / weightedTotalDemand.get(bottleneckResource);		
-		Vector throughput = Vector.create(numWorkloadClasses);		
-		for (int i = 0; i < numWorkloadClasses; i++) {			
-			throughput.set(i, totalThroughput * wheights.get(i));
-		}		
-		
-		Vector utilization = Vector.create(numResources);
-		utilization.set(bottleneckResource, maxUtil);
-		for (int r = 0; r < numResources; r++) {
-			if (r != bottleneckResource) {
-				utilization.set(r, throughput.multiply(demands.columnVector(r)));
+		Vector absoluteWheights = vector(numWorkloadClasses, new VectorInitializer() {			
+			@Override 
+			public double cell(int row) {
+				return 1.0 - randWheights.nextDouble() * workloadMixVariation;
 			}
-		}
+		});
+				
+		final Vector relativeWheights = absoluteWheights.times(sum(absoluteWheights));
+		
+		Vector weightedTotalDemand = vector(numResources, new VectorInitializer() {			
+			@Override
+			public double cell(int row) {
+				return relativeWheights.multipliedBy(demands.column(row));
+			}
+		});	
+		
+		final int bottleneckResource = max(weightedTotalDemand);
+		
+		final double maxUtil = randUtil.nextDouble() * (upperUtilizationBound - lowerUtilizationBound) + lowerUtilizationBound;
+		
+		final double totalThroughput = maxUtil / weightedTotalDemand.get(bottleneckResource);		
+		final Vector throughput = vector(numWorkloadClasses, new VectorInitializer() {
+			@Override
+			public double cell(int row) {
+				return totalThroughput * relativeWheights.get(row);
+			}
+			
+		});		
+		
+		final Vector utilization = vector(numResources, new VectorInitializer() {			
+			@Override
+			public double cell(int row) {
+				if (row != bottleneckResource) {
+					return throughput.multipliedBy(demands.column(row));
+				} else {
+					return maxUtil;
+				}
+			}
+		});
 	
-		Vector responsetime = Vector.create(numWorkloadClasses);
-		for (int i = 0; i < numWorkloadClasses; i++) {
-			double sumRT = 0.0;
-			for (int r = 0; r < numResources; r++) {
-				sumRT += demands.get(i, r) / (1 - utilization.get(r));
+		final Vector responsetime = vector(numWorkloadClasses, new VectorInitializer() {
+			@Override
+			public double cell(int row) {
+				double sumRT = 0.0;
+				for (int r = 0; r < numResources; r++) {
+					sumRT += demands.get(row, r) / (1 - utilization.get(r));
+				}
+				return sumRT;
 			}
-			responsetime.set(i, sumRT);
-		}
+			
+		});
 		return new Observation(utilization, throughput, responsetime);
 	}
 

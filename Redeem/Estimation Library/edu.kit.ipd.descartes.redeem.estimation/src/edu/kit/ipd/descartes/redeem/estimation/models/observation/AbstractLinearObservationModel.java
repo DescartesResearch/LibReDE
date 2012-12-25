@@ -8,7 +8,7 @@ public abstract class AbstractLinearObservationModel extends
 	
 	@Override
 	public Vector getOutputVector(Vector state) {
-		return getInputMatrix().multiply(state);
+		return getInputMatrix().multipliedBy(state);
 	}
 	
 	@Override
