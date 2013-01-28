@@ -1,8 +1,10 @@
-package edu.kit.ipd.descartes.linalg;
+package edu.kit.ipd.descartes.linalg.testutil;
 
 import org.fest.assertions.api.AbstractAssert;
 import org.fest.assertions.api.Assertions;
 import org.fest.assertions.data.Offset;
+
+import edu.kit.ipd.descartes.linalg.Matrix;
 
 public class MatrixAssert extends AbstractAssert<MatrixAssert, Matrix> {
 

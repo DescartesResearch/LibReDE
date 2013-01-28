@@ -7,4 +7,5 @@ Fragment-Host: edu.kit.ipd.descartes.linalg;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit,
  org.fest.assertions;bundle-version="2.0.0",
- org.mockito;bundle-version="1.9.5"
+ org.mockito;bundle-version="1.9.5",
+ edu.kit.ipd.descartes.linalg.testutil;bundle-version="1.0.0"

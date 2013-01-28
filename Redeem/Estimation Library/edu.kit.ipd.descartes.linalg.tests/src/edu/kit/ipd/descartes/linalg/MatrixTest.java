@@ -1,11 +1,11 @@
 package edu.kit.ipd.descartes.linalg;
 
 import static edu.kit.ipd.descartes.linalg.Matrix.*;
-import static edu.kit.ipd.descartes.linalg.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.Vector.ones;
 import static edu.kit.ipd.descartes.linalg.Vector.vector;
 import static edu.kit.ipd.descartes.linalg.Vector.zeros;
-import static edu.kit.ipd.descartes.linalg.VectorAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static org.mockito.AdditionalMatchers.aryEq;

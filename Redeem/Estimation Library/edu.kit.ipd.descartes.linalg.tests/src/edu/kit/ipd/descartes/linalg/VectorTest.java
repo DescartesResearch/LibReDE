@@ -1,7 +1,7 @@
 package edu.kit.ipd.descartes.linalg;
 
 import static edu.kit.ipd.descartes.linalg.Vector.*;
-import static edu.kit.ipd.descartes.linalg.VectorAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static org.mockito.AdditionalMatchers.aryEq;

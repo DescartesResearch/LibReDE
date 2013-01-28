@@ -69,7 +69,7 @@ public class ZhangKalmanFilterTest {
 			estimates[i] = vec.get(0);
 		}
 		
-		assertEquals(1.05, Descriptive.mean(new DoubleArrayList(estimates)), 0.0001);
+		assertEquals(0.05, Descriptive.mean(new DoubleArrayList(estimates)), 0.0001);
 	}
 
 }

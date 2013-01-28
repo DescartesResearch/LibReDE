@@ -1,14 +1,15 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation;
 
-import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public interface IObservationModel {
 	
-	Vector getOutputVector(Vector state);
+	int getObservationSize();
 	
-	Matrix getJacobiMatrix(Vector state);
+	boolean nextObservation();
 	
-	Matrix[] getHessianMatrices(Vector state);
+	Vector getObservedOutputVector();
+	
+	Vector getCalculatedOutputVector(Vector state);
 
 }

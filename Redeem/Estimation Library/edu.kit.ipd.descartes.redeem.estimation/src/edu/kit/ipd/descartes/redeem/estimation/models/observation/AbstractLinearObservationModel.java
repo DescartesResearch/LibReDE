@@ -2,12 +2,13 @@ package edu.kit.ipd.descartes.redeem.estimation.models.observation;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.models.IJacobiMatrix;
 
 public abstract class AbstractLinearObservationModel extends
-		AbstractObservationModel implements ILinearObservationModel {
+		AbstractObservationModel implements ILinearObservationModel, IJacobiMatrix {
 	
 	@Override
-	public Vector getOutputVector(Vector state) {
+	public Vector getCalculatedOutputVector(Vector state) {
 		return getInputMatrix().multipliedBy(state);
 	}
 	
@@ -16,9 +17,4 @@ public abstract class AbstractLinearObservationModel extends
 		return getInputMatrix();
 	}
 	
-	@Override
-	public Matrix[] getHessianMatrices(Vector state) {
-		return null;
-	}
-
 }
