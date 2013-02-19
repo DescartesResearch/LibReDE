@@ -1,12 +1,25 @@
 package edu.kit.ipd.descartes.redeem.nnls;
 
+import static edu.kit.ipd.descartes.linalg.Matrix.matrix;
+import static edu.kit.ipd.descartes.linalg.Matrix.row;
+import static edu.kit.ipd.descartes.linalg.Vector.vector;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
+
 import com.sun.jna.Memory;
 import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
+
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.bayesplusplus.MeasurementModel;
+import edu.kit.ipd.descartes.redeem.bayesplusplus.StateModel;
+import edu.kit.ipd.descartes.redeem.estimation.models.IJacobiMatrix;
+import edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm;
+import edu.kit.ipd.descartes.redeem.estimation.models.observation.ILinearObservationModel;
+import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;
+import edu.kit.ipd.descartes.redeem.estimation.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
 import edu.kit.ipd.descartes.redeem.nnls.backend.NNLSLibrary;
 
 /**
@@ -15,13 +28,22 @@ import edu.kit.ipd.descartes.redeem.nnls.backend.NNLSLibrary;
  * @author Mehran Saliminia
  * 
  */
-public class LeastSquares {
+public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiMatrix, O extends ILinearObservationModel & IJacobiMatrix>
+		implements IEstimationAlgorithm<S, O> {
+
+	private S stateModel;
+	private O observationModel;
+
+	private Vector stateNoiseCovariance = vector(1.0);
+	private Matrix stateNoiseCoupling = matrix(row(1));
+
+	private Vector observeNoise = vector(0.0001);
 
 	private final int SIZE_OF_DOUBLE = 8;
 	private final int SIZE_OF_INT = 8;
 	private static final cern.colt.matrix.DoubleFactory2D Factory2D = cern.colt.matrix.DoubleFactory2D.dense;
 
-	public LeastSquares() {
+	public LeastSquaresRegression() {
 
 	}
 
@@ -98,8 +120,10 @@ public class LeastSquares {
 			Memory w = new Memory(SIZE_OF_DOUBLE * n.getValue());
 			Memory zz = new Memory(SIZE_OF_DOUBLE * m.getValue());
 			Memory index = new Memory(SIZE_OF_INT * n.getValue());
+
 			NNLSLibrary.INSTANCE.nnls_(a, mda, m, n, b, x, rnorm, w, zz, index,
 					mode);
+
 			double[] res = new double[n.getValue()];
 			x.read(0, res, 0, res.length);
 			result = Vector.vector(res);
@@ -111,4 +135,73 @@ public class LeastSquares {
 		}
 	}
 
+	public void runEstimation() {
+
+		StateModelWrapper<S> stateModelWrapper = new StateModelWrapper<S>(
+				stateModel, stateNoiseCovariance, stateNoiseCoupling);
+		ObservationModelWrapper<O> obModelWrapper = new ObservationModelWrapper<O>(
+				observationModel, stateModel.getStateSize(), observeNoise);
+
+		while (true) {
+			 Vector estimation = predict(observationModel); //TODO: save estimates
+
+			if (!observationModel.nextObservation()) {
+				break;
+			}
+		}
+	}
+
+	private Vector predict(ILinearObservationModel model) {
+		Vector result = this.nnls(model.getInputMatrix(),
+				model.getObservedOutputVector());
+		return result;
+	}
+
+	private static class StateModelWrapper<S extends IStateModel & IJacobiMatrix>
+			extends StateModel {
+
+		private S model;
+
+		public StateModelWrapper(S model, Vector stateNoiseCovariance,
+				Matrix stateNoiseCoupling) {
+			super(model.getStateSize(), stateNoiseCovariance,
+					stateNoiseCoupling);
+			this.model = model;
+		}
+
+		@Override
+		public Vector nextState(Vector currentState) {
+			return model.getNextState(currentState);
+		}
+
+		@Override
+		public void calculateJacobi(Vector currentState) {
+			setJacobi(model.getJacobiMatrix(currentState));
+		}
+	}
+
+	private static class ObservationModelWrapper<O extends IObservationModel & IJacobiMatrix>
+			extends MeasurementModel {
+
+		private O model;
+
+		public ObservationModelWrapper(O model, int stateSize,
+				Vector observeNoiseCovariance) {
+			super(stateSize, model.getObservationSize(), observeNoiseCovariance);
+			this.model = model;
+		}
+
+		@Override
+		public Vector nextObservation(Vector currentState,
+				Vector... additionalInfo) {
+			return model.getCalculatedOutputVector(currentState);
+		}
+
+		@Override
+		public void calculateJacobi(Vector currentState,
+				Vector... additionalInfo) {
+			setJacobi(model.getJacobiMatrix(currentState));
+		}
+
+	}
 }
