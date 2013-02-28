@@ -36,25 +36,9 @@ public class UtilizationLawModel extends AbstractLinearObservationModel {
 			eos = eos || utilization[i].nextSample();
 		}
 		// update input matrix
-		double[][] values;
-		if (throughput.nextSample()) {
-			eos = true;
-			double[] currentThroughput = throughput.getCurrentSample()
-					.toArray();
-			int rows = 1, columns = currentThroughput.length;
-			// copy previous samples from input matrix
-			if (inputMatrix != null) {
-				rows = inputMatrix.rows() + 1;
-				values = new double[rows][columns];
-				for (int i = 0; i < inputMatrix.rows(); ++i) {
-					values[i] = inputMatrix.row(i).toArray();
-				}
-			} else
-				values = new double[rows][columns];
-			// add current sample to input matrix
-			values[rows - 1] = currentThroughput;
-			inputMatrix = Matrix.matrix(values);
-		}
+		if (throughput.nextSample())
+			inputMatrix.appendRow(Vector.vector(throughput.getCurrentSample()
+					.toArray()));
 		return eos;
 	}
 
