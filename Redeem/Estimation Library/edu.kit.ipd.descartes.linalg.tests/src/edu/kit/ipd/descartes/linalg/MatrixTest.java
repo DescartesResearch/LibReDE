@@ -60,6 +60,16 @@ public class MatrixTest {
 	}
 	
 	@Test
+	public void testAppendRow() {
+		Matrix a=Matrix.matrix(A);
+		int rows=a.rows();
+		double[] row={9,23,4};
+		Vector v=Vector.vector(row);
+		a.appendRow(v);
+		assertThat(v).isEqualTo(vector(a.row(rows)), offset(1e-9));
+	}
+	
+	@Test
 	public void testOnesCreate() {
 		Matrix c = ones(2 ,3);
 		assertThat(c).isEqualTo(matrix(row(1, 1, 1), row(1, 1, 1)), offset(1e-9));
