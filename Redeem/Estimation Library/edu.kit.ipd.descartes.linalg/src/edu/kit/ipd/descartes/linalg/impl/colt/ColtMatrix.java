@@ -123,6 +123,21 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
+	public Matrix appendRow(Vector row) {
+		double[][] newRow = new double[1][row.rows()];
+		newRow[0]= row.toArray();
+		double[][] matrix = content.toArray();
+		// append two arrays
+		double[][] values = new double[matrix.length + newRow.length][];
+		System.arraycopy(matrix, 0, values, 0, matrix.length);
+		System.arraycopy(newRow, 0, values, matrix.length, newRow.length);
+
+		content = new FlatArrayMatrix(content.rows() + 1, content.columns());
+		content.assign(values);
+		return new ColtMatrix(content);
+	}
+
+	@Override
 	public Matrix plus(Matrix a) {
 		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
 		res.assign(((ColtMatrix) a).content, Functions.plus);

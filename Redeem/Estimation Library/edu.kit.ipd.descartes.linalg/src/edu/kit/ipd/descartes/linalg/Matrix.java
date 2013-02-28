@@ -92,6 +92,8 @@ public abstract class Matrix {
 	public abstract Vector row(int row);
 
 	public abstract Vector column(int column);
+	
+	public abstract Matrix appendRow(Vector row);
 
 	/*
 	 * Algebra functions
