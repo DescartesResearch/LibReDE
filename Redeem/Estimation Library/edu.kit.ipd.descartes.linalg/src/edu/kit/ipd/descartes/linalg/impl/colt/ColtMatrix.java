@@ -52,6 +52,10 @@ public class ColtMatrix extends Matrix {
 		public DoubleMatrix2D like(int rows, int columns) {
 			return new FlatArrayMatrix(rows, columns);
 		}
+		
+		public double[] getElements() {
+			return elements;
+		}
 	}
 
 	protected FlatArrayMatrix content;
@@ -113,20 +117,13 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
-	public double[][] toArray() {
+	public double[][] toArray2D() {
 		return content.toArray();
 	}
 
 	@Override
 	public void toDoubleStorage(DoubleStorage storage) {
 		content.writeTo(storage);
-	}
-
-	@Override
-	public Matrix plus(Matrix a) {
-		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
-		res.assign(((ColtMatrix) a).content, Functions.plus);
-		return new ColtMatrix(res);
 	}
 
 	@Override
@@ -141,13 +138,6 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
-	public Matrix minus(Matrix a) {
-		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
-		res.assign(((ColtMatrix) a).content, Functions.minus);
-		return new ColtMatrix(res);
-	}
-
-	@Override
 	public Matrix minus(double a) {
 		ColtMatrix result = new ColtMatrix(this.rows(), this.columns());
 		for (int i = 0; i < content.rows(); i++) {
@@ -156,20 +146,6 @@ public class ColtMatrix extends Matrix {
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public Matrix multipliedBy(Matrix a) {
-		FlatArrayMatrix result = new FlatArrayMatrix(this.rows(), a.columns());
-		this.content.zMult(((ColtMatrix) a).content, result);
-		return new ColtMatrix(result);
-	}
-
-	@Override
-	public Vector multipliedBy(Vector a) {
-		FlatArrayVector result = new FlatArrayVector(this.rows());
-		this.content.zMult(((ColtVector) a).content, result);
-		return new ColtVector(result);
 	}
 
 	@Override
@@ -228,39 +204,60 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
-	protected double det() {
-		return ALG.det(content);
-	}
-
-	@Override
-	protected Matrix inverse() {
-		DoubleMatrix2D inv = ALG.inverse(content); // Returns a matrix of the
-													// wrong type!
-		FlatArrayMatrix ret = new FlatArrayMatrix(inv.rows(), inv.columns());
-		ret.assign(inv);
-		return new ColtMatrix(ret);
-	}
-
-	@Override
-	protected double rank() {
-		return ALG.rank(content);
-	}
-
-	@Override
-	protected double trace() {
-		return ALG.trace(content);
-	}
-
-	@Override
 	protected Matrix transpose() {
-		return new ColtMatrix((FlatArrayMatrix) ALG.transpose(content));
+		if (content.rows() == 1) {
+			return this.row(0);
+		} else {
+			return new ColtMatrix((FlatArrayMatrix) ALG.transpose(content));
+		}
 	}
 
 	@Override
-	protected Matrix pow(int p) {
-		DoubleMatrix2D a = content.copy(); // In contrast to the documentation
-											// pow alters its first argument
-		return new ColtMatrix((FlatArrayMatrix) ALG.pow(a, p));
+	protected Matrix internalPlus(Matrix a) {
+		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
+		res.assign(getMatrixContent(a), Functions.plus);
+		return new ColtMatrix(res);
+	}
+
+	@Override
+	protected Matrix internalMinus(Matrix a) {
+		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
+		res.assign(getMatrixContent(a), Functions.minus);
+		return new ColtMatrix(res);
+	}
+
+	@Override
+	protected Matrix internalMatrixMultiply(Matrix a) {
+		if (a.isVector()) {
+			FlatArrayVector result = new FlatArrayVector(this.rows());
+			this.content.zMult(getVectorContent(a), result);
+			return new ColtVector(result);
+		} else {
+			FlatArrayMatrix result = new FlatArrayMatrix(this.rows(), a.columns());
+			this.content.zMult(getMatrixContent(a), result);
+			return new ColtMatrix(result);
+		}		
+	}
+
+	@Override
+	public double[] toArray1D() {
+		return content.getElements();
+	}
+	
+	private FlatArrayMatrix getMatrixContent(Matrix a) {
+		if (a instanceof ColtMatrix) {
+			return ((ColtMatrix)a).content;
+		} else {
+			return new FlatArrayMatrix(a.toArray2D());
+		}
+	}
+	
+	private FlatArrayVector getVectorContent(Matrix a) {
+		if (a instanceof ColtVector) {
+			return ((ColtVector)a).content;
+		} else {
+			return new FlatArrayVector(a.toArray1D());
+		}
 	}
 
 }

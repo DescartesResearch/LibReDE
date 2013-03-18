@@ -4,14 +4,28 @@ import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public interface MatrixFactory {
 
-	Matrix create(double[][] values);
+	Matrix createMatrix(double[][] values);
 
-	Matrix create(int rows, int columns);
+	Matrix createMatrix(int rows, int columns);
 
-	Matrix create(int rows, int columns, double fill);
+	Matrix createMatrix(int rows, int columns, double fill);
 
-	Matrix create(int rows, int columns, DoubleStorage storage);
+	Matrix createMatrix(int rows, int columns, DoubleStorage storage);
 
-	Matrix create(int rows, int columns, MatrixInitializer init);
+	Matrix createMatrix(int rows, int columns, MatrixInitializer init);
+	
+	SquareMatrix createSquareMatrix(Matrix wrapped);
+	
+	Vector createVector(int rows);
+
+	Vector createVector(double[] values);
+
+	Vector createVector(int rows, double fill);
+
+	Vector createVector(int rows, DoubleStorage storage);
+
+	Vector createVector(int rows, VectorInitializer init);
+
+	Vector createVector(Vector[] vectors);
 
 }

@@ -5,8 +5,10 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
+import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorInitializer;
+import edu.kit.ipd.descartes.linalg.impl.colt.ColtMatrix.FlatArrayMatrix;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class ColtVector extends Vector {
@@ -17,6 +19,10 @@ public class ColtVector extends Vector {
 
 		public FlatArrayVector(int rows) {
 			super(rows);
+		}
+		
+		public FlatArrayVector(double[] elements) {
+			super(elements);
 		}
 
 		public FlatArrayVector(int size, double[] elements, int zero, int stride) {
@@ -84,8 +90,12 @@ public class ColtVector extends Vector {
 		int offset = 0;
 		for (int i = 0; i < vectors.length; i++) {
 			int len = vectors[i].rows();
-			content.viewPart(offset, len).assign(
+			if (vectors[i] instanceof ColtVector) {
+				content.viewPart(offset, len).assign(
 					((ColtVector) vectors[i]).content);
+			} else {
+				content.viewPart(offset, len).assign(vectors[i].toArray1D());
+			}
 			offset += len;
 		}
 	}
@@ -101,26 +111,12 @@ public class ColtVector extends Vector {
 	}
 
 	@Override
-	public Vector plus(Vector a) {
-		FlatArrayVector res = (FlatArrayVector) content.copy();
-		res.assign(((ColtVector) a).content, Functions.plus);
-		return new ColtVector(res);
-	}
-
-	@Override
 	public Vector plus(double d) {
 		ColtVector result = new ColtVector(this.rows());
 		for (int i = 0; i < content.size(); i++) {
 			result.content.setQuick(i, content.getQuick(i) + d);
 		}
 		return result;
-	}
-
-	@Override
-	public Vector minus(Vector a) {
-		FlatArrayVector res = (FlatArrayVector) content.copy();
-		res.assign(((ColtVector) a).content, Functions.minus);
-		return new ColtVector(res);
 	}
 
 	@Override
@@ -133,7 +129,7 @@ public class ColtVector extends Vector {
 	}
 
 	@Override
-	public double multipliedBy(Vector b) {
+	public double dot(Vector b) {
 		return content.zDotProduct(((ColtVector) b).content);
 	}
 
@@ -171,7 +167,7 @@ public class ColtVector extends Vector {
 	}
 
 	@Override
-	public double[] toArray() {
+	public double[] toArray1D() {
 		return content.toArray();
 	}
 
@@ -192,5 +188,38 @@ public class ColtVector extends Vector {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	protected Matrix internalPlus(Matrix a) {
+		FlatArrayVector res = (FlatArrayVector) content.copy();
+		res.assign(getVectorContent(a), Functions.plus);
+		return new ColtVector(res);
+	}
+
+	@Override
+	protected Matrix internalMinus(Matrix a) {
+		FlatArrayVector res = (FlatArrayVector) content.copy();
+		res.assign(getVectorContent(a), Functions.minus);
+		return new ColtVector(res);
+	}
+
+	@Override
+	protected Matrix internalMatrixMultiply(Matrix a) {
+		if (a.rows() == 1) {
+			FlatArrayVector vector = new FlatArrayVector(a.toArray1D());			
+			FlatArrayMatrix result = (FlatArrayMatrix)ALG.multOuter(this.content, vector, null);
+			return new ColtMatrix(result);			
+		} else {
+			throw new IllegalArgumentException("Dimensions of operands do not match.");
+		}
+	}
+	
+	private FlatArrayVector getVectorContent(Matrix a) {
+		if (a instanceof ColtVector) {
+			return ((ColtVector)a).content;
+		} else {
+			return new FlatArrayVector(a.toArray1D());
+		}
 	}
 }

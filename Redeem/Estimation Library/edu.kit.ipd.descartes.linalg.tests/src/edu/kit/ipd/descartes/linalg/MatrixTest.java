@@ -1,9 +1,16 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.Matrix.abs;
+import static edu.kit.ipd.descartes.linalg.Matrix.matrix;
+import static edu.kit.ipd.descartes.linalg.Matrix.norm1;
+import static edu.kit.ipd.descartes.linalg.Matrix.norm2;
+import static edu.kit.ipd.descartes.linalg.Matrix.ones;
+import static edu.kit.ipd.descartes.linalg.Matrix.row;
+import static edu.kit.ipd.descartes.linalg.Matrix.sum;
+import static edu.kit.ipd.descartes.linalg.Matrix.transpose;
+import static edu.kit.ipd.descartes.linalg.Matrix.zeros;
 import static edu.kit.ipd.descartes.linalg.Vector.ones;
 import static edu.kit.ipd.descartes.linalg.Vector.vector;
-import static edu.kit.ipd.descartes.linalg.Vector.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -26,10 +33,10 @@ public class MatrixTest {
 	private static final double[][] A = new double[][] {{1, 2, 3}, {4, 5, 6}};
 	private static final double[][] B = new double[][] {{1, 4,  9}, {16, 25, 36}};
 	private static final double[][] B_TRANS = new double[][] {{1, 16}, {4, 25}, {9, 36}};
-	private static final double[][] SQUARE = new double[][] {{1,2,0}, {2,3,0}, {3,4,1}};
+
 	private static final double[] V = new double[] {1, 4, 9};
 	
-	private Matrix a, b, b_trans, square;
+	private Matrix a, b, b_trans;
 	private Vector v;
 
 	@Before
@@ -37,7 +44,6 @@ public class MatrixTest {
 		a = matrix(A);		
 		b = matrix(B);		
 		b_trans = matrix(B_TRANS);	
-		square = matrix(SQUARE);
 		v = vector(V);
 	}
 
@@ -191,16 +197,6 @@ public class MatrixTest {
 		assertThat(a).isEqualTo(matrix(A), offset(1e-9));
 	}
 
-	@Test
-	public void testMultiplyVector() {
-		Vector c = a.multipliedBy(v);
-		assertThat(c).isEqualTo(vector(A[0][0] * V[0] + A[0][1] * V[1] + A[0][2] * V[2], 
-									A[1][0] * V[0] + A[1][1] * V[1] + A[1][2] * V[2]
-								), offset(1e-9));
-		assertThat(a).isEqualTo(matrix(A), offset(1e-9));
-		assertThat(v).isEqualTo(vector(V), offset(1e-9));
-	}
-	
 	@Test(expected=IllegalArgumentException.class)
 	public void testMultiplyVectorWrongDimensions() {
 		Vector d = ones(2);
@@ -265,37 +261,6 @@ public class MatrixTest {
 		assertThat(b_trans).isEqualTo(matrix(B_TRANS), offset(1e-9));
 	}
 	
-	@Test
-	public void testDet() {
-		double c = det(square);
-		assertThat(c).isEqualTo(-1.0 /*Matlab: det(SQUARE)*/, offset(1e-9));
-		assertThat(square).isEqualTo(matrix(SQUARE), offset(1e-9));
-	}
-	
-	@Test
-	public void testInverse() {
-		Matrix c = inverse(square);
-		assertThat(c).isEqualTo(matrix(
-							row(-3.0, 2.0, 0),
-						    row(2.0, -1.0, 0),
-						    row(1.0, -2.0, 1.0)
-			    		)/*Matlab: inv(SQUARE)*/, offset(1e6));
-		assertThat(square).isEqualTo(matrix(SQUARE), offset(1e-9));
-	}
-	
-	@Test
-	public void testRank() {
-		double c = rank(square);
-		assertThat(c).isEqualTo(3 /*Matlab: rank(SQUARE)*/, offset(1e-9));
-		assertThat(square).isEqualTo(matrix(SQUARE), offset(1e-9));
-	}
-	
-	@Test
-	public void testTrace() {
-		double c = trace(square);
-		assertThat(c).isEqualTo(5 /*Matlab: trace(SQUARE)*/, offset(1e-9));
-		assertThat(square).isEqualTo(matrix(SQUARE), offset(1e-9));
-	}
 	
 	@Test
 	public void testTranspose() {
@@ -304,15 +269,6 @@ public class MatrixTest {
 		assertThat(b).isEqualTo(matrix(B), offset(1e-9));
 	}
 	
-	@Test
-	public void testPow() {
-		Matrix c = pow(square, 3);
-		assertThat(c).isEqualTo(matrix(
-					 row(21, 34, 0),
-					 row(34, 55, 0),
-					 row(61, 98, 1)		
-				) /*Matlab SQUARE^3*/, offset(1e-9));
-		assertThat(square).isEqualTo(matrix(SQUARE), offset(1e-9));
-	}
+	
 
 }
