@@ -1,7 +1,6 @@
 package edu.kit.ipd.descartes.redeem.estimation.testutils;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.*;
-import static edu.kit.ipd.descartes.linalg.Vector.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 
 import java.util.Random;
 
@@ -79,7 +78,7 @@ public class ObservationDataGenerator {
 		Vector weightedTotalDemand = vector(numResources, new VectorInitializer() {			
 			@Override
 			public double cell(int row) {
-				return relativeWheights.multipliedBy(demands.column(row));
+				return relativeWheights.dot(demands.column(row));
 			}
 		});	
 		
@@ -100,7 +99,7 @@ public class ObservationDataGenerator {
 			@Override
 			public double cell(int row) {
 				if (row != bottleneckResource) {
-					return throughput.multipliedBy(demands.column(row));
+					return throughput.dot(demands.column(row));
 				} else {
 					return maxUtil;
 				}

@@ -1,9 +1,15 @@
 package edu.kit.ipd.descartes.redeem.estimation.system;
 
-public abstract class Resource extends IdentifiableEntity {
+
+public abstract class Resource implements IModelEntity {
 	
-	public Resource(String identifier) {
-		super(identifier);
+	private final String name;
+		
+	public Resource(String name) {
+		this.name = name;
 	}
 
+	public String getName() {
+		return name;
+	}
 }

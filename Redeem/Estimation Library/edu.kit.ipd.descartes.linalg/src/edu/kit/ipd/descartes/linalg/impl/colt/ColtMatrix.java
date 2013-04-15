@@ -1,5 +1,6 @@
 package edu.kit.ipd.descartes.linalg.impl.colt;
 
+import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -51,6 +52,10 @@ public class ColtMatrix extends Matrix {
 		@Override
 		public DoubleMatrix2D like(int rows, int columns) {
 			return new FlatArrayMatrix(rows, columns);
+		}
+		
+		public double[] getElements() {
+			return elements;
 		}
 	}
 
@@ -113,35 +118,13 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
-	public double[][] toArray() {
+	public double[][] toArray2D() {
 		return content.toArray();
 	}
 
 	@Override
 	public void toDoubleStorage(DoubleStorage storage) {
 		content.writeTo(storage);
-	}
-
-	@Override
-	public Matrix appendRow(Vector row) {
-		double[][] newRow = new double[1][row.rows()];
-		newRow[0]= row.toArray();
-		double[][] matrix = content.toArray();
-		// append two arrays
-		double[][] values = new double[matrix.length + newRow.length][];
-		System.arraycopy(matrix, 0, values, 0, matrix.length);
-		System.arraycopy(newRow, 0, values, matrix.length, newRow.length);
-
-		content = new FlatArrayMatrix(content.rows() + 1, content.columns());
-		content.assign(values);
-		return new ColtMatrix(content);
-	}
-
-	@Override
-	public Matrix plus(Matrix a) {
-		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
-		res.assign(((ColtMatrix) a).content, Functions.plus);
-		return new ColtMatrix(res);
 	}
 
 	@Override
@@ -156,13 +139,6 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
-	public Matrix minus(Matrix a) {
-		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
-		res.assign(((ColtMatrix) a).content, Functions.minus);
-		return new ColtMatrix(res);
-	}
-
-	@Override
 	public Matrix minus(double a) {
 		ColtMatrix result = new ColtMatrix(this.rows(), this.columns());
 		for (int i = 0; i < content.rows(); i++) {
@@ -171,20 +147,6 @@ public class ColtMatrix extends Matrix {
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public Matrix multipliedBy(Matrix a) {
-		FlatArrayMatrix result = new FlatArrayMatrix(this.rows(), a.columns());
-		this.content.zMult(((ColtMatrix) a).content, result);
-		return new ColtMatrix(result);
-	}
-
-	@Override
-	public Vector multipliedBy(Vector a) {
-		FlatArrayVector result = new FlatArrayVector(this.rows());
-		this.content.zMult(((ColtVector) a).content, result);
-		return new ColtVector(result);
 	}
 
 	@Override
@@ -243,39 +205,84 @@ public class ColtMatrix extends Matrix {
 	}
 
 	@Override
-	protected double det() {
-		return ALG.det(content);
-	}
-
-	@Override
-	protected Matrix inverse() {
-		DoubleMatrix2D inv = ALG.inverse(content); // Returns a matrix of the
-													// wrong type!
-		FlatArrayMatrix ret = new FlatArrayMatrix(inv.rows(), inv.columns());
-		ret.assign(inv);
-		return new ColtMatrix(ret);
-	}
-
-	@Override
-	protected double rank() {
-		return ALG.rank(content);
-	}
-
-	@Override
-	protected double trace() {
-		return ALG.trace(content);
-	}
-
-	@Override
 	protected Matrix transpose() {
-		return new ColtMatrix((FlatArrayMatrix) ALG.transpose(content));
+		if (content.rows() == 1) {
+			return this.row(0);
+		} else {
+			return new ColtMatrix((FlatArrayMatrix) ALG.transpose(content));
+		}
 	}
 
 	@Override
-	protected Matrix pow(int p) {
-		DoubleMatrix2D a = content.copy(); // In contrast to the documentation
-											// pow alters its first argument
-		return new ColtMatrix((FlatArrayMatrix) ALG.pow(a, p));
+	protected Matrix internalPlus(Matrix a) {
+		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
+		res.assign(getMatrixContent(a), Functions.plus);
+		return new ColtMatrix(res);
+	}
+
+	@Override
+	protected Matrix internalMinus(Matrix a) {
+		FlatArrayMatrix res = (FlatArrayMatrix) content.copy();
+		res.assign(getMatrixContent(a), Functions.minus);
+		return new ColtMatrix(res);
+	}
+
+	@Override
+	protected Matrix internalMatrixMultiply(Matrix a) {
+		if (a.isVector()) {
+			FlatArrayVector result = new FlatArrayVector(this.rows());
+			this.content.zMult(getVectorContent(a), result);
+			return new ColtVector(result);
+		} else {
+			FlatArrayMatrix result = new FlatArrayMatrix(this.rows(), a.columns());
+			this.content.zMult(getMatrixContent(a), result);
+			return new ColtMatrix(result);
+		}		
+	}
+
+	@Override
+	public double[] toArray1D() {
+		return content.getElements();
+	}
+	
+	private FlatArrayMatrix getMatrixContent(Matrix a) {
+		if (a instanceof ColtMatrix) {
+			return ((ColtMatrix)a).content;
+		} else {
+			return new FlatArrayMatrix(a.toArray2D());
+		}
+	}
+	
+	private FlatArrayVector getVectorContent(Matrix a) {
+		if (a instanceof ColtVector) {
+			return ((ColtVector)a).content;
+		} else {
+			return new FlatArrayVector(a.toArray1D());
+		}
+	}
+
+	@Override
+	protected Matrix appendRows(Matrix a) {
+		if (a.columns() != this.columns()) {
+			throw new IllegalArgumentException("Number of columns must be equal.");
+		}
+		
+		FlatArrayMatrix combined = new FlatArrayMatrix(this.rows() + a.rows(), this.columns());
+		combined.viewPart(0, 0, this.rows(), this.columns()).assign(this.content);
+		combined.viewPart(this.rows(), 0, a.rows(), a.columns()).assign(getMatrixContent(a));
+		return new ColtMatrix(combined);
+	}
+
+	@Override
+	protected Matrix appendColumns(Matrix a) {
+		if (a.rows() != this.rows()) {
+			throw new IllegalArgumentException("Number of rows must be equal.");
+		}
+		
+		FlatArrayMatrix combined = new FlatArrayMatrix(this.rows(), this.columns() + a.columns());
+		combined.viewPart(0, 0, this.rows(), this.columns()).assign(this.content);
+		combined.viewPart(0, this.columns(), a.rows(), a.columns()).assign(getMatrixContent(a));
+		return new ColtMatrix(combined);
 	}
 
 }

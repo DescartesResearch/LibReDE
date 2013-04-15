@@ -5,7 +5,7 @@ import com.sun.jna.Pointer;
 
 public interface Eval_F_CB extends Callback {
 
-	public boolean execute(int n, Pointer x, boolean new_x, Pointer obj_value,
+	public boolean eval_f(int n, Pointer x, boolean new_x, Pointer obj_value,
 			Pointer user_data);
 
 }

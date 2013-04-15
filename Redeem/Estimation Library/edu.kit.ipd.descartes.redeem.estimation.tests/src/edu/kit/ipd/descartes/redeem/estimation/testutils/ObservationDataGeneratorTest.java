@@ -1,6 +1,6 @@
 package edu.kit.ipd.descartes.redeem.estimation.testutils;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -120,14 +120,14 @@ public class ObservationDataGeneratorTest {
 	
 	private void assertObservation(Observation ob, Matrix demands) {
 		for (int r = 0; r < demands.columns(); r++) {
-			double util = demands.column(r).multipliedBy(ob.getMeanThroughput());
+			double util = demands.column(r).dot(ob.getMeanThroughput());
 			assertEquals(util, ob.getMeanUtilization().get(r), EPSILON);
 		}
 		
 		for (int i = 0; i < demands.rows(); i++) {
 			double sumRT = 0.0;
 			for (int r = 0; r < demands.columns(); r++) {
-				sumRT += demands.get(i, r) / (1 - demands.column(r).multipliedBy(ob.getMeanThroughput()));
+				sumRT += demands.get(i, r) / (1 - demands.column(r).dot(ob.getMeanThroughput()));
 			}
 			assertEquals(sumRT, ob.getMeanResponseTime().get(i), EPSILON);
 		}

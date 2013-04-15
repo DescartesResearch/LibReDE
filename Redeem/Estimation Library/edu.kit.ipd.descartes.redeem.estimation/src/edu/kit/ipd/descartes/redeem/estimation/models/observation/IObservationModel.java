@@ -1,15 +1,14 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation;
 
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction;
 
-public interface IObservationModel {
+public interface IObservationModel<E extends IOutputFunction, O extends Vector> extends Iterable<E> {
 	
-	int getObservationSize();
+	int getOutputSize();
 	
-	boolean nextObservation();
+	O getObservedOutput();
 	
-	Vector getObservedOutputVector();
+	O getCalculatedOutput(Vector state);
 	
-	Vector getCalculatedOutputVector(Vector state);
-
 }

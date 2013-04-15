@@ -5,6 +5,8 @@ Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.ipopt.java
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: edu.kit.ipd.descartes.redeem.ipopt.java.IpoptActivator
 Require-Bundle: org.eclipse.core.runtime,
- com.sun.jna;bundle-version="3.2.7"
+ edu.kit.ipd.descartes.redeem.estimation;bundle-version="1.0.0",
+ edu.kit.ipd.descartes.linalg;bundle-version="1.0.0",
+ edu.kit.ipd.descartes.redeem.nativehelper;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

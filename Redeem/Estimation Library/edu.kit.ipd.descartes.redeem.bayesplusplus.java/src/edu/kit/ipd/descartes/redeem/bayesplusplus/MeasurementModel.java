@@ -1,7 +1,6 @@
 package edu.kit.ipd.descartes.redeem.bayesplusplus;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.*;
-import static edu.kit.ipd.descartes.linalg.Vector.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 
 import com.sun.jna.Pointer;
 
@@ -9,8 +8,8 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.backend.BayesPlusPlusLibrary;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.backend.HCallback;
-import edu.kit.ipd.descartes.redeem.bayesplusplus.util.NativeDoubleStorage;
-import edu.kit.ipd.descartes.redeem.bayesplusplus.util.NativeHelper;
+import edu.kit.ipd.descartes.redeem.nativehelper.NativeDoubleStorage;
+import edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper;
 
 public abstract class MeasurementModel {
 	

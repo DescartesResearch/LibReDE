@@ -1,87 +1,8 @@
 package edu.kit.ipd.descartes.linalg;
 
-import edu.kit.ipd.descartes.linalg.impl.colt.ColtMatrixFactory;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public abstract class Matrix {
-
-	private static MatrixFactory factory = new ColtMatrixFactory();
-
-	public static Matrix zeros(int rows, int columns) {
-		return factory.create(rows, columns);
-	}
-
-	public static Matrix ones(int rows, int columns) {
-		return factory.create(rows, columns, 1);
-	}
-
-	public static Matrix identity(int size) {
-		return factory.create(size, size, new MatrixInitializer() {
-			@Override
-			public double cell(int row, int column) {
-				if (row == column) {
-					return 1.0;
-				}
-				return 0.0;
-			}
-		});
-	}
-
-	public static Matrix matrix(double[]... values) {
-		return factory.create(values);
-	}
-
-	public static Matrix matrix(int rows, int columns, MatrixInitializer init) {
-		return factory.create(rows, columns, init);
-	}
-
-	public static Matrix matrix(int rows, int columns, DoubleStorage storage) {
-		return factory.create(rows, columns, storage);
-	}
-
-	public static double[] row(double... values) {
-		return values;
-	}
-
-	public static Matrix abs(Matrix a) {
-		return a.abs();
-	}
-
-	public static double sum(Matrix a) {
-		return a.sum();
-	}
-
-	public static double norm1(Matrix a) {
-		return a.norm1();
-	}
-
-	public static double norm2(Matrix a) {
-		return a.norm2();
-	}
-
-	public static double det(Matrix a) {
-		return a.det();
-	}
-
-	public static Matrix inverse(Matrix a) {
-		return a.inverse();
-	}
-
-	public static double rank(Matrix a) {
-		return a.rank();
-	}
-
-	public static double trace(Matrix a) {
-		return a.trace();
-	}
-
-	public static Matrix transpose(Matrix a) {
-		return a.transpose();
-	}
-
-	public static Matrix pow(Matrix a, int p) {
-		return a.pow(p);
-	}
 
 	public abstract double get(int row, int col);
 
@@ -93,31 +14,61 @@ public abstract class Matrix {
 
 	public abstract Vector column(int column);
 	
-	public abstract Matrix appendRow(Vector row);
+	public boolean isVector() {
+		return false;
+	}
+	
+	public boolean isScalar() {
+		return false;
+	}
 
 	/*
 	 * Algebra functions
 	 */
 
-	public abstract Matrix plus(Matrix a);
+	public Matrix plus(Matrix a) {
+		if (a.isScalar() || a.isVector()) {
+			throw new IllegalArgumentException("Dimensions of operands do not match.");
+		} else {
+			return this.internalPlus(a);
+		}
+	}
 
 	public abstract Matrix plus(double a);
 
-	public abstract Matrix minus(Matrix a);
+	public Matrix minus(Matrix a) {
+		if (a.isScalar() || a.isVector()) {
+			throw new IllegalArgumentException("Dimensions of operands do not match.");
+		} else {
+			return this.internalMinus(a);
+		}
+	}
 
 	public abstract Matrix minus(double a);
 
-	public abstract Vector multipliedBy(Vector a);
-
-	public abstract Matrix multipliedBy(Matrix a);
+	public Matrix multipliedBy(Matrix a) {
+		if (a.isScalar()) {
+			return this.times(((Scalar)a).getValue());
+		} else {
+			return this.internalMatrixMultiply(a);
+		}
+	}
 
 	public abstract Matrix times(double a);
+	
+	protected abstract Matrix internalPlus(Matrix a);
+	
+	protected abstract Matrix internalMinus(Matrix a);
+	
+	protected abstract Matrix internalMatrixMultiply(Matrix a);
 
 	/*
 	 * Conversion functions
 	 */
+	
+	public abstract double[] toArray1D();
 
-	public abstract double[][] toArray();
+	public abstract double[][] toArray2D();
 
 	public abstract void toDoubleStorage(DoubleStorage storage);
 
@@ -133,16 +84,9 @@ public abstract class Matrix {
 
 	protected abstract double norm2();
 
-	protected abstract double det();
-
-	protected abstract Matrix inverse();
-
-	protected abstract double rank();
-
-	protected abstract double trace();
-
 	protected abstract Matrix transpose();
-
-	protected abstract Matrix pow(int p);
-
+	
+	protected abstract Matrix appendRows(Matrix a);
+	
+	protected abstract Matrix appendColumns(Matrix a);
 }
