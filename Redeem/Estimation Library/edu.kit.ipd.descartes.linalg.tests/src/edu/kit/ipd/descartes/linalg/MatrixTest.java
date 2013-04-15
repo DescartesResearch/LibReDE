@@ -1,16 +1,6 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.abs;
-import static edu.kit.ipd.descartes.linalg.Matrix.matrix;
-import static edu.kit.ipd.descartes.linalg.Matrix.norm1;
-import static edu.kit.ipd.descartes.linalg.Matrix.norm2;
-import static edu.kit.ipd.descartes.linalg.Matrix.ones;
-import static edu.kit.ipd.descartes.linalg.Matrix.row;
-import static edu.kit.ipd.descartes.linalg.Matrix.sum;
-import static edu.kit.ipd.descartes.linalg.Matrix.transpose;
-import static edu.kit.ipd.descartes.linalg.Matrix.zeros;
-import static edu.kit.ipd.descartes.linalg.Vector.ones;
-import static edu.kit.ipd.descartes.linalg.Vector.vector;
+import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -269,6 +259,46 @@ public class MatrixTest {
 		assertThat(b).isEqualTo(matrix(B), offset(1e-9));
 	}
 	
+	@Test
+	public void testHorzCat() {
+		Matrix c = horzcat(a, b, v.slice(range(0,2)));
+		assertThat(c).isEqualTo(
+						matrix(row(A[0][0], A[0][1], A[0][2], B[0][0], B[0][1], B[0][2], V[0]), 
+						row(A[1][0], A[1][1], A[1][2], B[1][0], B[1][1], B[1][2], V[1])), 
+						offset(1e-9)
+								);
+		
+		c = horzcat(v.slice(range(0,2)), a, b);
+		assertThat(c).isEqualTo(
+						matrix(
+								row(V[0], A[0][0], A[0][1], A[0][2], B[0][0], B[0][1], B[0][2]), 
+								row(V[1], A[1][0], A[1][1], A[1][2], B[1][0], B[1][1], B[1][2])), 
+								offset(1e-9)
+								);
+		
+	}
 	
+	@Test
+	public void testVertCat() {
+		Matrix c = vertcat(a, b, transpose(v));
+		assertThat(c).isEqualTo(
+						matrix(
+							row(A[0][0], A[0][1], A[0][2]), 
+							row(A[1][0], A[1][1], A[1][2]),
+							row(B[0][0], B[0][1], B[0][2]), 
+							row(B[1][0], B[1][1], B[1][2]),
+							row(V[0], V[1], V[2])
+						), offset(1e-9));
+		
+		c = vertcat(transpose(v), a, b);
+		assertThat(c).isEqualTo(
+						matrix(
+							row(V[0], V[1], V[2]),
+							row(A[0][0], A[0][1], A[0][2]), 
+							row(A[1][0], A[1][1], A[1][2]),
+							row(B[0][0], B[0][1], B[0][2]), 
+							row(B[1][0], B[1][1], B[1][2])
+						), offset(1e-9));
+	}
 
 }

@@ -1,37 +1,10 @@
 package edu.kit.ipd.descartes.linalg;
 
-import edu.kit.ipd.descartes.linalg.impl.colt.ColtMatrixFactory;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public abstract class SquareMatrix extends Matrix {
 
-	private static MatrixFactory factory = new ColtMatrixFactory();
-	
 	protected Matrix delegate;
-	
-	public static SquareMatrix square(Matrix a) {
-		return factory.createSquareMatrix(a);
-	}
-
-	public static double det(SquareMatrix a) {
-		return a.det();
-	}
-
-	public static SquareMatrix inverse(SquareMatrix a) {
-		return a.inverse();
-	}
-
-	public static double rank(SquareMatrix a) {
-		return a.rank();
-	}
-
-	public static double trace(SquareMatrix a) {
-		return a.trace();
-	}
-	
-	public static SquareMatrix pow(SquareMatrix a, int p) {
-		return a.pow(p);
-	}
 	
 	protected SquareMatrix(Matrix wrappedMatrix) {
 		if (wrappedMatrix.columns() != wrappedMatrix.rows()) {
@@ -77,27 +50,27 @@ public abstract class SquareMatrix extends Matrix {
 	}
 
 	public SquareMatrix plus(Matrix a) {
-		return factory.createSquareMatrix(delegate.plus(a));
+		return LinAlg.square(delegate.plus(a));
 	}
 
 	public SquareMatrix plus(double a) {
-		return factory.createSquareMatrix(delegate.plus(a));
+		return LinAlg.square(delegate.plus(a));
 	}
 
 	public SquareMatrix minus(Matrix a) {
-		return factory.createSquareMatrix(delegate.minus(a));
+		return LinAlg.square(delegate.minus(a));
 	}
 
 	public SquareMatrix minus(double a) {
-		return factory.createSquareMatrix(delegate.minus(a));
+		return LinAlg.square(delegate.minus(a));
 	}
 
 	public SquareMatrix multipliedBy(Matrix a) {
-		return factory.createSquareMatrix(delegate.multipliedBy(a));
+		return LinAlg.square(delegate.multipliedBy(a));
 	}
 
 	public SquareMatrix times(double a) {
-		return factory.createSquareMatrix(delegate.times(a));
+		return LinAlg.square(delegate.times(a));
 	}
 
 	public double[] toArray1D() {
@@ -136,7 +109,7 @@ public abstract class SquareMatrix extends Matrix {
 
 	@Override
 	protected SquareMatrix abs() {
-		return factory.createSquareMatrix(delegate.abs());
+		return LinAlg.square(delegate.abs());
 	}
 
 	@Override
@@ -156,7 +129,17 @@ public abstract class SquareMatrix extends Matrix {
 
 	@Override
 	protected SquareMatrix transpose() {
-		return factory.createSquareMatrix(delegate.transpose());
+		return LinAlg.square(delegate.transpose());
+	}
+	
+	@Override
+	protected Matrix appendColumns(Matrix a) {
+		return delegate.appendColumns(a);
+	}
+	
+	@Override
+	protected Matrix appendRows(Matrix a) {
+		return delegate.appendRows(a);
 	}
 
 	protected abstract double det();

@@ -190,7 +190,7 @@ public class Example {
 	
 	public static class Eval_f implements Eval_F_CB {
 		@Override
-		public boolean execute(int n, Pointer x, boolean new_x,
+		public boolean eval_f(int n, Pointer x, boolean new_x,
 				Pointer obj_value, Pointer user_data) {
 			 assert n == 4;
 			 
@@ -204,7 +204,7 @@ public class Example {
 	
 	public static class Eval_grad_f implements Eval_Grad_F_CB {
 		@Override
-		public boolean execute(int n, Pointer x, boolean new_x, Pointer grad_f,
+		public boolean eval_grad_f(int n, Pointer x, boolean new_x, Pointer grad_f,
 				Pointer user_data) {
 			assert n == 4;
 			
@@ -224,7 +224,7 @@ public class Example {
 	
 	public static class Eval_g implements Eval_G_CB {
 		@Override
-		public boolean execute(int n, Pointer x, boolean new_x, int m,
+		public boolean eval_g(int n, Pointer x, boolean new_x, int m,
 				Pointer g, Pointer user_data) {
 
 			  assert n == 4;
@@ -244,7 +244,7 @@ public class Example {
 
 	public static class Eval_jac_g implements Eval_Jac_G_CB {
 		@Override
-		public boolean execute(int n, Pointer x, boolean new_x, int m,
+		public boolean eval_jac_g(int n, Pointer x, boolean new_x, int m,
 				int nele_jac, Pointer iRow, Pointer jCol, Pointer values,
 				Pointer user_data) {
 			if (values == Pointer.NULL) {
@@ -299,7 +299,7 @@ public class Example {
 
 	public static class Eval_h implements Eval_H_CB {
 		@Override
-		public boolean execute(int n, Pointer x, boolean new_x,
+		public boolean eval_h(int n, Pointer x, boolean new_x,
 				double obj_factor, int m, Pointer lambda, boolean new_lambda,
 				int nele_hess, Pointer iRow, Pointer jCol, Pointer values,
 				Pointer user_data) {

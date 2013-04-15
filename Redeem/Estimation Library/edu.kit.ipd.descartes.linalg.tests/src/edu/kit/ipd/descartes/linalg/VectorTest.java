@@ -1,6 +1,6 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.Vector.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -275,5 +275,15 @@ public class VectorTest {
 	@Test
 	public void testToArray2D() {
 		assertThat(a.toArray2D()).isEqualTo(new double[][] { {A[0]}, {A[1]}, {A[2]}});
+	}
+	
+	@Test
+	public void testSliceNormal() {
+		assertThat(a.slice(range(0, 2))).isEqualTo(vector(A[0], A[1]), offset(1e-9));
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testSliceIllegal() {
+		a.slice(range(0, 4));
 	}
 }

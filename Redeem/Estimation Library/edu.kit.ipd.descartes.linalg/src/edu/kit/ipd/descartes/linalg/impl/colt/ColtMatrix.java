@@ -1,5 +1,6 @@
 package edu.kit.ipd.descartes.linalg.impl.colt;
 
+import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -258,6 +259,30 @@ public class ColtMatrix extends Matrix {
 		} else {
 			return new FlatArrayVector(a.toArray1D());
 		}
+	}
+
+	@Override
+	protected Matrix appendRows(Matrix a) {
+		if (a.columns() != this.columns()) {
+			throw new IllegalArgumentException("Number of columns must be equal.");
+		}
+		
+		FlatArrayMatrix combined = new FlatArrayMatrix(this.rows() + a.rows(), this.columns());
+		combined.viewPart(0, 0, this.rows(), this.columns()).assign(this.content);
+		combined.viewPart(this.rows(), 0, a.rows(), a.columns()).assign(getMatrixContent(a));
+		return new ColtMatrix(combined);
+	}
+
+	@Override
+	protected Matrix appendColumns(Matrix a) {
+		if (a.rows() != this.rows()) {
+			throw new IllegalArgumentException("Number of rows must be equal.");
+		}
+		
+		FlatArrayMatrix combined = new FlatArrayMatrix(this.rows(), this.columns() + a.columns());
+		combined.viewPart(0, 0, this.rows(), this.columns()).assign(this.content);
+		combined.viewPart(0, this.columns(), a.rows(), a.columns()).assign(getMatrixContent(a));
+		return new ColtMatrix(combined);
 	}
 
 }

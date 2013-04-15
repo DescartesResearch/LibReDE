@@ -1,9 +1,6 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.Vector.*;
-import static edu.kit.ipd.descartes.linalg.Scalar.*;
-import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
-import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static org.mockito.AdditionalMatchers.aryEq;

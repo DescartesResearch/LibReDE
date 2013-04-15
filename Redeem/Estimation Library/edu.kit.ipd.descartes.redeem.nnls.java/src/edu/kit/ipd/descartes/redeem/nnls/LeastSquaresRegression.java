@@ -1,8 +1,8 @@
 package edu.kit.ipd.descartes.redeem.nnls;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.matrix;
-import static edu.kit.ipd.descartes.linalg.Matrix.row;
-import static edu.kit.ipd.descartes.linalg.Vector.vector;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 
@@ -14,9 +14,7 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.MeasurementModel;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.StateModel;
-import edu.kit.ipd.descartes.redeem.estimation.models.IJacobiMatrix;
 import edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm;
-import edu.kit.ipd.descartes.redeem.estimation.models.observation.ILinearObservationModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
@@ -28,7 +26,7 @@ import edu.kit.ipd.descartes.redeem.nnls.backend.NNLSLibrary;
  * @author Mehran Saliminia
  * 
  */
-public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiMatrix, O extends ILinearObservationModel & IJacobiMatrix>
+public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiCalculator, O extends LinearObservationModel & IJacobiCalculator>
 		implements IEstimationAlgorithm<S, O> {
 
 	private S stateModel;
@@ -58,10 +56,10 @@ public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiMatrix
 	 */
 	public Matrix solve(Matrix A, Matrix B) {
 		Algebra alg = new Algebra();
-		DoubleMatrix2D a = Factory2D.make(A.toArray());
-		DoubleMatrix2D b = Factory2D.make(B.toArray());
+		DoubleMatrix2D a = Factory2D.make(A.toArray2D());
+		DoubleMatrix2D b = Factory2D.make(B.toArray2D());
 		DoubleMatrix2D x = alg.solve(a, b);
-		Matrix X = Matrix.matrix(x.toArray());
+		Matrix X = matrix(x.toArray());
 		return X;
 	}
 
@@ -126,7 +124,7 @@ public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiMatrix
 
 			double[] res = new double[n.getValue()];
 			x.read(0, res, 0, res.length);
-			result = Vector.vector(res);
+			result = vector(res);
 			return result;
 
 		} catch (Exception ex) {
@@ -151,13 +149,13 @@ public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiMatrix
 		}
 	}
 
-	private Vector predict(ILinearObservationModel model) {
+	private Vector predict(LinearObservationModel model) {
 		Vector result = this.nnls(model.getInputMatrix(),
-				model.getObservedOutputVector());
+				model.getObservedOutput());
 		return result;
 	}
 
-	private static class StateModelWrapper<S extends IStateModel & IJacobiMatrix>
+	private static class StateModelWrapper<S extends IStateModel & IJacobiCalculator>
 			extends StateModel {
 
 		private S model;
@@ -180,7 +178,7 @@ public class LeastSquaresRegression<S extends ConstantStateModel & IJacobiMatrix
 		}
 	}
 
-	private static class ObservationModelWrapper<O extends IObservationModel & IJacobiMatrix>
+	private static class ObservationModelWrapper<O extends IObservationModel & IJacobiCalculator>
 			extends MeasurementModel {
 
 		private O model;

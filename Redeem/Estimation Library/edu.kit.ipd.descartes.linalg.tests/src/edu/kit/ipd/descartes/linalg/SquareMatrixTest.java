@@ -1,13 +1,6 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.Matrix.matrix;
-import static edu.kit.ipd.descartes.linalg.Matrix.row;
-import static edu.kit.ipd.descartes.linalg.SquareMatrix.det;
-import static edu.kit.ipd.descartes.linalg.SquareMatrix.inverse;
-import static edu.kit.ipd.descartes.linalg.SquareMatrix.pow;
-import static edu.kit.ipd.descartes.linalg.SquareMatrix.rank;
-import static edu.kit.ipd.descartes.linalg.SquareMatrix.square;
-import static edu.kit.ipd.descartes.linalg.SquareMatrix.trace;
+import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;

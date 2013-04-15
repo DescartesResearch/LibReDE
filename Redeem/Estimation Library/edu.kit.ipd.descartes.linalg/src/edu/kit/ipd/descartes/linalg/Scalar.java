@@ -9,10 +9,6 @@ public class Scalar extends Vector {
 	
 	private double value;
 	
-	public static Scalar scalar(double value) {
-		return new Scalar(value);
-	}
-	
 	protected Scalar(double value) {
 		this.value = value;
 	}
@@ -134,6 +130,30 @@ public class Scalar extends Vector {
 	protected Matrix internalMatrixMultiply(Matrix a) {
 		// This function should never be called.
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Scalar slice(Range range) {
+		if (range.getStart() != 0 && range.getEnd() != 1) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+
+	@Override
+	protected Matrix appendRows(Matrix a) {
+		if (a.columns() != 1) {
+			throw new IllegalArgumentException("Number of columns must be equal.");
+		}
+		return LinAlg.vector(this, (Vector)a);
+	}
+
+	@Override
+	protected Matrix appendColumns(Matrix a) {
+		if (a.rows() != 1) {
+			throw new IllegalArgumentException("Number of rows must be equal.");
+		}
+		return LinAlg.vector(this, a.row(0)).transpose();
 	}
 
 }
