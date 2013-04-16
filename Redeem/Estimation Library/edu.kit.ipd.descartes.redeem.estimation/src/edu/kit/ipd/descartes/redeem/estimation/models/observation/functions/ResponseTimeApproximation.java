@@ -6,12 +6,15 @@ import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.system.Service;
 import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
 
 public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	
 	private Service cls_r;
+	
+	private IMonitoringRepository repository;
 	
 	private Query<Scalar> individualResponseTimesQuery;
 	
@@ -23,9 +26,11 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 			throw new IllegalArgumentException();
 		}
 		
+		this.repository = repository;
+		
 		cls_r = workloadClass;
 		
-		individualResponseTimesQuery = repository.select(Metric.RESPONSE_TIME).forService(cls_r).last();
+		individualResponseTimesQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forService(cls_r).last();
 	}
 
 	@Override
@@ -35,7 +40,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 
 	@Override
 	public double getObservedOutput() {
-		return individualResponseTimesQuery.execute().getValue();
+		return repository.execute(individualResponseTimesQuery).getData().getValue();
 	}
 
 }

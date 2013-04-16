@@ -7,12 +7,15 @@ import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
 
 public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
-	Resource res_i;
+	private Resource res_i;
+	
+	private IMonitoringRepository repository;
 	
 	Query<Vector> throughputQuery;
 	Query<Scalar> utilizationQuery;
@@ -25,20 +28,22 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 			throw new IllegalArgumentException();
 		}
 		
+		this.repository = repository;
+		
 		res_i = resource;
 		
-		throughputQuery = repository.select(Metric.THROUGHPUT).forAllServices().average();
-		utilizationQuery = repository.select(Metric.UTILIZATION).forResource(res_i).average();
+		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average();
+		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average();
 	}
 
 	@Override
 	public Vector getIndependentVariables() {
-		return throughputQuery.execute();
+		return repository.execute(throughputQuery).getData();
 	}
 
 	@Override
 	public double getObservedOutput() {
-		return utilizationQuery.execute().getValue();
+		return repository.execute(utilizationQuery).getData().getValue();
 	}
 
 }

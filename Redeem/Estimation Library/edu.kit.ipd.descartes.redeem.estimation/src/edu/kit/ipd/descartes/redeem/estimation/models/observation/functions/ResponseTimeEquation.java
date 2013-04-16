@@ -15,6 +15,8 @@ import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFuncti
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
 import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.system.Service;
 import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
@@ -22,6 +24,8 @@ import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
 public class ResponseTimeEquation extends AbstractOutputFunction implements IDifferentiableFunction {
 
 	private Service cls_r;
+	
+	private IMonitoringRepository repository;
 	
 	private Query<Scalar> responseTimeQuery;
 	private Query<Vector> throughputQuery;
@@ -35,15 +39,17 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			throw new IllegalArgumentException();
 		}
 		
+		this.repository = repository;
+		
 		cls_r = workloadClass;
 		
-		responseTimeQuery = repository.select(Metric.RESPONSE_TIME).forService(workloadClass).average();
-		throughputQuery = repository.select(Metric.THROUGHPUT).forAllServices().average();
+		responseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forService(workloadClass).average();
+		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average();
 	}
 	
 	@Override
 	public double getObservedOutput() {
-		return responseTimeQuery.execute().getValue();
+		return repository.execute(responseTimeQuery).getData().getValue();
 	}
 
 	@Override
@@ -53,7 +59,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			Vector D_i = state.slice(getSystem().getState().getRange(res_i));
 			double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 			
-			Vector X = throughputQuery.execute();
+			Vector X = repository.execute(throughputQuery).getData();
 			
 			rt += D_ir / (1 - X.dot(D_i));
 		}
@@ -71,8 +77,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				Vector D_i = state.slice(getSystem().getState().getRange(res_i));
 				double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 				
-				Vector X = throughputQuery.execute();
-				double X_s = X.get(throughputQuery.getIndex(cls_s));
+				Result<Vector> throughputResult = repository.execute(throughputQuery);
+				
+				Vector X = throughputResult.getData();
+				double X_s = X.get(throughputResult.getIndex(cls_s));
 				
 				double beta = 1 - X.dot(D_i);
 				
@@ -99,9 +107,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 					Vector D_i = state.slice(getSystem().getState().getRange(res_i));
 					double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 					
-					Vector X = throughputQuery.execute();
-					double X_s = X.get(throughputQuery.getIndex(cls_s));
-					double X_t = X.get(throughputQuery.getIndex(cls_t));
+					Result<Vector> throughputResult = repository.execute(throughputQuery);
+					
+					Vector X = throughputResult.getData();
+					double X_s = X.get(throughputResult.getIndex(cls_s));
+					double X_t = X.get(throughputResult.getIndex(cls_t));
 					
 					double beta = 1 - X.dot(D_i);
 					
