@@ -10,6 +10,6 @@ public interface IEstimationAlgorithm<S extends IStateModel<?>, O extends IObser
 	
 	Vector estimate();
 	
-	void cleanup();
+	void destroy();
 
 }

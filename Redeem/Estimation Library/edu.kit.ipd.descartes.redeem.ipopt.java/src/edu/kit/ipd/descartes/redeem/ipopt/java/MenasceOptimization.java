@@ -391,7 +391,7 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 	}
 
 	@Override
-	public void cleanup() {
+	public void destroy() {
 		
 	}
 	

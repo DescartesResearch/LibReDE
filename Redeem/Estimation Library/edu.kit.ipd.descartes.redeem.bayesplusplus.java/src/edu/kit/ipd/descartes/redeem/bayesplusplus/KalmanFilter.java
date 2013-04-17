@@ -98,7 +98,7 @@ public class KalmanFilter implements IEstimationAlgorithm<IStateModel<Unconstrai
 	}
 
 	@Override
-	public void cleanup() {
+	public void destroy() {
 		
 	}
 
