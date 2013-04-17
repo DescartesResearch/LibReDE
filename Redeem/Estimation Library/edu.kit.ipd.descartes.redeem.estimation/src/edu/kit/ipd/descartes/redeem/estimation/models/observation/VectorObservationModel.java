@@ -11,16 +11,16 @@ import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOut
 
 public class VectorObservationModel<E extends IOutputFunction> implements IObservationModel<E, Vector> {
 
-	private List<E> equations;
+	private List<E> outputFunctions;
 	private int outputSize;
 	
 	public VectorObservationModel() {
-		equations = new ArrayList<>();
+		outputFunctions = new ArrayList<>();
 		outputSize = 0;
 	}
 	
-	public void addEquation(E equation) {
-		equations.add(equation);
+	public void addOutputFunction(E function) {
+		outputFunctions.add(function);
 		outputSize++;
 	}
 	
@@ -33,7 +33,7 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	public Vector getObservedOutput() {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = equations.get(i).getObservedOutput();
+			temp[i] = outputFunctions.get(i).getObservedOutput();
 		}
 		return vector(temp);
 	}
@@ -42,14 +42,14 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	public Vector getCalculatedOutput(Vector state) {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = equations.get(i).getCalculatedOutput(state);
+			temp[i] = outputFunctions.get(i).getCalculatedOutput(state);
 		}
 		return vector(temp);
 	}
 
 	@Override
 	public Iterator<E> iterator() {
-		return equations.iterator();
+		return outputFunctions.iterator();
 	}
 
 }

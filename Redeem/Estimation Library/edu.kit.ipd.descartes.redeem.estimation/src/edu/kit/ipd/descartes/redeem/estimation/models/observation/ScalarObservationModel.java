@@ -12,10 +12,10 @@ import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOut
 
 public class ScalarObservationModel<E extends IOutputFunction> implements IObservationModel<E, Scalar> {
 	
-	private final E equation;
+	private final E outputFunction;
 	
-	public ScalarObservationModel(E equation) {
-		this.equation = equation;
+	public ScalarObservationModel(E outputFunction) {
+		this.outputFunction = outputFunction;
 	}
 	
 	@Override
@@ -25,18 +25,18 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 
 	@Override
 	public Scalar getObservedOutput() {
-		return scalar(equation.getObservedOutput());
+		return scalar(outputFunction.getObservedOutput());
 	}
 
 	@Override
 	public Scalar getCalculatedOutput(Vector state) {
-		return scalar(equation.getCalculatedOutput(state));
+		return scalar(outputFunction.getCalculatedOutput(state));
 	}
 
 	@Override
 	public Iterator<E> iterator() {
 		ArrayList<E> temp = new ArrayList<E>(1);
-		temp.add(equation);		
+		temp.add(outputFunction);		
 		return temp.iterator();
 	}
 
