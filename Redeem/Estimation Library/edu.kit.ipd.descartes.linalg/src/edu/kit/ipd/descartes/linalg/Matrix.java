@@ -108,5 +108,23 @@ public class Matrix {
 	public void toDoubleStorage(DoubleStorage storage) {
 		delegate.toDoubleStorage(storage);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		for (int i = 0; i < rows(); i++) {
+			builder.append("[");
+			for (int j = 0; j < columns(); j++) {
+				if (j > 0) {
+					builder.append("; ");
+				}
+				builder.append(get(i, j));
+			}
+			builder.append("]");
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

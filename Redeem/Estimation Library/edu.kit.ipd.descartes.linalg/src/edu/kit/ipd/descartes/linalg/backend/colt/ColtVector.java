@@ -12,6 +12,7 @@ import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementation {
 
+	private static final long serialVersionUID = 1464728927753092222L;
 	private static final Algebra ALG = new Algebra();
 
 	public ColtVector(int rows) {
@@ -95,20 +96,6 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 	@Override
 	public void toDoubleStorage(DoubleStorage storage) {
 		storage.write(elements);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		for (int i = 0; i < size(); i++) {
-			if (i > 0) {
-				builder.append("; ");
-			}
-			builder.append(get(i));
-		}
-		builder.append("]");
-		return builder.toString();
 	}
 
 	@Override

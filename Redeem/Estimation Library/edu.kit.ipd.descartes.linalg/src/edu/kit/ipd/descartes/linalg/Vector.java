@@ -38,4 +38,18 @@ public class Vector extends Matrix {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		for (int i = 0; i < rows(); i++) {
+			if (i > 0) {
+				builder.append("; ");
+			}
+			builder.append(get(i));
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+	
 }

@@ -1,7 +1,6 @@
 package edu.kit.ipd.descartes.linalg.backend;
 
 import edu.kit.ipd.descartes.linalg.Range;
-import edu.kit.ipd.descartes.linalg.Vector;
 
 public interface VectorImplementation extends MatrixImplementation {
 	

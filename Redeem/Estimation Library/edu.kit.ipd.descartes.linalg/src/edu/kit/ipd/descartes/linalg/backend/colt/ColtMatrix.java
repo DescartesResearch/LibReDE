@@ -1,7 +1,5 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
@@ -80,24 +78,6 @@ public class ColtMatrix extends DenseDoubleMatrix2D implements
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		for (int i = 0; i < rows(); i++) {
-			builder.append("[");
-			for (int j = 0; j < columns(); j++) {
-				if (j > 0) {
-					builder.append("; ");
-				}
-				builder.append(get(i, j));
-			}
-			builder.append("]");
-		}
-		builder.append("]");
-		return builder.toString();
 	}
 
 	@Override
