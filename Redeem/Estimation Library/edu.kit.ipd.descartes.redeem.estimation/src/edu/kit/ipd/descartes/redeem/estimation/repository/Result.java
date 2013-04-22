@@ -6,17 +6,24 @@ import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
 public class Result<T extends Matrix> {
 
 	private T data;
+	private IModelEntity[] entities;
 	
-	public Result(T data) {
+	public Result(T data, IModelEntity[] entities) {
 		this.data = data;
+		this.entities = entities;
 	}
 	
 	public int getIndex(IModelEntity entity) {
+		for (int i = 0; i < entities.length; i++) {
+			if (entity.equals(entities[i])) {
+				return i;
+			}
+		}
 		return 0;
 	}
 	
 	public IModelEntity getEntity(int index) {
-		return null;
+		return entities[index];
 	}
 	
 	public T getData() {

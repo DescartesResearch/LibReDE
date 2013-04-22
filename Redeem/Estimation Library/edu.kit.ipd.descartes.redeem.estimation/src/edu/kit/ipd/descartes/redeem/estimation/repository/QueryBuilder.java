@@ -3,12 +3,17 @@ package edu.kit.ipd.descartes.redeem.estimation.repository;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Aggregation;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Type;
+import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
 import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.system.Service;
 
 public class QueryBuilder {
 	
+	private Query.Type type;
 	private Metric metric;
+	private IModelEntity entity;
 	
 	private QueryBuilder(Metric metric) {
 		this.metric = metric;
@@ -22,19 +27,27 @@ public class QueryBuilder {
 	public class SelectClause {
 	
 		public ForClause<Scalar> forResource(Resource resource) {
-			return null;
+			type = Type.RESOURCE;
+			entity = resource;
+			return new ForClause<>();
 		}
 		
 		public ForClause<Scalar> forService(Service cls) {
-			return null;
+			type = Type.SERVICE;
+			entity = cls;
+			return new ForClause<>();
 		}
 		
 		public ForClause<Vector> forAllServices() {
-			return null;
+			type = Type.ALL_SERVICES;
+			entity = null;
+			return new ForClause<>();
 		}
 		
 		public ForClause<Vector> forAllResources() {
-			return null;
+			type = Type.ALL_RESOURCES;
+			entity = null;
+			return new ForClause<>();
 		}
 		
 	}
@@ -42,15 +55,15 @@ public class QueryBuilder {
 	public class ForClause<T extends Matrix> {
 		
 		public Query<T> sum() {
-			return null;
+			return new Query<>(Aggregation.SUM, type, metric, entity);
 		}
 		
 		public Query<T> average() {
-			return null;
+			return new Query<>(Aggregation.AVERAGE, type, metric, entity);
 		}
 				
 		public Query<T> last() {			
-			return null;
+			return new Query<>(Aggregation.LAST, type, metric, entity);
 		}
 	}
 	
