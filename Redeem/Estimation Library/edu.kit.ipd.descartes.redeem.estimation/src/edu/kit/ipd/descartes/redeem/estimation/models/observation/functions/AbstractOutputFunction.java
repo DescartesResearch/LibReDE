@@ -15,7 +15,7 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 	protected AbstractOutputFunction(SystemModel system, List<Resource> selectedResources,
 			List<Service> selectedClasses) {		
 		if (system == null || selectedResources == null || selectedClasses == null) {
-			throw new IllegalArgumentException();
+			throw new NullPointerException();
 		}
 		if (selectedResources.size() < 1 || selectedClasses.size() < 1) {
 			throw new IllegalArgumentException();
