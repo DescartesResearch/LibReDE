@@ -14,15 +14,15 @@ public class MatrixAssert extends AbstractAssert<MatrixAssert, Matrix> {
 	
 	public MatrixAssert isEqualTo(Matrix expected, Offset<Double> delta) {
 		Assertions.assertThat(actual.rows())
-			.overridingErrorMessage("Expected matrix row count to be <%s> but was <%s>", expected.rows(), actual.rows())
+			.overridingErrorMessage("Expected matrix row count to be <%d> but was <%d>", expected.rows(), actual.rows())
 			.isEqualTo(expected.rows());
 		Assertions.assertThat(actual.columns())
-			.overridingErrorMessage("Expected matrix column count to be <%s> but was <%s>", expected.columns(), actual.columns())
+			.overridingErrorMessage("Expected matrix column count to be <%d> but was <%d>", expected.columns(), actual.columns())
 			.isEqualTo(expected.columns());
 		for (int i = 0; i < actual.rows(); i++) {
 			for (int j = 0; j < actual.columns(); j++) {
 				Assertions.assertThat(actual.get(i, j))
-					.overridingErrorMessage("Expected matrix to be <%s> but was <%s>", expected.toString(), actual.toString())
+					.overridingErrorMessage("Expected matrix(%d, %d) to be <%f>, but was <%f>", i, j,expected.get(i, j), actual.get(i, j))
 					.isEqualTo(expected.get(i,j), delta);
 			}
 		}
