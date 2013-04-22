@@ -118,7 +118,7 @@ public class VectorTest {
 	
 	@Test
 	public void testSum() {
-		assertThat(a.sum()).isEqualTo(A[0] + A[1] + A[2], offset(1e-9));
+		assertThat(sum(a)).isEqualTo(A[0] + A[1] + A[2], offset(1e-9));
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 	}
 	
@@ -128,7 +128,7 @@ public class VectorTest {
 		Vector c = ones(3).times(-1.0);
 		Vector res = abs(c);
 		assertThat(res).isEqualTo(ones(3), offset(1e-9));
-		assertThat(c).isEqualTo(ones(3).times(-1.0), offset(1e-9));
+		assertThat(c).isEqualTo(ones(3).<Vector>times(-1.0), offset(1e-9));
 	}
 	
 	@Test
@@ -269,7 +269,7 @@ public class VectorTest {
 	
 	@Test
 	public void testTranspose() {
-		assertThat(a.transpose()).isEqualTo(matrix(row(A)), offset(1e-9));
+		assertThat(transpose(a)).isEqualTo(matrix(row(A)), offset(1e-9));
 	}
 	
 	@Test

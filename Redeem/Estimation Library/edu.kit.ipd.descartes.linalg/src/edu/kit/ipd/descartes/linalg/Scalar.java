@@ -1,5 +1,7 @@
 package edu.kit.ipd.descartes.linalg;
 
+import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
+import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class Scalar extends Vector {
@@ -7,101 +9,22 @@ public class Scalar extends Vector {
 	public static final Scalar ZERO = new Scalar(0);
 	public static final Scalar ONE = new Scalar(1);
 	
-	private double value;
+	public Scalar(double value) {
+		super(new ScalarImplementation(value));
+	}
 	
-	protected Scalar(double value) {
-		this.value = value;
+	Scalar(ScalarImplementation delegate) {
+		super(delegate);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	<M extends Matrix> M newInstance(MatrixImplementation delegate) {
+		return (M) new Scalar((ScalarImplementation)delegate);
 	}
 	
 	public double getValue() {
-		return value;
-	}
-	
-	@Override
-	public double get(int row) {
-		if (row > 0) {
-			throw new IndexOutOfBoundsException();
-		}
-		return value;
-	}
-
-	@Override
-	public int rows() {
-		return 1;
-	}
-
-	@Override
-	public double dot(Vector b) {
-		if (!b.isScalar()) {
-			throw new IllegalArgumentException("Dimensions of operands do not match.");
-		}		
-		return value * ((Scalar)b).value;
-	}
-
-	@Override
-	public Scalar times(double d) {
-		return new Scalar(value * d);
-	}
-
-	@Override
-	public Scalar plus(Matrix a) {
-		if (!a.isScalar()) {
-			throw new IllegalArgumentException("Dimensions of operands do not match.");
-		}
-		return new Scalar(value + ((Scalar)a).value);
-	}
-
-	@Override
-	public Scalar plus(double d) {
-		return new Scalar(value + d);
-	}
-
-	@Override
-	public Scalar minus(Matrix a) {
-		if (!a.isScalar()) {
-			throw new IllegalArgumentException("Dimensions of operands do not match.");
-		}
-		return new Scalar(value - ((Scalar)a).value);
-	}
-
-	@Override
-	public Scalar minus(double d) {
-		return new Scalar(value - d);
-	}
-	
-	@Override
-	public Matrix multipliedBy(Matrix a) {
-		return a.times(value);
-	}
-
-	@Override
-	public double[] toArray1D() {
-		return new double[] { value };
-	}
-
-	@Override
-	public void toDoubleStorage(DoubleStorage storage) {
-		storage.write(new double[] { value });
-	}
-
-	@Override
-	protected Scalar abs() {
-		return new Scalar(Math.abs(value));
-	}
-
-	@Override
-	protected double sum() {
-		return value;
-	}
-
-	@Override
-	protected double norm1() {
-		return Math.abs(value);
-	}
-
-	@Override
-	protected double norm2() {
-		return value * value;
+		return ((ScalarImplementation)delegate).value;
 	}
 	
 	@Override
@@ -114,46 +37,168 @@ public class Scalar extends Vector {
 		return false;
 	}
 
-	@Override
-	protected Matrix internalPlus(Matrix a) {
-		// This function should never be called.
-		throw new UnsupportedOperationException();
-	}
+	private static class ScalarImplementation implements VectorImplementation {
+		
+		public double value;
 
-	@Override
-	protected Matrix internalMinus(Matrix a) {
-		// This function should never be called.
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	protected Matrix internalMatrixMultiply(Matrix a) {
-		// This function should never be called.
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Scalar slice(Range range) {
-		if (range.getStart() != 0 && range.getEnd() != 1) {
-			throw new IndexOutOfBoundsException();
+		public ScalarImplementation(double value) {
+			this.value = value;
 		}
-		return this;
-	}
-
-	@Override
-	protected Matrix appendRows(Matrix a) {
-		if (a.columns() != 1) {
-			throw new IllegalArgumentException("Number of columns must be equal.");
+		
+		@Override
+		public ScalarImplementation abs() {
+			return new ScalarImplementation(Math.abs(value));
 		}
-		return LinAlg.vector(this, (Vector)a);
-	}
 
-	@Override
-	protected Matrix appendColumns(Matrix a) {
-		if (a.rows() != 1) {
-			throw new IllegalArgumentException("Number of rows must be equal.");
+		@Override
+		public double sum() {
+			return value;
 		}
-		return LinAlg.vector(this, a.row(0)).transpose();
-	}
 
+		@Override
+		public double norm1() {
+			return Math.abs(value);
+		}
+
+		@Override
+		public double norm2() {
+			return value*value;
+		}
+
+		@Override
+		public ScalarImplementation transpose() {
+			return this;
+		}
+
+		@Override
+		public MatrixImplementation appendRows(MatrixImplementation a) {
+			if (a.columns() != 1) {
+				throw new IllegalArgumentException("Number of columns must be equal.");
+			}
+			double[] vector = new double[a.rows() + 1];
+			vector[0] = value;
+			System.arraycopy(a.toArray1D(), 0, vector, 1,  a.rows());
+			return LinAlg.FACTORY.createVector(vector);
+		}
+
+		@Override
+		public MatrixImplementation appendColumns(MatrixImplementation a) {
+			if (a.rows() != 1) {
+				throw new IllegalArgumentException("Number of rows must be equal.");
+			}
+			double[][] matrix = new double[1][a.columns()];
+			matrix[0][0] = value;
+			System.arraycopy(a.toArray1D(), 0, matrix[0], 1, a.columns());
+			return LinAlg.FACTORY.createMatrix(matrix);
+		}
+
+		@Override
+		public double get(int row, int col) {
+			if (row > 0 || col > 0) {
+				throw new IndexOutOfBoundsException();
+			}
+			return value;
+		}
+
+		@Override
+		public int rows() {
+			return 1;
+		}
+
+		@Override
+		public int columns() {
+			return 1;
+		}
+
+		@Override
+		public VectorImplementation row(int row) {
+			if (row != 0) {
+				throw new IndexOutOfBoundsException();
+			}
+			return this;
+		}
+
+		@Override
+		public ScalarImplementation column(int column) {
+			if (column != 0) {
+				throw new IndexOutOfBoundsException();
+			}
+			return this;
+		}
+
+		@Override
+		public ScalarImplementation plus(double a) {
+			return new ScalarImplementation(value + a);
+		}
+
+		@Override
+		public ScalarImplementation minus(double a) {
+			return new ScalarImplementation(value - a);
+		}
+		
+		@Override
+		public ScalarImplementation times(double a) {
+			return new ScalarImplementation(value * a);
+		}
+
+		@Override
+		public MatrixImplementation plus(MatrixImplementation a) {
+			return new ScalarImplementation(value + ((ScalarImplementation)a).value);
+		}
+		
+		@Override
+		public MatrixImplementation arrayMultipliedBy(MatrixImplementation a) {
+			return new ScalarImplementation(value * ((ScalarImplementation)a).value);
+		}
+
+		@Override
+		public MatrixImplementation minus(MatrixImplementation a) {
+			return new ScalarImplementation(value - ((ScalarImplementation)a).value);
+		}
+
+		@Override
+		public MatrixImplementation multipliedBy(MatrixImplementation a) {
+			return a.times(value);
+		}
+
+		@Override
+		public double[] toArray1D() {
+			return new double[] { value };
+		}
+
+		@Override
+		public double[][] toArray2D() {
+			return new double[][] {{ value }};
+		}
+
+		@Override
+		public void toDoubleStorage(DoubleStorage storage) {
+			storage.write(new double[] { value });			
+		}
+
+		@Override
+		public double get(int row) {
+			if (row > 0) {
+				throw new IndexOutOfBoundsException();
+			}
+			return value;
+		}
+
+		@Override
+		public VectorImplementation slice(Range range) {
+			if (range.getStart() != 0 && range.getEnd() != 1) {
+				throw new IndexOutOfBoundsException();
+			}
+			return this;
+		}
+
+		@Override
+		public double dot(VectorImplementation b) {
+			if (!(b instanceof ScalarImplementation)) {
+				throw new IllegalArgumentException("Dimensions of operands do not match.");
+			}		
+			return value * ((ScalarImplementation)b).value;
+		}
+		
+	}
 }

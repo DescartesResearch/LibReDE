@@ -1,18 +1,40 @@
 package edu.kit.ipd.descartes.linalg;
 
+import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
-public abstract class Matrix {
+public class Matrix {
+	
+	final MatrixImplementation delegate;
+	
+	Matrix(MatrixImplementation delegate)  {
+		this.delegate = delegate;
+	}
+	
+	@SuppressWarnings("unchecked")
+	<M extends Matrix> M newInstance(MatrixImplementation delegate) {
+		return (M) new Matrix(delegate);
+	}
 
-	public abstract double get(int row, int col);
+	public double get(int row, int col) {
+		return delegate.get(row, col);
+	}
 
-	public abstract int rows();
+	public int rows() {
+		return delegate.rows();
+	}
 
-	public abstract int columns();
+	public int columns() {
+		return delegate.columns();
+	}
 
-	public abstract Vector row(int row);
+	public Vector row(int row) {
+		return new Vector(delegate.row(row));
+	}
 
-	public abstract Vector column(int column);
+	public Vector column(int column) {
+		return new Vector(delegate.column(column));
+	}
 	
 	public boolean isVector() {
 		return false;
@@ -26,67 +48,65 @@ public abstract class Matrix {
 	 * Algebra functions
 	 */
 
-	public Matrix plus(Matrix a) {
-		if (a.isScalar() || a.isVector()) {
-			throw new IllegalArgumentException("Dimensions of operands do not match.");
-		} else {
-			return this.internalPlus(a);
+	public <M extends Matrix> M plus(M a) {
+		if (a.columns() != this.columns() || a.rows() != this.rows()) {
+			throw new IllegalArgumentException("Both operands must have the same size.");
 		}
+		return newInstance(delegate.plus(a.delegate));
 	}
 
-	public abstract Matrix plus(double a);
-
-	public Matrix minus(Matrix a) {
-		if (a.isScalar() || a.isVector()) {
-			throw new IllegalArgumentException("Dimensions of operands do not match.");
-		} else {
-			return this.internalMinus(a);
-		}
+	public <M extends Matrix> M plus(double a) {
+		return newInstance(delegate.plus(a));
 	}
 
-	public abstract Matrix minus(double a);
-
-	public Matrix multipliedBy(Matrix a) {
-		if (a.isScalar()) {
-			return this.times(((Scalar)a).getValue());
-		} else {
-			return this.internalMatrixMultiply(a);
+	public <M extends Matrix> M minus(M a) {
+		if (a.columns() != this.columns() || a.rows() != this.rows()) {
+			throw new IllegalArgumentException("Both operands must have the same size.");
 		}
+		return newInstance(delegate.minus(a.delegate));
 	}
 
-	public abstract Matrix times(double a);
-	
-	protected abstract Matrix internalPlus(Matrix a);
-	
-	protected abstract Matrix internalMinus(Matrix a);
-	
-	protected abstract Matrix internalMatrixMultiply(Matrix a);
+	public <M extends Matrix> M minus(double a) {
+		return newInstance(delegate.minus(a));
+	}
 
+	public <M extends Matrix> M multipliedBy(M a) {
+		if (columns() != a.rows()) {
+			throw new IllegalArgumentException("Inner dimensions of operands must be equal.");
+		} else {
+			if (a.isScalar()) {
+				return this.times(((Scalar)a).getValue());
+			} else {
+				return newInstance(delegate.multipliedBy(a.delegate));
+			}
+		}
+	}
+	
+	public <M extends Matrix> M arrayMultipliedBy(M a) {
+		if (a.columns() != this.columns() || a.rows() != this.rows()) {
+			throw new IllegalArgumentException("Both operands must have the same size.");
+		}
+		return newInstance(delegate.arrayMultipliedBy(a.delegate));
+	}
+
+	public <M extends Matrix> M times(double a) {
+		return newInstance(delegate.times(a));
+	}
+	
 	/*
 	 * Conversion functions
 	 */
 	
-	public abstract double[] toArray1D();
+	public double[] toArray1D() {
+		return delegate.toArray1D();
+	}
 
-	public abstract double[][] toArray2D();
+	public double[][] toArray2D() {
+		return delegate.toArray2D();
+	}
 
-	public abstract void toDoubleStorage(DoubleStorage storage);
+	public void toDoubleStorage(DoubleStorage storage) {
+		delegate.toDoubleStorage(storage);
+	}
 
-	/*
-	 * Internal functions
-	 */
-
-	protected abstract Matrix abs();
-
-	protected abstract double sum();
-
-	protected abstract double norm1();
-
-	protected abstract double norm2();
-
-	protected abstract Matrix transpose();
-	
-	protected abstract Matrix appendRows(Matrix a);
-	
-	protected abstract Matrix appendColumns(Matrix a);
 }

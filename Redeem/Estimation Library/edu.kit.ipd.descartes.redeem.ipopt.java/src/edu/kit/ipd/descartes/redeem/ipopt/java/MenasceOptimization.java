@@ -11,7 +11,7 @@ import com.sun.jna.ptr.DoubleByReference;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.linalg.VectorInitializer;
+import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.JacobiMatrixBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;

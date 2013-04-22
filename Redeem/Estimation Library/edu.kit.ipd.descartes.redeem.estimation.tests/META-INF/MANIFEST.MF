@@ -8,4 +8,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.10.0",
  cern.colt;bundle-version="1.2.0",
  org.fest.assertions;bundle-version="2.0.0",
- edu.kit.ipd.descartes.linalg.testutil;bundle-version="1.0.0"
+ edu.kit.ipd.descartes.linalg.testutil;bundle-version="1.0.0",
+ edu.kit.ipd.descartes.redeem.estimation.testutil;bundle-version="1.0.0"

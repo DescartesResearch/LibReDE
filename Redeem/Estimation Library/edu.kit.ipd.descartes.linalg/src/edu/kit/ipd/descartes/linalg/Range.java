@@ -17,4 +17,9 @@ public class Range {
 	public int getEnd() {
 		return end;
 	}
+	
+	@Override
+	public String toString() {
+		return "Range: [" + start + ", " + end + ")";
+	}
 }

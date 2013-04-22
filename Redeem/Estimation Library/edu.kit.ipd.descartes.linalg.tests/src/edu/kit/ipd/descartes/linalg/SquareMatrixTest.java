@@ -17,7 +17,7 @@ public class SquareMatrixTest {
 
 	@Before
 	public void setUp() throws Exception {
-		square = square(matrix(SQUARE));
+		square = (SquareMatrix)matrix(SQUARE);
 	}
 
 	@Test

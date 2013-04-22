@@ -83,13 +83,13 @@ public class ScalarTest {
 	
 	@Test
 	public void testSum() {
-		assertThat(a.sum()).isEqualTo(A, offset(1e-9));
+		assertThat(sum(a)).isEqualTo(A, offset(1e-9));
 	}
 
 	@Test
 	public void testAbs() {
-		assertThat(a.abs().getValue()).isEqualTo(A, offset(1e-9));
-		assertThat(b.abs().getValue()).isEqualTo(-B, offset(1e-9));
+		assertThat(abs(a).getValue()).isEqualTo(A, offset(1e-9));
+		assertThat(abs(b).getValue()).isEqualTo(-B, offset(1e-9));
 	}
 	
 	@Test
@@ -103,14 +103,14 @@ public class ScalarTest {
 	
 	@Test
 	public void testNorm1() {
-		assertThat(a.norm1()).isEqualTo(A, offset(1e-9));
-		assertThat(b.norm1()).isEqualTo(-B, offset(1e-9));
+		assertThat(norm1(a)).isEqualTo(A, offset(1e-9));
+		assertThat(norm1(b)).isEqualTo(-B, offset(1e-9));
 	}
 	
 	@Test
 	public void testNorm2() {
-		assertThat(a.norm2()).isEqualTo(A*A, offset(1e-9));
-		assertThat(b.norm2()).isEqualTo(B*B, offset(1e-9));
+		assertThat(norm2(a)).isEqualTo(A*A, offset(1e-9));
+		assertThat(norm2(b)).isEqualTo(B*B, offset(1e-9));
 	}	
 
 	@Test

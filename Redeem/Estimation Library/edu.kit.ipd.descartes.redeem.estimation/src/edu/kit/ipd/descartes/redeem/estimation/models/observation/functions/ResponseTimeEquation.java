@@ -7,10 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
-import edu.kit.ipd.descartes.linalg.MatrixInitializer;
+import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.linalg.VectorInitializer;
+import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
@@ -68,7 +68,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	@Override
 	public Vector getFirstDerivatives(final Vector state) {
-		return vector(state.rows(), new VectorInitializer() {		
+		return vector(state.rows(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
 				Resource res_i = getSystem().getState().getResource(row);
@@ -95,7 +95,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	@Override
 	public Matrix getSecondDerivatives(final Vector state) {
-		return matrix(state.rows(), state.rows(), new MatrixInitializer() {			
+		return matrix(state.rows(), state.rows(), new MatrixFunction() {
 			@Override
 			public double cell(int row, int column) {
 				Resource res_i = getSystem().getState().getResource(row);
