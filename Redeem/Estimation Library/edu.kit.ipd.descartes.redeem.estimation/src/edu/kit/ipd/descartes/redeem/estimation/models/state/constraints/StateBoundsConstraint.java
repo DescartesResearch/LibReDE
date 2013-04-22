@@ -16,6 +16,10 @@ public class StateBoundsConstraint implements INonLinearConstraint, IDifferentia
 		this.stateVar = stateVar;
 	}
 	
+	public int getStateVariable() {
+		return stateVar;
+	}
+	
 	@Override
 	public double getValue(Vector state) {
 		return state.get(stateVar);
