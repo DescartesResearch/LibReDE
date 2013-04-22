@@ -11,18 +11,34 @@ import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
 
+/**
+ * This output function implements the Utilization Law:
+ * 
+ * U_{i} = \sum_{r = 1}^{N} X_{r} * D_{i,r}
+ * 
+ * with
+ * <ul>
+ * 	<li>U_{i} is the utilization of resource i
+ * 	<li>N is the number of services</li>
+ *  <li>D_{i,r} is the resource demand of resource i and service r</li>
+ *  <li>X_{r} is the throughput of service r</li>
+ * </ul>
+ * 
+ * @author Simon Spinner (simon.spinner@kit.edu)
+ * @version 1.0
+ */
 public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
 	
 	private IMonitoringRepository repository;
 	
-	Query<Vector> throughputQuery;
-	Query<Scalar> utilizationQuery;
+	private Query<Vector> throughputQuery;
+	private Query<Scalar> utilizationQuery;
 	
-	protected UtilizationLaw(SystemModel system, IMonitoringRepository repository,
+	public UtilizationLaw(SystemModel system, IMonitoringRepository repository,
 			Resource resource) {
-		super(system, Arrays.asList(resource), system.getWorkloadClasses());
+		super(system, Arrays.asList(resource), system.getServices());
 
 		if (resource == null) {
 			throw new IllegalArgumentException();
@@ -36,11 +52,17 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.ILinearOutputFunction#getIndependentVariables()
+	 */
 	@Override
 	public Vector getIndependentVariables() {
 		return repository.execute(throughputQuery).getData();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#getObservedOutput()
+	 */
 	@Override
 	public double getObservedOutput() {
 		return repository.execute(utilizationQuery).getData().getValue();
