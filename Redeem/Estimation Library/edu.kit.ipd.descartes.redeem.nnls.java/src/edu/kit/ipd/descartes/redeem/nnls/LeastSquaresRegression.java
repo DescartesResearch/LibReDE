@@ -4,6 +4,7 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
+import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 
@@ -12,6 +13,7 @@ import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;
@@ -19,6 +21,7 @@ import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.ILin
 import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.redeem.nnls.backend.NNLSLibrary;
+import edu.kit.ipd.descartes.redeem.exceptions.EstimationException;;
 
 /**
  * This class implements Least-Squares (NNLS) algorithm.
@@ -28,26 +31,28 @@ import edu.kit.ipd.descartes.redeem.nnls.backend.NNLSLibrary;
  */
 public class LeastSquaresRegression
 		implements
-		IEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<ILinearOutputFunction, Vector>> {
+		IEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<ILinearOutputFunction, Scalar>> {
 
-	private IObservationModel<ILinearOutputFunction, Vector> observationModel;
+	private IObservationModel<ILinearOutputFunction, Scalar> observationModel;
 	private IStateModel<Unconstrained> stateModel;
 
+	// contains all measured throughputs
 	private Matrix throughputs;
+	// contains all measured utilizations
 	private Vector utilizations;
 
 	private final int SIZE_OF_DOUBLE = 8;
 	private final int SIZE_OF_INT = 8;
-	private static final cern.colt.matrix.DoubleFactory2D Factory2D = cern.colt.matrix.DoubleFactory2D.dense;
+	private static final DoubleFactory2D FACTORY2D = DoubleFactory2D.dense;
 
 	public LeastSquaresRegression() {
 	}
 
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
-			IObservationModel<ILinearOutputFunction, Vector> observationModel) {
+			IObservationModel<ILinearOutputFunction, Scalar> observationModel) {
 		this.observationModel = observationModel;
-		this.stateModel = this.stateModel;
+		this.stateModel = stateModel;
 	}
 
 	/**
@@ -59,13 +64,12 @@ public class LeastSquaresRegression
 	 *         squares solution otherwise.
 	 * 
 	 */
-	public Matrix solve(Matrix A, Matrix B) {
+	private Matrix solve(Matrix A, Matrix B) {
 		Algebra alg = new Algebra();
-		DoubleMatrix2D a = Factory2D.make(A.toArray2D());
-		DoubleMatrix2D b = Factory2D.make(B.toArray2D());
+		DoubleMatrix2D a = FACTORY2D.make(A.toArray2D());
+		DoubleMatrix2D b = FACTORY2D.make(B.toArray2D());
 		DoubleMatrix2D x = alg.solve(a, b);
-		Matrix X = matrix(x.toArray());
-		return X;
+		return matrix(x.toArray());
 	}
 
 	/**
@@ -78,41 +82,42 @@ public class LeastSquaresRegression
 	 * @param F
 	 *            m-vector
 	 * @return the solution Vector
+	 * @throws EstimationException 
 	 */
-	public Vector nnls(Matrix E, Vector F) {
+	private Vector nnls(Matrix e, Vector f) throws EstimationException {
 		try {
-			System.loadLibrary("NNLS");
 			// The solution vector
 			Vector result;
 
 			// Check inputs
-			if (E == null || F == null || E.rows() != F.rows())
-				throw new Exception("[NNLS]: Invalid inputs!");
+			if (e == null || f == null || e.rows() != f.rows())
+				throw new IllegalArgumentException("[NNLS]: Invalid inputs!");
 
 			// Inputs
-			int size_of_m_vector = F.rows();
+			int size_of_m_vector = f.rows();
 
 			IntByReference mda = new IntByReference(size_of_m_vector);
 			IntByReference m = new IntByReference(size_of_m_vector); // mda == m
-			IntByReference n = new IntByReference(E.columns());
+			IntByReference n = new IntByReference(e.columns());
 			Memory a = new Memory(SIZE_OF_DOUBLE * mda.getValue()
 					* n.getValue()); // 8 ==
 			// sizeof(double)
-			double[] e = new double[size_of_m_vector * (E.columns())];
-			double[] f = new double[size_of_m_vector];
+			double[] eArray = new double[size_of_m_vector * (e.columns())];
+			double[] fArray = new double[size_of_m_vector];
 			for (int i = 0; i < size_of_m_vector; ++i)
-				f[i] = F.get(i);
+				fArray[i] = f.get(i);
 			int count = 0;
-			for (int i = 0; i < E.columns(); ++i)
-				for (int j = 0; j < E.rows(); ++j) {
-					e[count] = E.get(j, i); // column-order
+			for (int i = 0; i < e.columns(); ++i)
+				for (int j = 0; j < e.rows(); ++j) {
+					eArray[count] = e.get(j, i); // column-order
 					count++;
 				}
-			a.write(0, e, 0, mda.getValue() * n.getValue()); // Fortran expects
-																// column-order
-																// array!
+			a.write(0, eArray, 0, mda.getValue() * n.getValue()); // Fortran
+																	// expects
+																	// column-order
+																	// array!
 			Memory b = new Memory(SIZE_OF_DOUBLE * mda.getValue());
-			b.write(0, f, 0, mda.getValue());
+			b.write(0, fArray, 0, mda.getValue());
 
 			// Outputs
 			Memory x = new Memory(SIZE_OF_DOUBLE * n.getValue());
@@ -133,33 +138,25 @@ public class LeastSquaresRegression
 			return result;
 
 		} catch (Exception ex) {
-			System.out.println("[NNLS]: failed!");
-			return null;
+			//System.out.println("[NNLS]: failed!"); @TODO logging through log4j
+			throw new EstimationException("NNLS failed!");
 		}
 	}
 
 	@Override
-	public Vector estimate() {
+	public Vector estimate() throws EstimationException {
 		// when the sample size is small
 		if (observationModel.getOutputSize() < 1)
 			return vector(0);
-
-		while (true) {
-			if (observationModel.iterator().hasNext()) {
-				ILinearOutputFunction outputFunction = observationModel
-						.iterator().next();
-				utilizations = (Vector) horzcat(utilizations,
-						vector(outputFunction.getObservedOutput()));
-				throughputs = vertcat(throughputs,
-						outputFunction.getIndependentVariables());
-			} else
-				return predict();
+		if (observationModel.iterator().hasNext()) {
+			ILinearOutputFunction outputFunction = observationModel.iterator()
+					.next();
+			utilizations = (Vector) horzcat(utilizations,
+					vector(outputFunction.getObservedOutput()));
+			throughputs = vertcat(throughputs,
+					outputFunction.getIndependentVariables());
 		}
-	}
-
-	private Vector predict() {
-		Vector result = this.nnls(throughputs, utilizations);
-		return result;
+		return nnls(throughputs, utilizations);
 	}
 
 	@Override
