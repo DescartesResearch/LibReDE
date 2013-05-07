@@ -35,6 +35,7 @@ public class LeastSquaresRegression
 
 	private IObservationModel<ILinearOutputFunction, Scalar> observationModel;
 	private IStateModel<Unconstrained> stateModel;
+	private ILinearOutputFunction outputFunction;
 
 	// contains all measured throughputs
 	private Matrix throughputs;
@@ -43,6 +44,7 @@ public class LeastSquaresRegression
 
 	private final int SIZE_OF_DOUBLE = 8;
 	private final int SIZE_OF_INT = 8;
+	private final int MIN_SIZE_OF_ESTIMATION = 2;
 	private static final DoubleFactory2D FACTORY2D = DoubleFactory2D.dense;
 
 	public LeastSquaresRegression() {
@@ -77,15 +79,16 @@ public class LeastSquaresRegression
 	 * We are initially given the m*n matrix E and the m-vector F. Minimize
 	 * ||Ex-F|| subject to x >= 0.
 	 * 
-	 * @param E
+	 * @param e
 	 *            m*n matrix
-	 * @param F
+	 * @param f
 	 *            m-vector
 	 * @return the solution Vector
 	 * @throws EstimationException 
 	 */
-	private Vector nnls(Matrix e, Vector f) throws EstimationException {
-		try {
+	//public for testing
+	public Vector nnls(Matrix e, Vector f){
+		
 			// The solution vector
 			Vector result;
 
@@ -136,27 +139,23 @@ public class LeastSquaresRegression
 			x.read(0, res, 0, res.length);
 			result = vector(res);
 			return result;
-
-		} catch (Exception ex) {
-			//System.out.println("[NNLS]: failed!"); @TODO logging through log4j
-			throw new EstimationException("NNLS failed!");
-		}
 	}
 
 	@Override
 	public Vector estimate() throws EstimationException {
+		if (observationModel.iterator().hasNext())
+			outputFunction = observationModel.iterator().next();
+
+		utilizations = (Vector) horzcat(utilizations,
+				vector(outputFunction.getObservedOutput()));
+		throughputs = vertcat(throughputs,
+				outputFunction.getIndependentVariables());
+
 		// when the sample size is small
-		if (observationModel.getOutputSize() < 1)
+		if (utilizations.columns() < MIN_SIZE_OF_ESTIMATION)
 			return vector(0);
-		if (observationModel.iterator().hasNext()) {
-			ILinearOutputFunction outputFunction = observationModel.iterator()
-					.next();
-			utilizations = (Vector) horzcat(utilizations,
-					vector(outputFunction.getObservedOutput()));
-			throughputs = vertcat(throughputs,
-					outputFunction.getIndependentVariables());
-		}
-		return nnls(throughputs, utilizations);
+		else
+			return nnls(throughputs, utilizations);
 	}
 
 	@Override
