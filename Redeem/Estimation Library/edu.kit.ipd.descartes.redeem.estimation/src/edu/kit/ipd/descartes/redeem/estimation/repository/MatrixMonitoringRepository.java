@@ -73,7 +73,10 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 
 		if (query.getAggregation().equals(Aggregation.LAST))
 			return new Result<T>((T) table.getLastMeasurement(), entities);
-		else if (query.getAggregation().equals(Aggregation.AVERAGE)) {	
+		else if (query.getAggregation().equals(Aggregation.AVERAGE)) {
+			
+			if(query.getWindowSize() > table.getSize())
+				throw new IndexOutOfBoundsException("window size is larger than measurements!");
 			if(query.getWindowSize() == 0 )
 				return new Result<T>((T) zero, entities);
 			
@@ -91,6 +94,8 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 
 			return new Result<T>((T) measurements, entities);
 		} else {
+			if(query.getWindowSize() > table.getSize())
+				throw new IndexOutOfBoundsException("window size is larger than measurements!");
 			if(query.getWindowSize() == 0 )
 				return new Result<T>((T) zero, entities);
 			
@@ -126,6 +131,9 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 		}
 
 		else if (query.getAggregation().equals(Aggregation.AVERAGE)) {
+			
+			if(query.getWindowSize() > table.getSize())
+				throw new IndexOutOfBoundsException("window size is larger than measurements!");
 			if(query.getWindowSize() == 0 )
 				return new Result<T>((T) scalar(0), entities);
 			
@@ -138,6 +146,8 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 			double avg = sum / entityData.rows();
 			return new Result<T>((T) scalar(avg), entities);
 		} else {
+			if(query.getWindowSize() > table.getSize())
+				throw new IndexOutOfBoundsException("window size is larger than measurements!");
 			if(query.getWindowSize() == 0 )
 				return new Result<T>((T) scalar(0), entities);
 			
