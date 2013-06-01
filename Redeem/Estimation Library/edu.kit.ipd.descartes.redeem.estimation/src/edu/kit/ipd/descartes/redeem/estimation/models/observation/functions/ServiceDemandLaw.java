@@ -17,6 +17,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	
 	private Resource res_i;
 	private Service cls_r;
+	private int WINDOW_SIZE = 2;
 	
 	private IMonitoringRepository repository;
 	
@@ -24,6 +25,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	private Query<Vector> avgResponseTimeQuery;
 	private Query<Vector> avgThroughputQuery;
 	private Query<Scalar> avgThroughputQueryCurrentService;
+	
 	
 	public ServiceDemandLaw(SystemModel system, IMonitoringRepository repository,
 			Resource resource,
@@ -39,10 +41,10 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		res_i = resource;
 		cls_r = workloadClass;
 		
-		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average();
-		avgResponseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forAllServices().average();
-		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average();
-		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(workloadClass).average();
+		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average(WINDOW_SIZE);
+		avgResponseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forAllServices().average(WINDOW_SIZE);
+		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
+		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(workloadClass).average(WINDOW_SIZE);
 	}
 
 	@Override

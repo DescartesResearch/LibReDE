@@ -2,8 +2,10 @@ package edu.kit.ipd.descartes.redeem.estimation.repository;
 
 import java.util.HashMap;
 import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.linalg.VectorInitializer;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Aggregation;
 import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
 import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
@@ -23,7 +25,7 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 	public MatrixMonitoringRepository() {
 
 	}
-
+	
 	@Override
 	public <T extends Matrix> Result<T> execute(Query<T> query) {
 
@@ -31,7 +33,7 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 				|| query.getType().equals(Query.Type.ALL_SERVICES))
 			return executeSelectQueryForAllEntities(query);
 		else
-			return  executeSelectQueryForEntity(query);
+			return executeSelectQueryForEntity(query);
 	}
 
 	public void createMesurementTable(MeasurementTable measurementTable) {
@@ -42,11 +44,21 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 					measurementTable);
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends Matrix> Result<T> executeSelectQueryForAllEntities(
 			Query<T> query) {
 		MeasurementTable table = repository.get(query.getMetric().toString());
 		IModelEntity[] entities;
 
+		//zero Vector
+		Vector zero = vector(table.columns(), new VectorInitializer() {					
+			@Override
+			public double cell(int row) {
+				return 0;
+			}
+		});
+		
+		// TODO throw exception
 		if (table == null)
 			return null;
 
@@ -60,19 +72,42 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 				entities[i] = new Resource(table.getEntityNames()[i]);
 
 		if (query.getAggregation().equals(Aggregation.LAST))
-			return  new Result<T>((T) table.getLastMeasurement(),
-					entities);
-		else if (query.getAggregation().equals(Aggregation.AVERAGE)) {
-			double sum = sum(table.getAllMesurenments());
-			double avg = sum / (table.columns() * table.getSize());
-			return   new Result<T>((T) scalar(avg), entities);
+			return new Result<T>((T) table.getLastMeasurement(), entities);
+		else if (query.getAggregation().equals(Aggregation.AVERAGE)) {	
+			if(query.getWindowSize() == 0 )
+				return new Result<T>((T) zero, entities);
+			
+			Matrix measurements;
+			int numberOfRows = table.getSize();
+
+			measurements = table.getAllMeasurements().row(numberOfRows - 1);
+			for (int i = 1; i < query.getWindowSize(); ++i) {
+				measurements = measurements.plus(table.getAllMeasurements().row(
+						numberOfRows - i - 1));
+			}
+			numberOfRows = query.getWindowSize();
+
+			measurements = measurements.times(1.0/(double)numberOfRows);
+
+			return new Result<T>((T) measurements, entities);
 		} else {
-			double sum = sum(table.getAllMesurenments());
-			return  new Result<T>((T) scalar(sum), entities);
+			if(query.getWindowSize() == 0 )
+				return new Result<T>((T) zero, entities);
+			
+			Matrix measurements;
+			int numberOfRows = table.getSize();
+
+			measurements = table.getAllMeasurements().row(numberOfRows - 1);
+			for (int i = 1; i < query.getWindowSize(); ++i)
+				measurements = measurements.plus(table.getAllMeasurements().row(
+						numberOfRows - i - 1));
+
+			return new Result<T>((T) measurements, entities);
 		}
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends Matrix> Result<T> executeSelectQueryForEntity(
 			Query<T> query) {
 		MeasurementTable table = repository.get(query.getMetric().toString());
@@ -91,12 +126,28 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 		}
 
 		else if (query.getAggregation().equals(Aggregation.AVERAGE)) {
-			double sum = sum(table.getColumn(query.getEntity().getName()));
-			double avg = sum / (table.columns() * table.getSize());
-			return  new Result<T>((T) scalar(avg), entities);
+			if(query.getWindowSize() == 0 )
+				return new Result<T>((T) scalar(0), entities);
+			
+			Vector entityData = table.getColumn(query.getEntity().getName());
+			if (entityData.rows() > query.getWindowSize()) {
+				entityData = entityData.slice(new Range(entityData.rows() - query
+						.getWindowSize() , entityData.rows()));
+			}
+			double sum = sum(entityData);
+			double avg = sum / entityData.rows();
+			return new Result<T>((T) scalar(avg), entities);
 		} else {
-			double sum = sum(table.getColumn(query.getEntity().getName()));
-			return  new Result<T>((T) scalar(sum), entities);
+			if(query.getWindowSize() == 0 )
+				return new Result<T>((T) scalar(0), entities);
+			
+			Vector entityData = table.getColumn(query.getEntity().getName());
+			if (entityData.rows() > query.getWindowSize()) {
+				entityData = entityData.slice(new Range(entityData.rows() - query
+						.getWindowSize() , entityData.rows()));
+			}
+			double sum = sum(entityData);
+			return new Result<T>((T) scalar(sum), entities);
 		}
 	}
 

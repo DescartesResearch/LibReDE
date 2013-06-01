@@ -14,3 +14,4 @@ Export-Package: edu.kit.ipd.descartes.redeem.estimation.models.algorithm,
  edu.kit.ipd.descartes.redeem.estimation.models.state.constraints,
  edu.kit.ipd.descartes.redeem.estimation.repository,
  edu.kit.ipd.descartes.redeem.estimation.system
+Import-Package: edu.kit.ipd.descartes.redeem.exceptions

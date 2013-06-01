@@ -54,16 +54,17 @@ public class QueryBuilder {
 	
 	public class ForClause<T extends Matrix> {
 		
-		public Query<T> sum() {
-			return new Query<>(Aggregation.SUM, type, metric, entity);
+		//TODO window size
+		public Query<T> sum(int windowSize) {
+			return new Query<>(Aggregation.SUM, type, metric, entity, windowSize);
 		}
 		
-		public Query<T> average() {
-			return new Query<>(Aggregation.AVERAGE, type, metric, entity);
+		public Query<T> average(int windowSize) {
+			return new Query<>(Aggregation.AVERAGE, type, metric, entity, windowSize);
 		}
 				
 		public Query<T> last() {			
-			return new Query<>(Aggregation.LAST, type, metric, entity);
+			return new Query<>(Aggregation.LAST, type, metric, entity,1);
 		}
 	}
 	

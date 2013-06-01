@@ -1,13 +1,13 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation.impl;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.models.diff.observation.AbstractLinearObservationModel;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 
-public class UtilizationLawModel extends AbstractLinearObservationModel {
-
+public class UtilizationLawModel  {
+/*
 	private IMonitoringRepository[] utilization;
 	private IMonitoringRepository throughput;
 
@@ -65,6 +65,6 @@ public class UtilizationLawModel extends AbstractLinearObservationModel {
 			util[i] = utilization[i].getCurrentSample().get(0);
 		}
 		return vector(util);
-	}
+	}*/
 
 }

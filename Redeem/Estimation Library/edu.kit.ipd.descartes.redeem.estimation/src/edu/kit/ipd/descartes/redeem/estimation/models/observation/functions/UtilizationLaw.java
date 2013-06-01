@@ -30,6 +30,7 @@ import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
 public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
+	private int WINDOW_SIZE = 2;
 	
 	private IMonitoringRepository repository;
 	
@@ -48,8 +49,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		
 		res_i = resource;
 		
-		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average();
-		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average();
+		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
+		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average(WINDOW_SIZE);
 	}
 
 	/* (non-Javadoc)

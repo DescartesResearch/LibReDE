@@ -43,10 +43,7 @@ public class MeasurementTable {
 	// returns measurements for specific resource/service
 	public Vector getColumn(String entityNames) {
 		int index = Arrays.asList(this.entityNames).indexOf(entityNames);
-		if (index >= 0)
-			return table.column(index);
-		else
-			return null;
+		return table.column(index);
 	}
 
 	// add new measurement for all services/resources
@@ -63,7 +60,7 @@ public class MeasurementTable {
 		return metric;
 	}
 
-	public Matrix getAllMesurenments() {
+	public Matrix getAllMeasurements() {
 		return table;
 	}
 
