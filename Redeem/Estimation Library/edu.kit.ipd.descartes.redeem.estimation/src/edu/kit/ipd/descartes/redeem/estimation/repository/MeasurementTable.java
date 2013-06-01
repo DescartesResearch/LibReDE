@@ -22,6 +22,8 @@ public class MeasurementTable {
 	private String[] entityNames;
 	private Matrix table;
 	private Metric metric;
+	
+	private int index;
 
 	public MeasurementTable(IModelEntity[] entities, Metric metric) {
 		this.entityNames = new String[entities.length];
@@ -71,5 +73,24 @@ public class MeasurementTable {
 	public int columns() {
 		return table.columns();
 	}
-
+	
+	public boolean hasNext()
+	{
+		if( index >= table.rows() || table == null)
+			return false;
+		else 
+			return true;
+	}
+	
+	public Vector next()
+	{
+		if(index + 1 != table.rows() || table == null)
+			return null;
+		else
+		{
+			index++;
+			return table.row(index - 1);
+		}
+	}
+	
 }

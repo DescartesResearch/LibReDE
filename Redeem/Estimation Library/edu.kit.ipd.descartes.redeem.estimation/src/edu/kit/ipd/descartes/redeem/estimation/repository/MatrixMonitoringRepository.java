@@ -20,7 +20,7 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.*;
  */
 public class MatrixMonitoringRepository implements IMonitoringRepository {
 
-	HashMap<String, MeasurementTable> repository = new HashMap<String, MeasurementTable>();
+	HashMap<Metric, MeasurementTable> repository = new HashMap<Metric, MeasurementTable>();
 
 	public MatrixMonitoringRepository() {
 
@@ -40,14 +40,14 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 		if (measurementTable != null
 				&& !repository.containsKey(measurementTable.getMetric()
 						.toString()))
-			repository.put(measurementTable.getMetric().toString(),
+			repository.put(measurementTable.getMetric(),
 					measurementTable);
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T extends Matrix> Result<T> executeSelectQueryForAllEntities(
 			Query<T> query) {
-		MeasurementTable table = repository.get(query.getMetric().toString());
+		MeasurementTable table = repository.get(query.getMetric());
 		IModelEntity[] entities;
 
 		//zero Vector
@@ -110,7 +110,7 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 	@SuppressWarnings("unchecked")
 	private <T extends Matrix> Result<T> executeSelectQueryForEntity(
 			Query<T> query) {
-		MeasurementTable table = repository.get(query.getMetric().toString());
+		MeasurementTable table = repository.get(query.getMetric());
 		IModelEntity[] entities;
 
 		if (table == null)
@@ -149,6 +149,18 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 			double sum = sum(entityData);
 			return new Result<T>((T) scalar(sum), entities);
 		}
+	}
+
+	@Override
+	public boolean hasNext(Metric metric) {
+		MeasurementTable table = repository.get(metric);
+		return table.hasNext();
+	}
+
+	@Override
+	public Vector next(Metric metric) {
+		MeasurementTable table = repository.get(metric);
+		return table.next();
 	}
 
 }
