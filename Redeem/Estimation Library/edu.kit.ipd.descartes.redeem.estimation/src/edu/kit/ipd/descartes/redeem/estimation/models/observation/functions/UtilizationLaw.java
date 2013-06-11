@@ -1,7 +1,10 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+
 import java.util.Arrays;
 
+import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
@@ -31,11 +34,13 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
 	private int WINDOW_SIZE = 2;
+	private final IMonitoringRepository repository;
 	
-	private IMonitoringRepository repository;
+	private final Query<Vector> throughputQuery;
+	private final Query<Scalar> utilizationQuery;
 	
-	private Query<Vector> throughputQuery;
-	private Query<Scalar> utilizationQuery;
+	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
+	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
 	
 	public UtilizationLaw(SystemModel system, IMonitoringRepository repository,
 			Resource resource) {
@@ -45,9 +50,10 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 			throw new IllegalArgumentException();
 		}
 		
-		this.repository = repository;
+		this.repository = repository;		
 		
-		res_i = resource;
+		variables = zeros(system.getState().getStateSize());
+		varFocusedRange = system.getState().getRange(resource);
 		
 		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
 		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average(WINDOW_SIZE);
@@ -58,7 +64,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public Vector getIndependentVariables() {
-		return repository.execute(throughputQuery).getData();
+		return variables.set(varFocusedRange, repository.execute(throughputQuery).getData());
 	}
 
 	/* (non-Javadoc)

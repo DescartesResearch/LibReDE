@@ -1,7 +1,8 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
-import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 
@@ -33,12 +34,15 @@ public class UtilizationLawTest {
 		resource = generator.getSystemModel().getResources().get(RESOURCE_IDX);
 		law = new UtilizationLaw(generator.getSystemModel(), generator, resource);
 		current = generator.nextObservation();
-		state = generator.getDemands().slice(generator.getSystemModel().getState().getRange(resource));
+		state = generator.getDemands();
 	}
 
 	@Test
-	public void testGetIndependentVariables() {		
-		assertThat(law.getIndependentVariables()).isEqualTo(current.getMeanThroughput(), offset(1e-9));
+	public void testGetIndependentVariables() {
+		Vector varVector = law.getIndependentVariables();		
+		Vector expectedVarVector = zeros(state.rows()).set(generator.getSystemModel().getState().getRange(resource), current.getMeanThroughput());
+		
+		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}
 
 	@Test
