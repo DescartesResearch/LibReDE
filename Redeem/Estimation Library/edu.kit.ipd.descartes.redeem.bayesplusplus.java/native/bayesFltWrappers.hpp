@@ -39,6 +39,7 @@ public:
 		const double* xNextArr = ffunc(xArr);
 
 		std::copy(xNextArr, xNextArr + x_cur.size(), x_cur.begin());
+
 		return x_cur;
 	}
 
@@ -65,6 +66,7 @@ public:
 		const double* outArr = hfunc(xArr);
 
 		std::copy(outArr, outArr + z_cur.size(), z_cur.begin());
+
 		return z_cur;
 	}
 

@@ -38,15 +38,17 @@ BF::Covariance_scheme* create_covariance_scheme(std::size_t x_size);
 
 void dispose_covariance_scheme(BF::Covariance_scheme* scheme);
 
-void init_kalman(BF::Covariance_scheme* scheme, double* x_0, double* X_0, std::size_t x_size);
+int init_kalman(BF::Covariance_scheme* scheme, double* x_0, double* X_0, std::size_t x_size);
 
-void predict(BF::Covariance_scheme* scheme, BF::Linrz_predict_model* predict_model);
+int predict(BF::Covariance_scheme* scheme, BF::Linrz_predict_model* predict_model);
 
-void observe(BF::Covariance_scheme* scheme, BF::Linrz_uncorrelated_observe_model* observe_model, double* z, std::size_t z_size);
+int observe(BF::Covariance_scheme* scheme, BF::Linrz_uncorrelated_observe_model* observe_model, double* z, std::size_t z_size);
 
-void update(BF::Covariance_scheme* scheme);
+int update(BF::Covariance_scheme* scheme);
 
 void get_x(BF::Covariance_scheme* scheme, double* x);
+
+const char* get_last_error();
 
 }
 

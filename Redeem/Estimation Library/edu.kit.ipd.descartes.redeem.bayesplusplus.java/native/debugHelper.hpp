@@ -1,5 +1,5 @@
-#define TRACE
-#define ASSERT
+//#define TRACE
+//#define ASSERT
 
 void assert_transformed_vector(FM::Vec vec, double* arr) {
 	for (unsigned int i = 0; i < vec.size(); i++)

@@ -9,14 +9,30 @@
 #include "CWrapper.h"
 #include "debugHelper.hpp"
 
+const int ERROR = -1;
+const int OK = 0;
+
+static const char* last_error = 0;
+
 BF::Linrz_predict_model* create_linrz_predict_model(std::size_t x_size, std::size_t q_size, H_callback hfunc)
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: create_linrz_predict_model(" << x_size << ", " << q_size << ", hfunc)" << std::endl;
-	std::cout << "END FUNCTION CALL: create_linrz_predict_model" << std::endl;
 #endif
 
-	return new Linrz_predict_model_java_wrapper(x_size, q_size, hfunc);
+	BF::Linrz_predict_model* model = 0;
+	try {
+		model = new Linrz_predict_model_java_wrapper(x_size, q_size, hfunc);
+	}
+	catch(const std::exception& e)
+	{
+		last_error = e.what();
+	}
+
+#ifdef TRACE
+	std::cout << "END FUNCTION CALL: create_linrz_predict_model" << std::endl;
+#endif
+	return model;
 }
 
 void dispose_linrz_predict_model(BF::Linrz_predict_model* model)
@@ -58,6 +74,7 @@ void set_G(BF::Linrz_predict_model* predict_model, double* G, std::size_t x_size
 	std::cout << "FUNCTION CALL: set_G(model, G, x_size=" << x_size << ")" << std::endl;
 	std::cout << "INPUT MATRIX: G="; print_matrix(G, x_size, x_size); std::cout << std::endl;
 #endif
+
 	std::copy(G, G + x_size*x_size, predict_model->G.data().begin());
 
 #ifdef TRACE
@@ -95,10 +112,22 @@ BF::Linrz_uncorrelated_observe_model* create_linrz_uncorrelated_observe_model(st
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: create_linrz_uncorrelated_observe_model(x_size=" << x_size << ", z_size=" << z_size << ", ffunc)" << std::endl;
-	std::cout << "END FUNCTION CALL: create_linrz_uncorrelated_observe_mode" << std::endl;
 #endif
 
-	return new Linrz_uncorrelated_observe_model_java_wrapper(x_size, z_size, ffunc);
+	BF::Linrz_uncorrelated_observe_model* model = 0;
+	try
+	{
+		model = new Linrz_uncorrelated_observe_model_java_wrapper(x_size, z_size, ffunc);
+	}
+	catch(const std::exception& e)
+	{
+		last_error = e.what();
+	}
+
+#ifdef TRACE
+	std::cout << "END FUNCTION CALL: create_linrz_uncorrelated_observe_mode" << std::endl;
+#endif
+	return model;
 }
 
 void dispose_linrz_uncorrelated_observe_model(BF::Linrz_uncorrelated_observe_model* model)
@@ -158,9 +187,21 @@ BF::Covariance_scheme* create_covariance_scheme(std::size_t x_size)
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: create_covariance_scheme(x_size=" << x_size << ")" << std::endl;
+#endif
+
+	BF::Covariance_scheme* scheme = 0;
+	try {
+		scheme = new BF::Covariance_scheme(x_size);
+	}
+	catch(const std::exception& e)
+	{
+		last_error = e.what();
+	}
+
+#ifdef TRACE
 	std::cout << "END FUNCTION CALL: create_covariance_scheme" << std::endl;
 #endif
-	return new BF::Covariance_scheme(x_size);
+	return scheme;
 }
 
 void dispose_covariance_scheme(BF::Covariance_scheme* scheme)
@@ -174,7 +215,7 @@ void dispose_covariance_scheme(BF::Covariance_scheme* scheme)
 #endif
 }
 
-void init_kalman(BF::Covariance_scheme* scheme, double* x_0, double* X_0, std::size_t x_size)
+int init_kalman(BF::Covariance_scheme* scheme, double* x_0, double* X_0, std::size_t x_size)
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: init_kalman(scheme, x_0, X_0, x_size=" << x_size << ")" << std::endl;
@@ -198,27 +239,45 @@ void init_kalman(BF::Covariance_scheme* scheme, double* x_0, double* X_0, std::s
 #endif
 
 	FM::SymMatrix X0_Mat_sym(X0_Mat);
-	scheme->init_kalman(x0_Vec, X0_Mat_sym);
+
+	try
+	{
+		scheme->init_kalman(x0_Vec, X0_Mat_sym);
+	}
+	catch(const std::exception& e) {
+		last_error = e.what();
+		return ERROR;
+	}
 
 #ifdef TRACE
 	std::cout << "END FUNCTION CALL: init_kalman" << std::endl;
 #endif
+	return OK;
 }
 
-void predict(BF::Covariance_scheme* scheme, BF::Linrz_predict_model* predict_model)
+int predict(BF::Covariance_scheme* scheme, BF::Linrz_predict_model* predict_model)
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: predict(scheme, predict_model)" << std::endl;
 #endif
 
-	scheme->predict(*predict_model);
+	try
+	{
+		scheme->predict(*predict_model);
+	}
+	catch(const std::exception& e)
+	{
+		last_error = e.what();
+		return ERROR;
+	}
 
 #ifdef TRACE
 	std::cout << "END FUNCTION CALL: predict" << std::endl;
 #endif
+	return OK;
 }
 
-void observe(BF::Covariance_scheme* scheme, BF::Linrz_uncorrelated_observe_model* observe_model, double* z, std::size_t z_size)
+int observe(BF::Covariance_scheme* scheme, BF::Linrz_uncorrelated_observe_model* observe_model, double* z, std::size_t z_size)
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: observe(scheme, observe_model, z, z_size=" << z_size << ")" << std::endl;
@@ -235,24 +294,42 @@ void observe(BF::Covariance_scheme* scheme, BF::Linrz_uncorrelated_observe_model
 	assert_transformed_vector(zVec, z);
 #endif
 
-	scheme->observe(*observe_model, zVec);
+	try
+	{
+		scheme->observe(*observe_model, zVec);
+	}
+	catch(const std::exception& e)
+	{
+		last_error = e.what();
+		return ERROR;
+	}
 
 #ifdef TRACE
 	std::cout << "END FUNCTION CALL: observe" << std::endl;
 #endif
+	return OK;
 }
 
-void update(BF::Covariance_scheme* scheme)
+int update(BF::Covariance_scheme* scheme)
 {
 #ifdef TRACE
 	std::cout << "FUNCTION CALL: observe(scheme)" << std::endl;
 #endif
 
-	scheme->update();
+	try
+	{
+		scheme->update();
+	}
+	catch(const std::exception& e)
+	{
+		last_error = e.what();
+		return ERROR;
+	}
 
 #ifdef TRACE
 	std::cout << "END FUNCTION CALL: update" << std::endl;
 #endif
+	return OK;
 }
 
 void get_x(BF::Covariance_scheme* scheme, double* x)
@@ -275,6 +352,13 @@ void get_x(BF::Covariance_scheme* scheme, double* x)
 	std::cout << "END FUNCTION CALL: get_x" << std::endl;
 #endif
 
+}
+
+const char* get_last_error()
+{
+	const char* temp = last_error;
+	last_error = 0;
+	return temp;
 }
 
 
