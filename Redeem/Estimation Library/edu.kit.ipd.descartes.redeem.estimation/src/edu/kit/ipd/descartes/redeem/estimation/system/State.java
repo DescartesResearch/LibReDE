@@ -8,10 +8,11 @@ import edu.kit.ipd.descartes.linalg.Range;
 
 public class State {
 	
-	private Map<Resource, Range> ranges = new HashMap<>();
-	private Map<Service, Integer> serviceIndex = new HashMap<>();
-	private List<Resource> resources;
-	private List<Service> services;
+	private final Map<Resource, Range> ranges = new HashMap<>();
+	private final Map<Service, Integer> serviceIndex = new HashMap<>();
+	private final List<Resource> resources;
+	private final List<Service> services;
+	private final int stateSize;
 	
 	State(List<Resource> resources, List<Service> services) {
 		this.services = services;
@@ -23,6 +24,7 @@ public class State {
 			Range r = new Range(i * services.size(), (i + 1) * services.size());
 			ranges.put(resources.get(i), r);
 		}
+		this.stateSize = resources.size() * services.size();
 	}
 	
 	public Range getRange(Resource resource) {
@@ -40,6 +42,10 @@ public class State {
 	
 	public Service getService(int index) {
 		return services.get(index % services.size());
+	}
+	
+	public int getStateSize() {
+		return stateSize;
 	}
 
 }
