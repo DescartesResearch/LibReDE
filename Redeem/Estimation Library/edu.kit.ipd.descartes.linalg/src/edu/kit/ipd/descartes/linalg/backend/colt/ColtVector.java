@@ -52,7 +52,7 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 
 	@Override
 	public double dot(VectorImplementation b) {
-		return zDotProduct(getVectorContent(b));
+		return zDotProduct(getColtVector(b));
 	}
 
 	@Override
@@ -101,32 +101,32 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 	@Override
 	public ColtVector plus(MatrixImplementation a) {
 		ColtVector res = (ColtVector) copy();
-		res.assign(getVectorContent(a), Functions.plus);
+		res.assign(getColtVector(a), Functions.plus);
 		return res;
 	}
 
 	@Override
 	public ColtVector minus(MatrixImplementation a) {
 		ColtVector res = (ColtVector) copy();
-		res.assign(getVectorContent(a), Functions.minus);
+		res.assign(getColtVector(a), Functions.minus);
 		return res;
 	}
 	
 	@Override
 	public MatrixImplementation arrayMultipliedBy(MatrixImplementation a) {
 		ColtVector res = (ColtVector) copy();
-		res.assign(getVectorContent(a), Functions.mult);
+		res.assign(getColtVector(a), Functions.mult);
 		return res;
 	}
 
 	@Override
 	public MatrixImplementation multipliedBy(MatrixImplementation a) {
-		ColtVector vector = getVectorContent(a);
+		ColtVector vector = getColtVector(a);
 		ColtMatrix result = (ColtMatrix)ALG.multOuter(this, vector, null);
 		return result;			
 	}
 	
-	private ColtVector getVectorContent(MatrixImplementation a) {
+	private ColtVector getColtVector(MatrixImplementation a) {
 		if (a instanceof ColtVector) {
 			return (ColtVector)a;
 		} else {
@@ -134,7 +134,7 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 		}
 	}
 	
-	private ColtMatrix getMatrixContent(MatrixImplementation a) {
+	private ColtMatrix getColtMatrix(MatrixImplementation a) {
 		if (a instanceof ColtMatrix) {
 			return (ColtMatrix)a;
 		} else {
@@ -155,7 +155,7 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 		
 		ColtMatrix combined = new ColtMatrix(this.rows(), 1 + a.columns());
 		combined.viewPart(0, 0, this.rows(), 1).assign(this.toArray2D());
-		combined.viewPart(0, 1, a.rows(), a.columns()).assign(getMatrixContent(a));
+		combined.viewPart(0, 1, a.rows(), a.columns()).assign(getColtMatrix(a));
 		return combined;
 	}
 	
@@ -166,7 +166,7 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 		}
 		ColtVector combined = new ColtVector(this.size() + a.rows());
 		combined.viewPart(0, this.size()).assign(this);
-		combined.viewPart(this.size(), a.rows()).assign(getVectorContent(a));		
+		combined.viewPart(this.size(), a.rows()).assign(getColtVector(a));		
 		return combined;
 	}
 	
@@ -191,7 +191,7 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 
 	@Override
 	public double get(int row, int col) {
-		if (col > 0) {
+		if (col != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return get(row);
@@ -228,5 +228,22 @@ public class ColtVector extends DenseDoubleMatrix1D implements VectorImplementat
 			temp[i][0] = this.get(i);
 		}
 		return temp;
+	}
+
+	@Override
+	public MatrixImplementation copyAndSet(int row, int col, double value) {
+		if (col != 0) {
+			throw new IndexOutOfBoundsException();
+		}		
+		ColtVector copy = (ColtVector)this.copy();
+		copy.set(row, value);
+		return copy;
+	}
+
+	@Override
+	public VectorImplementation copyAndSet(Range rows, VectorImplementation values) {
+		ColtVector copy = (ColtVector)this.copy();
+		copy.viewPart(rows.getStart(), rows.getLength()).assign(getColtVector(values));
+		return copy;
 	}
 }

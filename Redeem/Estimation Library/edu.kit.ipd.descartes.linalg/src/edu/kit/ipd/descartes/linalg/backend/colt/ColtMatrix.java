@@ -219,4 +219,11 @@ public class ColtMatrix extends DenseDoubleMatrix2D implements
 		return new ColtMatrix(rows, columns);
 	}
 
+	@Override
+	public MatrixImplementation copyAndSet(int row, int col, double value) {
+		ColtMatrix copy = (ColtMatrix)this.copy();
+		copy.set(row, col, value);
+		return copy;
+	}
+
 }

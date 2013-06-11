@@ -17,7 +17,15 @@ public class Vector extends Matrix {
 	}
 
 	public double get(int row) {
-		return ((VectorImplementation)delegate).get(row);
+		return ((VectorImplementation)delegate).get(row, 0);
+	}
+	
+	public Vector set(int row, double value) {
+		return set(row, 0, value);
+	}
+	
+	public Vector set(Range rows, Vector values) {
+		return newInstance(((VectorImplementation)delegate).copyAndSet(rows, (VectorImplementation)values.delegate));
 	}
 	
 	public Vector slice(Range range) {

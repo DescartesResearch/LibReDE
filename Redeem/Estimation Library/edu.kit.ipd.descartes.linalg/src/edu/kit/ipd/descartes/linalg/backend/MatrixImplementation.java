@@ -19,7 +19,9 @@ public interface MatrixImplementation {
 	MatrixImplementation appendColumns(MatrixImplementation a);
 	
 	double get(int row, int col);
-
+	
+	MatrixImplementation copyAndSet(int row, int col, double value);
+	
 	int rows();
 
 	int columns();
@@ -47,5 +49,4 @@ public interface MatrixImplementation {
 	double[][] toArray2D();
 
 	void toDoubleStorage(DoubleStorage storage);
-
 }

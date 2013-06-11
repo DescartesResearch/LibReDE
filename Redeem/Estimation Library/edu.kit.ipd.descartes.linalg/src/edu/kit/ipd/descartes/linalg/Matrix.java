@@ -19,6 +19,10 @@ public class Matrix {
 	public double get(int row, int col) {
 		return delegate.get(row, col);
 	}
+	
+	public <M extends Matrix> M set(int row, int col, double value) {
+		return newInstance(delegate.copyAndSet(row, col, value));
+	}
 
 	public int rows() {
 		return delegate.rows();

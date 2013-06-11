@@ -94,7 +94,7 @@ public class Scalar extends Vector {
 
 		@Override
 		public double get(int row, int col) {
-			if (row > 0 || col > 0) {
+			if (row != 0 || col != 0) {
 				throw new IndexOutOfBoundsException();
 			}
 			return value;
@@ -177,14 +177,6 @@ public class Scalar extends Vector {
 		}
 
 		@Override
-		public double get(int row) {
-			if (row > 0) {
-				throw new IndexOutOfBoundsException();
-			}
-			return value;
-		}
-
-		@Override
 		public VectorImplementation slice(Range range) {
 			if (range.getStart() != 0 && range.getEnd() != 1) {
 				throw new IndexOutOfBoundsException();
@@ -198,6 +190,26 @@ public class Scalar extends Vector {
 				throw new IllegalArgumentException("Dimensions of operands do not match.");
 			}		
 			return value * ((ScalarImplementation)b).value;
+		}
+
+		@Override
+		public MatrixImplementation copyAndSet(int row, int col, double value) {
+			if (row != 0 || col != 0) {
+				throw new IndexOutOfBoundsException();
+			}
+			return new ScalarImplementation(value);
+		}
+
+		@Override
+		public VectorImplementation copyAndSet(Range rows,
+				VectorImplementation values) {
+			if (rows.getStart() != 0 || rows.getEnd() != 1) {
+				throw new IndexOutOfBoundsException();
+			}
+			if (values.rows() != 1) {
+				throw new IllegalArgumentException("Size of values vector must match range specification.");
+			}
+			return new ScalarImplementation(values.get(0, 0));
 		}
 		
 	}

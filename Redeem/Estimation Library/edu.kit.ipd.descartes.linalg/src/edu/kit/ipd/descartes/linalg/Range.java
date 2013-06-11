@@ -22,4 +22,8 @@ public class Range {
 	public String toString() {
 		return "Range: [" + start + ", " + end + ")";
 	}
+
+	public int getLength() {
+		return end - start;
+	}
 }
