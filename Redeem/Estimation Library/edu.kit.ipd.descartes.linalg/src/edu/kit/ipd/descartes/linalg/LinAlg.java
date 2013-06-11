@@ -146,9 +146,9 @@ public class LinAlg {
 	}
 	
 	public static Matrix vertcat(Matrix...rows) {
-		if (rows.length < 2) {
-			throw new IllegalArgumentException("At least two matrices required.");
-		}
+		if (rows.length < 1) {
+			throw new IllegalArgumentException("At least one row required.");
+		}		
 		MatrixImplementation res = rows[0].delegate;
 		for (int i = 1; i < rows.length; i++) {
 			res = res.appendRows(rows[i].delegate);
@@ -157,8 +157,8 @@ public class LinAlg {
 	}
 	
 	public static Matrix horzcat(Matrix...cols) {
-		if (cols.length < 2) {
-			throw new IllegalArgumentException("At least two matrices required.");
+		if (cols.length < 1) {
+			throw new IllegalArgumentException("At least one column required.");
 		}
 		MatrixImplementation res = cols[0].delegate;
 		for (int i = 1; i < cols.length; i++) {
