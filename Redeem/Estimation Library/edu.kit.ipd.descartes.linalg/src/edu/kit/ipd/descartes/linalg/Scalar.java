@@ -37,7 +37,7 @@ public class Scalar extends Vector {
 		return false;
 	}
 
-	private static class ScalarImplementation implements VectorImplementation {
+	static class ScalarImplementation implements VectorImplementation {
 		
 		public double value;
 

@@ -3,6 +3,7 @@ package edu.kit.ipd.descartes.linalg;
 import edu.kit.ipd.descartes.linalg.backend.MatrixFactory;
 import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
 import edu.kit.ipd.descartes.linalg.backend.SquareMatrixImplementation;
+import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
 import edu.kit.ipd.descartes.linalg.backend.colt.ColtMatrixFactory;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
@@ -152,8 +153,16 @@ public class LinAlg {
 		MatrixImplementation res = rows[0].delegate;
 		for (int i = 1; i < rows.length; i++) {
 			res = res.appendRows(rows[i].delegate);
-		}		
-		return new Matrix(res);
+		}
+		if (res.columns() == 1) {
+			if (res.rows() == 1) {
+				return new Scalar((Scalar.ScalarImplementation)res);
+			} else {
+				return new Vector((VectorImplementation)res);
+			}
+		} else {		
+			return new Matrix(res);
+		}
 	}
 	
 	public static Matrix horzcat(Matrix...cols) {
@@ -164,7 +173,15 @@ public class LinAlg {
 		for (int i = 1; i < cols.length; i++) {
 			res = res.appendColumns(cols[i].delegate);
 		}		
-		return new Matrix(res);
+		if (res.columns() == 1) {
+			if (res.rows() == 1) {
+				return new Scalar((Scalar.ScalarImplementation)res);
+			} else {
+				return new Vector((VectorImplementation)res);
+			}
+		} else {		
+			return new Matrix(res);
+		}
 	}
 	
 	public static Matrix repmat(Matrix a, int vertical, int horizontal) {
@@ -177,7 +194,15 @@ public class LinAlg {
 		for (int i = 1; i < vertical; i++) {
 			res = res.appendRows(row);
 		}
-		return new Matrix(res);
+		if (res.columns() == 1) {
+			if (res.rows() == 1) {
+				return new Scalar((Scalar.ScalarImplementation)res);
+			} else {
+				return new Vector((VectorImplementation)res);
+			}
+		} else {		
+			return new Matrix(res);
+		}
 	}
 
 	public static <M extends Matrix> M abs(M a) {
@@ -323,5 +348,4 @@ public class LinAlg {
 		}
 		return idx;
 	}
-
 }

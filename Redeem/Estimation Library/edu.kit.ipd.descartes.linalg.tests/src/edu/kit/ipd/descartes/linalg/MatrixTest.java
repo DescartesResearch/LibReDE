@@ -300,5 +300,4 @@ public class MatrixTest {
 							row(B[1][0], B[1][1], B[1][2])
 						), offset(1e-9));
 	}
-
 }
