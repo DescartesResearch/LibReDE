@@ -24,12 +24,12 @@ public class IpoptActivator implements BundleActivator {
 		IpoptActivator.context = bundleContext;
 		
 		// Check that native library part is available
-		System.loadLibrary("IpOpt-vc10");
+		System.loadLibrary("IpOpt");
 		
 		// Add base location of plugin to the native library search path
 		// of JNA so that it can find the library
 		String pluginBasePath = new File(FileLocator.toFileURL(context.getBundle().getEntry("/")).getFile()).getAbsolutePath();
-		NativeLibrary.addSearchPath("IpOpt-vc10", pluginBasePath);
+		NativeLibrary.addSearchPath("IpOpt", pluginBasePath);
 	}
 
 	/*

@@ -1,0 +1,17 @@
+<project name="edu.kit.ipd.descartes.redeem.backend.kalman" default="build" basedir=".">	
+	
+	<property name="ipopt.dir" value="D:\Dateien\SVN\ipopt" />
+	<property name="make.executable" value="mingw32-make" />
+	<property name="ipopt.lib.dir" location="${ipopt.dir}/build/lib" />
+	<property name="ipopt.include.dir" location="${ipopt.dir}/build/include/coin" />
+	
+	
+	<target name="build">
+		<exec executable="${make.executable}" dir="./native">
+			<env key="IPOPT_INCLUDES" value="${ipopt.include.dir}" />
+			<env key="IPOPT_LIB" value="${ipopt.lib.dir}" />
+			<env key="BUILD_DIR" value="../build" />
+		</exec>
+		<copy file="./build/IpOpt.dll" todir="${basedir}"></copy>
+	</target>
+</project>

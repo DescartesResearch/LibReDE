@@ -9,7 +9,7 @@ import com.sun.jna.ptr.DoubleByReference;
 public interface IpoptLibrary extends Library {
 
 	public static IpoptLibrary INSTANCE = (IpoptLibrary) Native.loadLibrary(
-			"IpOpt-vc10", IpoptLibrary.class);
+			"IpOpt", IpoptLibrary.class);
 
 	public static final int IP_SOLVE_SUCCEEDED = 0;
 
@@ -53,29 +53,29 @@ public interface IpoptLibrary extends Library {
 
 	public static final int IP_RESTORATION_PHASE_MODE = 1;
 
-	public Pointer CreateIpoptProblem(int n, Pointer x_L, Pointer x_U, int m,
+	public Pointer IpOpt_CreateIpoptProblem(int n, Pointer x_L, Pointer x_U, int m,
 			Pointer g_L, Pointer g_U, int nele_jac, int nele_hess,
 			int index_style, Callback eval_f, Callback eval_g,
 			Callback eval_grad_f, Callback eval_jac_g, Callback eval_h);
 
-	public void FreeIpoptProblem(Pointer ipopt_problem);
+	public void IpOpt_FreeIpoptProblem(Pointer ipopt_problem);
 
-	boolean AddIpoptStrOption(Pointer ipopt_problem, String keyword, String val);
+	boolean IpOpt_AddIpoptStrOption(Pointer ipopt_problem, String keyword, String val);
 
-	boolean AddIpoptNumOption(Pointer ipopt_problem, String keyword, double val);
+	boolean IpOpt_AddIpoptNumOption(Pointer ipopt_problem, String keyword, double val);
 
-	boolean AddIpoptIntOption(Pointer ipopt_problem, String keyword, int val);
+	boolean IpOpt_AddIpoptIntOption(Pointer ipopt_problem, String keyword, int val);
 
-	boolean OpenIpoptOutputFile(Pointer ipopt_problem, String file_name,
+	boolean IpOpt_OpenIpoptOutputFile(Pointer ipopt_problem, String file_name,
 			int print_level);
 
-	boolean SetIpoptProblemScaling(Pointer ipopt_problem, double obj_scaling,
+	boolean IpOpt_SetIpoptProblemScaling(Pointer ipopt_problem, double obj_scaling,
 			Pointer x_scaling, Pointer g_scaling);
 
-	boolean SetIntermediateCallback(Pointer ipopt_problem,
+	boolean IpOpt_SetIntermediateCallback(Pointer ipopt_problem,
 			Callback intermediate_cb);
 
-	int IpoptSolve(Pointer ipopt_problem, Pointer x, Pointer g,
+	int IpOpt_IpoptSolve(Pointer ipopt_problem, Pointer x, Pointer g,
 			DoubleByReference obj_val, Pointer mult_g, Pointer mult_x_L,
 			Pointer mult_x_U, Pointer user_data);
 

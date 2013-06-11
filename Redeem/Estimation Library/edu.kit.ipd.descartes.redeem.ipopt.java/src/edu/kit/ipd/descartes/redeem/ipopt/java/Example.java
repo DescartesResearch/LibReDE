@@ -16,7 +16,7 @@ public class Example {
 	
 	public static void main(String[] args) {
 		
-		System.loadLibrary("IpOpt-vc10");
+		System.loadLibrary("IpOpt");
 		
 		 int n=-1;                          /* number of variables */
 		  int m=-1;                          /* number of constraints */
@@ -70,7 +70,7 @@ public class Example {
 		  g_U.setDouble(1*8, 40);
 
 		  /* create the IpoptProblem */
-		  nlp = IpoptLibrary.INSTANCE.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess,
+		  nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess,
 		                           index_style, new Eval_f(), new Eval_g(), new Eval_grad_f(),
 		                           new Eval_jac_g(), new Eval_h());
 
@@ -83,9 +83,9 @@ public class Example {
 
 		  /* Set some options.  Note the following ones are only examples,
 		     they might not be suitable for your problem. */
-		  IpoptLibrary.INSTANCE.AddIpoptNumOption(nlp, "tol", 1e-7);
-		  IpoptLibrary.INSTANCE.AddIpoptStrOption(nlp, "mu_strategy", "adaptive");
-		  IpoptLibrary.INSTANCE.AddIpoptStrOption(nlp, "output_file", "ipopt.out");
+		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, "tol", 1e-7);
+		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "mu_strategy", "adaptive");
+		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "output_file", "ipopt.out");
 
 		  /* allocate space for the initial point and set the values */
 		  x = new Memory(8*n);
@@ -110,7 +110,7 @@ public class Example {
 		  /* SetIntermediateCallback(nlp, intermediate_cb); */
 
 		  /* solve the problem */
-		  status = IpoptLibrary.INSTANCE.IpoptSolve(nlp, x, null, obj, mult_g, mult_x_L, mult_x_U, user_data);
+		  status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, null, obj, mult_g, mult_x_L, mult_x_U, user_data);
 
 		  if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
 		    System.out.println("\n\nSolution of the primal variables, x");
@@ -145,12 +145,12 @@ public class Example {
 
 		  if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
 		    /* Now resolve with a warmstart. */
-			  IpoptLibrary.INSTANCE.AddIpoptStrOption(nlp, "warm_start_init_point", "yes");
+			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "warm_start_init_point", "yes");
 		    /* The following option reduce the automatic modification of the
 		       starting point done my Ipopt. */
-			  IpoptLibrary.INSTANCE.AddIpoptNumOption(nlp, "bound_push", 1e-5);
-			  IpoptLibrary.INSTANCE.AddIpoptNumOption(nlp, "bound_frac", 1e-5);
-		    status = IpoptLibrary.INSTANCE.IpoptSolve(nlp, x, null, obj, mult_g, mult_x_L, mult_x_U, user_data);
+			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, "bound_push", 1e-5);
+			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, "bound_frac", 1e-5);
+		    status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, null, obj, mult_g, mult_x_L, mult_x_U, user_data);
 
 		    if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
 		      System.out.println("\n\nSolution of the primal variables, x");
@@ -179,7 +179,7 @@ public class Example {
 		  }
 
 		  /* free allocated memory */
-		  IpoptLibrary.INSTANCE.FreeIpoptProblem(nlp);
+		  IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
 
 		  x = null;
 		  mult_g = null;
