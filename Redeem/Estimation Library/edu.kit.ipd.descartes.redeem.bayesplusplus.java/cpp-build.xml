@@ -2,8 +2,8 @@
 	
 	<property name="bayesplusplus.dir" value="C:/Users/spinner/Git/redeem/Redeem/Third-Party Libraries/bayesplusplus" />
 	<property name="make.executable" value="mingw32-make" />
-	<property name="boost.root" value="C:\mingw64\boost_1_51_0" />
-	<property name="gcc.version" value="mingw-4.7.2" />
+	<property name="boost.root" value="C:\mingw64\boost_1_53_0" />
+	<property name="gcc.version" value="mingw-4.7.1" />
 	<property name="bjam.toolset" value="gcc" />
 	<property name="bayesplusplus.lib.dir" location="${bayesplusplus.dir}/target/BayesFilter/${bjam.toolset}-${gcc.version}/release/link-static" />
 	<property name="bayesplusplus.include.dir" location="${bayesplusplus.dir}" />
