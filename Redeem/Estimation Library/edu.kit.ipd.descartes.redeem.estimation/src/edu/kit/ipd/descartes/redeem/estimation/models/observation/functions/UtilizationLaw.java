@@ -42,13 +42,18 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
 	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
 	
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param system - the model of the system
+	 * @param repository - the repository with current measurement data
+	 * @param resource - the resource for which the utilization is calculated
+	 * 
+	 * @throws {@link NullPointerException} if any parameter is null
+	 */
 	public UtilizationLaw(SystemModel system, IMonitoringRepository repository,
 			Resource resource) {
 		super(system, Arrays.asList(resource), system.getServices());
-
-		if (resource == null) {
-			throw new IllegalArgumentException();
-		}
 		
 		this.repository = repository;		
 		

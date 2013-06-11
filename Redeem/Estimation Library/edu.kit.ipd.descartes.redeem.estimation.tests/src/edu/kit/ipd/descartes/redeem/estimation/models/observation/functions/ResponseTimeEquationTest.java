@@ -31,7 +31,7 @@ public class ResponseTimeEquationTest {
 		
 		law = new ResponseTimeEquation(generator.getSystemModel(), generator, generator.getSystemModel().getServices().get(SERVICE_IDX), generator.getSystemModel().getResources());
 		current = generator.nextObservation();
-		state = vector(generator.getDemands().toArray1D());
+		state = generator.getDemands();
 	}
 
 	@Test
