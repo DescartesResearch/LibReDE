@@ -91,6 +91,9 @@ public class KalmanFilter implements IEstimationAlgorithm<IStateModel<Unconstrai
 		this.observationModel = observationModel;
 		this.stateModel = stateModel;
 		
+		this.stateSize = stateModel.getStateSize();
+		this.outputSize = observationModel.getOutputSize();
+		
 		stateModelWrapper = new StateModelWrapper();
 		obModelWrapper = new ObservationModelWrapper();
 
