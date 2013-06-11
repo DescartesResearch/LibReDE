@@ -25,8 +25,8 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 	private Random randUtil;
 	private Random randWheights;
 	private Random randDemands;
-	private double upperUtilizationBound = 0.0;
-	private double lowerUtilizationBound = 1.0;
+	private double upperUtilizationBound = 1.0;
+	private double lowerUtilizationBound = 0.0;
 	private Vector demands;
 	private double workloadMixVariation = 1.0;
 	

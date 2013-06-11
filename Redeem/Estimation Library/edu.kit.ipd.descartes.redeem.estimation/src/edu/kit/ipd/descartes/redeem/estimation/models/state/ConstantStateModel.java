@@ -14,19 +14,28 @@ import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.IStateCo
 public class ConstantStateModel<C extends IStateConstraint> implements IStateModel<C> {	
 	
 	private class ConstantFunction implements IDifferentiableFunction {
+		
+		private final Vector firstDev;
+		private final Vector secondDev;
+		
+		public ConstantFunction(int stateSize, int varIdx) {
+			firstDev = zeros(stateSize).set(varIdx, 1.0);
+			secondDev = zeros(stateSize);
+		}
 
 		@Override
 		public Vector getFirstDerivatives(Vector x) {
-			return zeros(x.rows());
+			return firstDev;
 		}
 
 		@Override
 		public Matrix getSecondDerivatives(Vector x) {
-			return zeros(x.rows());
+			return secondDev;
 		}
 		
 	}
 	
+	private int stateSize;
 	private List<C> constraints = new ArrayList<C>();
 	private Vector initialState;
 	private List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
@@ -42,15 +51,17 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			throw new IllegalArgumentException("Size of initial state vector must be equal to the state size.");
 		}
 		
-		ConstantFunction func = new ConstantFunction();
+		this.stateSize = stateSize;
+		this.initialState = initialState;
+		
 		for (int i = 0; i < stateSize; i++) {
-			derivatives.add(func);
+			derivatives.add(new ConstantFunction(stateSize, i));
 		}
 	}
 
 	@Override
 	public int getStateSize() {
-		return 0;
+		return stateSize;
 	}
 
 	@Override
