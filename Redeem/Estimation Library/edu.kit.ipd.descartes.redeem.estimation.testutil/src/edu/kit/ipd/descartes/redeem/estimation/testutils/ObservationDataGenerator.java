@@ -12,6 +12,7 @@ import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Type;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
@@ -208,6 +209,18 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 			}
 		}
 		return -1;
+	}
+
+	@Override
+	public boolean hasNext(Metric metric) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Vector next(Metric metric) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

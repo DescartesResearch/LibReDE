@@ -77,7 +77,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average(WINDOW_SIZE);
 		avgResponseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forAllServices().average(WINDOW_SIZE);
 		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
-		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(workloadClass).average(WINDOW_SIZE);
+		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average(WINDOW_SIZE);
 	}
 
 	/* (non-Javadoc)

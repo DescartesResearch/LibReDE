@@ -15,13 +15,13 @@ import com.sun.jna.ptr.IntByReference;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.ILinearOutputFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.redeem.nnls.backend.NNLSLibrary;
-import edu.kit.ipd.descartes.redeem.exceptions.EstimationException;;
 
 /**
  * This class implements Least-Squares (NNLS) algorithm.

@@ -5,7 +5,7 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.linalg.VectorInitializer;
+import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Aggregation;
 import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
 import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
@@ -51,7 +51,7 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 		IModelEntity[] entities;
 
 		//zero Vector
-		Vector zero = vector(table.columns(), new VectorInitializer() {					
+		Vector zero = vector(table.columns(), new VectorFunction() {					
 			@Override
 			public double cell(int row) {
 				return 0;

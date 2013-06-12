@@ -8,8 +8,7 @@ Require-Bundle: com.sun.jna;bundle-version="3.2.7",
  cern.colt,
  edu.kit.ipd.descartes.redeem.estimation;bundle-version="1.0.0",
  edu.kit.ipd.descartes.redeem.bayesplusplus.java;bundle-version="1.0.0",
- edu.kit.ipd.descartes.linalg;bundle-version="1.0.0",
- edu.kit.ipd.descartes.redeem;bundle-version="1.1.0"
+ edu.kit.ipd.descartes.linalg;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: cern.colt.matrix.linalg,
