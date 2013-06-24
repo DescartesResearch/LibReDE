@@ -162,6 +162,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 		return model;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Matrix> Result<T> execute(Query<T> query) {
 		switch(query.getMetric()) {
@@ -203,7 +204,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 	}
 	
 	private int getIndexOfService(Service service) {
-		for (int i = 0; i < resources.length; i++) {
+		for (int i = 0; i < services.length; i++) {
 			if (services[i].equals(service)) {
 				return i;
 			}
