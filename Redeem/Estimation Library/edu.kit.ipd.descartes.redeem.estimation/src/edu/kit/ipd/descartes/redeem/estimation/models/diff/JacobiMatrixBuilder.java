@@ -1,5 +1,7 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.diff;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
+import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
 
 import java.util.ArrayList;
@@ -10,7 +12,8 @@ import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
-import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.INonLinearConstraint;
+import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.ILinearStateConstraint;
+import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.IStateConstraint;
 
 public final class JacobiMatrixBuilder {
 	
@@ -24,13 +27,13 @@ public final class JacobiMatrixBuilder {
 			}
 		}
 		
-		return vertcat(dev.toArray(new Vector[dev.size()]));
+		return transpose(horzcat(dev.toArray(new Vector[dev.size()])));
 	}
 	
-	public static Matrix calculateOfConstraints(List<INonLinearConstraint> constraints, Vector x) {
+	public static Matrix calculateOfConstraints(List<? extends IStateConstraint> constraints, Vector x) {
 		List<Vector> dev = new ArrayList<Vector>();
 		
-		for (INonLinearConstraint c : constraints) {
+		for (IStateConstraint c : constraints) {
 			if (c instanceof IDifferentiableFunction) {
 				dev.add(((IDifferentiableFunction)c).getFirstDerivatives(x));
 			} else {

@@ -3,7 +3,7 @@ package edu.kit.ipd.descartes.redeem.estimation.models.diff;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction;
-import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.INonLinearConstraint;
+import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.IStateConstraint;
 
 public final class HessianMatrixBuilder {
 	
@@ -15,7 +15,7 @@ public final class HessianMatrixBuilder {
 		}
 	}
 	
-	public static Matrix calculateOfConstraint(INonLinearConstraint constraint, Vector x) {
+	public static Matrix calculateOfConstraint(IStateConstraint constraint, Vector x) {
 		if (constraint instanceof IDifferentiableFunction) {
 			return ((IDifferentiableFunction)constraint).getSecondDerivatives(x);
 		} else {
