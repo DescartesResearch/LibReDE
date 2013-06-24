@@ -1,6 +1,7 @@
 package edu.kit.ipd.descartes.linalg;
 
 import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
+import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
 import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class Matrix {
@@ -13,6 +14,18 @@ public class Matrix {
 	
 	@SuppressWarnings("unchecked")
 	<M extends Matrix> M newInstance(MatrixImplementation delegate) {
+		return (M) new Matrix(delegate);
+	}
+	
+	@SuppressWarnings("unchecked")
+	static <M extends Matrix> M newInstanceDynamic(MatrixImplementation delegate) {
+		if (delegate.columns() == 1) {
+			if (delegate.rows() == 1) {
+				return (M) new Scalar((Scalar.ScalarImplementation)delegate);
+			} else {
+				return (M) new Vector((VectorImplementation)delegate);
+			}
+		}
 		return (M) new Matrix(delegate);
 	}
 
@@ -81,7 +94,7 @@ public class Matrix {
 			if (a.isScalar()) {
 				return this.times(((Scalar)a).getValue());
 			} else {
-				return newInstance(delegate.multipliedBy(a.delegate));
+				return newInstanceDynamic(delegate.multipliedBy(a.delegate));
 			}
 		}
 	}

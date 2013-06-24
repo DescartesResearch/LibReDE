@@ -154,15 +154,7 @@ public class LinAlg {
 		for (int i = 1; i < rows.length; i++) {
 			res = res.appendRows(rows[i].delegate);
 		}
-		if (res.columns() == 1) {
-			if (res.rows() == 1) {
-				return new Scalar((Scalar.ScalarImplementation)res);
-			} else {
-				return new Vector((VectorImplementation)res);
-			}
-		} else {		
-			return new Matrix(res);
-		}
+		return Matrix.newInstanceDynamic(res);
 	}
 	
 	public static Matrix horzcat(Matrix...cols) {
@@ -172,16 +164,8 @@ public class LinAlg {
 		MatrixImplementation res = cols[0].delegate;
 		for (int i = 1; i < cols.length; i++) {
 			res = res.appendColumns(cols[i].delegate);
-		}		
-		if (res.columns() == 1) {
-			if (res.rows() == 1) {
-				return new Scalar((Scalar.ScalarImplementation)res);
-			} else {
-				return new Vector((VectorImplementation)res);
-			}
-		} else {		
-			return new Matrix(res);
 		}
+		return Matrix.newInstanceDynamic(res);
 	}
 	
 	public static Matrix repmat(Matrix a, int vertical, int horizontal) {
@@ -194,15 +178,7 @@ public class LinAlg {
 		for (int i = 1; i < vertical; i++) {
 			res = res.appendRows(row);
 		}
-		if (res.columns() == 1) {
-			if (res.rows() == 1) {
-				return new Scalar((Scalar.ScalarImplementation)res);
-			} else {
-				return new Vector((VectorImplementation)res);
-			}
-		} else {		
-			return new Matrix(res);
-		}
+		return Matrix.newInstanceDynamic(res);
 	}
 
 	public static <M extends Matrix> M abs(M a) {
@@ -222,7 +198,7 @@ public class LinAlg {
 	}
 
 	public static Matrix transpose(Matrix a) {
-		return new Matrix(a.delegate.transpose());
+		return Matrix.newInstanceDynamic(a.delegate.transpose());
 	}
 	
 	public static Range range(int start, int end) {
