@@ -1,4 +1,4 @@
-#define TRACE
+//#define TRACE
 //#define ASSERT
 
 template<class T>

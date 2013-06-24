@@ -60,13 +60,13 @@ public interface IpoptLibrary extends Library {
 
 	public void IpOpt_FreeIpoptProblem(Pointer ipopt_problem);
 
-	boolean IpOpt_AddIpoptStrOption(Pointer ipopt_problem, String keyword, String val);
+	boolean IpOpt_AddIpoptStrOption(Pointer ipopt_problem, Pointer keyword, Pointer val);
 
-	boolean IpOpt_AddIpoptNumOption(Pointer ipopt_problem, String keyword, double val);
+	boolean IpOpt_AddIpoptNumOption(Pointer ipopt_problem, Pointer keyword, double val);
 
-	boolean IpOpt_AddIpoptIntOption(Pointer ipopt_problem, String keyword, int val);
+	boolean IpOpt_AddIpoptIntOption(Pointer ipopt_problem, Pointer keyword, int val);
 
-	boolean IpOpt_OpenIpoptOutputFile(Pointer ipopt_problem, String file_name,
+	boolean IpOpt_OpenIpoptOutputFile(Pointer ipopt_problem, Pointer file_name,
 			int print_level);
 
 	boolean IpOpt_SetIpoptProblemScaling(Pointer ipopt_problem, double obj_scaling,

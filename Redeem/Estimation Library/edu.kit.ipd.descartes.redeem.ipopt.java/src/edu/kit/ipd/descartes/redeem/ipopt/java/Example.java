@@ -11,6 +11,8 @@ import edu.kit.ipd.descartes.redeem.ipopt.java.backend.Eval_H_CB;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.Eval_Jac_G_CB;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.Intermediate_CB;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptLibrary;
+import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptOptionKeyword;
+import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptOptionValue;
 
 public class Example {
 	
@@ -83,9 +85,10 @@ public class Example {
 
 		  /* Set some options.  Note the following ones are only examples,
 		     they might not be suitable for your problem. */
-		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, "tol", 1e-7);
-		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "mu_strategy", "adaptive");
-		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "output_file", "ipopt.out");
+		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), 1e-7);
+		  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.MU_STRATEGY.toNativeString(), 
+				  IpoptOptionValue.ADAPTIVE.toNativeString());
+		  //IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "output_file", "ipopt.out");
 
 		  /* allocate space for the initial point and set the values */
 		  x = new Memory(8*n);
@@ -145,11 +148,12 @@ public class Example {
 
 		  if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
 		    /* Now resolve with a warmstart. */
-			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "warm_start_init_point", "yes");
+			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.WARM_START_INIT_POINT.toNativeString(),
+					  IpoptOptionValue.YES.toNativeString());
 		    /* The following option reduce the automatic modification of the
 		       starting point done my Ipopt. */
-			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, "bound_push", 1e-5);
-			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, "bound_frac", 1e-5);
+			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.BOUND_PUSH.toNativeString(), 1e-5);
+			  IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.BOUND_FRAC.toNativeString(), 1e-5);
 		    status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, null, obj, mult_g, mult_x_L, mult_x_U, user_data);
 
 		    if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
