@@ -4,7 +4,7 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
 
-public class StateBoundsConstraint implements INonLinearConstraint, IDifferentiableFunction {
+public class StateBoundsConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 	
 	private double lower;
 	private double upper;

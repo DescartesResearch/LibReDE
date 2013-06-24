@@ -8,4 +8,19 @@ public final class Unconstrained implements IStateConstraint {
 		throw new AssertionError("Class Unconstrained cannot be instantiated.");
 	}
 
+	@Override
+	public double getLowerBound() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getUpperBound() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getValue(Vector state) {
+		throw new UnsupportedOperationException();
+	}
+
 }
