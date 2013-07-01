@@ -4,6 +4,7 @@ Bundle-Name: Testutil
 Bundle-SymbolicName: edu.kit.ipd.descartes.linalg.testutil
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: org.fest.assertions;bundle-version="2.0.0",
- edu.kit.ipd.descartes.linalg;bundle-version="1.0.0"
 Export-Package: edu.kit.ipd.descartes.linalg.testutil
+Import-Package: edu.kit.ipd.descartes.linalg,
+ org.fest.assertions.api,
+ org.fest.assertions.data

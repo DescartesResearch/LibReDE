@@ -4,7 +4,10 @@ Bundle-Name: Linalg
 Bundle-SymbolicName: edu.kit.ipd.descartes.linalg
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: cern.colt;bundle-version="1.2.0"
 Export-Package: edu.kit.ipd.descartes.linalg,
  edu.kit.ipd.descartes.linalg.backend,
  edu.kit.ipd.descartes.linalg.storage
+Import-Package: cern.colt.matrix,
+ cern.colt.matrix.impl,
+ cern.colt.matrix.linalg,
+ cern.jet.math
