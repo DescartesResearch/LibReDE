@@ -6,9 +6,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.nnls.LeastSquares;
+import edu.kit.ipd.descartes.redeem.nnls.LeastSquaresRegression;
 
 /**
  * 
@@ -42,9 +44,9 @@ public class NNLSTest {
 		Polynomial pol=new Polynomial(5);
 		//generates random coefficients
 		pol.generateRandomCoeffs();
-		LeastSquares reg=new LeastSquares();		
-		Vector F=Vector.vector(pol.getValues(5));
-		Vector coef=Vector.vector(pol.getCoef());
+		LeastSquaresRegression reg=new LeastSquaresRegression();		
+		Vector F=LinAlg.vector(pol.getValues(5));
+		Vector coef=LinAlg.vector(pol.getCoef());
 		
 		Vector result=reg.nnls(E,F );
 		VectorAssert.assertThat(result).isEqualTo(coef , Assertions.offset(1e-9));			
@@ -57,9 +59,9 @@ public class NNLSTest {
 		Polynomial pol=new Polynomial(4);
 		//generates random coefficients
 		pol.generateRandomCoeffs();
-		LeastSquares reg=new LeastSquares();		
-		Vector F=Vector.vector(pol.getValues(4));
-		Vector coef=Vector.vector(pol.getCoef());
+		LeastSquaresRegression reg=new LeastSquaresRegression();		
+		Vector F= LinAlg.vector(pol.getValues(4));
+		Vector coef=LinAlg.vector(pol.getCoef());
 		
 		Vector result=reg.nnls(E,F );
 		VectorAssert.assertThat(result).isEqualTo(coef , Assertions.offset(1e-9));			
@@ -72,9 +74,9 @@ public class NNLSTest {
 		Polynomial pol=new Polynomial(3);
 		//generates random coefficients
 		pol.generateRandomCoeffs();
-		LeastSquares reg=new LeastSquares();		
-		Vector F=Vector.vector(pol.getValues(4));
-		Vector coef=Vector.vector(pol.getCoef());
+		LeastSquaresRegression reg=new LeastSquaresRegression();		
+		Vector F=LinAlg.vector(pol.getValues(4));
+		Vector coef=LinAlg.vector(pol.getCoef());
 		
 		Vector result=reg.nnls(E,F );
 		VectorAssert.assertThat(result).isEqualTo(coef , Assertions.offset(1e-9));			
@@ -87,7 +89,7 @@ public class NNLSTest {
 			for (int j = 1; j < rows + 1; ++j) {
 				e[j-1][i] = Math.pow(j, i);
 			}		
-		Matrix matrix=Matrix.matrix(e);
+		Matrix matrix=LinAlg.matrix(e);
 		return matrix;		
 	}
 }

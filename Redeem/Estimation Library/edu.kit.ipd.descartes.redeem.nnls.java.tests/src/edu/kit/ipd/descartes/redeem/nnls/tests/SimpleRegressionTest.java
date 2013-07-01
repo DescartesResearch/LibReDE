@@ -19,7 +19,7 @@ package edu.kit.ipd.descartes.redeem.nnls.tests;
 
 import java.util.Random;
 
-import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
