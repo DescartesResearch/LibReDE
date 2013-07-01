@@ -7,9 +7,9 @@ import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 /**
  * This output function describes the relationship between the per-service utilization and the resource demands. 
@@ -64,7 +64,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ServiceDemandLaw(SystemModel system, IMonitoringRepository repository,
+	public ServiceDemandLaw(WorkloadDescription system, IMonitoringRepository repository,
 			Resource resource,
 			Service service) {
 		super(system, resource, service);

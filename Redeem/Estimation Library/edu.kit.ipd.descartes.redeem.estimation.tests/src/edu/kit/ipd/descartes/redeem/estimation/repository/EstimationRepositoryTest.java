@@ -17,8 +17,8 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.testutil.MatrixAssert;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 
 public class EstimationRepositoryTest {
 

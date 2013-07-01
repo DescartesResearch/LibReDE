@@ -1,9 +1,9 @@
-package edu.kit.ipd.descartes.redeem.estimation.system;
+package edu.kit.ipd.descartes.redeem.estimation.workload;
 
 import java.util.Collections;
 import java.util.List;
 
-public class SystemModel {
+public class WorkloadDescription {
 	
 	private final List<Resource> resources;
 	
@@ -11,7 +11,7 @@ public class SystemModel {
 	
 	private final State state;
 
-	public SystemModel(List<Resource> resources, List<Service> services) {
+	public WorkloadDescription(List<Resource> resources, List<Service> services) {
 		this.resources = resources;
 		this.services = services;
 		this.state = new State(resources, services);

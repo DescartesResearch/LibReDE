@@ -5,9 +5,9 @@ import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 /**
  * This output function approximates the resource demands with the observed response times of a service.
@@ -33,7 +33,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ResponseTimeApproximation(SystemModel system, IMonitoringRepository repository, Resource resource,
+	public ResponseTimeApproximation(WorkloadDescription system, IMonitoringRepository repository, Resource resource,
 			Service service) {
 		super(system, resource, service);
 		

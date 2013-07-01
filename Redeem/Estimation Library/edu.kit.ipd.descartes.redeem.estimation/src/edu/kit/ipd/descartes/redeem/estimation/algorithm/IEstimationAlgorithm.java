@@ -1,4 +1,4 @@
-package edu.kit.ipd.descartes.redeem.estimation.models.algorithm;
+package edu.kit.ipd.descartes.redeem.estimation.algorithm;
 
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.exceptions.EstimationException;

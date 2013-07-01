@@ -2,17 +2,17 @@ package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
 import java.util.List;
 
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public abstract class AbstractOutputFunction implements IOutputFunction {
 	
-	private SystemModel system;
+	private WorkloadDescription system;
 	private List<Resource> selectedResources;
 	private List<Service> selectedClasses;
 
-	protected AbstractOutputFunction(SystemModel system, List<Resource> selectedResources,
+	protected AbstractOutputFunction(WorkloadDescription system, List<Resource> selectedResources,
 			List<Service> selectedClasses) {		
 		if (system == null || selectedResources == null || selectedClasses == null) {
 			throw new NullPointerException();
@@ -26,7 +26,7 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 		this.selectedClasses = selectedClasses;
 	}
 
-	public SystemModel getSystem() {
+	public WorkloadDescription getSystem() {
 		return system;
 	}
 

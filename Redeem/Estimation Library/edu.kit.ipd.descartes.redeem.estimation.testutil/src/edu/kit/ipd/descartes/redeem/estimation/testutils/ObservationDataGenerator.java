@@ -16,10 +16,10 @@ import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Type;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
-import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
+import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class ObservationDataGenerator implements IMonitoringRepository {
 	
@@ -34,7 +34,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 	private Resource[] resources;
 	private Service[] services;
 	
-	private SystemModel model;
+	private WorkloadDescription model;
 	
 	private Observation currentObservation = null;
 	
@@ -54,7 +54,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 			resources[i] = new Resource("R" + i);
 		}
 		
-		model = new SystemModel(Arrays.asList(resources), Arrays.asList(services));
+		model = new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services));
 	}
 	
 	public double getUpperUtilizationBound() {
@@ -158,7 +158,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 		return currentObservation;
 	}
 	
-	public SystemModel getSystemModel() {
+	public WorkloadDescription getSystemModel() {
 		return model;
 	}
 

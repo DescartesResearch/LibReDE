@@ -1,12 +1,11 @@
-package edu.kit.ipd.descartes.redeem.estimation.system;
+package edu.kit.ipd.descartes.redeem.estimation.workload;
 
 
-public class Service implements IModelEntity {
+public class Resource implements IModelEntity {
 	
-	private final String name;	
-
-	public Service(String name) {
-		super();
+	private final String name;
+		
+	public Resource(String name) {
 		this.name = name;
 	}
 
@@ -30,7 +29,7 @@ public class Service implements IModelEntity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Service other = (Service) obj;
+		Resource other = (Resource) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -41,7 +40,6 @@ public class Service implements IModelEntity {
 	
 	@Override
 	public String toString() {
-		return "Service: " + name;
+		return "Resource: " + name;
 	}
-	
 }

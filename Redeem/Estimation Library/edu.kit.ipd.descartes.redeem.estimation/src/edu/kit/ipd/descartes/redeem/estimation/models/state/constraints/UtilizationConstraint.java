@@ -8,8 +8,8 @@ import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
@@ -17,13 +17,13 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	
 	private Resource res_i;
 	
-	private SystemModel system;
+	private WorkloadDescription system;
 	
 	private IMonitoringRepository repository;
 	
 	private Query<Vector> throughputQuery;
 	
-	public UtilizationConstraint(SystemModel system, IMonitoringRepository repository, Resource resource) {
+	public UtilizationConstraint(WorkloadDescription system, IMonitoringRepository repository, Resource resource) {
 		this.system = system;
 		this.repository = repository;
 		this.res_i = resource;

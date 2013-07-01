@@ -7,13 +7,13 @@ import java.util.List;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction {
 	
-	protected AbstractLinearOutputFunction(SystemModel system,
+	protected AbstractLinearOutputFunction(WorkloadDescription system,
 			List<Resource> selectedResources,
 			List<Service> selectedClasses) {
 		super(system, selectedResources, selectedClasses);

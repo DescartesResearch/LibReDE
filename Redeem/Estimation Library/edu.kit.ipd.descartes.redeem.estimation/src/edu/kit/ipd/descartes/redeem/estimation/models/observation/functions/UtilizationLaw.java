@@ -11,8 +11,8 @@ import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 /**
  * This output function implements the Utilization Law:
@@ -51,7 +51,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public UtilizationLaw(SystemModel system, IMonitoringRepository repository,
+	public UtilizationLaw(WorkloadDescription system, IMonitoringRepository repository,
 			Resource resource) {
 		super(system, Arrays.asList(resource), system.getServices());
 		

@@ -11,10 +11,10 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Observation;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.ObservationDataGenerator;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 
 public class UtilizationLawTest {
 		

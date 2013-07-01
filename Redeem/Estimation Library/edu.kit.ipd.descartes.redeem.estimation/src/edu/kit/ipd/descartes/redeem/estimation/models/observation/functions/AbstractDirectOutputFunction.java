@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
-import edu.kit.ipd.descartes.redeem.estimation.system.SystemModel;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public abstract class AbstractDirectOutputFunction extends
 		AbstractLinearOutputFunction implements IDirectOutputFunction {
@@ -14,7 +14,7 @@ public abstract class AbstractDirectOutputFunction extends
 	private Vector zeros;
 	private int idx;
 
-	protected AbstractDirectOutputFunction(SystemModel system,
+	protected AbstractDirectOutputFunction(WorkloadDescription system,
 			Resource resource,
 			Service service) {
 		super(system, Arrays.asList(resource), Arrays.asList(service));

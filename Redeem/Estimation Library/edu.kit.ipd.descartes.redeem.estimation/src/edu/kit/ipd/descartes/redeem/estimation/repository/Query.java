@@ -1,7 +1,7 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
-import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
+import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
 
 public final class Query<T extends Matrix> {
 	

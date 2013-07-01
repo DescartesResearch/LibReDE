@@ -7,9 +7,9 @@ import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Aggregation;
-import edu.kit.ipd.descartes.redeem.estimation.system.IModelEntity;
-import edu.kit.ipd.descartes.redeem.estimation.system.Resource;
-import edu.kit.ipd.descartes.redeem.estimation.system.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 
 /**
