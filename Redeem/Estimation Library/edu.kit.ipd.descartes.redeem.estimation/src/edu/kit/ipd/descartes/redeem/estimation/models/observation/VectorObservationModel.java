@@ -48,6 +48,11 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
+	public E getOutputFunction(int output) {
+		return outputFunctions.get(output);
+	}
+	
+	@Override
 	public Iterator<E> iterator() {
 		return outputFunctions.iterator();
 	}

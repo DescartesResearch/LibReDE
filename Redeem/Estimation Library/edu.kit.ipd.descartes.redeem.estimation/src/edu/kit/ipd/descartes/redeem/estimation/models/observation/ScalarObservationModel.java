@@ -32,6 +32,14 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 	public Scalar getCalculatedOutput(Vector state) {
 		return scalar(outputFunction.getCalculatedOutput(state));
 	}
+	
+	@Override
+	public E getOutputFunction(int output) {
+		if (output != 0) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		return outputFunction;
+	}
 
 	@Override
 	public Iterator<E> iterator() {
