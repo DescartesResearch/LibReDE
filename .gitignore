@@ -1,2 +1,13 @@
 target/
 .settings/
+Redeem/Estimation Library/edu.kit.ipd.descartes.redeem.bayesplusplus.java.tests/bin/
+Redeem/Estimation Library/edu.kit.ipd.descartes.redeem.estimation.testutil/bin/
+Redeem/Redeem Core/edu.kit.ipd.descartes.redeem.backend.matlab/bin/
+Redeem/Redeem Core/edu.kit.ipd.descartes.redeem.model/bin/
+Redeem/Redeem Core/edu.kit.ipd.descartes.redeem.repository/bin/
+Redeem/Redeem Core/edu.kit.ipd.descartes.redeem.ui/bin/
+Redeem/Redeem Core/edu.kit.ipd.descartes.redeem.util/bin/
+Redeem/Redeem Editor/edu.kit.ipd.descartes.redeem.model.edit/bin/
+Redeem/Redeem Editor/edu.kit.ipd.descartes.redeem.model.editor/bin/
+Redeem/Estimation Library/edu.kit.ipd.descartes.redeem.ipopt.java.tests/bin/
+Redeem/Estimation Library/edu.kit.ipd.descartes.redeem.nativehelper/bin/
