@@ -3,7 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Redeem Native Helper
 Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.nativehelper
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: edu.kit.ipd.descartes.redeem.nativehelper
-Import-Package: com.sun.jna,
- edu.kit.ipd.descartes.linalg.storage
+Import-Package: cern.colt.matrix;version="1.2.0",
+ com.sun.jna,
+ edu.kit.ipd.descartes.linalg,
+ edu.kit.ipd.descartes.linalg.backend.colt
