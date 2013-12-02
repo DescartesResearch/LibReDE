@@ -52,7 +52,7 @@ public class ZhangKalmanFilterTest {
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(stateModel, observationModel);
 		
-		long start = System.nanoTime();		
+		long start = System.nanoTime();	
 		
 		for (int i = 0; i < ITERATIONS; i++) {
 			Observation ob = generator.nextObservation();
@@ -63,46 +63,39 @@ public class ZhangKalmanFilterTest {
 		System.out.println("Duration: " + (System.nanoTime() - start));
 		
 		filter.destroy();
+	}
+	
+	@Test
+	public void testFilter5WC1R() throws Exception {
 		
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);		
+		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
+		generator.setDemands(demands);
+		generator.setUpperUtilizationBound(0.9);
 		
-//		
-//		
-//		Matrix demands = matrix(row(0.05));
-//		generator.setDemands(demands);
-//		
-//		Vector stateNoiseCovariance = vector(1.0);
-//		Matrix stateNoiseCoupling = matrix(row(1));
-//		ConstantStateModel stateModel = new ConstantStateModel(1, stateNoiseCovariance, stateNoiseCoupling);
-//		
-//		
-//		Vector observeNoise = vector(0.0001);
-//		ZhangModel zhangModel = new ZhangModel(1, 1, new int[] { 1 }, observeNoise);
-//		
-//		Vector initialEstimate = vector(0.1);
-//		Matrix initialCovariance = matrix(row(0.01));
-//		
-//		ExtendedKalmanFilter filter = new ExtendedKalmanFilter(1, initialEstimate, initialCovariance);
-//		
-//		double[] estimates = new double[ITERATIONS];
-//		
-//		for (int i = 0; i < ITERATIONS; i++) {
-//			Observation ob = generator.nextObservation();
-//			
-//			filter.predict(stateModel);
-//			
-//			Vector observation = vector(
-//					ob.getMeanResponseTime().get(0), 
-//					ob.getMeanUtilization().get(0));
-//			
-//			filter.observe(zhangModel, observation, ob.getMeanThroughput());
-//			
-//			filter.update();	
-//			
-//			Vector vec = filter.getCurrentEstimate();
-//			estimates[i] = vec.get(0);
-//		}
-//		
-//		assertEquals(0.05, Descriptive.mean(new DoubleArrayList(estimates)), 0.0001);
+		Vector initialEstimate = vector(0.1, 0.1, 0.1, 0.1, 0.1);
+		stateModel = new ConstantStateModel<>(5, initialEstimate);
+		
+		observationModel = new VectorObservationModel<>();
+		for (int i = 0; i < 5; i++) {
+			observationModel.addOutputFunction(new ResponseTimeEquation(generator.getSystemModel(), generator, generator.getSystemModel().getServices().get(i), generator.getSystemModel().getResources()));
+		}
+		observationModel.addOutputFunction(new UtilizationLaw(generator.getSystemModel(), generator, generator.getSystemModel().getResources().get(0)));
+		
+		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
+		filter.initialize(stateModel, observationModel);
+		
+		long start = System.nanoTime();	
+		
+		for (int i = 0; i < ITERATIONS; i++) {
+			Observation ob = generator.nextObservation();
+			
+			Vector estimates = filter.estimate();
+		}
+		
+		System.out.println("Duration: " + (System.nanoTime() - start));
+		
+		filter.destroy();
 	}
 
 }
