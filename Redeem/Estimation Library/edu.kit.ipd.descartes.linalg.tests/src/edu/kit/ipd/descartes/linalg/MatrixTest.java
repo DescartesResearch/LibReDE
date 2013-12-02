@@ -1,22 +1,25 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.abs;
+import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.norm1;
+import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
+import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
+import static edu.kit.ipd.descartes.linalg.LinAlg.range;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
+import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static org.mockito.AdditionalMatchers.aryEq;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class MatrixTest {
 	
@@ -50,6 +53,13 @@ public class MatrixTest {
 	}
 	
 	@Test
+	public void testToArray() {
+		double[] arr = a.toArray1D();
+		assertThat(arr).isNotNull();
+		assertThat(arr).isEqualTo(new double[] { A[0][0], A[0][1], A[0][2], A[1][0], A[1][1], A[1][2] });
+	}
+	
+	@Test
 	public void testZerosCreate() {
 		Matrix c = zeros(2 ,3);
 		assertThat(c).isEqualTo(matrix(row(0, 0, 0), row(0, 0, 0)), offset(1e-9));
@@ -59,25 +69,6 @@ public class MatrixTest {
 	public void testOnesCreate() {
 		Matrix c = ones(2 ,3);
 		assertThat(c).isEqualTo(matrix(row(1, 1, 1), row(1, 1, 1)), offset(1e-9));
-	}
-	
-	@Test
-	public void testCreateFromStorage() {
-		DoubleStorage storageMock = mock(DoubleStorage.class);
-		
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				double[] elements = (double[])invocation.getArguments()[0];
-				System.arraycopy(B[0], 0, elements, 0, 3);
-				System.arraycopy(B[1], 0, elements, 3, 3);
-				return null;
-			}			
-		}).when(storageMock).read(any(double[].class));
-		
-		Matrix c = matrix(2, 3, storageMock);
-		
-		assertThat(c).isEqualTo(matrix(B), offset(1e-9));
 	}
 
 	@Test
@@ -122,15 +113,6 @@ public class MatrixTest {
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testColumnVectorIllegalIndex() {
 		a.column(4);
-	}
-
-	@Test
-	public void testWriteTo() {
-		DoubleStorage storageMock = mock(DoubleStorage.class);		
-		
-		a.toDoubleStorage(storageMock);
-		
-		verify(storageMock).write(aryEq(new double[] {A[0][0], A[0][1], A[0][2], A[1][0], A[1][1], A[1][2]}));
 	}
 
 	@Test

@@ -3,11 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: edu.kit.ipd.descartes.linalg.tests
 Bundle-Version: 1.0.0.qualifier
-Fragment-Host: edu.kit.ipd.descartes.linalg;bundle-version="1.0.0"
+Fragment-Host: edu.kit.ipd.descartes.linalg
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: edu.kit.ipd.descartes.linalg.testutil,
  org.fest.assertions.api,
- org.junit;version="4.11.0",
- org.mockito;version="1.9.5",
- org.mockito.invocation;version="1.9.5",
- org.mockito.stubbing;version="1.9.5"
+ org.mockito,
+ org.mockito.invocation,
+ org.mockito.stubbing
+Require-Bundle: org.junit;bundle-version="4.11.0"

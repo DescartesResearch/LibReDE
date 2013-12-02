@@ -1,22 +1,23 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
-import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.LinAlg.abs;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.norm1;
+import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
+import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
+import static edu.kit.ipd.descartes.linalg.LinAlg.range;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
+import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
+import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static org.mockito.AdditionalMatchers.aryEq;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class VectorTest {
 	
@@ -41,39 +42,6 @@ public class VectorTest {
 		
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 		assertThat(b).isEqualTo(vector(B), offset(1e-9));		
-	}
-	
-	@Test
-	public void testCreateFromStorage() {		
-		DoubleStorage storageMock = mock(DoubleStorage.class);
-		
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				double[] elements = (double[])invocation.getArguments()[0];
-				System.arraycopy(B, 0, elements, 0, 3);
-				return null;
-			}			
-		}).when(storageMock).read(any(double[].class));
-		
-		Vector c = vector(3, storageMock);
-		assertThat(c).isInstanceOf(Vector.class);
-		assertThat(c).isEqualTo(vector(B), offset(1e-9));		
-		
-		storageMock = mock(DoubleStorage.class);
-		
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				double[] elements = (double[])invocation.getArguments()[0];
-				System.arraycopy(B, 0, elements, 0, 1);
-				return null;
-			}			
-		}).when(storageMock).read(any(double[].class));
-		
-		c = vector(1, storageMock);
-		assertThat(c).isInstanceOf(Scalar.class);
-		assertThat(((Scalar)c).getValue()).isEqualTo(B[0], offset(1e-9));
 	}
 	
 	@Test
@@ -213,17 +181,6 @@ public class VectorTest {
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 	}
 	
-
-
-	@Test
-	public void testToDoubleStorage() {
-		DoubleStorage storageMock = mock(DoubleStorage.class);		
-	
-		a.toDoubleStorage(storageMock);
-		
-		verify(storageMock).write(aryEq(A));
-	}
-	
 	@Test
 	public void testColumnNormal() {
 		assertThat(a.column(0)).isEqualTo(a, offset(1e-9));
@@ -264,7 +221,7 @@ public class VectorTest {
 	
 	@Test
 	public void testRow() {
-		assertThat(a.row(1).getValue()).isEqualTo(A[1], offset(1e-9));
+		assertThat(((Scalar)a.row(1)).getValue()).isEqualTo(A[1], offset(1e-9));
 	}
 	
 	@Test

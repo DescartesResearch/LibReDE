@@ -1,33 +1,29 @@
 package edu.kit.ipd.descartes.linalg.backend;
 
+import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
+import edu.kit.ipd.descartes.linalg.SquareMatrix;
+import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public interface MatrixFactory {
 
-	MatrixImplementation createMatrix(double[][] values);
+	Matrix createMatrix(double[][] values);
 
-	MatrixImplementation createMatrix(int rows, int columns, double fill);
+	Matrix createMatrix(int rows, int columns, double fill);
 
-	MatrixImplementation createMatrix(int rows, int columns, DoubleStorage storage);
-
-	MatrixImplementation createMatrix(int rows, int columns, MatrixFunction init);
+	Matrix createMatrix(int rows, int columns, MatrixFunction init);
 	
-	SquareMatrixImplementation createSquareMatrix(double[][] values);
+	SquareMatrix createSquareMatrix(double[][] values);
 
-	SquareMatrixImplementation createSquareMatrix(int size, double fill);
+	SquareMatrix createSquareMatrix(int size, double fill);
 	
-	SquareMatrixImplementation createSquareMatrix(int size, MatrixFunction init);
+	SquareMatrix createSquareMatrix(int size, MatrixFunction init);
 	
-	SquareMatrixImplementation createSquareMatrix(int size, DoubleStorage storage);
-	
-	VectorImplementation createVector(double[] values);
+	Vector createVector(double[] values);
 
-	VectorImplementation createVector(int rows, double fill);
+	Vector createVector(int rows, double fill);
 
-	VectorImplementation createVector(int rows, DoubleStorage storage);
-
-	VectorImplementation createVector(int rows, VectorFunction init);
+	Vector createVector(int rows, VectorFunction init);
 
 }

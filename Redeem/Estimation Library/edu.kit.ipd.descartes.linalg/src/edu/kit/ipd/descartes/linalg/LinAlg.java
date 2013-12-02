@@ -1,11 +1,7 @@
 package edu.kit.ipd.descartes.linalg;
 
 import edu.kit.ipd.descartes.linalg.backend.MatrixFactory;
-import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.SquareMatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
 import edu.kit.ipd.descartes.linalg.backend.colt.ColtMatrixFactory;
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class LinAlg {
 	
@@ -18,13 +14,13 @@ public class LinAlg {
 			if (rows == 1) {
 				return Scalar.ZERO;
 			} else {
-				return new Vector(FACTORY.createVector(rows, 0));
+				return FACTORY.createVector(rows, 0);
 			}
 		} else {
 			if (rows == columns) {
-				return new SquareMatrix(FACTORY.createSquareMatrix(rows, 0));
+				return FACTORY.createSquareMatrix(rows, 0);
 			} else {
-				return new Matrix(FACTORY.createMatrix(rows, columns, 0));
+				return FACTORY.createMatrix(rows, columns, 0);
 			}
 		}
 	}
@@ -36,13 +32,13 @@ public class LinAlg {
 			if (rows == 1) {
 				return Scalar.ONE;
 			} else {
-				return new Vector(FACTORY.createVector(rows, 1));
+				return FACTORY.createVector(rows, 1);
 			}
 		} else {
 			if (rows == columns) {
-				return new SquareMatrix(FACTORY.createSquareMatrix(rows, 1));
+				return FACTORY.createSquareMatrix(rows, 1);
 			} else {
-				return new Matrix(FACTORY.createMatrix(rows, columns, 1));
+				return FACTORY.createMatrix(rows, columns, 1);
 			}
 		}
 	}
@@ -53,7 +49,7 @@ public class LinAlg {
 		} else if (size == 1) {
 			return Scalar.ONE;
 		} else {
-			return new SquareMatrix(FACTORY.createSquareMatrix(size, new MatrixFunction() {
+			return FACTORY.createSquareMatrix(size, new MatrixFunction() {
 				@Override
 				public double cell(int row, int column) {
 					if (row == column) {
@@ -61,7 +57,7 @@ public class LinAlg {
 					}
 					return 0.0;
 				}
-			}));
+			});
 		}
 	}
 
@@ -81,18 +77,18 @@ public class LinAlg {
 					return new Scalar(values[0][0]);
 				} else {
 					final double[][] temp = values;
-					return new Vector(FACTORY.createVector(values.length, new VectorFunction() {					
+					return FACTORY.createVector(values.length, new VectorFunction() {					
 						@Override
 						public double cell(int row) {
 							return temp[row][0];
 						}
-					}));
+					});
 				}
 			} else {
 				if (columns == values.length) {
-					return new SquareMatrix(FACTORY.createSquareMatrix(values));
+					return FACTORY.createSquareMatrix(values);
 				} else {
-					return new Matrix(FACTORY.createMatrix(values));
+					return FACTORY.createMatrix(values);
 				}
 			}			
 		}
@@ -106,38 +102,18 @@ public class LinAlg {
 				return new Scalar(init.cell(0, 0));
 			} else {	
 				final MatrixFunction temp = init;
-				return new Vector(FACTORY.createVector(rows, new VectorFunction() {					
+				return FACTORY.createVector(rows, new VectorFunction() {					
 					@Override
 					public double cell(int row) {
 						return temp.cell(row, 0);
 					}
-				}));
+				});
 			}
 		} else {
 			if (rows == columns) {
-				return new SquareMatrix(FACTORY.createSquareMatrix(rows, init));
+				return FACTORY.createSquareMatrix(rows, init);
 			} else {
-				return new Matrix(FACTORY.createMatrix(rows, columns, init));
-			}
-		}
-	}
-
-	public static Matrix matrix(int rows, int columns, DoubleStorage storage) {
-		if (rows < 1 || columns < 1) {
-			throw new IllegalArgumentException();
-		} else	if (columns == 1) {
-			if (rows == 1) {
-				double[] temp = new double[1];
-				storage.read(temp);
-				return new Scalar(temp[0]);
-			} else {				
-				return new Vector(FACTORY.createVector(rows, storage));
-			}
-		} else {
-			if(rows == columns) {
-				return new SquareMatrix(FACTORY.createSquareMatrix(rows, storage));
-			} else {
-				return new Matrix(FACTORY.createMatrix(rows, columns, storage));
+				return FACTORY.createMatrix(rows, columns, init);
 			}
 		}
 	}
@@ -150,55 +126,59 @@ public class LinAlg {
 		if (rows.length < 1) {
 			throw new IllegalArgumentException("At least one row required.");
 		}		
-		MatrixImplementation res = rows[0].delegate;
+		Matrix res = rows[0];
 		for (int i = 1; i < rows.length; i++) {
-			res = res.appendRows(rows[i].delegate);
+			res = res.appendRows(rows[i]);
 		}
-		return Matrix.newInstanceDynamic(res);
+		return res;
 	}
 	
 	public static Matrix horzcat(Matrix...cols) {
 		if (cols.length < 1) {
 			throw new IllegalArgumentException("At least one column required.");
 		}
-		MatrixImplementation res = cols[0].delegate;
+		Matrix res = cols[0];
 		for (int i = 1; i < cols.length; i++) {
-			res = res.appendColumns(cols[i].delegate);
+			res = res.appendColumns(cols[i]);
 		}
-		return Matrix.newInstanceDynamic(res);
+		return res;
 	}
 	
 	public static Matrix repmat(Matrix a, int vertical, int horizontal) {
-		MatrixImplementation res = a.delegate;
+		Matrix res = a;
 		for (int i = 1; i < horizontal; i++) {
-			res = res.appendColumns(a.delegate);
+			res = res.appendColumns(a);
 		}
 		
-		MatrixImplementation row = res;
+		Matrix row = res;
 		for (int i = 1; i < vertical; i++) {
 			res = res.appendRows(row);
 		}
-		return Matrix.newInstanceDynamic(res);
+		return res;
 	}
 
 	public static <M extends Matrix> M abs(M a) {
-		return a.newInstance(a.delegate.abs());
+		return a.abs();
+	}
+	
+	public static double mean(Vector a) {
+		return a.mean();
 	}
 
 	public static double sum(Matrix a) {
-		return a.delegate.sum();
+		return a.sum();
 	}
 
 	public static double norm1(Matrix a) {
-		return a.delegate.norm1();
+		return a.norm1();
 	}
 
 	public static double norm2(Matrix a) {
-		return a.delegate.norm2();
+		return a.norm2();
 	}
 
 	public static Matrix transpose(Matrix a) {
-		return Matrix.newInstanceDynamic(a.delegate.transpose());
+		return a.transpose();
 	}
 	
 	public static Range range(int start, int end) {
@@ -213,41 +193,38 @@ public class LinAlg {
 		if (size < 1) {
 			throw new IllegalArgumentException();
 		}
-		return new SquareMatrix(FACTORY.createSquareMatrix(size, fill));
+		return FACTORY.createSquareMatrix(size, fill);
 	}
-	
-	public static SquareMatrix square(int size, DoubleStorage storage) {
-		if (size < 1) {
-			throw new IllegalArgumentException();
-		}
-		return new SquareMatrix(FACTORY.createSquareMatrix(size, storage));
-	}	
 	
 	public static SquareMatrix square(int size, MatrixFunction init) {
 		if (size < 1) {
 			throw new IllegalArgumentException();
 		}
-		return new SquareMatrix(FACTORY.createSquareMatrix(size, init));
+		return FACTORY.createSquareMatrix(size, init);
 	}
 
 	public static double det(SquareMatrix a) {
-		return ((SquareMatrixImplementation)a.delegate).det();
+		return a.det();
 	}
 
 	public static SquareMatrix inverse(SquareMatrix a) {
-		return a.newInstance(((SquareMatrixImplementation)a.delegate).inverse());
+		return a.inverse();
 	}
 
 	public static double rank(SquareMatrix a) {
-		return ((SquareMatrixImplementation)a.delegate).rank();
+		return a.rank();
 	}
 
 	public static double trace(SquareMatrix a) {
-		return ((SquareMatrixImplementation)a.delegate).trace();
+		return a.trace();
 	}
 	
 	public static SquareMatrix pow(SquareMatrix a, int p) {
-		return a.newInstance(((SquareMatrixImplementation)a.delegate).pow(p));		
+		return a.pow(p);		
+	}
+	
+	public static int[] sort(Matrix a, int column) {
+		return a.sort(column);
 	}
 	
 	public static Vector zeros(int rows) {
@@ -256,7 +233,7 @@ public class LinAlg {
 		} else if (rows == 1) {
 			return Scalar.ZERO;
 		} else {
-			return new Vector(FACTORY.createVector(rows, 0));
+			return FACTORY.createVector(rows, 0);
 		}
 	}
 
@@ -267,7 +244,7 @@ public class LinAlg {
 		} else if (rows == 1) {
 			return Scalar.ONE;
 		} else {
-			return new Vector(FACTORY.createVector(rows, 1));
+			return FACTORY.createVector(rows, 1);
 		}
 	}
 
@@ -275,7 +252,7 @@ public class LinAlg {
 		if (values.length == 1) {
 			return new Scalar(values[0]);
 		} else {
-			return new Vector(FACTORY.createVector(values));
+			return FACTORY.createVector(values);
 		}
 	}
 
@@ -285,22 +262,10 @@ public class LinAlg {
 		} else	if (rows == 1) {
 			return new Scalar(init.cell(0));
 		} else {
-			return new Vector(FACTORY.createVector(rows, init));
+			return FACTORY.createVector(rows, init);
 		}
 	}
 
-	public static Vector vector(int rows, DoubleStorage storage) {
-		if (rows < 1) {
-			throw new IllegalArgumentException();
-		} else	if (rows == 1) {
-			double[] temp = new double[1];
-			storage.read(temp);
-			return new Scalar(temp[0]);
-		} else {
-			return new Vector(FACTORY.createVector(rows, storage));
-		}
-	}
-	
 	public static int min(Vector v) {
 		double min = Double.MAX_VALUE;
 		int idx = -1;

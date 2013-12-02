@@ -1,63 +1,18 @@
 package edu.kit.ipd.descartes.linalg;
 
-import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
-
-
-public class Vector extends Matrix {
+public interface Vector extends Matrix {
 	
-	Vector(VectorImplementation delegate)  {
-		super(delegate);
-	}
+	double get(int row);
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	<M extends Matrix> M newInstance(MatrixImplementation delegate) {
-		return (M) new Vector((VectorImplementation)delegate);
-	}
-
-	public double get(int row) {
-		return ((VectorImplementation)delegate).get(row, 0);
-	}
+	<V extends Vector> V set(int row, double value);
 	
-	public Vector set(int row, double value) {
-		return set(row, 0, value);
-	}
+	<V extends Vector> V set(Range rows, Vector values);
 	
-	public Vector set(Range rows, Vector values) {
-		return newInstance(((VectorImplementation)delegate).copyAndSet(rows, (VectorImplementation)values.delegate));
-	}
+	<V extends Vector> V slice(Range range);
 	
-	public Vector slice(Range range) {
-		return new Vector(((VectorImplementation)delegate).slice(range));
-	}
-
-	public double dot(Vector b) {
-		return ((VectorImplementation)delegate).dot((VectorImplementation)b.delegate);
-	}
+	<V extends Vector> V subset(int[] indeces);
 	
-	@Override
-	public Scalar row(int row) {
-		return LinAlg.scalar(get(row));
-	}
+	double dot(Vector b);
 	
-	@Override
-	public boolean isVector() {
-		return true;
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		for (int i = 0; i < rows(); i++) {
-			if (i > 0) {
-				builder.append("; ");
-			}
-			builder.append(get(i));
-		}
-		builder.append("]");
-		return builder.toString();
-	}
-	
+	double mean();	
 }

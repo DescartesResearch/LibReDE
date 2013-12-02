@@ -5,6 +5,7 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+import static edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,6 @@ import edu.kit.ipd.descartes.redeem.ipopt.java.backend.Eval_Jac_G_CB;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptLibrary;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptOptionKeyword;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptOptionValue;
-import edu.kit.ipd.descartes.redeem.nativehelper.NativeDoubleStorage;
 import edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper;
 
 public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
@@ -53,9 +53,9 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 	 * types of constraints are managed in separate lists so that they can
 	 * be treated differently during the optimization
 	 */
-	private List<IStateConstraint> nonlinearConstraints = new ArrayList<>();
-	private List<ILinearStateConstraint> linearConstraints = new ArrayList<>();
-	private List<StateBoundsConstraint> boundsConstraints = new ArrayList<>();
+	private List<IStateConstraint> nonlinearConstraints = new ArrayList<IStateConstraint>();
+	private List<ILinearStateConstraint> linearConstraints = new ArrayList<ILinearStateConstraint>();
+	private List<StateBoundsConstraint> boundsConstraints = new ArrayList<StateBoundsConstraint>();
 	
 	/*
 	 * Callback functions which are called from native code of IPOPT during optimization
@@ -145,7 +145,7 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 		
 		Vector estimate = zeros(stateSize);		
 		if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
-			estimate = vector(stateSize, new NativeDoubleStorage(x));			
+			estimate = nativeVector(stateSize, x);		
 		} else {
 			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
 		}
@@ -286,7 +286,7 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 			
 			state.update(x, new_x);
 			
-			state.objGrad.toDoubleStorage(new NativeDoubleStorage(grad_f));
+			toNative(grad_f, state.objGrad);
 			
 			return true;
 		}
@@ -368,7 +368,7 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 					}
 				}
 				if (jacobi != null) {
-					jacobi.toDoubleStorage(new NativeDoubleStorage(values));
+					toNative(values, jacobi);
 				}
 			}
 
@@ -491,7 +491,7 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 
 		public void update(Pointer x, boolean new_x) {
 			if (new_x) {
-				current = vector(stateSize, new NativeDoubleStorage(x));
+				current = nativeVector(stateSize, x);
 			
 				Vector o_real = observationModel.getObservedOutput();
 				Vector o_calc = observationModel.getCalculatedOutput(current);

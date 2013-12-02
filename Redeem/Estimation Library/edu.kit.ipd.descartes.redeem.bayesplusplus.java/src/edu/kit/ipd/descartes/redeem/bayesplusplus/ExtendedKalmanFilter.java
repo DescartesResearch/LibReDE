@@ -3,10 +3,11 @@ package edu.kit.ipd.descartes.redeem.bayesplusplus;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.row;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
+import static edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper.nativeVector;
+import static edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper.toNative;
 
 import com.sun.jna.Pointer;
 
-import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -21,7 +22,6 @@ import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationMo
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.redeem.nativehelper.NativeDoubleStorage;
 import edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper;
 
 public class ExtendedKalmanFilter implements
@@ -35,15 +35,15 @@ public class ExtendedKalmanFilter implements
 
 		@Override
 		public Pointer execute(Pointer x) {
-			Vector currentState = vector(stateSize, new NativeDoubleStorage(x));
+			Vector currentState = nativeVector(stateSize, x);
 
 			Vector nextObservation = observationModel.getCalculatedOutput(currentState);
 
 			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(observationModel, currentState);
-			jacobi.toDoubleStorage(new NativeDoubleStorage(jacobiBuffer));
+			toNative(jacobiBuffer, jacobi);
 			BayesPlusPlusLibrary.set_Hx(nativeObservationModel, jacobiBuffer, stateSize, outputSize);
 
-			nextObservation.toDoubleStorage(new NativeDoubleStorage(outputBuffer));
+			toNative(outputBuffer, nextObservation);
 			return outputBuffer;
 		}
 
@@ -57,15 +57,14 @@ public class ExtendedKalmanFilter implements
 
 		@Override
 		public Pointer execute(Pointer x) {
-			Vector currentState = vector(stateSize, new NativeDoubleStorage(x));
+			Vector currentState = nativeVector(stateSize, x);
 
 			Vector nextState = stateModel.getNextState(currentState);
 			Matrix jacobi = JacobiMatrixBuilder.calculateOfState(stateModel, currentState);
-
-			jacobi.toDoubleStorage(new NativeDoubleStorage(jacobiBuffer));
+			toNative(jacobiBuffer, jacobi);
 			BayesPlusPlusLibrary.set_Fx(nativeStateModel, jacobiBuffer, stateSize);
 
-			nextState.toDoubleStorage(new NativeDoubleStorage(stateBuffer));
+			toNative(stateBuffer, nextState);
 			return stateBuffer;
 		}
 	}
@@ -104,11 +103,11 @@ public class ExtendedKalmanFilter implements
 		}
 
 		Vector initialState = stateModel.getInitialState();
-		initialState.toDoubleStorage(new NativeDoubleStorage(stateBuffer));
+		toNative(stateBuffer, initialState);
 
 		Pointer covBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
 		Matrix initialCovariance = getInitialStateCovariance(initialState);
-		initialCovariance.toDoubleStorage(new NativeDoubleStorage(covBuffer));
+		toNative(covBuffer, initialCovariance);
 
 		if (BayesPlusPlusLibrary.init_kalman(nativeScheme, stateBuffer, covBuffer, stateSize) == BayesPlusPlusLibrary.ERROR) {
 			throw new InitializationException("Could not initialize kalman filter: "
@@ -124,10 +123,10 @@ public class ExtendedKalmanFilter implements
 			throw new InitializationException("Error creating state model: " + BayesPlusPlusLibrary.get_last_error());
 		}
 
-		stateNoiseCovariance.toDoubleStorage(new NativeDoubleStorage(stateBuffer));
+		toNative(stateBuffer, stateNoiseCovariance);
 		BayesPlusPlusLibrary.set_q(nativeStateModel, stateBuffer, stateSize);
 
-		stateNoiseCoupling.toDoubleStorage(new NativeDoubleStorage(stateBuffer));
+		toNative(stateBuffer, stateNoiseCoupling);
 		BayesPlusPlusLibrary.set_G(nativeStateModel, stateBuffer, stateSize);
 	}
 
@@ -142,7 +141,7 @@ public class ExtendedKalmanFilter implements
 		}
 
 		Pointer buffer = NativeHelper.allocateDoubleArray(outputSize);
-		observeNoise.toDoubleStorage(new NativeDoubleStorage(buffer));
+		toNative(buffer, observeNoise);
 		BayesPlusPlusLibrary.set_Zv(nativeObservationModel, buffer, outputSize);
 	}
 
@@ -155,7 +154,7 @@ public class ExtendedKalmanFilter implements
 	private void observe(Vector observation)
 			throws EstimationException {
 		Pointer buffer = NativeHelper.allocateDoubleArray(observation.rows());
-		observation.toDoubleStorage(new NativeDoubleStorage(buffer));
+		toNative(buffer, observation);
 		if (BayesPlusPlusLibrary.observe(nativeScheme, nativeObservationModel, buffer, observation.rows()) == BayesPlusPlusLibrary.ERROR) {
 			throw new EstimationException("Error in observation phase: " + BayesPlusPlusLibrary.get_last_error());
 		}
@@ -169,7 +168,7 @@ public class ExtendedKalmanFilter implements
 
 	private Vector getCurrentEstimate() {		
 		BayesPlusPlusLibrary.get_x(nativeScheme, stateBuffer);
-		return vector(stateSize, new NativeDoubleStorage(stateBuffer));
+		return nativeVector(stateSize, stateBuffer);
 	}
 	
 	private Matrix getInitialStateCovariance(final Vector initialState) {

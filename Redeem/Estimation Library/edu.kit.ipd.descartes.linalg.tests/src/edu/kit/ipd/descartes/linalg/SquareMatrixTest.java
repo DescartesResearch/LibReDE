@@ -1,10 +1,15 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.det;
+import static edu.kit.ipd.descartes.linalg.LinAlg.inverse;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.pow;
+import static edu.kit.ipd.descartes.linalg.LinAlg.rank;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.trace;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;

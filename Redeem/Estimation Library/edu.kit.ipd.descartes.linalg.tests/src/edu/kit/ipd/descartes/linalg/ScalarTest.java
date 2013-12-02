@@ -1,16 +1,20 @@
 package edu.kit.ipd.descartes.linalg;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.abs;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.norm1;
+import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
+import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
+import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static org.mockito.AdditionalMatchers.aryEq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class ScalarTest {
 	
@@ -93,15 +97,6 @@ public class ScalarTest {
 	}
 	
 	@Test
-	public void testToDoubleStorage() {
-		DoubleStorage storageMock = mock(DoubleStorage.class);		
-	
-		a.toDoubleStorage(storageMock);
-		
-		verify(storageMock).write(aryEq(new double[] { A }));
-	}
-	
-	@Test
 	public void testNorm1() {
 		assertThat(norm1(a)).isEqualTo(A, offset(1e-9));
 		assertThat(norm1(b)).isEqualTo(-B, offset(1e-9));
@@ -158,6 +153,18 @@ public class ScalarTest {
 		double[] arr = a.toArray1D();
 		assertThat(arr.length).isEqualTo(1);
 		assertThat(arr[0]).isEqualTo(A, offset(1e-9));
+	}
+	
+	@Test
+	public void testAppendColumns() {
+		Matrix res = a.appendColumns(matrix(row(2, 3, 4)));
+		assertThat(res).isEqualTo(matrix(row(1, 2, 3, 4)), offset(1e-9));
+	}
+	
+	@Test
+	public void testAppendRows() {
+		Vector res = a.appendRows(vector(2, 3, 4));
+		assertThat(res).isEqualTo(vector(1, 2, 3, 4), offset(1e-9));
 	}
 
 }

@@ -1,94 +1,70 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
+import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
+import edu.kit.ipd.descartes.linalg.SquareMatrix;
+import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.linalg.backend.MatrixFactory;
-import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.SquareMatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
 
 public class ColtMatrixFactory implements MatrixFactory {
+	
+	public Matrix createMatrix(DoubleMatrix2D wrapped) {
+		return new ColtMatrix(wrapped);
+	}
 
 	@Override
-	public MatrixImplementation createMatrix(double[][] values) {
+	public Matrix createMatrix(double[][] values) {
 		return new ColtMatrix(values);
 	}
 
 	@Override
-	public MatrixImplementation createMatrix(int rows, int columns, double fill) {
-		ColtMatrix matrix = new ColtMatrix(rows, columns);
-		matrix.assign(fill);
-		return matrix;
+	public Matrix createMatrix(int rows, int columns, double fill) {
+		return new ColtMatrix(rows, columns, fill);
 	}
 
 	@Override
-	public MatrixImplementation createMatrix(int rows, int columns, DoubleStorage storage) {
-		return new ColtMatrix(rows, columns, storage);
+	public Matrix createMatrix(int rows, int columns, MatrixFunction init) {
+		return new ColtMatrix(rows, columns, init);
 	}
-
-	@Override
-	public MatrixImplementation createMatrix(int rows, int columns, MatrixFunction init) {
-		ColtMatrix matrix = new ColtMatrix(rows, columns);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < columns; j++) {
-				matrix.setQuick(i, j, init.cell(i, j));
-			}
-		}
-		return matrix;
+	
+	public Vector createVector(DoubleMatrix1D wrapped) {
+		return new ColtVector(wrapped);
 	}
 	
 	@Override
-	public VectorImplementation createVector(double[] values) {
+	public Vector createVector(double[] values) {
 		return new ColtVector(values);
 	}
 
 	@Override
-	public VectorImplementation createVector(int rows, double fill) {
-		ColtVector vector = new ColtVector(rows);
-		vector.assign(fill);
-		return vector;
+	public Vector createVector(int rows, double fill) {
+		return new ColtVector(rows, fill);
 	}
 
 	@Override
-	public VectorImplementation createVector(int rows, DoubleStorage storage) {
-		return new ColtVector(rows, storage);
+	public Vector createVector(int rows, VectorFunction init) {
+		return new ColtVector(rows, init);
 	}
-
-	@Override
-	public VectorImplementation createVector(int rows, VectorFunction init) {
-		ColtVector vector = new ColtVector(rows);
-		for (int i = 0; i < rows; i++) {
-			vector.setQuick(i, init.cell(i));
-		}
-		return vector;
+	
+	public SquareMatrix createSquareMatrix(DoubleMatrix2D wrapped) {
+		return new ColtSquareMatrix(wrapped);
 	}
 	
 	@Override
-	public SquareMatrixImplementation createSquareMatrix(double[][] values) {
+	public SquareMatrix createSquareMatrix(double[][] values) {
 		return new ColtSquareMatrix(values);
 	}
 
 	@Override
-	public SquareMatrixImplementation createSquareMatrix(int size, double fill) {
-		ColtSquareMatrix matrix = new ColtSquareMatrix(size);
-		matrix.assign(fill);
-		return matrix;
+	public SquareMatrix createSquareMatrix(int size, double fill) {
+		return new ColtSquareMatrix(size, fill);
 	}
 
 	@Override
-	public SquareMatrixImplementation createSquareMatrix(int size, MatrixFunction init) {
-		ColtSquareMatrix matrix = new ColtSquareMatrix(size);
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				matrix.setQuick(i, j, init.cell(i, j));
-			}
-		}
-		return matrix;
-	}
-
-	@Override
-	public SquareMatrixImplementation createSquareMatrix(int size, DoubleStorage storage) {
-		return new ColtSquareMatrix(size, storage);
+	public SquareMatrix createSquareMatrix(int size, MatrixFunction init) {
+		return new ColtSquareMatrix(size, init);
 	}
 }

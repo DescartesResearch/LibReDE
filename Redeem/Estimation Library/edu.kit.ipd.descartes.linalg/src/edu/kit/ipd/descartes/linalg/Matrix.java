@@ -1,147 +1,65 @@
 package edu.kit.ipd.descartes.linalg;
 
-import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
+import edu.kit.ipd.descartes.linalg.backend.SharedBuffer;
 
-public class Matrix {
-	
-	final MatrixImplementation delegate;
-	
-	Matrix(MatrixImplementation delegate)  {
-		this.delegate = delegate;
-	}
-	
-	@SuppressWarnings("unchecked")
-	<M extends Matrix> M newInstance(MatrixImplementation delegate) {
-		return (M) new Matrix(delegate);
-	}
-	
-	@SuppressWarnings("unchecked")
-	static <M extends Matrix> M newInstanceDynamic(MatrixImplementation delegate) {
-		if (delegate.columns() == 1) {
-			if (delegate.rows() == 1) {
-				return (M) new Scalar((Scalar.ScalarImplementation)delegate);
-			} else {
-				return (M) new Vector((VectorImplementation)delegate);
-			}
-		}
-		return (M) new Matrix(delegate);
-	}
 
-	public double get(int row, int col) {
-		return delegate.get(row, col);
-	}
+public interface Matrix {
 	
-	public <M extends Matrix> M set(int row, int col, double value) {
-		return newInstance(delegate.copyAndSet(row, col, value));
-	}
-
-	public int rows() {
-		return delegate.rows();
-	}
-
-	public int columns() {
-		return delegate.columns();
-	}
-
-	public Vector row(int row) {
-		return new Vector(delegate.row(row));
-	}
-
-	public Vector column(int column) {
-		return new Vector(delegate.column(column));
-	}
+	double get(int row, int col);
 	
-	public boolean isVector() {
-		return false;
-	}
+	<M extends Matrix> M set(int row, int col, double value);
 	
-	public boolean isScalar() {
-		return false;
-	}
+	<M extends Matrix> M appendColumns(Matrix a);
+	
+	<M extends Matrix> M appendRows(Matrix a);
+
+	int rows();
+
+	int columns();
+
+	Vector row(int row);
+
+	Vector column(int column);
+	
+	boolean isVector();
+	
+	boolean isScalar();
 
 	/*
 	 * Algebra functions
 	 */
 
-	public <M extends Matrix> M plus(M a) {
-		if (a.columns() != this.columns() || a.rows() != this.rows()) {
-			throw new IllegalArgumentException("Both operands must have the same size.");
-		}
-		return newInstance(delegate.plus(a.delegate));
-	}
+	<M extends Matrix> M plus(M a);
 
-	public <M extends Matrix> M plus(double a) {
-		return newInstance(delegate.plus(a));
-	}
+	<M extends Matrix> M plus(double a);
 
-	public <M extends Matrix> M minus(M a) {
-		if (a.columns() != this.columns() || a.rows() != this.rows()) {
-			throw new IllegalArgumentException("Both operands must have the same size.");
-		}
-		return newInstance(delegate.minus(a.delegate));
-	}
+	<M extends Matrix> M minus(M a);
 
-	public <M extends Matrix> M minus(double a) {
-		return newInstance(delegate.minus(a));
-	}
+	<M extends Matrix> M minus(double a);
 
-	public <M extends Matrix> M multipliedBy(M a) {
-		if (columns() != a.rows()) {
-			throw new IllegalArgumentException("Inner dimensions of operands must be equal.");
-		} else {
-			if (a.isScalar()) {
-				return this.times(((Scalar)a).getValue());
-			} else {
-				return newInstanceDynamic(delegate.multipliedBy(a.delegate));
-			}
-		}
-	}
+	<M extends Matrix> M multipliedBy(M a);
 	
-	public <M extends Matrix> M arrayMultipliedBy(M a) {
-		if (a.columns() != this.columns() || a.rows() != this.rows()) {
-			throw new IllegalArgumentException("Both operands must have the same size.");
-		}
-		return newInstance(delegate.arrayMultipliedBy(a.delegate));
-	}
+	<M extends Matrix> M arrayMultipliedBy(M a);
 
-	public <M extends Matrix> M times(double a) {
-		return newInstance(delegate.times(a));
-	}
+	<M extends Matrix> M times(double a);	
+	
+	double norm1();
+	
+	double norm2();
+	
+	double sum();
+	
+	<M extends Matrix> M abs();
+	
+	<M extends Matrix> M transpose();
+	
+	public abstract int[] sort(int column);
 	
 	/*
 	 * Conversion functions
 	 */
 	
-	public double[] toArray1D() {
-		return delegate.toArray1D();
-	}
+	public abstract double[] toArray1D();
 
-	public double[][] toArray2D() {
-		return delegate.toArray2D();
-	}
-
-	public void toDoubleStorage(DoubleStorage storage) {
-		delegate.toDoubleStorage(storage);
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		for (int i = 0; i < rows(); i++) {
-			builder.append("[");
-			for (int j = 0; j < columns(); j++) {
-				if (j > 0) {
-					builder.append("; ");
-				}
-				builder.append(get(i, j));
-			}
-			builder.append("]");
-		}
-		builder.append("]");
-		return builder.toString();
-	}
-
+	public abstract double[][] toArray2D();
 }

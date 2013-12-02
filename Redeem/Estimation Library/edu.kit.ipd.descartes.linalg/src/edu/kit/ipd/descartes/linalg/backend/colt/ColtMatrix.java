@@ -1,160 +1,197 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
+import cern.colt.Sorting;
+import cern.colt.function.IntComparator;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
-import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.VectorImplementation;
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
+import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.MatrixFunction;
+import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.linalg.backend.AbstractMatrix;
 
-public class ColtMatrix extends DenseDoubleMatrix2D implements
-		MatrixImplementation {
-
-	private static final long serialVersionUID = -7263599554445918458L;
+public class ColtMatrix extends AbstractMatrix {
+	
+	protected DoubleMatrix2D delegate;
 
 	protected static final Algebra ALG = new Algebra();
+	
+	protected ColtMatrix(DoubleMatrix2D delegate) {
+		this.delegate = delegate;
+	}
 
 	public ColtMatrix(int rows, int columns) {
-		super(rows, columns);
+		this(new DenseDoubleMatrix2D(rows, columns));
 	}
 
 	public ColtMatrix(double[][] values) {
-		super(values);
+		this(new DenseDoubleMatrix2D(values));
 	}
-
-	public ColtMatrix(int rows, int columns, DoubleStorage storage) {
-		super(rows, columns);
-		storage.read(elements);
+	
+	public ColtMatrix(int rows, int columns, double fill) {
+		this(new DenseDoubleMatrix2D(rows,columns));
+		delegate.assign(fill);
+	}
+	
+	public ColtMatrix(int rows, int columns, MatrixFunction init) {
+		this(new DenseDoubleMatrix2D(rows,columns));
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				delegate.setQuick(i, j, init.cell(i, j));
+			}
+		}
+	}
+	
+	@Override
+	public int rows() {
+		return delegate.rows();
+	}
+	
+	@Override
+	public int columns() {
+		return delegate.columns();
+	}
+	
+	@Override
+	public double get(int row, int col) {
+		return delegate.get(row, col);
 	}
 
 	@Override
-	public VectorImplementation row(int row) {
-		return (VectorImplementation) viewRow(row);
+	public ColtVector row(int row) {
+		return new ColtVector(delegate.viewRow(row));
 	}
 
 	@Override
-	public VectorImplementation column(int column) {
-		return (VectorImplementation) viewColumn(column);
+	public ColtVector column(int column) {
+		return new ColtVector(delegate.viewColumn(column));
 	}
 
 	@Override
 	public double[][] toArray2D() {
-		return toArray();
+		return delegate.toArray();
 	}
 
 	@Override
-	public void toDoubleStorage(DoubleStorage storage) {
-		storage.write(elements);
-	}
-
-	@Override
-	public MatrixImplementation plus(double a) {
-		ColtMatrix result = like();
+	public ColtMatrix internalPlus(double a) {
+		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
-				result.setQuick(i, j, getQuick(i, j) + a);
+				result.setQuick(i, j, delegate.getQuick(i, j) + a);
 			}
 		}
-		return result;
+		return new ColtMatrix(result);
 	}
 
 	@Override
-	public MatrixImplementation minus(double a) {
-		ColtMatrix result = like();
+	public ColtMatrix internalMinus(double a) {
+		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
-				result.setQuick(i, j, getQuick(i, j) - a);
+				result.setQuick(i, j, delegate.getQuick(i, j) - a);
 			}
 		}
-		return result;
+		return new ColtMatrix(result);
 	}
 
 	@Override
-	public MatrixImplementation times(double a) {
-		ColtMatrix result = like();
+	public ColtMatrix internalTimes(double a) {
+		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
-				result.setQuick(i, j, getQuick(i, j) * a);
+				result.setQuick(i, j, delegate.getQuick(i, j) * a);
 			}
 		}
-		return result;
+		return new ColtMatrix(result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public MatrixImplementation abs() {
-		ColtMatrix result = like();
+	public Matrix abs() {
+		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
-				result.setQuick(i, j, Math.abs(getQuick(i, j)));
+				result.setQuick(i, j, Math.abs(delegate.getQuick(i, j)));
 			}
 		}
-		return result;
+		return new ColtMatrix(result);
 	}
 
 	@Override
 	public double sum() {
-		return zSum();
+		return delegate.zSum();
 	}
 
 	@Override
 	public double norm1() {
-		return ALG.norm1(this);
+		return ALG.norm1(delegate);
 	}
 
 	@Override
 	public double norm2() {
-		return ALG.norm2(this);
+		return ALG.norm2(delegate);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public MatrixImplementation transpose() {
+	public Matrix transpose() {
 		if (rows() == 1) {
-			return (MatrixImplementation) viewRow(0);
+			return new ColtVector(delegate.viewRow(0));
 		} else {
-			return (MatrixImplementation) ALG.transpose(this);
+			return new ColtMatrix(ALG.transpose(delegate));
 		}
 	}
 
 	@Override
-	public MatrixImplementation plus(MatrixImplementation a) {
-		ColtMatrix res = (ColtMatrix) this.copy();
-		res.assign(toColtMatrix(a), Functions.plus);
-		return res;
+	public Matrix internalPlus(Matrix a) {
+		DoubleMatrix2D res = copyMatrix();
+		res.assign(toColtMatrix(a).delegate, Functions.plus);
+		return new ColtMatrix(res);
 	}
 
 	@Override
-	public MatrixImplementation minus(MatrixImplementation a) {
-		ColtMatrix res = (ColtMatrix) this.copy();
-		res.assign(toColtMatrix(a), Functions.minus);
-		return res;
+	public Matrix internalMinus(Matrix a) {
+		DoubleMatrix2D res = copyMatrix();
+		res.assign(toColtMatrix(a).delegate, Functions.minus);
+		return new ColtMatrix(res);
 	}
 
 	@Override
-	public MatrixImplementation arrayMultipliedBy(MatrixImplementation a) {
-		ColtMatrix res = (ColtMatrix) this.copy();
-		res.assign(toColtMatrix(a), Functions.mult);
-		return res;
+	public Matrix internalArrayMultipliedBy(Matrix a) {
+		DoubleMatrix2D res = copyMatrix();
+		res.assign(toColtMatrix(a).delegate, Functions.mult);
+		return new ColtMatrix(res);
 	}
 
 	@Override
-	public MatrixImplementation multipliedBy(MatrixImplementation a) {
-		if (a instanceof VectorImplementation) {
-			ColtVector result = like1D(this.rows());
-			zMult(toColtVector(a), result);
-			return result;
+	public Matrix internalMultipliedBy(Matrix a) {
+		if (a.isVector()) {
+			DoubleMatrix1D result = newVector(this.rows());
+			delegate.zMult(toColtVector((Vector)a).delegate, result);
+			return new ColtVector(result);
 		} else {
-			ColtMatrix result = like(rows(), a.columns());
-			zMult(toColtMatrix(a), result);
-			return result;
+			DoubleMatrix2D result = newMatrix(delegate.rows(), a.columns());
+			delegate.zMult(toColtMatrix(a).delegate, result);
+			return new ColtMatrix(result);
 		}
 	}
 
 	@Override
 	public double[] toArray1D() {
-		return elements.clone();
+		int rows = delegate.rows();
+		int columns = delegate.columns();
+		double[] ret = new double[rows * columns];
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				ret[i * columns + j] = delegate.getQuick(i, j);
+			}
+		}
+		return ret;
 	}
 
-	protected ColtMatrix toColtMatrix(MatrixImplementation a) {
+	protected ColtMatrix toColtMatrix(Matrix a) {
 		if (a instanceof ColtMatrix) {
 			return (ColtMatrix) a;
 		} else {
@@ -162,7 +199,7 @@ public class ColtMatrix extends DenseDoubleMatrix2D implements
 		}
 	}
 
-	protected ColtVector toColtVector(MatrixImplementation a) {
+	protected ColtVector toColtVector(Vector a) {
 		if (a instanceof ColtVector) {
 			return (ColtVector) a;
 		} else {
@@ -170,60 +207,81 @@ public class ColtMatrix extends DenseDoubleMatrix2D implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public MatrixImplementation appendRows(MatrixImplementation a) {
+	public Matrix appendRows(Matrix a) {
 		if (a.columns() != this.columns()) {
 			throw new IllegalArgumentException(
 					"Number of columns must be equal.");
 		}
 
-		ColtMatrix combined = like(this.rows() + a.rows(),
-				this.columns());
-		combined.viewPart(0, 0, this.rows(), this.columns()).assign(this);
+		DoubleMatrix2D combined = newMatrix(delegate.rows() + a.rows(),
+				delegate.columns());
+		combined.viewPart(0, 0, this.rows(), this.columns()).assign(delegate);
 		combined.viewPart(this.rows(), 0, a.rows(), a.columns()).assign(
-				toColtMatrix(a));
-		return combined;
+				toColtMatrix(a).delegate);
+		return new ColtMatrix(combined);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public MatrixImplementation appendColumns(MatrixImplementation a) {
+	public Matrix appendColumns(Matrix a) {
 		if (a.rows() != this.rows()) {
 			throw new IllegalArgumentException("Number of rows must be equal.");
 		}
 
-		ColtMatrix combined = like(this.rows(), this.columns()
+		DoubleMatrix2D combined = newMatrix(delegate.rows(), delegate.columns()
 				+ a.columns());
-		combined.viewPart(0, 0, this.rows(), this.columns()).assign(this);
+		combined.viewPart(0, 0, this.rows(), this.columns()).assign(delegate);
 		combined.viewPart(0, this.columns(), a.rows(), a.columns()).assign(
-				toColtMatrix(a));
-		return combined;
+				toColtMatrix(a).delegate);
+		return new ColtMatrix(combined);
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	@Override
-	public ColtVector like1D(int arg0) {
-		return new ColtVector(arg0);
-	}
-
-	@Override
-	protected ColtVector like1D(int size, int zero, int stride) {
-		return new ColtVector(size, elements, zero, stride);
-	}
-
-	@Override
-	public ColtMatrix like() {
-		return new ColtMatrix(this.rows(), this.columns());
-	}
-
-	@Override
-	public ColtMatrix like(int rows, int columns) {
-		return new ColtMatrix(rows, columns);
-	}
-
-	@Override
-	public MatrixImplementation copyAndSet(int row, int col, double value) {
-		ColtMatrix copy = (ColtMatrix)this.copy();
+	public Matrix set(int row, int col, double value) {
+		DoubleMatrix2D copy = copyMatrix();
 		copy.set(row, col, value);
-		return copy;
+		return new ColtMatrix(copy);
 	}
-
+	
+	@Override
+	public int[] sort(final int column) {
+		int[] idx = new int[rows()];
+		for (int i = 0; i < idx.length; i++) {
+			idx[i] = i;
+		}	
+		
+		Sorting.quickSort(idx, 0, idx.length, new IntComparator() {			
+			@Override
+			public int compare(int idx1, int idx2) {
+				double val1 = delegate.getQuick(idx1, column);
+				double val2 = delegate.getQuick(idx2, column);
+				if (val1 < val2) {
+					return -1;
+				} else if (val1 > val2) {
+					return 1;
+				}
+				return 0;
+			}
+		});
+		return idx;
+	}
+	
+	protected DoubleMatrix1D newVector(int size) {
+		return delegate.like1D(size);
+	}
+	
+	protected DoubleMatrix2D newMatrix() {
+		return delegate.like();
+	}
+	
+	protected DoubleMatrix2D newMatrix(int rows, int columns) {
+		return delegate.like(rows, columns);
+	}
+	
+	protected DoubleMatrix2D copyMatrix() {
+		return delegate.copy();
+	}
 }

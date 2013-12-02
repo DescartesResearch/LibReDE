@@ -1,12 +1,14 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
 import cern.colt.matrix.DoubleMatrix2D;
-import edu.kit.ipd.descartes.linalg.backend.SquareMatrixImplementation;
-import edu.kit.ipd.descartes.linalg.storage.DoubleStorage;
+import edu.kit.ipd.descartes.linalg.MatrixFunction;
+import edu.kit.ipd.descartes.linalg.SquareMatrix;
 
-public class ColtSquareMatrix extends ColtMatrix implements SquareMatrixImplementation {
+public class ColtSquareMatrix extends ColtMatrix implements SquareMatrix {
 	
-	private static final long serialVersionUID = 6300083743869129514L;
+	protected ColtSquareMatrix(DoubleMatrix2D delegate) {
+		super(delegate);
+	}
 	
 	public ColtSquareMatrix(double[][] values) {
 		super(values);
@@ -16,52 +18,42 @@ public class ColtSquareMatrix extends ColtMatrix implements SquareMatrixImplemen
 		super(size, size);
 	}
 	
-	public ColtSquareMatrix(int size, DoubleStorage storage) {
-		super(size, size, storage);
+	public ColtSquareMatrix(int size, double fill) {
+		super(size, size, fill);
+	}
+	
+	public ColtSquareMatrix(int size, MatrixFunction init) {
+		super(size, size, init);
 	}
 	
 	@Override
 	public double det() {
-		return ALG.det(this);
+		return ALG.det(delegate);
 	}
 
 	@Override
-	public SquareMatrixImplementation inverse() {
-		DoubleMatrix2D inv = ALG.inverse(this); // Returns a matrix of the
+	public SquareMatrix inverse() {
+		DoubleMatrix2D inv = ALG.inverse(delegate); // Returns a matrix of the
 												// wrong type!
-		ColtSquareMatrix ret = new ColtSquareMatrix(inv.rows());
-		ret.assign(inv);
-		return ret;
+		return new ColtSquareMatrix(inv);
 	}
 
 	@Override
 	public double rank() {
-		return ALG.rank(this);
+		return ALG.rank(delegate);
 	}
 
 	@Override
 	public double trace() {
-		return ALG.trace(this);
+		return ALG.trace(delegate);
 	}
 
 	@Override
-	public SquareMatrixImplementation pow(int p) {
-		DoubleMatrix2D a = this.copy(); // In contrast to the documentation
+	public SquareMatrix pow(int p) {
+		DoubleMatrix2D a = copyMatrix(); // In contrast to the documentation
 											// pow alters its first argument
-		return (SquareMatrixImplementation) ALG.pow(a, p);
+		return new ColtSquareMatrix(ALG.pow(a, p));
 	}
-	
-	@Override
-	public ColtSquareMatrix like() {
-		return new ColtSquareMatrix(rows());
-	}
-	
-	@Override
-	public ColtMatrix like(int rows, int columns) {
-		if (rows == columns) {
-			return new ColtSquareMatrix(rows);
-		} else {
-			return new ColtMatrix(rows, columns);
-		}
-	}
+
+
 }

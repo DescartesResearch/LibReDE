@@ -1,18 +1,16 @@
 package edu.kit.ipd.descartes.linalg;
 
-import edu.kit.ipd.descartes.linalg.backend.MatrixImplementation;
-import edu.kit.ipd.descartes.linalg.backend.SquareMatrixImplementation;
 
-public class SquareMatrix extends Matrix {
+public interface SquareMatrix extends Matrix {
 
-	SquareMatrix(SquareMatrixImplementation delegate) {
-		super(delegate);
-	}
+	double det();
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	<M extends Matrix> M newInstance(MatrixImplementation delegate) {
-		return (M) new SquareMatrix((SquareMatrixImplementation)delegate);
-	}
+	SquareMatrix inverse();
+	
+	SquareMatrix pow(int a);
+	
+	double rank();
+	
+	double trace();
 
 }
