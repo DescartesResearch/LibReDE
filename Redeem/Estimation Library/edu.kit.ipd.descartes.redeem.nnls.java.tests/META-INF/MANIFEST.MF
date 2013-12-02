@@ -4,9 +4,10 @@ Bundle-Name: Tests
 Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.nnls.java.tests
 Bundle-Version: 1.0.0.qualifier
 Import-Package: edu.kit.ipd.descartes.linalg,
+ edu.kit.ipd.descartes.redeem.estimation.repository,
  edu.kit.ipd.descartes.redeem.nnls,
- junit.framework;version="4.11.0",
+ org.apache.commons.math3.stat.regression,
  org.fest.assertions.api,
- org.fest.assertions.data,
- org.junit;version="4.11.0"
+ org.fest.assertions.data
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.junit;bundle-version="4.11.0"
