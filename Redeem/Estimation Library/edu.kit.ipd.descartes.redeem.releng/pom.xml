@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
@@ -15,13 +15,26 @@
 		<url>http://qpme.sourceforge.net</url>
 		<name>Karlsruhe Institute of Technology (KIT)</name>
 	</organization>
-	
+
 	<properties>
-		<tycho-version>0.18.0</tycho-version>
+		<tycho-version>0.19.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+						<descriptors>
+							<descriptor>assemble/distribution.xml</descriptor>
+						</descriptors>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -42,6 +55,16 @@
 							<version>1.0.0-SNAPSHOT</version>
 						</artifact>
 					</target>
+					<!-- Fix resolution problem with mockito and hamcrest -->
+					<dependency-resolution>
+						<extraRequirements>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>org.hamcrest</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+						</extraRequirements>
+					</dependency-resolution>
 					<!-- configure the p2 target environments for multi-platform build -->
 					<environments>
 						<environment>
@@ -71,9 +94,27 @@
 	</build>
 
 	<modules>
-		<module>edu.kit.ipd.descartes.redeem.releng.platform</module>
-		<module>edu.kit.ipd.descartes.linalg</module>
-		<module>edu.kit.ipd.descartes.linalg.tests</module>
-		<module>edu.kit.ipd.descartes.linalg.testutil</module>
+		<module>../../Third-Party Libraries/com.mathworks.matlab.javabuilder</module>
+		<module>../edu.kit.ipd.descartes.redeem.releng.platform</module>
+		<module>../edu.kit.ipd.descartes.redeem.releng.p2</module>
+		<module>../edu.kit.ipd.descartes.redeem.releng.assembly</module>
+		<module>../edu.kit.ipd.descartes.redeem.feature</module>
+		<module>../edu.kit.ipd.descartes.linalg</module>
+		<module>../edu.kit.ipd.descartes.linalg.tests</module>
+		<module>../edu.kit.ipd.descartes.linalg.testutil</module>
+		<module>../edu.kit.ipd.descartes.redeem.estimation</module>
+		<module>../edu.kit.ipd.descartes.redeem.estimation.testutil</module>
+		<module>../edu.kit.ipd.descartes.redeem.estimation.tests</module>
+		<module>../edu.kit.ipd.descartes.redeem.matlab</module>
+		<module>../edu.kit.ipd.descartes.redeem.nativehelper</module>
+		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.java</module>
+		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.win32</module>
+		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.java.tests</module>
+		<module>../edu.kit.ipd.descartes.redeem.ipopt.java</module>
+		<module>../edu.kit.ipd.descartes.redeem.ipopt.win32</module>
+		<module>../edu.kit.ipd.descartes.redeem.ipopt.java.tests</module>
+		<module>../edu.kit.ipd.descartes.redeem.nnls.java</module>
+		<module>../edu.kit.ipd.descartes.redeem.nnls.win32</module>
+		<module>../edu.kit.ipd.descartes.redeem.nnls.java.tests</module>
 	</modules>
 </project>

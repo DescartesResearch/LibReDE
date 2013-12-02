@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/edu.kit.ipd.descartes.redeem.feature_1.0.0.qualifier.jar" id="edu.kit.ipd.descartes.redeem.feature" version="1.0.0.qualifier">
+      <category name="redeem.category"/>
+   </feature>
+   <category-def name="redeem.category" label="Redeem"/>
+</site>
