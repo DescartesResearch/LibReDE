@@ -1,6 +1,5 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
-import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Aggregation;
@@ -14,6 +13,7 @@ public class QueryBuilder {
 	private Query.Type type;
 	private Metric metric;
 	private IModelEntity entity;
+	private Aggregation aggregation;
 	
 	private QueryBuilder(Metric metric) {
 		this.metric = metric;
@@ -26,45 +26,84 @@ public class QueryBuilder {
 	
 	public class SelectClause {
 	
-		public ForClause<Scalar> forResource(Resource resource) {
+		public ForClause forResource(Resource resource) {
 			type = Type.RESOURCE;
 			entity = resource;
-			return new ForClause<>();
+			return new ForClause();
 		}
 		
-		public ForClause<Scalar> forService(Service cls) {
+		public ForClause forService(Service cls) {
 			type = Type.SERVICE;
 			entity = cls;
-			return new ForClause<>();
+			return new ForClause();
 		}
 		
-		public ForClause<Vector> forAllServices() {
+		public ForAllClause forAllServices() {
 			type = Type.ALL_SERVICES;
 			entity = null;
-			return new ForClause<>();
+			return new ForAllClause();
 		}
 		
-		public ForClause<Vector> forAllResources() {
+		public ForAllClause forAllResources() {
 			type = Type.ALL_RESOURCES;
 			entity = null;
-			return new ForClause<>();
+			return new ForAllClause();
 		}
 		
 	}
 	
-	public class ForClause<T extends Matrix> {
-		
-		//TODO window size
-		public Query<T> sum(int windowSize) {
-			return new Query<>(Aggregation.SUM, type, metric, entity, windowSize);
+	public class ForAllClause {
+		public UsingClause<Vector> sum() {
+			aggregation = Aggregation.SUM;
+			return new UsingClause<Vector>();
 		}
 		
-		public Query<T> average(int windowSize) {
-			return new Query<>(Aggregation.AVERAGE, type, metric, entity, windowSize);
+		public UsingClause<Vector> min() {
+			aggregation = Aggregation.MINIMUM;
+			return new UsingClause<Vector>();
+		}
+		
+		public UsingClause<Vector> max() {
+			aggregation = Aggregation.MAXIMUM;
+			return new UsingClause<Vector>();
+		}
+		
+		public UsingClause<Vector> average() {
+			aggregation = Aggregation.AVERAGE;
+			return new UsingClause<Vector>();
+		}
+	}
+	
+	public class ForClause {		
+		public UsingClause<Scalar> sum() {
+			aggregation = Aggregation.SUM;
+			return new UsingClause<Scalar>();
+		}
+		
+		public UsingClause<Scalar> min() {
+			aggregation = Aggregation.MINIMUM;
+			return new UsingClause<Scalar>();
+		}
+		
+		public UsingClause<Scalar> max() {
+			aggregation = Aggregation.MAXIMUM;
+			return new UsingClause<Scalar>();
+		}
+		
+		public UsingClause<Scalar> average() {
+			aggregation = Aggregation.AVERAGE;
+			return new UsingClause<Scalar>();
 		}
 				
-		public Query<T> last() {			
-			return new Query<>(Aggregation.LAST, type, metric, entity,1);
+		public UsingClause<Vector> all() {
+			aggregation = Aggregation.ALL;
+			return new UsingClause<Vector>();
+		}
+	}
+	
+	public class UsingClause<T extends Vector> {
+		public Query<T> using(ObservationRepositoryView repository) {
+			return new Query<T>(aggregation, type, metric, entity);
 		}
 	}
 	

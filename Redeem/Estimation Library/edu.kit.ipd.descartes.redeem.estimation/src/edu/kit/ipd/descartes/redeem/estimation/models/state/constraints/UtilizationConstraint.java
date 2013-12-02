@@ -4,8 +4,8 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
-import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -13,22 +13,17 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
-	private int WINDOW_SIZE = 2;
-	
 	private Resource res_i;
 	
 	private WorkloadDescription system;
 	
-	private IMonitoringRepository repository;
-	
 	private Query<Vector> throughputQuery;
 	
-	public UtilizationConstraint(WorkloadDescription system, IMonitoringRepository repository, Resource resource) {
+	public UtilizationConstraint(WorkloadDescription system, ObservationRepositoryView repository, Resource resource) {
 		this.system = system;
-		this.repository = repository;
 		this.res_i = resource;
 		
-		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
+		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
 	}
 	
 	@Override
@@ -44,13 +39,13 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public double getValue(Vector state) {
 		Vector D_i = state.slice(system.getState().getRange(res_i));
-		Vector X = repository.execute(throughputQuery).getData();
+		Vector X = throughputQuery.execute();
 		return X.dot(D_i);
 	}
 
 	@Override
 	public Vector getFirstDerivatives(Vector x) {
-		return repository.execute(throughputQuery).getData();
+		return throughputQuery.execute();
 	}
 
 	@Override

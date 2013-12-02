@@ -3,7 +3,6 @@ package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
-import static org.junit.Assert.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 

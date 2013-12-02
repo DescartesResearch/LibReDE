@@ -1,27 +1,24 @@
 package edu.kit.ipd.descartes.redeem.estimation.testutils;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.max;
+import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
+import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import edu.kit.ipd.descartes.linalg.LinAlg;
-import edu.kit.ipd.descartes.linalg.Matrix;
-import edu.kit.ipd.descartes.linalg.MatrixFunction;
-import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
+import edu.kit.ipd.descartes.redeem.estimation.repository.MatrixMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Type;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
-import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
+import edu.kit.ipd.descartes.redeem.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
-public class ObservationDataGenerator implements IMonitoringRepository {
+public class ObservationDataGenerator {
 	
 	private Random randUtil;
 	private Random randWheights;
@@ -34,9 +31,11 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 	private Resource[] resources;
 	private Service[] services;
 	
+	private double time = 0.0;
+	
 	private WorkloadDescription model;
 	
-	private Observation currentObservation = null;
+	private MatrixMonitoringRepository repository;
 	
 	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources) {
 		Random randSeed = new Random(seed);
@@ -55,6 +54,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 		}
 		
 		model = new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services));
+		repository = new MatrixMonitoringRepository(model);
 	}
 	
 	public double getUpperUtilizationBound() {
@@ -101,7 +101,7 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 		});
 	}
 	
-	public Observation nextObservation() {		
+	public void nextObservation() {		
 		Vector absoluteWheights = vector(services.length, new VectorFunction() {			
 			@Override 
 			public double cell(int row) {
@@ -127,11 +127,10 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 			@Override
 			public double cell(int row) {
 				return totalThroughput * relativeWheights.get(row);
-			}
-			
-		});		
+			}			
+		});
 		
-		final Vector utilization = vector(resources.length, new VectorFunction() {			
+		final Vector utilization = vector(resources.length, new VectorFunction() {
 			@Override
 			public double cell(int row) {
 				if (row != bottleneckResource) {
@@ -141,87 +140,53 @@ public class ObservationDataGenerator implements IMonitoringRepository {
 				}
 			}
 		});
+		
+
+		for (int i = 0; i < services.length; i++) {
+			TimeSeries ts;
+			if (time == 0.0) {
+				ts = new TimeSeries(scalar(0.0), scalar(throughput.get(i)));
+			} else {
+				time += 1.0;
+				ts = repository.getData(Metric.THROUGHPUT, services[i]);
+				ts = ts.addSample(time, throughput.get(i));
+			}
+			repository.setData(Metric.THROUGHPUT, services[i], ts);	
+		}
+		
+		
+
+		for (int i = 0; i < resources.length; i++) {
+			TimeSeries ts;
+			if (time == 0.0) {
+				ts = new TimeSeries(scalar(0.0), scalar(utilization.get(i)));
+			} else {
+				time += 1.0;
+				ts = repository.getData(Metric.UTILIZATION, resources[i]);
+				ts = ts.addSample(time, utilization.get(i));
+			}
+			repository.setData(Metric.UTILIZATION, resources[i], ts);	
+		}
 	
-		final Vector responsetime = vector(services.length, new VectorFunction() {
-			@Override
-			public double cell(int row) {
-				double sumRT = 0.0;
-				for (int r = 0; r < resources.length; r++) {
-					sumRT += demands.get(model.getState().getIndex(resources[r], services[row])) / (1 - utilization.get(r));
-				}
-				return sumRT;
+		for (Service service : services) {
+			double sumRT = 0.0;
+			for (int r = 0; r < resources.length; r++) {
+				sumRT += demands.get(model.getState().getIndex(resources[r], service)) / (1 - utilization.get(r));
 			}
 			
-		});
-		currentObservation = new Observation(utilization, throughput, responsetime);
-		
-		return currentObservation;
+			TimeSeries ts;
+			if (time == 0.0) {
+				ts = new TimeSeries(scalar(0.0), scalar(sumRT));
+			} else {
+				time += 1.0;
+				ts = repository.getData(Metric.AVERAGE_RESPONSE_TIME, service);
+				ts = ts.addSample(time, sumRT);
+			}
+			repository.setData(Metric.AVERAGE_RESPONSE_TIME, service, ts);	
+		}
 	}
 	
-	public WorkloadDescription getSystemModel() {
-		return model;
+	public IMonitoringRepository getRepository() {
+		return repository;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Matrix> Result<T> execute(Query<T> query) {
-		switch(query.getMetric()) {
-		case RESPONSE_TIME:
-			if (query.getType() == Type.ALL_SERVICES) {
-				return new Result<T>((T) currentObservation.getMeanResponseTime(), services);
-			} else if (query.getType() == Type.SERVICE) {
-				return new Result<T>((T) LinAlg.scalar(currentObservation.getMeanResponseTime().get(getIndexOfService((Service)query.getEntity()))), 
-						new IModelEntity[] { query.getEntity() });
-			}
-			break;
-		case UTILIZATION:
-			if (query.getType() == Type.ALL_RESOURCES) {
-				return new Result<T>((T) currentObservation.getMeanUtilization(), resources);
-			} else if (query.getType() == Type.RESOURCE) {
-				return new Result<T>((T) LinAlg.scalar(currentObservation.getMeanUtilization().get(getIndexOfResource((Resource)query.getEntity()))), 
-						new IModelEntity[] { query.getEntity() });
-			}
-			break;
-		case THROUGHPUT:
-			if (query.getType() == Type.ALL_SERVICES) {
-				return new Result<T>((T) currentObservation.getMeanThroughput(), services);
-			} else if (query.getType() == Type.SERVICE) {
-				return new Result<T>((T) LinAlg.scalar(currentObservation.getMeanThroughput().get(getIndexOfService((Service)query.getEntity()))), 
-						new IModelEntity[] { query.getEntity() });
-			}
-			break;
-		}
-		return null;
-	}
-	
-	private int getIndexOfResource(Resource resource) {
-		for (int i = 0; i < resources.length; i++) {
-			if (resources[i].equals(resource)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	private int getIndexOfService(Service service) {
-		for (int i = 0; i < services.length; i++) {
-			if (services[i].equals(service)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	@Override
-	public boolean hasNext(Metric metric) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Vector next(Metric metric) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

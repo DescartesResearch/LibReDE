@@ -7,8 +7,8 @@ import java.util.Arrays;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -33,8 +33,6 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
-	private int WINDOW_SIZE = 2;
-	private final IMonitoringRepository repository;
 	
 	private final Query<Vector> throughputQuery;
 	private final Query<Scalar> utilizationQuery;
@@ -51,17 +49,17 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public UtilizationLaw(WorkloadDescription system, IMonitoringRepository repository,
+	public UtilizationLaw(WorkloadDescription system, ObservationRepositoryView repository,
 			Resource resource) {
 		super(system, Arrays.asList(resource), system.getServices());
 		
-		this.repository = repository;		
+		this.res_i = resource;
 		
 		variables = zeros(system.getState().getStateSize());
 		varFocusedRange = system.getState().getRange(resource);
 		
-		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
-		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average(WINDOW_SIZE);
+		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
+		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average().using(repository);
 	}
 
 	/* (non-Javadoc)
@@ -69,7 +67,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public Vector getIndependentVariables() {
-		return variables.set(varFocusedRange, repository.execute(throughputQuery).getData());
+		return variables.set(varFocusedRange, throughputQuery.execute());
 	}
 
 	/* (non-Javadoc)
@@ -77,7 +75,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		return repository.execute(utilizationQuery).getData().getValue();
+		return utilizationQuery.execute().getValue();
 	}
 
 }

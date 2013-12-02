@@ -5,6 +5,8 @@ Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.estimation.testutil
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: edu.kit.ipd.descartes.redeem.estimation.testutils
-Require-Bundle: edu.kit.ipd.descartes.redeem.estimation;bundle-version="1.0.0",
- edu.kit.ipd.descartes.linalg;bundle-version="1.0.0",
- org.junit;bundle-version="4.10.0"
+Import-Package: edu.kit.ipd.descartes.linalg,
+ edu.kit.ipd.descartes.redeem.estimation.models.observation.functions,
+ edu.kit.ipd.descartes.redeem.estimation.repository,
+ edu.kit.ipd.descartes.redeem.estimation.workload,
+ org.junit;version="4.11.0"

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Estimation
 Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.estimation
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: edu.kit.ipd.descartes.redeem.estimation.algorithm,
  edu.kit.ipd.descartes.redeem.estimation.exceptions,
  edu.kit.ipd.descartes.redeem.estimation.models.diff,

@@ -14,11 +14,10 @@ import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 //import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
-import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
@@ -45,35 +44,29 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	private Service cls_r;
 	
-	private IMonitoringRepository repository;
-	
 	private Query<Scalar> responseTimeQuery;
 	private Query<Vector> throughputQuery;
 	
-	private int WINDOW_SIZE = 2;
-		
 	/**
 	 * Creates a new instance.
 	 * 
 	 * @param system - the model of the system
-	 * @param repository - the repository with current measurement data
+	 * @param repository - a view of the repository with current measurement data
 	 * @param service - the service for which the response time is calculated
 	 * @param selectedResources - the list of resources which are involved during the processing of the service
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 * @thorws {@link IllegalArgumentException} if the list of services or resources is empty
 	 */
-	public ResponseTimeEquation(WorkloadDescription system, IMonitoringRepository repository,
+	public ResponseTimeEquation(WorkloadDescription system, ObservationRepositoryView repository,
 			Service service, List<Resource> selectedResources
 			) {
 		super(system, selectedResources, Arrays.asList(service));
 		
-		this.repository = repository;
-		
 		cls_r = service;
 		
-		responseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forService(service).average(WINDOW_SIZE);
-		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
+		responseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forService(service).average().using(repository);
+		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
 	}
 	
 	/* (non-Javadoc)
@@ -81,7 +74,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 */
 	@Override
 	public double getObservedOutput() {
-		return repository.execute(responseTimeQuery).getData().getValue();
+		return responseTimeQuery.execute().getValue();
 	}
 
 	/* (non-Javadoc)
@@ -94,7 +87,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			Vector D_i = state.slice(getSystem().getState().getRange(res_i));
 			double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 			
-			Vector X = repository.execute(throughputQuery).getData();
+			Vector X = throughputQuery.execute();
 			
 			rt += D_ir / (1 - X.dot(D_i));
 		}
@@ -124,10 +117,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 				
 				// get current throughput data
-				Result<Vector> throughputResult = repository.execute(throughputQuery);
-				
-				Vector X = throughputResult.getData();
-				double X_s = X.get(throughputResult.getIndex(cls_s));
+				Vector X = throughputQuery.execute();
+				double X_s = X.get(throughputQuery.indexOf(cls_s));
 				
 				/*
 				 * beta is a shorthand variable for the denominator of the response time equation
@@ -182,11 +173,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 					double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 					
 					// get current throughput data
-					Result<Vector> throughputResult = repository.execute(throughputQuery);
-					
-					Vector X = throughputResult.getData();
-					double X_s = X.get(throughputResult.getIndex(cls_s));
-					double X_t = X.get(throughputResult.getIndex(cls_t));
+					Vector X = throughputQuery.execute();
+					double X_s = X.get(throughputQuery.indexOf(cls_s));
+					double X_t = X.get(throughputQuery.indexOf(cls_t));
 					
 					/*
 					 * beta is a shorthand variable for the denominator of the response time equation

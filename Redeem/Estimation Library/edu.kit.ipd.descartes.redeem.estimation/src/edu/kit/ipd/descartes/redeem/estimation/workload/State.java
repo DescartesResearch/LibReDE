@@ -8,8 +8,8 @@ import edu.kit.ipd.descartes.linalg.Range;
 
 public class State {
 	
-	private final Map<Resource, Range> ranges = new HashMap<>();
-	private final Map<Service, Integer> serviceIndex = new HashMap<>();
+	private final Map<Resource, Range> ranges = new HashMap<Resource, Range>();
+	private final Map<Service, Integer> serviceIndex = new HashMap<Service, Integer>();
 	private final List<Resource> resources;
 	private final List<Service> services;
 	private final int stateSize;

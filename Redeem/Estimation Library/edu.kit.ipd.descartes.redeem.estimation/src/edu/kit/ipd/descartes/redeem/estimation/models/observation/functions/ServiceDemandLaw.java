@@ -2,11 +2,10 @@ package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Result;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
@@ -44,9 +43,6 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	
 	private Resource res_i;
 	private Service cls_r;
-	private int WINDOW_SIZE = 2;
-	
-	private IMonitoringRepository repository;
 	
 	private Query<Scalar> utilizationQuery;
 	private Query<Vector> avgResponseTimeQuery;
@@ -58,26 +54,24 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * Creates a new instance.
 	 * 
 	 * @param system - the model of the system
-	 * @param repository - the repository with current measurement data
+	 * @param repository - the view of the repository with current measurement data
 	 * @param service - the service for which the utilization is calculated
 	 * @param resource - the resource for which the utilization is calculated
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ServiceDemandLaw(WorkloadDescription system, IMonitoringRepository repository,
+	public ServiceDemandLaw(WorkloadDescription system, ObservationRepositoryView repository,
 			Resource resource,
 			Service service) {
 		super(system, resource, service);
 		
-		this.repository = repository;
-		
 		res_i = resource;
 		cls_r = service;
 		
-		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average(WINDOW_SIZE);
-		avgResponseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forAllServices().average(WINDOW_SIZE);
-		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average(WINDOW_SIZE);
-		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average(WINDOW_SIZE);
+		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average().using(repository);
+		avgResponseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forAllServices().average().using(repository);
+		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
+		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(repository);
 	}
 
 	/* (non-Javadoc)
@@ -85,18 +79,15 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		Result<Vector> avgRespTimeResult = repository.execute(avgResponseTimeQuery);
-		Result<Vector> avgThroughputResult = repository.execute(avgThroughputQuery);
-		
 		/*
 		 * We only get the aggregate utilization of a resource. In order to apportion this utilization between
 		 * services, we assume R ~ D.
 		 */
-		Vector R = avgRespTimeResult.getData();
-		Vector X = avgThroughputResult.getData();
-		double R_r = R.get(avgRespTimeResult.getIndex(cls_r));
-		double X_r = X.get(avgThroughputResult.getIndex(cls_r));
-		double U_i = repository.execute(utilizationQuery).getData().getValue();		
+		Vector R = avgResponseTimeQuery.execute();
+		Vector X = avgThroughputQuery.execute();
+		double R_r = R.get(avgResponseTimeQuery.indexOf(cls_r));
+		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
+		double U_i = utilizationQuery.execute().getValue();		
 		
 		return U_i * (R_r * X_r) / (R.dot(X));
 	}
@@ -106,7 +97,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getFactor() {
-		return repository.execute(avgThroughputQueryCurrentService).getData().getValue();
+		return avgThroughputQueryCurrentService.execute().getValue();
 	}
 
 }

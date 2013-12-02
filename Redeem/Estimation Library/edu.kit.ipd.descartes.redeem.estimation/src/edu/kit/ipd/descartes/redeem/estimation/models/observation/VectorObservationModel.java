@@ -15,7 +15,7 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	private int outputSize;
 	
 	public VectorObservationModel() {
-		outputFunctions = new ArrayList<>();
+		outputFunctions = new ArrayList<E>();
 		outputSize = 0;
 	}
 	

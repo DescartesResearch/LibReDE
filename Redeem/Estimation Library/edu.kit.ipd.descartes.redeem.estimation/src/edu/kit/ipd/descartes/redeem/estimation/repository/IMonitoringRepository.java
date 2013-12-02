@@ -1,14 +1,20 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
-import edu.kit.ipd.descartes.linalg.Matrix;
-import edu.kit.ipd.descartes.linalg.Vector;
+import java.util.List;
+
+import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 
 
 public interface IMonitoringRepository {
+
+	public double getStartTimestamp();
+	public double getEndTimestamp();
+	public TimeSeries getData(Metric metric, IModelEntity entity);
 	
-	public <T extends Matrix> Result<T> execute(Query<T> query);
-	public boolean hasNext(Metric metric);
-	public Vector next(Metric metric);
+	public List<Resource> listResources();
+	public List<Service> listServices();
 	
-	
+	public ObservationRepositoryView createView(int periodLength);
 }
