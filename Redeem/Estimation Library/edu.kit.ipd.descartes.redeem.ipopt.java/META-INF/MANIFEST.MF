@@ -5,7 +5,7 @@ Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.ipopt.java
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: edu.kit.ipd.descartes.redeem.ipopt.java.IpoptActivator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.sun.jna,
  com.sun.jna.ptr,
  edu.kit.ipd.descartes.linalg,
@@ -15,6 +15,5 @@ Import-Package: com.sun.jna,
  edu.kit.ipd.descartes.redeem.estimation.models.observation.functions,
  edu.kit.ipd.descartes.redeem.estimation.models.state,
  edu.kit.ipd.descartes.redeem.estimation.models.state.constraints,
- edu.kit.ipd.descartes.redeem.nativehelper,
- org.eclipse.core.runtime;version="3.4.0",
- org.osgi.framework;version="1.7.0"
+ edu.kit.ipd.descartes.redeem.nativehelper
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.9.0"
