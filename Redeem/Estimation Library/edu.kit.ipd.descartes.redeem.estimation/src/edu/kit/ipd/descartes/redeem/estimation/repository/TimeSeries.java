@@ -1,5 +1,6 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.empty;
 import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.row;
@@ -14,16 +15,26 @@ import edu.kit.ipd.descartes.linalg.VectorFunction;
 
 public class TimeSeries {
 	
+	public static final TimeSeries EMPTY = new TimeSeries();
 	private Matrix content;
 	private int[] offset;
 	private double startTime;
 	private double endTime;
+	
+	private TimeSeries() {
+		this(empty(), new int[0]);
+	}
 
 	private TimeSeries(Matrix content, int[] offset) {
 		this.content = content;
 		this.offset = offset;
-		this.startTime = content.get(offset[0], 0);
-		this.endTime = content.get(offset[offset.length - 1], 0);
+		if (offset.length != 0) {
+			this.startTime = content.get(offset[0], 0);
+			this.endTime = content.get(offset[offset.length - 1], 0);
+		} else {
+			this.startTime = Double.NaN;
+			this.endTime = Double.NaN;
+		}
 	}
 
 	private TimeSeries(Matrix content) {
@@ -101,7 +112,7 @@ public class TimeSeries {
 		// Therefore, start insertion from back to reduce number of timestamp
 		// comparisons.
 		int i = offset.length - 1;
-		while (i >= 0 && (content.get(offset[i], 0) < time)) {
+		while (i >= 0 && (content.get(offset[i], 0) > time)) {
 			newOffset[i + 1] = offset[i];
 			i--;
 		}
@@ -113,8 +124,20 @@ public class TimeSeries {
 		return new TimeSeries(vertcat(content, matrix(row(time, value))),
 				newOffset);
 	}
-
-	public TimeSeries subset(double startTime, double endTime) {
+	
+	public double timeWeightedMean(double startTime, double endTime, TimeSeries userWeights) {
+		return mean(startTime, endTime, true, userWeights);
+	}
+	
+	public double timeWeightedMean(double startTime, double endTime) {
+		return mean(startTime, endTime, true, null);
+	}
+	
+	public double mean(double startTime, double endTime) {
+		return mean(startTime, endTime, false, null);
+	}
+	
+	private double mean(double startTime, double endTime, boolean timeWeighted, TimeSeries userWeights) {
 		if (startTime > endTime) {
 			throw new IllegalArgumentException("Start time must be less or equal than end time.");
 		}
@@ -122,7 +145,149 @@ public class TimeSeries {
 		int idx1 = interpolationSearch(startTime);
 		int idx2 = interpolationSearch(endTime);
 		
-		int[] subsetOffset = new int[idx2 - idx1 + 1];	
+		int start = getSubsetBegin(idx1, idx2);
+		
+		if (start < 0) {
+			// the requested interval (start,end] is not in the scope of this time series
+			return Double.NaN;
+		}
+		
+		if (!timeWeighted) {
+			double total = 0.0;
+			int n = 0;
+			for (int i = start; i < offset.length; i++) {
+				double value = content.get(offset[i], 1);
+				if (!Double.isNaN(value)) {
+					if (content.get(offset[i], 0) > endTime) {
+						break;
+					}
+					total += value;
+					n++;
+				}
+			}
+			if (n == 0) {
+				return Double.NaN;
+			} else {
+				return total / n;
+			}
+		} else {
+			double total = 0.0;
+			double totalWeight = 0;
+			
+			for(int i = start; i < offset.length; i++) {
+				double curTs = content.get(offset[i], 0);
+				double curInterval = getTimeInterval(i);
+				double lastTs = Math.max(startTime, curTs - curInterval);				
+				if ((curTs - curInterval) < endTime) {
+					double value = content.get(offset[i], 1);
+					if (!Double.isNaN(value)) {
+						double weight = Math.min(Math.min(curTs, endTime) - lastTs, curInterval);
+						if (userWeights != null) {
+							weight = weight * userWeights.get(curTs);
+						}
+						total += weight * value;
+						totalWeight += weight;
+					}
+				}
+				lastTs = curTs;
+				if (lastTs >= endTime) {
+					break;
+				}	
+			}
+			if (totalWeight == 0) {
+				return Double.NaN;
+			} else {
+				return total / totalWeight;
+			}
+		}
+	}
+	
+	public double min(double startTime, double endTime) {
+		if (startTime > endTime) {
+			throw new IllegalArgumentException("Start time must be less or equal than end time.");
+		}
+		
+		int idx1 = interpolationSearch(startTime);
+		int idx2 = interpolationSearch(endTime);
+		
+		int start = getSubsetBegin(idx1, idx2);
+		
+		if (start < 0) {
+			// the requested interval (start,end] is not in the scope of this time series
+			return Double.NaN;
+		}
+		
+		double min = Double.MAX_VALUE;
+		int n = 0;
+		for (int i = start; i < offset.length; i++) {
+			if (content.get(offset[i], 0) > endTime) {
+				break;
+			}
+			min = Math.min(content.get(offset[i], 1), min);
+			n++;
+		}
+		if (n == 0) {
+			return Double.NaN;
+		} else {
+			return min;
+		}
+	}
+	
+	public double max(double startTime, double endTime) {
+		if (startTime > endTime) {
+			throw new IllegalArgumentException("Start time must be less or equal than end time.");
+		}
+		
+		int idx1 = interpolationSearch(startTime);
+		int idx2 = interpolationSearch(endTime);
+		
+		int start = getSubsetBegin(idx1, idx2);
+		
+		if (start < 0) {
+			// the requested interval (start,end] is not in the scope of this time series
+			return Double.NaN;
+		}
+		
+		double max = Double.MIN_VALUE;
+		int n = 0;
+		for (int i = start; i < offset.length; i++) {
+			if (content.get(offset[i], 0) > endTime) {
+				break;
+			}
+			max = Math.max(content.get(offset[i], 1), max);
+			n++;
+		}
+		if (n == 0) {
+			return Double.NaN;
+		} else {
+			return max;
+		}
+	}
+
+	public TimeSeries subset(double startTime, double endTime) {
+		if (startTime > endTime) {
+			throw new IllegalArgumentException("Start time must be less or equal than end time.");
+		}
+		
+		if (startTime == endTime) {
+			return EMPTY;
+		}
+		
+		int idx1 = interpolationSearch(startTime);
+		int idx2 = interpolationSearch(endTime);
+		
+		int start = getSubsetBegin(idx1, idx2);
+		int end = getSubsetEnd(idx1, idx2);
+		
+		if (start < 0 || end < 0) {
+			return EMPTY;
+		}
+		int num = end - start + 1;
+		
+		int[] subsetOffset = new int[num];
+		for (int i = 0; i < num; i++) {
+			subsetOffset[i] = offset[start + i];
+		}
 		
 		return new TimeSeries(content, subsetOffset);
 	}
@@ -138,7 +303,54 @@ public class TimeSeries {
 
 		return content.get(offset[idx], 1);
 	}
-
+	
+	private double getTimeInterval(int idx1) {
+		if (offset.length <= 1) {
+			return 1.0; //no wheight
+		} else {
+			if (idx1 == 0) {
+				// first sample ts[0] -> use ts[1] - ts[0] as interval
+				return content.get(offset[1], 0) - content.get(offset[0], 0);
+			} else {
+				return content.get(offset[idx1], 0) - content.get(offset[idx1 - 1], 0);
+			}
+		}
+	}
+	
+	private int getSubsetBegin(int idx1, int idx2) {
+		if (idx1 == Integer.MAX_VALUE) {
+			return -1;
+		}
+		if (idx1 < 0 && idx1 != Integer.MIN_VALUE) {
+			if (idx2 != idx1) {
+				idx1 = -idx1 - 1;
+			} else {
+				return -1;
+			}
+		}
+		if (idx1 == Integer.MIN_VALUE) {
+			return 0;
+		}
+		return idx1 + 1;
+	}
+	
+	private int getSubsetEnd(int idx1, int idx2) {
+		if (idx2 == Integer.MIN_VALUE) {
+			return -1;
+		}
+		if (idx2 < 0 && idx2 != Integer.MAX_VALUE) {
+			if (idx2 != idx1) {
+				idx2 = -idx2 - 1;
+			} else {
+				return -1;
+			}
+		}
+		if (idx2 == Integer.MAX_VALUE) {
+			idx2 = offset.length - 1;
+		}
+		return idx2;
+	}
+	
 	private double interpolate(int idx, double timestamp) {
 		int p1 = offset[-idx - 1];
 		int p2 = offset[-idx];
@@ -234,6 +446,10 @@ public class TimeSeries {
 			}
 		});		
 		return newTimestamps;
+	}
+
+	public boolean isEmpty() {
+		return offset.length == 0;
 	}
 
 }
