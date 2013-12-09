@@ -24,6 +24,8 @@ public interface Matrix {
 	boolean isVector();
 	
 	boolean isScalar();
+	
+	boolean isEmpty();
 
 	/*
 	 * Algebra functions

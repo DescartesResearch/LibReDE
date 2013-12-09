@@ -8,6 +8,7 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
 import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
 import static edu.kit.ipd.descartes.linalg.LinAlg.range;
 import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
 import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
@@ -108,6 +109,10 @@ public class MatrixTest {
 		assertThat(c1).isEqualTo(vector(A[0][0], A[1][0]), offset(1e-9));
 		assertThat(c2).isEqualTo(vector(A[0][1], A[1][1]), offset(1e-9));
 		assertThat(c3).isEqualTo(vector(A[0][2], A[1][2]), offset(1e-9));
+		
+		Vector scalar1 = matrix(row(1, 2, 3)).column(0);
+		assertThat(scalar1.isScalar()).isTrue();
+		assertThat(scalar1).isEqualTo(scalar(1), offset(1e-9));
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)

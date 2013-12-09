@@ -7,6 +7,7 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
 import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
 import static edu.kit.ipd.descartes.linalg.LinAlg.range;
 import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
 import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
@@ -183,7 +184,8 @@ public class VectorTest {
 	
 	@Test
 	public void testColumnNormal() {
-		assertThat(a.column(0)).isEqualTo(a, offset(1e-9));
+		Vector r = a.column(0);
+		assertThat(r).isEqualTo(a, offset(1e-9));
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
@@ -237,10 +239,16 @@ public class VectorTest {
 	@Test
 	public void testSliceNormal() {
 		assertThat(a.slice(range(0, 2))).isEqualTo(vector(A[0], A[1]), offset(1e-9));
+		assertThat(a.slice(range(0, 1)).isScalar()).isTrue();
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testSliceIllegal() {
 		a.slice(range(0, 4));
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testDotIllegal() {
+		a.dot(scalar(0));
 	}
 }

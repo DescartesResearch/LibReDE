@@ -25,6 +25,11 @@ public class Scalar implements Vector {
 	public boolean isVector() {
 		return false;
 	}
+	
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

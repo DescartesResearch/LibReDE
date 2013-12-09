@@ -17,6 +17,11 @@ public abstract class AbstractMatrix implements Matrix {
 		return false;
 	}
 	
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <M extends Matrix> M plus(M a) {
 		if (a.columns() != this.columns() || a.rows() != this.rows()) {

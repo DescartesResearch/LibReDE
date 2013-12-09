@@ -9,6 +9,7 @@ import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
+import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.backend.AbstractMatrix;
 
@@ -65,7 +66,10 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 
 	@Override
-	public ColtVector column(int column) {
+	public Vector column(int column) {
+		if (delegate.rows() == 1) {
+			return new Scalar(delegate.get(0, column));
+		}
 		return new ColtVector(delegate.viewColumn(column));
 	}
 

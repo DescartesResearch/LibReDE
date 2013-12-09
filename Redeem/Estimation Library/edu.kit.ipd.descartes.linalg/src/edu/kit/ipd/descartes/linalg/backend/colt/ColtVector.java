@@ -64,6 +64,9 @@ public class ColtVector extends AbstractVector {
 
 	@Override
 	public double dot(Vector b) {
+		if (b.rows() != delegate.size()) {
+			throw new IllegalArgumentException("A and B must have the same size.");
+		}
 		return delegate.zDotProduct(getColtVector(b).delegate);
 	}
 
@@ -286,6 +289,9 @@ public class ColtVector extends AbstractVector {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Vector slice(Range range) {
+		if (range.getLength() == 1) {
+			return new Scalar(delegate.get(range.getStart()));
+		}
 		DoubleMatrix1D part = delegate.viewPart(range.getStart(), range.getEnd() - range.getStart());
 		return new ColtVector(part);
 	}

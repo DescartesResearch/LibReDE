@@ -1,15 +1,22 @@
 package edu.kit.ipd.descartes.linalg;
 
+import edu.kit.ipd.descartes.linalg.backend.Empty;
 import edu.kit.ipd.descartes.linalg.backend.MatrixFactory;
 import edu.kit.ipd.descartes.linalg.backend.colt.ColtMatrixFactory;
 
 public class LinAlg {
 	
 	static final MatrixFactory FACTORY = new ColtMatrixFactory();
+	
+	public static Empty empty() {
+		return Empty.EMPTY;
+	}
 
 	public static Matrix zeros(int rows, int columns) {
-		if (rows < 1 || columns < 1) {
+		if (rows < 0 || columns < 0) {
 			throw new IllegalArgumentException();
+		} else if (rows == 0 || columns == 0) {
+			return Empty.EMPTY;
 		} else	if (columns == 1) {
 			if (rows == 1) {
 				return Scalar.ZERO;
@@ -26,8 +33,10 @@ public class LinAlg {
 	}
 
 	public static Matrix ones(int rows, int columns) {
-		if (rows < 1 || columns < 1) {
+		if (rows < 0 || columns < 0) {
 			throw new IllegalArgumentException();
+		} else if (rows == 0 || columns == 0) {
+			return Empty.EMPTY;
 		} else	if (columns == 1) {
 			if (rows == 1) {
 				return Scalar.ONE;
@@ -44,8 +53,10 @@ public class LinAlg {
 	}
 
 	public static Matrix identity(int size) {
-		if (size < 1) {
+		if (size < 0) {
 			throw new IllegalArgumentException();
+		} else if (size == 0) {
+			return Empty.EMPTY;
 		} else if (size == 1) {
 			return Scalar.ONE;
 		} else {
@@ -63,7 +74,7 @@ public class LinAlg {
 
 	public static Matrix matrix(double[]... values) {
 		if (values.length < 1) {
-			throw new IllegalArgumentException();
+			return Empty.EMPTY;
 		} else {
 			int columns = values[0].length;
 			for (int i = 1; i < values.length; i++) {
@@ -95,8 +106,10 @@ public class LinAlg {
 	}
 
 	public static Matrix matrix(int rows, int columns, MatrixFunction init) {
-		if (rows < 1 || columns < 1) {
+		if (rows < 0 || columns < 0) {
 			throw new IllegalArgumentException();
+		} else if (rows == 0 || columns == 0) {
+			return Empty.EMPTY;
 		} else	if (columns == 1) {
 			if (rows == 1) {
 				return new Scalar(init.cell(0, 0));
@@ -190,15 +203,19 @@ public class LinAlg {
 	}
 	
 	public static SquareMatrix square(int size, double fill) {
-		if (size < 1) {
+		if (size < 0) {
 			throw new IllegalArgumentException();
+		} else if (size == 0) {
+			return Empty.EMPTY;
 		}
 		return FACTORY.createSquareMatrix(size, fill);
 	}
 	
 	public static SquareMatrix square(int size, MatrixFunction init) {
-		if (size < 1) {
+		if (size < 0) {
 			throw new IllegalArgumentException();
+		} else if (size == 0) {
+			return Empty.EMPTY;
 		}
 		return FACTORY.createSquareMatrix(size, init);
 	}
@@ -228,8 +245,10 @@ public class LinAlg {
 	}
 	
 	public static Vector zeros(int rows) {
-		if (rows < 1) {
+		if (rows < 0) {
 			throw new IllegalArgumentException();
+		} else if (rows == 0) {
+			return Empty.EMPTY;
 		} else if (rows == 1) {
 			return Scalar.ZERO;
 		} else {
@@ -239,8 +258,10 @@ public class LinAlg {
 
 
 	public static Vector ones(int rows) {
-		if (rows < 1) {
+		if (rows < 0) {
 			throw new IllegalArgumentException();
+		} else if (rows == 0) {
+			return Empty.EMPTY;
 		} else if (rows == 1) {
 			return Scalar.ONE;
 		} else {
@@ -249,7 +270,9 @@ public class LinAlg {
 	}
 
 	public static Vector vector(double... values) {
-		if (values.length == 1) {
+		if (values.length == 0) {
+			return Empty.EMPTY;
+		} else if (values.length == 1) {
 			return new Scalar(values[0]);
 		} else {
 			return FACTORY.createVector(values);
@@ -257,9 +280,11 @@ public class LinAlg {
 	}
 
 	public static Vector vector(int rows, VectorFunction init) {
-		if (rows < 1) {
+		if (rows < 0) {
 			throw new IllegalArgumentException();
-		} else	if (rows == 1) {
+		} else if (rows == 0) {
+			return Empty.EMPTY;
+		} else if (rows == 1) {
 			return new Scalar(init.cell(0));
 		} else {
 			return FACTORY.createVector(rows, init);
