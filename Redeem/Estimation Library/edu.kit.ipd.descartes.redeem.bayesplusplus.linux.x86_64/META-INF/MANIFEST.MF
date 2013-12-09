@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: X86_64
+Bundle-SymbolicName: edu.kit.ipd.descartes.redeem.bayesplusplus.linux.x86_64
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: edu.kit.ipd.descartes.redeem.bayesplusplus.java;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
