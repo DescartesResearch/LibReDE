@@ -1,8 +1,6 @@
-CXXFLAGS =	-O2 -g -Wall -fmessage-length=0 -I"$(BAYES_PLUS_PLUS_INCLUDES)" -I"$(BOOST_ROOT)"
+CXXFLAGS =	-O2 -g -Wall -fPIC -fmessage-length=0 -I"$(BAYES_PLUS_PLUS_INCLUDES)" -I"$(BOOST_ROOT)"
 
 LDFLAGS = 	-shared -L"$(BAYES_PLUS_PLUS_LIB)"
-
-#OBJS =		$(BUILD_DIR)\bayesFltWrappers.hpp
 
 LIB_NAME = 	BayesPlusPlus
 
@@ -14,7 +12,7 @@ OBJS = 		$(addprefix $(BUILD_DIR)/,$(SOURCES:%.cpp=%.obj))
 
 LIBS =		-lBayesFilter
 
-TARGET =	$(LIB_NAME).dll
+TARGET =	$(LIB_PREFIX)$(LIB_NAME).$(LIB_EXTENSION)
 
 $(BUILD_DIR)/%.obj: %.cpp $(HEADERS) makefile | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

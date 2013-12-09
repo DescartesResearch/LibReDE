@@ -64,7 +64,7 @@
 								<versionRange>0.0.0</versionRange>
 							</requirement>
 						</extraRequirements>
-					</dependency-resolution>
+					</dependency-resolsimon@localhost.localdomainution>
 					<!-- configure the p2 target environments for multi-platform build -->
 					<environments>
 						<environment>
@@ -104,7 +104,7 @@
 							<goal>aggregate</goal>
 						</goals>
 						<phase>site</phase>
-						<configuration>
+						<configurationsimon@localhost.localdomain>
 						</configuration>
 					</execution>
 				</executions>
@@ -127,14 +127,10 @@
 		<module>../edu.kit.ipd.descartes.redeem.matlab</module>
 		<module>../edu.kit.ipd.descartes.redeem.nativehelper</module>
 		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.java</module>
-		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.win32</module>
-		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.linux.x86_64</module>
 		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.java.tests</module>
 		<module>../edu.kit.ipd.descartes.redeem.ipopt.java</module>
-		<module>../edu.kit.ipd.descartes.redeem.ipopt.win32</module>
 		<module>../edu.kit.ipd.descartes.redeem.ipopt.java.tests</module>
 		<module>../edu.kit.ipd.descartes.redeem.nnls.java</module>
-		<module>../edu.kit.ipd.descartes.redeem.nnls.win32</module>
 		<module>../edu.kit.ipd.descartes.redeem.nnls.java.tests</module>
 	</modules>
 </project>
