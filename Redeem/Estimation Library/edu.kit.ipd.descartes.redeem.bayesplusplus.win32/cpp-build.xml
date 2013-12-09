@@ -1,11 +1,11 @@
 <project name="edu.kit.ipd.descartes.redeem.backend.kalman" default="build" basedir=".">	
 	
-	<property name="bayesplusplus.dir" value="C:/Users/Simon/Git/redeem/Redeem/Third-Party Libraries/bayesplusplus" />
+	<property name="bayesplusplus.dir" value="C:\Users\Simon\Git\redeem\Redeem\Third-Party Libraries\bayesplusplus" />
 	<property name="make.executable" value="mingw32-make" />
 	<property name="boost.root" value="C:\MinGW64\boost_1_55_0" />
 	<property name="gcc.version" value="mingw-4.7.1" />
 	<property name="bjam.toolset" value="gcc" />
-	<property name="bayesplusplus.lib.dir" location="${bayesplusplus.dir}/target/BayesFilter/${bjam.toolset}-${gcc.version}/release/link-static" />
+	<property name="bayesplusplus.lib.dir" location="${bayesplusplus.dir}\target\BayesFilter\${bjam.toolset}-${gcc.version}\release\link-static" />
 	<property name="bayesplusplus.include.dir" location="${bayesplusplus.dir}" />
 	
 	
