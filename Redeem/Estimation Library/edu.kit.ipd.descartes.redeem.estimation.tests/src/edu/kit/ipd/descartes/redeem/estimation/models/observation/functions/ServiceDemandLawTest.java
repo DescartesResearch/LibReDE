@@ -10,11 +10,14 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
-import edu.kit.ipd.descartes.redeem.estimation.testutils.Observation;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class ServiceDemandLawTest {
 	
@@ -23,7 +26,7 @@ public class ServiceDemandLawTest {
 	
 	private ObservationDataGenerator generator;
 	private ServiceDemandLaw law;
-	private Observation current;
+	private RepositoryCursor cursor;
 	private Vector state;
 	
 	private Resource resource;
@@ -34,32 +37,40 @@ public class ServiceDemandLawTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		resource = generator.getSystemModel().getResources().get(RESOURCE_IDX);
-		service = generator.getSystemModel().getServices().get(SERVICE_IDX);
+		WorkloadDescription workload = generator.getWorkloadDescription();
+		cursor = generator.getRepository().getCursor(1);
 		
-		law = new ServiceDemandLaw(generator.getSystemModel(), generator, resource, service);
-		current = generator.nextObservation();
-		state = generator.getDemands();
+		resource = workload.getResources().get(RESOURCE_IDX);
+		service = workload.getServices().get(SERVICE_IDX);
+		
+		law = new ServiceDemandLaw(workload, cursor, resource, service);
+		state = generator.getDemands();	
+		
+		generator.nextObservation();
+		cursor.next();
 	}
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = current.getMeanThroughput();
-		Vector r = current.getMeanResponseTime();
+		Vector x = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector r = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forAllServices().average().using(cursor).execute();
+		double util = QueryBuilder.select(Metric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
 		
-		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * current.getMeanUtilization().get(RESOURCE_IDX) / x.dot(r), offset(1e-9));
+		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
 	}
 
 	@Test
-	public void testGetCalculatedOutput() {		
-		double expected = current.getMeanThroughput().get(SERVICE_IDX) * state.get(generator.getSystemModel().getState().getIndex(resource, service));
+	public void testGetCalculatedOutput() {
+		double x = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double expected = x * state.get(generator.getWorkloadDescription().getState().getIndex(resource, service));
 		
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
 	public void testGetFactor() {
-		assertThat(law.getFactor()).isEqualTo(current.getMeanThroughput().get(SERVICE_IDX), offset(1e-9));
+		double x = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
 	}
 
 	@Test

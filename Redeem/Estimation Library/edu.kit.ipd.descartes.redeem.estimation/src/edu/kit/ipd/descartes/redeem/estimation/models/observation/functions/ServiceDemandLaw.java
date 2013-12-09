@@ -3,7 +3,7 @@ package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
-import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -60,7 +60,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ServiceDemandLaw(WorkloadDescription system, ObservationRepositoryView repository,
+	public ServiceDemandLaw(WorkloadDescription system, RepositoryCursor repository,
 			Resource resource,
 			Service service) {
 		super(system, resource, service);
@@ -69,7 +69,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		cls_r = service;
 		
 		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average().using(repository);
-		avgResponseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forAllServices().average().using(repository);
+		avgResponseTimeQuery = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forAllServices().average().using(repository);
 		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(repository);
 	}

@@ -15,7 +15,7 @@ import edu.kit.ipd.descartes.linalg.VectorFunction;
 //import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
-import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -58,14 +58,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @throws {@link NullPointerException} if any parameter is null
 	 * @thorws {@link IllegalArgumentException} if the list of services or resources is empty
 	 */
-	public ResponseTimeEquation(WorkloadDescription system, ObservationRepositoryView repository,
+	public ResponseTimeEquation(WorkloadDescription system, RepositoryCursor repository,
 			Service service, List<Resource> selectedResources
 			) {
 		super(system, selectedResources, Arrays.asList(service));
 		
 		cls_r = service;
 		
-		responseTimeQuery = QueryBuilder.select(Metric.RESPONSE_TIME).forService(service).average().using(repository);
+		responseTimeQuery = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(service).average().using(repository);
 		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
 	}
 	
@@ -82,12 +82,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 */
 	@Override
 	public double getCalculatedOutput(final Vector state) {
-		double rt = 0.0;		
+		double rt = 0.0;
+		Vector X = throughputQuery.execute();
+		
 		for (Resource res_i : getSelectedResources()) {
 			Vector D_i = state.slice(getSystem().getState().getRange(res_i));
 			double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
-			
-			Vector X = throughputQuery.execute();
 			
 			rt += D_ir / (1 - X.dot(D_i));
 		}

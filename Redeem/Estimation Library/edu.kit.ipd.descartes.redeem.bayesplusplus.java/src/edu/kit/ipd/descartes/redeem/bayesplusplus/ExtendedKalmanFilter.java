@@ -11,6 +11,7 @@ import com.sun.jna.Pointer;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.backend.BayesPlusPlusLibrary;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.backend.FCallback;
 import edu.kit.ipd.descartes.redeem.bayesplusplus.backend.HCallback;
@@ -75,12 +76,10 @@ public class ExtendedKalmanFilter implements
 	private int stateSize;
 	private int outputSize;
 
-	private Vector stateNoiseCovariance = vector(1.0);
-	private Matrix stateNoiseCoupling = matrix(row(1));
+	private Vector stateNoiseCovariance;
+	private Matrix stateNoiseCoupling;
 
-	private Vector observeNoise = vector(0.0001, 0.0001);
-	
-	private double stepSize = 1.0;
+	private Vector observeNoise;
 
 	/*
 	 * Callback functions from native code. IMPORTANT: References to these
@@ -123,11 +122,29 @@ public class ExtendedKalmanFilter implements
 			throw new InitializationException("Error creating state model: " + BayesPlusPlusLibrary.get_last_error());
 		}
 
+		stateNoiseCovariance = vector(stateSize, new VectorFunction() {			
+			@Override
+			public double cell(int row) {
+				return 1.0;
+			}
+		});
 		toNative(stateBuffer, stateNoiseCovariance);
 		BayesPlusPlusLibrary.set_q(nativeStateModel, stateBuffer, stateSize);
 
-		toNative(stateBuffer, stateNoiseCoupling);
-		BayesPlusPlusLibrary.set_G(nativeStateModel, stateBuffer, stateSize);
+		Pointer temp = NativeHelper.allocateDoubleArray(stateSize * stateSize);		
+		stateNoiseCoupling = matrix(stateSize, stateSize, new MatrixFunction() {
+			@Override
+			public double cell(int row, int column) {
+				if (row == column) {
+					return 1.0;
+				} else {
+					return 0.0;
+				}
+			}
+			
+		});
+		toNative(temp, stateNoiseCoupling);
+		BayesPlusPlusLibrary.set_G(nativeStateModel, temp, stateSize);
 	}
 
 	private void initNativeObservationModel() throws InitializationException {
@@ -141,6 +158,13 @@ public class ExtendedKalmanFilter implements
 		}
 
 		Pointer buffer = NativeHelper.allocateDoubleArray(outputSize);
+		
+		observeNoise = vector(outputSize, new VectorFunction() {			
+			@Override
+			public double cell(int row) {
+				return 0.0001;
+			}
+		});
 		toNative(buffer, observeNoise);
 		BayesPlusPlusLibrary.set_Zv(nativeObservationModel, buffer, outputSize);
 	}

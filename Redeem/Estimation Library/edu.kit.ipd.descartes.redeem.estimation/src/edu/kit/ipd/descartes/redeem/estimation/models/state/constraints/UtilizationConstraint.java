@@ -5,7 +5,7 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
-import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -19,7 +19,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	
 	private Query<Vector> throughputQuery;
 	
-	public UtilizationConstraint(WorkloadDescription system, ObservationRepositoryView repository, Resource resource) {
+	public UtilizationConstraint(WorkloadDescription system, RepositoryCursor repository, Resource resource) {
 		this.system = system;
 		this.res_i = resource;
 		

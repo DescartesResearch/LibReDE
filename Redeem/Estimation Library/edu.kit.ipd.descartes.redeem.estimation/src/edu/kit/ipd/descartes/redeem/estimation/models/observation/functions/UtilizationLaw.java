@@ -8,7 +8,7 @@ import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
-import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -49,7 +49,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public UtilizationLaw(WorkloadDescription system, ObservationRepositoryView repository,
+	public UtilizationLaw(WorkloadDescription system, RepositoryCursor repository,
 			Resource resource) {
 		super(system, Arrays.asList(resource), system.getServices());
 		

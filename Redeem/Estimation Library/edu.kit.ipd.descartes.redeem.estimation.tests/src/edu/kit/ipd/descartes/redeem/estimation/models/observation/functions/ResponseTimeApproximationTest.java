@@ -10,12 +10,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
-import edu.kit.ipd.descartes.redeem.estimation.testutils.Observation;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class ResponseTimeApproximationTest {
 	
@@ -24,25 +29,30 @@ public class ResponseTimeApproximationTest {
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeApproximation law;
-	private Observation current;
 	private Vector state;
 	
 	private Resource resource;
 	private Service service;
 	private int stateIdx;
+	private RepositoryCursor cursor;
 
 	@Before
 	public void setUp() throws Exception {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		resource = generator.getSystemModel().getResources().get(RESOURCE_IDX);
-		service = generator.getSystemModel().getServices().get(SERVICE_IDX);
-		stateIdx = generator.getSystemModel().getState().getIndex(resource, service);
+		WorkloadDescription workload = generator.getWorkloadDescription();
+		cursor = generator.getRepository().getCursor(1);
 		
-		law = new ResponseTimeApproximation(generator.getSystemModel(), generator, resource, service);
-		current = generator.nextObservation();
+		resource = workload.getResources().get(RESOURCE_IDX);
+		service = workload.getServices().get(SERVICE_IDX);
+		stateIdx = workload.getState().getIndex(resource, service);
+		
+		law = new ResponseTimeApproximation(workload, cursor, resource, service);
 		state = generator.getDemands();
+		
+		generator.nextObservation();
+		cursor.next();
 	}
 
 	@Test
@@ -52,7 +62,8 @@ public class ResponseTimeApproximationTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		assertThat(law.getObservedOutput()).isEqualTo(current.getMeanResponseTime().get(SERVICE_IDX), offset(1e-9));
+		Query<Scalar> resp = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(service).average().using(cursor);
+		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test

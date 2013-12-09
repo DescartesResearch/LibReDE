@@ -14,8 +14,9 @@ import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.Resp
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.UtilizationLaw;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.redeem.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.redeem.estimation.testutils.Observation;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.ObservationDataGenerator;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class ZhangKalmanFilterTest {
 	
@@ -42,12 +43,15 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
+		RepositoryCursor cursor = generator.getRepository().getCursor(1);		
+		WorkloadDescription workload = generator.getWorkloadDescription();
+		
 		Vector initialEstimate = vector(0.1);
 		stateModel = new ConstantStateModel<>(1, initialEstimate);
 		
 		observationModel = new VectorObservationModel<>();		
-		observationModel.addOutputFunction(new ResponseTimeEquation(generator.getSystemModel(), generator, generator.getSystemModel().getServices().get(0), generator.getSystemModel().getResources()));
-		observationModel.addOutputFunction(new UtilizationLaw(generator.getSystemModel(), generator, generator.getSystemModel().getResources().get(0)));
+		observationModel.addOutputFunction(new ResponseTimeEquation(workload, cursor, workload.getServices().get(0), workload.getResources()));
+		observationModel.addOutputFunction(new UtilizationLaw(workload, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(stateModel, observationModel);
@@ -55,7 +59,8 @@ public class ZhangKalmanFilterTest {
 		long start = System.nanoTime();	
 		
 		for (int i = 0; i < ITERATIONS; i++) {
-			Observation ob = generator.nextObservation();
+			generator.nextObservation();
+			cursor.next();
 			
 			Vector estimates = filter.estimate();
 		}
@@ -73,14 +78,17 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		Vector initialEstimate = vector(0.1, 0.1, 0.1, 0.1, 0.1);
+		RepositoryCursor cursor = generator.getRepository().getCursor(1);		
+		WorkloadDescription workload = generator.getWorkloadDescription();
+		
+		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 		stateModel = new ConstantStateModel<>(5, initialEstimate);
 		
 		observationModel = new VectorObservationModel<>();
 		for (int i = 0; i < 5; i++) {
-			observationModel.addOutputFunction(new ResponseTimeEquation(generator.getSystemModel(), generator, generator.getSystemModel().getServices().get(i), generator.getSystemModel().getResources()));
+			observationModel.addOutputFunction(new ResponseTimeEquation(workload, cursor, workload.getServices().get(i), workload.getResources()));
 		}
-		observationModel.addOutputFunction(new UtilizationLaw(generator.getSystemModel(), generator, generator.getSystemModel().getResources().get(0)));
+		observationModel.addOutputFunction(new UtilizationLaw(workload, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(stateModel, observationModel);
@@ -88,7 +96,8 @@ public class ZhangKalmanFilterTest {
 		long start = System.nanoTime();	
 		
 		for (int i = 0; i < ITERATIONS; i++) {
-			Observation ob = generator.nextObservation();
+			generator.nextObservation();
+			cursor.next();
 			
 			Vector estimates = filter.estimate();
 		}

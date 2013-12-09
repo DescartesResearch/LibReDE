@@ -1,6 +1,5 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -10,10 +9,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
-import edu.kit.ipd.descartes.redeem.estimation.testutils.Observation;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.ObservationDataGenerator;
+import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class ResponseTimeEquationTest {
 	
@@ -21,7 +26,8 @@ public class ResponseTimeEquationTest {
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeEquation law;
-	private Observation current;
+	private RepositoryCursor cursor;
+	private Service service;
 	private Vector state;
 
 	@Before
@@ -29,19 +35,28 @@ public class ResponseTimeEquationTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		law = new ResponseTimeEquation(generator.getSystemModel(), generator, generator.getSystemModel().getServices().get(SERVICE_IDX), generator.getSystemModel().getResources());
-		current = generator.nextObservation();
+		WorkloadDescription workload = generator.getWorkloadDescription();
+		cursor = generator.getRepository().getCursor(1);
+		
+		service = workload.getServices().get(SERVICE_IDX);
+		
+		law = new ResponseTimeEquation(workload, cursor, service, workload.getResources());
 		state = generator.getDemands();
+		
+		generator.nextObservation();
+		cursor.next();
 	}
 
 	@Test
 	public void testGetObservedOutput() {
-		assertThat(law.getObservedOutput()).isEqualTo(current.getMeanResponseTime().get(SERVICE_IDX), offset(1e-9));
+		Query<Scalar> resp = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(service).average().using(cursor);
+		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(current.getMeanResponseTime().get(SERVICE_IDX), offset(1e-9));
+		Query<Scalar> resp = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(service).average().using(cursor);
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test

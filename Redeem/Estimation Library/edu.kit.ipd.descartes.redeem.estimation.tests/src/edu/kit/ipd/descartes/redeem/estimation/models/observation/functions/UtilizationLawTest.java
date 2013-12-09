@@ -11,10 +11,13 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
-import edu.kit.ipd.descartes.redeem.estimation.testutils.Observation;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
+import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class UtilizationLawTest {
 		
@@ -22,7 +25,7 @@ public class UtilizationLawTest {
 	
 	private ObservationDataGenerator generator;
 	private UtilizationLaw law;
-	private Observation current;
+	private RepositoryCursor cursor;
 	private Vector state;
 	private Resource resource;
 
@@ -31,28 +34,36 @@ public class UtilizationLawTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		resource = generator.getSystemModel().getResources().get(RESOURCE_IDX);
-		law = new UtilizationLaw(generator.getSystemModel(), generator, resource);
-		current = generator.nextObservation();
-		state = generator.getDemands();
+		WorkloadDescription workload = generator.getWorkloadDescription();
+		cursor = generator.getRepository().getCursor(1);
+		
+		resource = workload.getResources().get(RESOURCE_IDX);
+		law = new UtilizationLaw(workload, cursor, resource);
+		state = generator.getDemands();		
+		
+		generator.nextObservation();
+		cursor.next();
 	}
 
 	@Test
 	public void testGetIndependentVariables() {
+		Vector x = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();		
-		Vector expectedVarVector = zeros(state.rows()).set(generator.getSystemModel().getState().getRange(resource), current.getMeanThroughput());
+		Vector expectedVarVector = zeros(state.rows()).set(generator.getWorkloadDescription().getState().getRange(resource), x);
 		
 		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}
 
 	@Test
 	public void testGetObservedOutput() {
-		assertThat(law.getObservedOutput()).isEqualTo(current.getMeanUtilization().get(RESOURCE_IDX), offset(1e-9));
+		double util = QueryBuilder.select(Metric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(current.getMeanUtilization().get(RESOURCE_IDX), offset(1e-9));
+		double util = QueryBuilder.select(Metric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test

@@ -1,25 +1,23 @@
 package edu.kit.ipd.descartes.redeem.estimation.testutils;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.range;
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
-import edu.kit.ipd.descartes.redeem.estimation.repository.ObservationRepositoryView;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 
 public class ObservationDataGeneratorTest {
 	
-	private static final double EPSILON = 1e-6;
+	private static final double EPSILON = 1e-4;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -32,7 +30,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation1WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
-		ObservationRepositoryView view = generator.getRepository().createView(1);
+		RepositoryCursor view = generator.getRepository().getCursor(1);
 		
 		Query<Vector> utilData = QueryBuilder.select(Metric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(view);
@@ -51,7 +49,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation4WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
-		ObservationRepositoryView view = generator.getRepository().createView(1);
+		RepositoryCursor view = generator.getRepository().getCursor(1);
 		
 		Query<Vector> utilData = QueryBuilder.select(Metric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(view);
@@ -71,7 +69,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation1WC4R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 4);
-		ObservationRepositoryView view = generator.getRepository().createView(1);
+		RepositoryCursor view = generator.getRepository().getCursor(1);
 		
 		Query<Vector> utilData = QueryBuilder.select(Metric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(view);
@@ -90,7 +88,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation4WC4R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 4);
-		ObservationRepositoryView view = generator.getRepository().createView(1);
+		RepositoryCursor view = generator.getRepository().getCursor(1);
 		
 		Query<Vector> utilData = QueryBuilder.select(Metric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(view);
@@ -115,22 +113,20 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setLowerUtilizationBound(0.4);
 		generator.setUpperUtilizationBound(0.6);
-		ObservationRepositoryView view = generator.getRepository().createView(1);
+		RepositoryCursor view = generator.getRepository().getCursor(1);
 		
 		Query<Vector> utilData = QueryBuilder.select(Metric.UTILIZATION).forAllResources().average().using(view);
 		
-		Vector demands = vector(
-				0.25,
-				0.3,
-				0.35,
-				0.4);
+		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
 		for (int i = 0; i < 10000; i++) {
 			generator.nextObservation();
 			view.next();
-			assertTrue(utilData.execute().get(0) >= 0.4);
-			assertTrue(utilData.execute().get(0) <= 0.6);
+			if (i >= 1) {
+				assertTrue(utilData.execute().get(0) >= 0.4);
+				assertTrue(utilData.execute().get(0) <= 0.6);
+			}
 		}
 	}
 	
@@ -138,15 +134,11 @@ public class ObservationDataGeneratorTest {
 	public void testNextObservation4WC1RWithNoMix() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setWorkloadMixVariation(0);
-		ObservationRepositoryView view = generator.getRepository().createView(1);
+		RepositoryCursor view = generator.getRepository().getCursor(1);
 		
 		Query<Vector> tputData = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(view);
 		
-		Vector demands = vector(
-				0.25,
-				0.3,
-				0.35,
-				0.4);
+		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
 		for (int i = 0; i < 10000; i++) {
@@ -159,16 +151,19 @@ public class ObservationDataGeneratorTest {
 		}
 	}
 	
-	private void assertObservation(Query<Vector> utilData, Query<Vector> tputData, Query<Vector> rtData, Matrix demands) {
-		for (int r = 0; r < demands.columns(); r++) {
-			double util = demands.column(r).dot(tputData.execute());
+	private void assertObservation(Query<Vector> utilData, Query<Vector> tputData, Query<Vector> rtData, Vector demands) {		
+		int wclCnt = tputData.getEntities().size();
+		int resCnt =  utilData.getEntities().size();
+		
+		for (int r = 0; r < resCnt; r++) {
+			double util = demands.slice(range(r * wclCnt, (r + 1) * wclCnt)).dot(tputData.execute());
 			assertEquals(util, utilData.execute().get(r), EPSILON);
 		}
 		
-		for (int i = 0; i < demands.rows(); i++) {
+		for (int i = 0; i < wclCnt; i++) {
 			double sumRT = 0.0;
-			for (int r = 0; r < demands.columns(); r++) {
-				sumRT += demands.get(i, r) / (1 - demands.column(r).dot(tputData.execute()));
+			for (int r = 0; r < resCnt; r++) {
+				sumRT += demands.get(r * wclCnt + i) / (1 - demands.slice(range(wclCnt * r, (r + 1) * wclCnt)).dot(tputData.execute()));
 			}
 			assertEquals(sumRT, rtData.execute().get(i), EPSILON);
 		}
