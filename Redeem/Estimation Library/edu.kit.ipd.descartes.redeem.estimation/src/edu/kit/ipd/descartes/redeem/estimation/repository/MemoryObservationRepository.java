@@ -15,21 +15,21 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
  * @author Mehran Saliminia
  * 
  */
-public class MatrixMonitoringRepository implements IMonitoringRepository {
+public class MemoryObservationRepository implements IMonitoringRepository {
 
 	private Map<Metric, Map<IModelEntity, TimeSeries>> data = new HashMap<Metric, Map<IModelEntity, TimeSeries>>();
-	private double minimumTimestamp;
-	private double maximumTimestamp;
+	private double minimumTimestamp = Double.NaN;
+	private double maximumTimestamp = Double.NaN;
 	private WorkloadDescription workload;
 	
-	public MatrixMonitoringRepository(WorkloadDescription workload) {
+	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
 	}
 	
 	public TimeSeries getData(Metric m, IModelEntity entity) {
 		Map<IModelEntity, TimeSeries> temp = data.get(m);
 		if (temp == null) {
-			return null;
+			return TimeSeries.EMPTY;
 		}
 		return temp.get(entity);
 	}
@@ -65,8 +65,8 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 	}
 	
 	@Override
-	public ObservationRepositoryView createView(int periodLength) {
-		return null;
+	public RepositoryCursor getCursor(int interval) {
+		return new RepositoryCursor(this, interval);
 	}
 	
 	private void updateMaxMinTimestamps() {
@@ -81,6 +81,10 @@ public class MatrixMonitoringRepository implements IMonitoringRepository {
 					maximumTimestamp = t.getEndTime();
 				}
 			}
+		}
+		if (minimumTimestamp > maximumTimestamp) {
+			minimumTimestamp = Double.NaN;
+			maximumTimestamp = Double.NaN;
 		}
 	}
 

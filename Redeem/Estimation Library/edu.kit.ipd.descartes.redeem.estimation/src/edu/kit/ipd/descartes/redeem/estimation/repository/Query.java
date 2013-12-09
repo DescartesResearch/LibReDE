@@ -1,15 +1,11 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.max;
-import static edu.kit.ipd.descartes.linalg.LinAlg.mean;
-import static edu.kit.ipd.descartes.linalg.LinAlg.min;
-import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import edu.kit.ipd.descartes.linalg.AggregateFunction;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
@@ -29,15 +25,15 @@ public final class Query<T extends Vector> {
 	private Query.Type type;
 	private Metric metric;
 	private List<IModelEntity> entities = new ArrayList<IModelEntity>();
-	private ObservationRepositoryView repositoryView;
-	private AggregateFunction func;
+	private RepositoryCursor repositoryCursor;
 	
 	protected Query(Aggregation aggregation, Type type, Metric metric,
-			IModelEntity entity) {
+			IModelEntity entity, RepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
 		this.type = type;
 		this.metric = metric;
+		this.repositoryCursor = repositoryCursor;
 		if (entity != null) {
 			entities.add(entity);
 		}
@@ -64,14 +60,14 @@ public final class Query<T extends Vector> {
 		for (IModelEntity entity : entities) {
 			TimeSeries current = null;
 			if (metric == Metric.AVERAGE_RESPONSE_TIME) {
-				current = repositoryView.getData(entity, Metric.RESPONSE_TIME);
-				if (current == null) {
-					current = repositoryView.getData(entity, Metric.AVERAGE_RESPONSE_TIME);
+				current = repositoryCursor.getRepository().getData(Metric.RESPONSE_TIME, entity);
+				if (current.isEmpty()) {
+					current = repositoryCursor.getRepository().getData(Metric.AVERAGE_RESPONSE_TIME, entity);
 				}
 			} else {
-				current = repositoryView.getData(entity, metric);
+				current = repositoryCursor.getRepository().getData(metric, entity);
 			}
-			if (current == null) {
+			if (current.isEmpty()) {
 				throw new IllegalStateException(); //TODO: introduce dedicated exception
 			}
 			timeSeries.add(current);			
@@ -81,17 +77,15 @@ public final class Query<T extends Vector> {
 			Vector result = vector(timeSeries.size(), new VectorFunction() {				
 				@Override
 				public double cell(int row) {
-					TimeSeries result = timeSeries.get(row).subset(repositoryView.getCurrentIntervalStart(), repositoryView.getCurrentIntervalEnd());
-					return result.aggregate(func);
+					return aggregate(entities.get(row), timeSeries.get(row), repositoryCursor.getCurrentIntervalStart(), repositoryCursor.getCurrentIntervalEnd());
 				}
 			});
 			return (T)result;
 		} else {
 			if (aggregation != Aggregation.ALL) {
-				TimeSeries result = timeSeries.get(0).subset(repositoryView.getCurrentIntervalStart(), repositoryView.getCurrentIntervalEnd());
-				return (T)new Scalar(result.aggregate(func));
+				return (T)new Scalar(aggregate(entities.get(0), timeSeries.get(0), repositoryCursor.getCurrentIntervalStart(), repositoryCursor.getCurrentIntervalEnd()));
 			} else {
-				TimeSeries result = timeSeries.get(0).subset(repositoryView.getCurrentIntervalStart(), repositoryView.getCurrentIntervalEnd());
+				TimeSeries result = timeSeries.get(0).subset(repositoryCursor.getCurrentIntervalStart(), repositoryCursor.getCurrentIntervalEnd());
 				return (T)result.getData();
 			}			
 		}
@@ -105,49 +99,44 @@ public final class Query<T extends Vector> {
 		return entities.get(index);
 	}
 	
-	private void load() {
+	public List<? extends IModelEntity> getEntities() {
+		return Collections.unmodifiableList(entities);
+	}
+	
+	private double aggregate(IModelEntity entity, TimeSeries ts, double startTime, double endTime) {
 		switch(aggregation) {
 		case AVERAGE:
-			func = new AggregateFunction() {				
-				@Override
-				public double aggregate(Vector values) {
-					return mean(values);
+			switch(metric) {
+			case RESPONSE_TIME:
+				return ts.mean(startTime, endTime);
+			case UTILIZATION:
+			case THROUGHPUT:
+				return ts.timeWeightedMean(startTime, endTime);
+			case AVERAGE_RESPONSE_TIME:
+				TimeSeries tputSeries = repositoryCursor.getRepository().getData(Metric.THROUGHPUT, entity);
+				if (tputSeries.isEmpty()) {
+					return ts.timeWeightedMean(startTime, endTime);
+				} else {
+					return ts.timeWeightedMean(startTime, endTime, tputSeries);
 				}
-			};
-			break;
-		case SUM:
-			func = new AggregateFunction() {				
-				@Override
-				public double aggregate(Vector values) {
-					return sum(values);
-				}
-			};
-			break;
+			}			
 		case MINIMUM:
-			func = new AggregateFunction() {				
-				@Override
-				public double aggregate(Vector values) {
-					return min(values);
-				}
-			};
-			break;
+			return ts.min(startTime, endTime);
 		case MAXIMUM:
-			func = new AggregateFunction() {				
-				@Override
-				public double aggregate(Vector values) {
-					return max(values);
-				}
-			};
-			break;
+			return ts.max(startTime, endTime);
+		case SUM:
+			return ts.subset(startTime, endTime).getData().sum();
 		default:
-			func = null;
 			break;
 		}
-		
+		return Double.NaN;
+	}
+	
+	private void load() {
 		if (type == Type.ALL_RESOURCES) {
-			entities.addAll(repositoryView.listResources());
+			entities.addAll(repositoryCursor.getRepository().listResources());
 		} else if (type == Type.ALL_SERVICES) {
-			entities.addAll(repositoryView.listServices());
+			entities.addAll(repositoryCursor.getRepository().listServices());
 		}		
 	}
 }

@@ -12,9 +12,10 @@ public interface IMonitoringRepository {
 	public double getStartTimestamp();
 	public double getEndTimestamp();
 	public TimeSeries getData(Metric metric, IModelEntity entity);
+	public void setData(Metric metric, IModelEntity entity, TimeSeries observations);	
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
-	public ObservationRepositoryView createView(int periodLength);
+	public RepositoryCursor getCursor(int periodLength);
 }
