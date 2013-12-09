@@ -23,7 +23,6 @@
 					</includes>
 					<excludes>
 						<exclude>plugins/org.eclipse.*.jar</exclude>
-						<exclude>plugins/*.win32.jar</exclude>
 					</excludes>
 				</unpackOptions>
 			</binaries>
@@ -31,9 +30,9 @@
 		<moduleSet>
 			<useAllReactorProjects>true</useAllReactorProjects>
 			<includes>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.win32</include>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.win32</include>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.win32</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.java</include>
 			</includes>
 			<binaries>
 				<outputDirectory>lib/native/win32</outputDirectory>
@@ -41,6 +40,23 @@
 				<unpackOptions>
 					<includes>
 						<include>*.dll</include>
+					</includes>
+				</unpackOptions>
+			</binaries>
+		</moduleSet>
+		<moduleSet>
+			<useAllReactorProjects>true</useAllReactorProjects>
+			<includes>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.java</include>
+			</includes>
+			<binaries>
+				<outputDirectory>lib/native/linux</outputDirectory>
+				<unpack>true</unpack>
+				<unpackOptions>
+					<includes>
+						<include>*.so</include>
 					</includes>
 				</unpackOptions>
 			</binaries>

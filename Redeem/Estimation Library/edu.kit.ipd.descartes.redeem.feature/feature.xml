@@ -87,28 +87,6 @@
          unpack="false"/>
 
    <plugin
-         id="edu.kit.ipd.descartes.redeem.bayesplusplus.win32"
-         os="win32"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="edu.kit.ipd.descartes.redeem.ipopt.win32"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="edu.kit.ipd.descartes.redeem.nnls.win32"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
          id="edu.kit.ipd.descartes.redeem.matlab"
          download-size="0"
          install-size="0"
