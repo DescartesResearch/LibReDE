@@ -10,12 +10,12 @@
 	
 	
 	<target name="build">
-		<exec executable="${make.executable}" dir="./native">
+		<exec executable="${make.executable}" dir="../edu.kit.ipd.descartes.redeem.bayesplusplus.java/native">
 			<env key="BOOST_ROOT" value="${boost.root}" />
 			<env key="BAYES_PLUS_PLUS_INCLUDES" value="${bayesplusplus.include.dir}" />
 			<env key="BAYES_PLUS_PLUS_LIB" value="${bayesplusplus.lib.dir}" />
 			<env key="BUILD_DIR" value="../build" />
 		</exec>
-		<copy file="./build/BayesPlusPlus.dll" todir="${basedir}"></copy>
+		<copy file="../edu.kit.ipd.descartes.redeem.bayesplusplus.java/build/BayesPlusPlus.dll" todir="${basedir}"></copy>
 	</target>
 </project>
