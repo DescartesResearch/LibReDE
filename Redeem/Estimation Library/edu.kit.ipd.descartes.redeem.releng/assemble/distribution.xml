@@ -77,4 +77,11 @@
 			</binaries>
 		</moduleSet>
 	</moduleSets>
+	
+	<dependencySets>
+		<dependencySet>
+					
+		</dependencySet>
+	
+	</dependencySets>
 </assembly>
