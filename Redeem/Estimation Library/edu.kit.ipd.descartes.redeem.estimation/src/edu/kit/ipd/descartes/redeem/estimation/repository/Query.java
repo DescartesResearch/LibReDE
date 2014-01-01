@@ -17,17 +17,13 @@ public final class Query<T extends Vector> {
 		SERVICE, ALL_SERVICES, RESOURCE, ALL_RESOURCES
 	}
 	
-	public static enum Aggregation {
-		ALL, MINIMUM, MAXIMUM, AVERAGE, SUM
-	}
-	
-	private Query.Aggregation aggregation;
+	private Aggregation aggregation;
 	private Query.Type type;
-	private Metric metric;
+	private IMetric metric;
 	private List<IModelEntity> entities = new ArrayList<IModelEntity>();
 	private RepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, Metric metric,
+	protected Query(Aggregation aggregation, Type type, IMetric metric,
 			IModelEntity entity, RepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
@@ -39,7 +35,7 @@ public final class Query<T extends Vector> {
 		}
 	}
 
-	public Query.Aggregation getAggregation() {
+	public Aggregation getAggregation() {
 		return aggregation;
 	}
 	
@@ -47,7 +43,7 @@ public final class Query<T extends Vector> {
 		return type;
 	}
 	
-	public Metric getMetric() {
+	public IMetric getMetric() {
 		return metric;
 	}
 	
@@ -56,37 +52,19 @@ public final class Query<T extends Vector> {
 			load();
 		}
 		
-		final List<TimeSeries> timeSeries = new ArrayList<TimeSeries>(entities.size());
-		for (IModelEntity entity : entities) {
-			TimeSeries current = null;
-			if (metric == Metric.AVERAGE_RESPONSE_TIME) {
-				current = repositoryCursor.getRepository().getData(Metric.RESPONSE_TIME, entity);
-				if (current.isEmpty()) {
-					current = repositoryCursor.getRepository().getData(Metric.AVERAGE_RESPONSE_TIME, entity);
-				}
-			} else {
-				current = repositoryCursor.getRepository().getData(metric, entity);
-			}
-			if (current.isEmpty()) {
-				throw new IllegalStateException(); //TODO: introduce dedicated exception
-			}
-			timeSeries.add(current);			
-		}
-		
-		if (timeSeries.size() > 1) {
-			Vector result = vector(timeSeries.size(), new VectorFunction() {				
+		if (entities.size() > 1) {
+			Vector result = vector(entities.size(), new VectorFunction() {				
 				@Override
 				public double cell(int row) {
-					return aggregate(entities.get(row), timeSeries.get(row), repositoryCursor.getCurrentIntervalStart(), repositoryCursor.getCurrentIntervalEnd());
+					return repositoryCursor.getAggregatedValue(metric, entities.get(row), aggregation);
 				}
 			});
 			return (T)result;
 		} else {
-			if (aggregation != Aggregation.ALL) {
-				return (T)new Scalar(aggregate(entities.get(0), timeSeries.get(0), repositoryCursor.getCurrentIntervalStart(), repositoryCursor.getCurrentIntervalEnd()));
+			if (aggregation != Aggregation.NONE) {
+				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, entities.get(0), aggregation));
 			} else {
-				TimeSeries result = timeSeries.get(0).subset(repositoryCursor.getCurrentIntervalStart(), repositoryCursor.getCurrentIntervalEnd());
-				return (T)result.getData();
+				return (T)repositoryCursor.getValues(metric, entities.get(0)).getData();
 			}			
 		}
 	}
@@ -103,34 +81,7 @@ public final class Query<T extends Vector> {
 		return Collections.unmodifiableList(entities);
 	}
 	
-	private double aggregate(IModelEntity entity, TimeSeries ts, double startTime, double endTime) {
-		switch(aggregation) {
-		case AVERAGE:
-			switch(metric) {
-			case RESPONSE_TIME:
-				return ts.mean(startTime, endTime);
-			case UTILIZATION:
-			case THROUGHPUT:
-				return ts.timeWeightedMean(startTime, endTime);
-			case AVERAGE_RESPONSE_TIME:
-				TimeSeries tputSeries = repositoryCursor.getRepository().getData(Metric.THROUGHPUT, entity);
-				if (tputSeries.isEmpty()) {
-					return ts.timeWeightedMean(startTime, endTime);
-				} else {
-					return ts.timeWeightedMean(startTime, endTime, tputSeries);
-				}
-			}			
-		case MINIMUM:
-			return ts.min(startTime, endTime);
-		case MAXIMUM:
-			return ts.max(startTime, endTime);
-		case SUM:
-			return ts.subset(startTime, endTime).getData().sum();
-		default:
-			break;
-		}
-		return Double.NaN;
-	}
+	
 	
 	private void load() {
 		if (type == Type.ALL_RESOURCES) {

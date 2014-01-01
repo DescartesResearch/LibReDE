@@ -67,13 +67,13 @@ public class QueryTest {
 
 		repository = new MemoryObservationRepository(new WorkloadDescription(
 				Arrays.asList(resources), Arrays.asList(services)));
-		repository.setData(Metric.UTILIZATION, resources[0], cpuUtilTable);
-		repository.setData(Metric.UTILIZATION, resources[1], hd1UtilTable);
-		repository.setData(Metric.UTILIZATION, resources[2], hd2UtilTable);
-		repository.setData(Metric.THROUGHPUT, services[0], addServTputTable);
-		repository.setData(Metric.THROUGHPUT, services[1], payServTputTable);
-		repository.setData(Metric.AVERAGE_RESPONSE_TIME, services[0], addServRtTable);
-		repository.setData(Metric.AVERAGE_RESPONSE_TIME, services[1], payServRtTable);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], cpuUtilTable);
+		repository.setData(StandardMetric.UTILIZATION, resources[1], hd1UtilTable);
+		repository.setData(StandardMetric.UTILIZATION, resources[2], hd2UtilTable);
+		repository.setData(StandardMetric.THROUGHPUT, services[0], addServTputTable);
+		repository.setData(StandardMetric.THROUGHPUT, services[1], payServTputTable);
+		repository.setData(StandardMetric.RESPONSE_TIME, services[0], addServRtTable);
+		repository.setData(StandardMetric.RESPONSE_TIME, services[1], payServRtTable);
 	}
 
 	@After
@@ -123,10 +123,10 @@ public class QueryTest {
 		RepositoryCursor cursor = repository.getCursor(1);
 		assertThat(cursor.next()).isTrue();
 		
-		Query<Vector> utilSingle = QueryBuilder.select(Metric.UTILIZATION).forResource(resources[1]).all().using(cursor);
-		Vector result = utilSingle.execute();
+		Query<Vector> respSingle = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(services[1]).all().using(cursor);
+		Vector result = respSingle.execute();
 		
-		assertThat(result).isEqualTo(scalar(utilMeasurements.get(1, 1)), offset(1e-9));
+		assertThat(result).isEqualTo(vector(rtMeasurements.get(1, 1)), offset(1e-9));
 		
 	}
 

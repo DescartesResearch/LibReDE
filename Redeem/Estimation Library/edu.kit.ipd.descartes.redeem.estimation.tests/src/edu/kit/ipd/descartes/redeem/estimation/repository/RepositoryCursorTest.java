@@ -24,9 +24,9 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void test1StepCursor() {		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1);
-		repository.setData(Metric.UTILIZATION, resources[1], ts1);
-		repository.setData(Metric.UTILIZATION, resources[2], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
 		RepositoryCursor cur = repository.getCursor(1);
 		
 		for (int i = 3; i <= 8; i++) {
@@ -40,9 +40,9 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void test1StepWithOffsetCursor() {		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1);
-		repository.setData(Metric.UTILIZATION, resources[1], ts2);
-		repository.setData(Metric.UTILIZATION, resources[2], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[1], ts2);
+		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
 		RepositoryCursor cur = repository.getCursor(1);
 		
 		for (int i = 0; i < 5; i++) {
@@ -55,9 +55,9 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void test1StepWithAddCursor() {		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1);
-		repository.setData(Metric.UTILIZATION, resources[1], ts1);
-		repository.setData(Metric.UTILIZATION, resources[2], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
 		RepositoryCursor cur = repository.getCursor(1);
 		
 		for (int i = 3; i <= 8; i++) {
@@ -67,9 +67,9 @@ public class RepositoryCursorTest {
 		}
 		assertThat(cur.next()).isFalse();
 		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		repository.setData(Metric.UTILIZATION, resources[1], ts1.addSample(10.0, 1.0));
-		repository.setData(Metric.UTILIZATION, resources[2], ts1.addSample(10.0, 1.0));
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
+		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1.addSample(10.0, 1.0));
+		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1.addSample(10.0, 1.0));
 		
 		for (int i = 9; i <= 10; i++) {
 			assertThat(cur.next()).isTrue();
@@ -81,9 +81,9 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void test3StepCursor() {		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1);
-		repository.setData(Metric.UTILIZATION, resources[1], ts1);
-		repository.setData(Metric.UTILIZATION, resources[2], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
 		RepositoryCursor cur = repository.getCursor(3);
 		
 		for (int i = 5; i <= 8; i+=3) {
@@ -97,9 +97,9 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void testTooBigStepCursor() {		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1);
-		repository.setData(Metric.UTILIZATION, resources[1], ts1);
-		repository.setData(Metric.UTILIZATION, resources[2], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
 		RepositoryCursor cur = repository.getCursor(100);
 		assertThat(cur.next()).isFalse();		
 	}
@@ -111,7 +111,7 @@ public class RepositoryCursorTest {
 		assertThat(cur.getCurrentIntervalStart()).isNaN();
 		assertThat(cur.getCurrentIntervalEnd()).isNaN();
 		
-		repository.setData(Metric.UTILIZATION, resources[0], ts1);
+		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		assertThat(cur.next()).isTrue();
 		assertThat(cur.getCurrentIntervalStart()).isEqualTo(ts1.getStartTime(), offset(1e-9));
 		assertThat(cur.getCurrentIntervalEnd()).isEqualTo(ts1.getStartTime() + 1.0, offset(1e-9));

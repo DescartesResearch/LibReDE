@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
@@ -47,7 +47,7 @@ public class UtilizationLawTest {
 
 	@Test
 	public void testGetIndependentVariables() {
-		Vector x = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();		
 		Vector expectedVarVector = zeros(state.rows()).set(generator.getWorkloadDescription().getState().getRange(resource), x);
 		
@@ -56,13 +56,13 @@ public class UtilizationLawTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		double util = QueryBuilder.select(Metric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
 		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double util = QueryBuilder.select(Metric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
 	}
 

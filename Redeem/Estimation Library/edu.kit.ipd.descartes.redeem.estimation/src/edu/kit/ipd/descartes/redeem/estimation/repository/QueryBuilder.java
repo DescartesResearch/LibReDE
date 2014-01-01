@@ -2,7 +2,6 @@ package edu.kit.ipd.descartes.redeem.estimation.repository;
 
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Aggregation;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query.Type;
 import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -11,15 +10,15 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 public class QueryBuilder {
 	
 	private Query.Type type;
-	private Metric metric;
+	private StandardMetric metric;
 	private IModelEntity entity;
 	private Aggregation aggregation;
 	
-	private QueryBuilder(Metric metric) {
+	private QueryBuilder(StandardMetric metric) {
 		this.metric = metric;
 	}
 	
-	public static SelectClause select(Metric metric) {
+	public static SelectClause select(StandardMetric metric) {
 		QueryBuilder builder = new QueryBuilder(metric);
 		return builder.new SelectClause();
 	}
@@ -96,7 +95,7 @@ public class QueryBuilder {
 		}
 				
 		public UsingClause<Vector> all() {
-			aggregation = Aggregation.ALL;
+			aggregation = Aggregation.NONE;
 			return new UsingClause<Vector>();
 		}
 	}

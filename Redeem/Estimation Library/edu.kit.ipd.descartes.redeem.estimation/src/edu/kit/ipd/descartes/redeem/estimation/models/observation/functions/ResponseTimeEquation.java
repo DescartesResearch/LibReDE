@@ -14,7 +14,7 @@ import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 //import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.IDifferentiableFunction;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
@@ -41,6 +41,8 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
  * @version 1.0
  */
 public class ResponseTimeEquation extends AbstractOutputFunction implements IDifferentiableFunction {
+	
+	private double[] factorials;
 
 	private Service cls_r;
 	
@@ -65,8 +67,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		
 		cls_r = service;
 		
-		responseTimeQuery = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(service).average().using(repository);
-		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
+//		int maxParallel = 1;
+//		for (Resource res : selectedResources) {
+//			maxParallel = Math.max(maxParallel, res.getNumberOfParallelServers());
+//		}
+//		precalculateFactorials(maxParallel);
+		
+		responseTimeQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
 	}
 	
 	/* (non-Javadoc)
@@ -84,12 +92,17 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	public double getCalculatedOutput(final Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.execute();
+		double X_total = X.sum();
 		
 		for (Resource res_i : getSelectedResources()) {
 			Vector D_i = state.slice(getSystem().getState().getRange(res_i));
 			double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
+			double U_i = X.dot(D_i);
+
+			int p = res_i.getNumberOfParallelServers();
+//			double P_q = calculateQueueingProbability(p, U_i);
 			
-			rt += D_ir / (1 - X.dot(D_i));
+			rt += D_ir / (p - U_i);
 		}
 		return rt;
 	}
@@ -214,4 +227,32 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			}
 		});
 	}
+	
+/*	private double calculatePhi0(int p, double U_i) {
+		double phi0 = 0.0;
+		for (int a = 0; a < p; a++) {
+			phi0 += Math.pow(p * U_i, a) / factorials[a];
+		}
+		phi0 += Math.pow(p * U_i, p) / (factorials[p] * (1 - U_i));		
+		return 1 / phi0;
+	}
+	
+	private double calculateQueueingProbability(int p, double U_i) {
+		if (p == 1) {
+			return U_i;
+		} else {
+			double phi0 = calculatePhi0(p, U_i);
+			return (Math.pow(p * U_i, p) * phi0) / (factorials[p] * (1 - U_i));
+		}
+	}
+	
+	private void precalculateFactorials(int p) {
+		factorials = new double[p + 1];
+		factorials[0] = 1.0;
+		factorials[1] = 1.0;
+		
+		for (int i = 2; i <= p; i++) {
+			factorials[i] = factorials[i - 1] * i;
+		}
+	}*/
 }

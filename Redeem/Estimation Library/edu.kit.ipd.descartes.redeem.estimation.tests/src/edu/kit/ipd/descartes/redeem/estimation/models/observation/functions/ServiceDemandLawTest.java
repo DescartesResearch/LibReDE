@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.testutils.Differentiation;
@@ -52,16 +52,16 @@ public class ServiceDemandLawTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(cursor).execute();
-		Vector r = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forAllServices().average().using(cursor).execute();
-		double util = QueryBuilder.select(Metric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector r = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forAllServices().average().using(cursor).execute();
+		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
 		
 		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double x = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
 		double expected = x * state.get(generator.getWorkloadDescription().getState().getIndex(resource, service));
 		
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
@@ -69,7 +69,7 @@ public class ServiceDemandLawTest {
 	
 	@Test
 	public void testGetFactor() {
-		double x = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
 		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
 	}
 

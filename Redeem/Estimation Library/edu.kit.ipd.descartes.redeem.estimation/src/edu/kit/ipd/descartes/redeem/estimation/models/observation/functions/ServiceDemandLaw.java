@@ -2,7 +2,7 @@ package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
@@ -68,10 +68,10 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		res_i = resource;
 		cls_r = service;
 		
-		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average().using(repository);
-		avgResponseTimeQuery = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forAllServices().average().using(repository);
-		avgThroughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
-		avgThroughputQueryCurrentService = QueryBuilder.select(Metric.THROUGHPUT).forService(service).average().using(repository);
+		utilizationQuery = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(res_i).average().using(repository);
+		avgResponseTimeQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forAllServices().average().using(repository);
+		avgThroughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
+		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(repository);
 	}
 
 	/* (non-Javadoc)
@@ -87,9 +87,10 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		Vector X = avgThroughputQuery.execute();
 		double R_r = R.get(avgResponseTimeQuery.indexOf(cls_r));
 		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
-		double U_i = utilizationQuery.execute().getValue();		
+		double U_i = utilizationQuery.execute().getValue();
+		int p = res_i.getNumberOfParallelServers();
 		
-		return U_i * (R_r * X_r) / (R.dot(X));
+		return p * U_i * (R_r * X_r) / (R.dot(X));
 	}
 
 	/* (non-Javadoc)

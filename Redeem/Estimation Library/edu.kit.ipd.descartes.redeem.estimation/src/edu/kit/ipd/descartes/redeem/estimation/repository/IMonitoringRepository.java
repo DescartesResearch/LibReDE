@@ -11,8 +11,11 @@ public interface IMonitoringRepository {
 
 	public double getStartTimestamp();
 	public double getEndTimestamp();
-	public TimeSeries getData(Metric metric, IModelEntity entity);
-	public void setData(Metric metric, IModelEntity entity, TimeSeries observations);	
+	public double getAggregationInterval(IMetric m, IModelEntity entity);
+	public TimeSeries getData(IMetric metric, IModelEntity entity);
+	public void setData(IMetric metric, IModelEntity entity, TimeSeries observations);
+	public void setAggregatedData(IMetric m, IModelEntity entity, TimeSeries aggregatedObservations);
+	public void setAggregatedData(IMetric m, IModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();

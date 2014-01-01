@@ -13,7 +13,7 @@ import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 import edu.kit.ipd.descartes.redeem.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.redeem.estimation.repository.MemoryObservationRepository;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
@@ -153,10 +153,10 @@ public class ObservationDataGenerator {
 				ts = new TimeSeries(scalar(1.0), scalar(throughput.get(i)));
 			} else {
 				time += 1.0;
-				ts = repository.getData(Metric.THROUGHPUT, services[i]);
+				ts = repository.getData(StandardMetric.THROUGHPUT, services[i]);
 				ts = ts.addSample(time, throughput.get(i));
 			}
-			repository.setData(Metric.THROUGHPUT, services[i], ts);	
+			repository.setData(StandardMetric.THROUGHPUT, services[i], ts);	
 		}
 		
 		
@@ -167,10 +167,10 @@ public class ObservationDataGenerator {
 				ts = new TimeSeries(scalar(1.0), scalar(utilization.get(i)));
 			} else {
 				time += 1.0;
-				ts = repository.getData(Metric.UTILIZATION, resources[i]);
+				ts = repository.getData(StandardMetric.UTILIZATION, resources[i]);
 				ts = ts.addSample(time, utilization.get(i));
 			}
-			repository.setData(Metric.UTILIZATION, resources[i], ts);	
+			repository.setData(StandardMetric.UTILIZATION, resources[i], ts);	
 		}
 	
 		for (int i = 0; i < services.length; i++) {
@@ -184,10 +184,10 @@ public class ObservationDataGenerator {
 				ts = new TimeSeries(scalar(1.0), scalar(sumRT));
 			} else {
 				time += 1.0;
-				ts = repository.getData(Metric.AVERAGE_RESPONSE_TIME, services[i]);
+				ts = repository.getData(StandardMetric.RESPONSE_TIME, services[i]);
 				ts = ts.addSample(time, sumRT);
 			}
-			repository.setData(Metric.AVERAGE_RESPONSE_TIME, services[i], ts);	
+			repository.setData(StandardMetric.RESPONSE_TIME, services[i], ts);	
 		}
 	}
 	

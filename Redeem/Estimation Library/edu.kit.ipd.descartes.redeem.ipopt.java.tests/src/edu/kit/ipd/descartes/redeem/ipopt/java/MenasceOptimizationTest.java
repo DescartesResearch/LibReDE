@@ -21,7 +21,7 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class MenasceOptimizationTest {
 
-	private static final int ITERATIONS =10000;
+	private static final int ITERATIONS = 100;
 
 	private VectorObservationModel<IOutputFunction> observationModel;
 	private ConstantStateModel<ILinearStateConstraint> stateModel;

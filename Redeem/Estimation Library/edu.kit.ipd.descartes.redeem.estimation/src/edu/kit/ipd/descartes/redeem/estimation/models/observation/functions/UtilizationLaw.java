@@ -7,7 +7,7 @@ import java.util.Arrays;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
@@ -58,8 +58,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		variables = zeros(system.getState().getStateSize());
 		varFocusedRange = system.getState().getRange(resource);
 		
-		throughputQuery = QueryBuilder.select(Metric.THROUGHPUT).forAllServices().average().using(repository);
-		utilizationQuery = QueryBuilder.select(Metric.UTILIZATION).forResource(res_i).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
+		utilizationQuery = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(res_i).average().using(repository);
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +67,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public Vector getIndependentVariables() {
-		return variables.set(varFocusedRange, throughputQuery.execute());
+		Vector X = throughputQuery.execute();
+		return variables.set(varFocusedRange, (Vector)X.times(1 / this.res_i.getNumberOfParallelServers()));
 	}
 
 	/* (non-Javadoc)

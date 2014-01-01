@@ -45,37 +45,37 @@ public class MemoryObservationRepositoryTest {
 
 	@Test
 	public void testStartAndEndTimestamp() {
-		assertThat(repo.getStartTimestamp()).isEqualTo(Double.NaN);
-		assertThat(repo.getEndTimestamp()).isEqualTo(Double.NaN);
+		assertThat(repo.getStartTimestamp()).isNaN();
+		assertThat(repo.getEndTimestamp()).isNaN();
 		
-		repo.setData(Metric.UTILIZATION, resources[0], ts1);
+		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		assertThat(repo.getStartTimestamp()).isEqualTo(2.0);
 		assertThat(repo.getEndTimestamp()).isEqualTo(8.0);
 		
-		repo.setData(Metric.THROUGHPUT, services[0], ts2);
+		repo.setData(StandardMetric.THROUGHPUT, services[0], ts2);
 		assertThat(repo.getStartTimestamp()).isEqualTo(4.0);
 		assertThat(repo.getEndTimestamp()).isEqualTo(8.0);
 		
-		repo.setData(Metric.THROUGHPUT, services[1], ts3);
-		assertThat(repo.getStartTimestamp()).isEqualTo(Double.NaN);
-		assertThat(repo.getEndTimestamp()).isEqualTo(Double.NaN);
+		repo.setData(StandardMetric.THROUGHPUT, services[1], ts3);
+		assertThat(repo.getStartTimestamp()).isEqualTo(10.0);
+		assertThat(repo.getEndTimestamp()).isEqualTo(8.0);
 		
-		repo.setData(Metric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
+		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
 		assertThat(repo.getStartTimestamp()).isEqualTo(10.0);
 		assertThat(repo.getEndTimestamp()).isEqualTo(10.0);
 	}
 	
 	@Test
 	public void testSetAndGetData() {
-		repo.setData(Metric.UTILIZATION, resources[0], ts1);
-		assertThat(repo.getData(Metric.UTILIZATION, resources[0]).getData().rows()).isEqualTo(5);
-		repo.setData(Metric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.getData(Metric.UTILIZATION, resources[0]).getData().rows()).isEqualTo(6);
+		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData().rows()).isEqualTo(5);
+		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
+		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData().rows()).isEqualTo(6);
 	}
 	
 	@Test
 	public void testGetDataEmpty() {
-		TimeSeries ts = repo.getData(Metric.RESPONSE_TIME, resources[0]);
+		TimeSeries ts = repo.getData(StandardMetric.RESPONSE_TIME, resources[0]);
 		assertThat(ts).isNotNull();
 		assertThat(ts.isEmpty()).isTrue();
 	}

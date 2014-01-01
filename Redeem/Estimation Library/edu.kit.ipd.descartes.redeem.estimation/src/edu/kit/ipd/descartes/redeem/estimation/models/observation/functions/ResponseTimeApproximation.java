@@ -1,7 +1,7 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
 import edu.kit.ipd.descartes.linalg.Scalar;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
@@ -37,7 +37,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		
 		cls_r = service;
 		
-		individualResponseTimesQuery = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(cls_r).average().using(repository);
+		individualResponseTimesQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(cls_r).average().using(repository);
 	}
 
 	/* (non-Javadoc)

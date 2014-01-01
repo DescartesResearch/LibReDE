@@ -12,7 +12,7 @@ import org.junit.Test;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.redeem.estimation.repository.Metric;
+import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.repository.RepositoryCursor;
@@ -62,7 +62,7 @@ public class ResponseTimeApproximationTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(Metric.AVERAGE_RESPONSE_TIME).forService(service).average().using(cursor);
+		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
 		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
