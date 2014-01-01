@@ -1,24 +1,40 @@
 package edu.kit.ipd.descartes.redeem.estimation.workload;
 
+import java.util.UUID;
+
 
 public class Resource implements IModelEntity {
 	
+	private final UUID id;
 	private final String name;
+	private final int parallelServers;
 		
 	public Resource(String name) {
+		this(name, 1);
+	}
+	
+	public Resource(String name, int parallelServers) {
+		this.id = UUID.randomUUID();
 		this.name = name;
+		this.parallelServers = parallelServers;
+	}
+	
+	public UUID getId() {
+		return id;
 	}
 
 	public String getName() {
 		return name;
 	}
+	
+	public int getNumberOfParallelServers() {
+		return parallelServers;
+	}
 
+	
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
+		return id.hashCode();
 	}
 
 	@Override
@@ -30,14 +46,14 @@ public class Resource implements IModelEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		Resource other = (Resource) obj;
-		if (name == null) {
-			if (other.name != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Resource: " + name;
