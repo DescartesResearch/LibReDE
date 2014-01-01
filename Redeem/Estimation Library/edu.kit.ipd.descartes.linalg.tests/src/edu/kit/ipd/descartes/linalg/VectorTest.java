@@ -97,7 +97,7 @@ public class VectorTest {
 		Vector c = ones(3).times(-1.0);
 		Vector res = abs(c);
 		assertThat(res).isEqualTo(ones(3), offset(1e-9));
-		assertThat(c).isEqualTo(ones(3).<Vector>times(-1.0), offset(1e-9));
+		assertThat(c).isEqualTo(ones(3).times(-1.0), offset(1e-9));
 	}
 	
 	@Test
@@ -250,5 +250,19 @@ public class VectorTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void testDotIllegal() {
 		a.dot(scalar(0));
+	}
+	
+	@Test
+	public void testSubset() {
+		Vector v = a.subset(1);
+		assertThat(v.isScalar()).isTrue();
+		assertThat(((Scalar)v).getValue()).isEqualTo(A[1], offset(1e-9));
+		v = a.subset(0, 1);
+		assertThat(v).isEqualTo(vector(A[0],  A[1]), offset(1e-9));
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testSubsetIllegal() {
+		a.subset(10, 11);
 	}
 }
