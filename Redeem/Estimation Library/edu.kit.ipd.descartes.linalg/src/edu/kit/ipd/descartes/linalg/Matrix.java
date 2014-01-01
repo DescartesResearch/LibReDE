@@ -1,67 +1,149 @@
 package edu.kit.ipd.descartes.linalg;
 
-import edu.kit.ipd.descartes.linalg.backend.SharedBuffer;
-
-
 public interface Matrix {
-	
-	double get(int row, int col);
-	
-	<M extends Matrix> M set(int row, int col, double value);
-	
-	<M extends Matrix> M appendColumns(Matrix a);
-	
-	<M extends Matrix> M appendRows(Matrix a);
 
+	/**
+	 * Access value at specified position in matrix.
+	 * 
+	 * @param row
+	 *            row index (0 <= row < rows())
+	 * @param col
+	 *            column index (0 <= col < columns())
+	 * @return value at [row, col]
+	 * @throws IndexOutOfBoundsException
+	 * @since 1.0
+	 */
+	double get(int row, int col);
+
+	/**
+	 * Updates the value at the specified position in the matrix. The original
+	 * matrix is kept unchanged. A copy including the changes is returned
+	 * instead.
+	 * 
+	 * @param row
+	 *            row index (0 <= row < rows())
+	 * @param col
+	 *            column index (0 <= col < columns())
+	 * @param value
+	 *            new value
+	 * @return new matrix instance with updated value.
+	 * @throws IndexOutOfBoundsException
+	 * @since 1.0
+	 */
+	Matrix set(int row, int col, double value);
+
+	/**
+	 * Appends the given matrix as additional columns to this matrix. The
+	 * original matrix is kept unchanged.
+	 * 
+	 * @param a
+	 *            the matrix to append (this.rows() == a.rows()).
+	 * @return a new <code>Matrix</code> instance with the appended columns.
+	 * @throws IllegalArgumentException
+	 *             if this.rows() != a.rows().
+	 * @since 1.0
+	 */
+	Matrix appendColumns(Matrix a);
+
+	/**
+	 * Appends the given matrix as additional rows to this matrix. The original
+	 * matrix is kept unchanged.
+	 * 
+	 * @param a
+	 *            the matrix to append (this.columns() == a.columns()).
+	 * @return a new <code>Matrix</code> instance with the appended rows.
+	 * @throws IllegalArgumentException
+	 *             if this.columns() != a.columns().
+	 * @since 1.0
+	 */
+	Matrix appendRows(Matrix a);
+
+	/**
+	 * @return number of rows of this matrix
+	 * @since 1.0
+	 */
 	int rows();
 
+	/**
+	 * @return number columns of this matrix
+	 * @since 1.0
+	 */
 	int columns();
 
+	/**
+	 * Returns a row vector.
+	 * 
+	 * @param row
+	 *            index of row to return (0 <= row < rows())
+	 * @return a <code>Vector</code> of the specified row
+	 * @throws IndexOutOfBoundsException
+	 * @since 1.0
+	 */
 	Vector row(int row);
 
+	/**
+	 * Returns a column vector.
+	 * 
+	 * @param column
+	 *            index of column to return (0 <= col < columns())
+	 * @return a <code>Vector</code> of the specified column
+	 * @throws IndexOutOfBoundsException
+	 * @since 1.0
+	 */
 	Vector column(int column);
-	
+
+	/**
+	 * @return true if matrix is a vector (n x 1), false otherwise.
+	 * @since 1.0
+	 */
 	boolean isVector();
-	
+
+	/**
+	 * @return true if matrix is a scalar (1 x 1), false otherwise.
+	 * @since 1.0
+	 */
 	boolean isScalar();
-	
+
+	/**
+	 * @return true if matrix is empty (0 x 0), false otherwise.
+	 */
 	boolean isEmpty();
 
-	/*
-	 * Algebra functions
-	 */
+	Matrix plus(Matrix a);
 
-	<M extends Matrix> M plus(M a);
+	Matrix plus(double a);
 
-	<M extends Matrix> M plus(double a);
+	Matrix minus(Matrix a);
 
-	<M extends Matrix> M minus(M a);
+	Matrix minus(double a);
 
-	<M extends Matrix> M minus(double a);
+	Matrix multipliedBy(Matrix a);
 
-	<M extends Matrix> M multipliedBy(M a);
-	
-	<M extends Matrix> M arrayMultipliedBy(M a);
+	Matrix arrayMultipliedBy(Matrix a);
 
-	<M extends Matrix> M times(double a);	
-	
+	Matrix times(double a);
+
 	double norm1();
-	
+
 	double norm2();
-	
+
 	double sum();
-	
-	<M extends Matrix> M abs();
-	
-	<M extends Matrix> M transpose();
-	
-	public abstract int[] sort(int column);
-	
+
+	Matrix abs();
+
+	Matrix transpose();
+
+	Matrix subset(int... rows);
+
+	Matrix sort(int column);
+
+	Matrix insertRow(int row, double... values);
+
 	/*
 	 * Conversion functions
 	 */
-	
-	public abstract double[] toArray1D();
 
-	public abstract double[][] toArray2D();
+	double[] toArray1D();
+
+	double[][] toArray2D();
 }

@@ -1,7 +1,9 @@
 package edu.kit.ipd.descartes.linalg;
 
+import edu.kit.ipd.descartes.linalg.backend.colt.ColtVector;
 
-public class Scalar implements Vector {
+
+public class Scalar implements Vector, SquareMatrix {
 
 	public static final Scalar ZERO = new Scalar(0);
 	public static final Scalar ONE = new Scalar(1);
@@ -31,7 +33,6 @@ public class Scalar implements Vector {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar abs() {
 		return new Scalar(Math.abs(value));
@@ -57,13 +58,11 @@ public class Scalar implements Vector {
 		return value * value;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar transpose() {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Vector appendRows(Matrix a) {
 		if (a.columns() != 1) {
@@ -78,7 +77,6 @@ public class Scalar implements Vector {
 		return LinAlg.FACTORY.createVector(vector);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix appendColumns(Matrix a) {
 		if (a.rows() != 1) {
@@ -124,25 +122,21 @@ public class Scalar implements Vector {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar plus(double a) {
 		return new Scalar(value + a);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar minus(double a) {
 		return new Scalar(value - a);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar times(double a) {
 		return new Scalar(value * a);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar plus(Matrix a) {
 		if (!a.isScalar()) {
@@ -151,7 +145,6 @@ public class Scalar implements Vector {
 		return new Scalar(value	+ ((Scalar) a).value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar arrayMultipliedBy(Matrix a) {
 		if (!a.isScalar()) {
@@ -160,7 +153,6 @@ public class Scalar implements Vector {
 		return new Scalar(value * ((Scalar) a).value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar minus(Matrix a) {
 		if (!a.isScalar()) {
@@ -169,9 +161,8 @@ public class Scalar implements Vector {
 		return new Scalar(value	- ((Scalar) a).value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Scalar multipliedBy(Matrix a) {
+	public Matrix multipliedBy(Matrix a) {
 		return a.times(value);
 	}
 
@@ -185,7 +176,6 @@ public class Scalar implements Vector {
 		return new double[][] { { value } };
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar slice(Range range) {
 		if (range.getStart() != 0 || range.getEnd() != 1) {
@@ -204,11 +194,11 @@ public class Scalar implements Vector {
 	}
 
 	@Override
-	public int[] sort(int column) {
+	public Scalar sort(int column) {
 		if (column != 0) {
 			throw new IndexOutOfBoundsException();
 		}
-		return new int[] { 0 };
+		return this;
 	}
 
 	@Override
@@ -219,7 +209,6 @@ public class Scalar implements Vector {
 		return value;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar set(int row, int col, double value) {
 		if (col != 0) {
@@ -228,7 +217,6 @@ public class Scalar implements Vector {
 		return set(row, value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar set(int row, double value) {
 		if (row != 0) {
@@ -237,7 +225,6 @@ public class Scalar implements Vector {
 		return new Scalar(value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Scalar set(Range rows, Vector values) {
 		if (rows.getStart() != 0 || rows.getEnd() != 1) {
@@ -250,12 +237,63 @@ public class Scalar implements Vector {
 		return new Scalar(values.get(0, 0));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Scalar subset(int[] indeces) {
+	public Scalar subset(int...indeces) {
 		if (indeces.length != 1 || indeces[0] != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
+	}
+	
+	public Scalar subset(int start, int end) {
+		if (start != 0 || end != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+	
+	@Override
+	public Vector insertRow(int row, double... values) {
+		if (values.length != 1) {
+			throw new IllegalArgumentException();
+		}
+		if (row < 0 || row > 1) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (row == 0) {
+			return new ColtVector(values[0], value);
+		} else {
+			return new ColtVector(value, values[0]);
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + value + "]";
+	}
+
+	@Override
+	public double det() {
+		return value;
+	}
+
+	@Override
+	public Scalar inverse() {
+		return new Scalar(1 / value);
+	}
+
+	@Override
+	public Scalar pow(int a) {
+		return new Scalar(Math.pow(value, a));
+	}
+
+	@Override
+	public double rank() {
+		return (value == 0) ? 0 : 1;
+	}
+
+	@Override
+	public double trace() {
+		return value;
 	}
 }

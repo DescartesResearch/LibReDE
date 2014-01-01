@@ -1,7 +1,5 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
-import cern.colt.Sorting;
-import cern.colt.function.IntComparator;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -79,7 +77,7 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 
 	@Override
-	public ColtMatrix internalPlus(double a) {
+	public ColtMatrix plus(double a) {
 		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
@@ -90,7 +88,7 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 
 	@Override
-	public ColtMatrix internalMinus(double a) {
+	public ColtMatrix minus(double a) {
 		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
@@ -101,7 +99,7 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 
 	@Override
-	public ColtMatrix internalTimes(double a) {
+	public ColtMatrix times(double a) {
 		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
@@ -111,9 +109,8 @@ public class ColtMatrix extends AbstractMatrix {
 		return new ColtMatrix(result);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Matrix abs() {
+	public ColtMatrix abs() {
 		DoubleMatrix2D result = newMatrix();
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < columns(); j++) {
@@ -138,7 +135,6 @@ public class ColtMatrix extends AbstractMatrix {
 		return ALG.norm2(delegate);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix transpose() {
 		if (rows() == 1) {
@@ -149,29 +145,39 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 
 	@Override
-	public Matrix internalPlus(Matrix a) {
+	public Matrix plus(Matrix a) {
+		checkOperandsSameSize(a);
+		
 		DoubleMatrix2D res = copyMatrix();
 		res.assign(toColtMatrix(a).delegate, Functions.plus);
 		return new ColtMatrix(res);
 	}
-
+	
 	@Override
-	public Matrix internalMinus(Matrix a) {
+	public Matrix minus(Matrix a) {
+		checkOperandsSameSize(a);
+		
 		DoubleMatrix2D res = copyMatrix();
 		res.assign(toColtMatrix(a).delegate, Functions.minus);
 		return new ColtMatrix(res);
-	}
+	}	
 
 	@Override
-	public Matrix internalArrayMultipliedBy(Matrix a) {
+	public Matrix arrayMultipliedBy(Matrix a) {
+		checkOperandsSameSize(a);
+		
 		DoubleMatrix2D res = copyMatrix();
 		res.assign(toColtMatrix(a).delegate, Functions.mult);
 		return new ColtMatrix(res);
 	}
 
 	@Override
-	public Matrix internalMultipliedBy(Matrix a) {
-		if (a.isVector()) {
+	public Matrix multipliedBy(Matrix a) {
+		checkOperandsInnerDimensions(a);
+		
+		if (a.isScalar()) {
+			return times(((Scalar)a).getValue());
+		} else if (a.isVector()) {
 			DoubleMatrix1D result = newVector(this.rows());
 			delegate.zMult(toColtVector((Vector)a).delegate, result);
 			return new ColtVector(result);
@@ -211,7 +217,6 @@ public class ColtMatrix extends AbstractMatrix {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix appendRows(Matrix a) {
 		if (a.columns() != this.columns()) {
@@ -227,7 +232,6 @@ public class ColtMatrix extends AbstractMatrix {
 		return new ColtMatrix(combined);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix appendColumns(Matrix a) {
 		if (a.rows() != this.rows()) {
@@ -242,7 +246,6 @@ public class ColtMatrix extends AbstractMatrix {
 		return new ColtMatrix(combined);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix set(int row, int col, double value) {
 		DoubleMatrix2D copy = copyMatrix();
@@ -251,26 +254,35 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public int[] sort(final int column) {
-		int[] idx = new int[rows()];
-		for (int i = 0; i < idx.length; i++) {
-			idx[i] = i;
-		}	
-		
-		Sorting.quickSort(idx, 0, idx.length, new IntComparator() {			
-			@Override
-			public int compare(int idx1, int idx2) {
-				double val1 = delegate.getQuick(idx1, column);
-				double val2 = delegate.getQuick(idx2, column);
-				if (val1 < val2) {
-					return -1;
-				} else if (val1 > val2) {
-					return 1;
-				}
-				return 0;
-			}
-		});
-		return idx;
+	public ColtMatrix sort(int column) {
+		return new ColtMatrix(delegate.viewSorted(column));
+	}
+	
+	@Override
+	public Matrix subset(int... rows) {
+		return new ColtMatrix(delegate.viewSelection(rows, null));
+	}
+	
+	@Override
+	public Matrix insertRow(int row, double... values) {
+		int n = delegate.rows();
+		int m = delegate.columns();
+		if (values.length != m) {
+			throw new IllegalArgumentException();
+		}
+		if (row < 0 || row > n) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		DoubleMatrix2D temp = newMatrix(n + 1, m);
+		if (row > 0) {
+			temp.viewPart(0, 0, row, m).assign(delegate.viewPart(0, 0, row, m));
+		}
+		temp.viewPart(row, 0, 1, m).assign(new double[][] { values });
+		if (row < n) {
+			temp.viewPart(row + 1, 0, n - row, m).assign(delegate.viewPart(row, 0, n - row, m));
+		}
+		return new ColtMatrix(temp);
 	}
 	
 	protected DoubleMatrix1D newVector(int size) {

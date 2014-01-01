@@ -1,7 +1,5 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
-import cern.colt.Sorting;
-import cern.colt.function.IntComparator;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -43,21 +41,21 @@ public class ColtVector extends AbstractVector {
 			delegate.setQuick(i, init.cell(i));
 		}
 	}
-
+	
 	@Override
-	public ColtVector internalPlus(double d) {
+	public ColtVector plus(double a) {
 		DoubleMatrix1D result = newVector();
 		for (int i = 0; i < delegate.size(); i++) {
-			result.setQuick(i, delegate.getQuick(i) + d);
+			result.setQuick(i, delegate.getQuick(i) + a);
 		}
 		return new ColtVector(result);
 	}
-
+	
 	@Override
-	public ColtVector internalMinus(double d) {
+	public ColtVector minus(double a) {
 		DoubleMatrix1D result = newVector();
 		for (int i = 0; i < delegate.size(); i++) {
-			result.setQuick(i, delegate.getQuick(i) - d);
+			result.setQuick(i, delegate.getQuick(i) - a);
 		}
 		return new ColtVector(result);
 	}
@@ -71,17 +69,16 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public ColtVector internalTimes(double d) {
+	public ColtVector times(double a) {
 		DoubleMatrix1D result = newVector();
 		for (int i = 0; i < delegate.size(); i++) {
-			result.setQuick(i, delegate.getQuick(i) * d);
+			result.setQuick(i, delegate.getQuick(i) * a);
 		}
 		return new ColtVector(result);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Vector abs() {
+	public ColtVector abs() {
 		DoubleMatrix1D result = newVector();
 		for (int i = 0; i < delegate.size(); i++) {
 			result.setQuick(i, Math.abs(delegate.getQuick(i)));
@@ -115,32 +112,44 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public ColtVector internalPlus(Matrix a) {
+	public ColtVector plus(Matrix a) {
+		checkOperandsSameSize(a);	
+		
 		DoubleMatrix1D res = copyVector();
 		res.assign(getColtVector(a).delegate, Functions.plus);
 		return new ColtVector(res);
 	}
-
+	
 	@Override
-	public ColtVector internalMinus(Matrix a) {
+	public ColtVector minus(Matrix a) {
+		checkOperandsSameSize(a);
+		
 		DoubleMatrix1D res = copyVector();
 		res.assign(getColtVector(a).delegate, Functions.minus);
 		return new ColtVector(res);
 	}
-	
+
 	@Override
-	public ColtVector internalArrayMultipliedBy(Matrix a) {
+	public ColtVector arrayMultipliedBy(Matrix a) {
+		checkOperandsSameSize(a);
+		
 		DoubleMatrix1D res = copyVector();
 		res.assign(getColtVector(a).delegate, Functions.mult);
 		return new ColtVector(res);
 	}
 
 	@Override
-	public ColtMatrix internalMultipliedBy(Matrix a) {
-		ColtVector vector = getColtVector(a);
-		// TODO buffer
-		DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate, null);
-		return new ColtMatrix(result);			
+	public Matrix multipliedBy(Matrix a) {
+		checkOperandsInnerDimensions(a);
+		
+		if (a.isScalar()) {
+			return times(((Scalar)a).getValue());
+		} else {
+			ColtVector vector = getColtVector(a);
+			// TODO buffer
+			DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate, null);
+			return new ColtMatrix(result);
+		}
 	}
 	
 	private ColtVector getColtVector(Matrix a) {
@@ -159,7 +168,6 @@ public class ColtVector extends AbstractVector {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix appendColumns(Matrix a) {		
 		if (a.rows() != this.rows()) {
@@ -172,7 +180,6 @@ public class ColtVector extends AbstractVector {
 		return new ColtMatrix(combined);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Vector appendRows(Matrix a) {
 		if (a.columns() != 1) {
@@ -184,7 +191,6 @@ public class ColtVector extends AbstractVector {
 		return new ColtVector(combined);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Matrix transpose() {
 		DoubleMatrix2D matrix = newMatrix(1, delegate.size());
@@ -230,30 +236,12 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public int[] sort(int column) {
+	public ColtVector sort(int column) {
 		if (column != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		int[] idx = new int[delegate.size()];
-		for (int i = 0; i < idx.length; i++) {
-			idx[i] = i;
-		}	
-		
-		Sorting.quickSort(idx, 0, idx.length, new IntComparator() {			
-			@Override
-			public int compare(int idx1, int idx2) {
-				double val1 = delegate.getQuick(idx1);
-				double val2 = delegate.getQuick(idx2);
-				if (val1 < val2) {
-					return -1;
-				} else if (val1 > val2) {
-					return 1;
-				}
-				return 0;
-			}
-		});
-		return idx;
+		return new ColtVector(delegate.viewSorted());
 	}
 
 	@Override
@@ -261,7 +249,6 @@ public class ColtVector extends AbstractVector {
 		return delegate.get(row);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Vector set(int row, double value) {
 		DoubleMatrix1D copy = copyVector();
@@ -269,7 +256,6 @@ public class ColtVector extends AbstractVector {
 		return  new ColtVector(copy);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Vector set(int row, int col, double value) {
 		if (col != 0) {
@@ -278,7 +264,6 @@ public class ColtVector extends AbstractVector {
 		return set(row, value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Vector set(Range rows, Vector values) {
 		DoubleMatrix1D copy = copyVector();
@@ -286,7 +271,6 @@ public class ColtVector extends AbstractVector {
 		return new ColtVector(copy);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Vector slice(Range range) {
 		if (range.getLength() == 1) {
@@ -296,15 +280,47 @@ public class ColtVector extends AbstractVector {
 		return new ColtVector(part);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Vector subset(int[] indeces) {
-		return new ColtVector(delegate.viewSelection(indeces));
+	public Vector subset(int...indeces) {
+		if (indeces.length == 1) {
+			return new Scalar(delegate.get(indeces[0]));
+		} else {
+			return new ColtVector(delegate.viewSelection(indeces));
+		}
+	}
+	
+	@Override
+	public Vector subset(int start, int end) {
+		if (start == end) {
+			return new Scalar(delegate.get(start));
+		} else {
+			return new ColtVector(delegate.viewPart(start, (end - start + 1)));
+		}
 	}
 
 	@Override
 	public Vector row(int row) {
 		return new Scalar(delegate.get(row));
+	}
+	
+	@Override
+	public Vector insertRow(int row, double... values) {
+		if (values.length != 1) {
+			throw new IllegalArgumentException();
+		}
+		if (row < 0 || row > delegate.size()) {
+			throw new IndexOutOfBoundsException();
+		}
+		int n = delegate.size();
+		DoubleMatrix1D temp = newVector(n + 1);
+		if (row > 0) {
+			temp.viewPart(0, row).assign(delegate.viewPart(0, row));
+		}
+		temp.viewPart(row, 1).assign(values[0]);
+		if (row < n) {
+			temp.viewPart(row + 1, n - row).assign(delegate.viewPart(row, n - row));
+		}
+		return new ColtVector(temp);
 	}
 	
 	private DoubleMatrix1D newVector() {

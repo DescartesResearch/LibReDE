@@ -1,5 +1,6 @@
 package edu.kit.ipd.descartes.linalg.backend;
 
+import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.SquareMatrix;
@@ -12,45 +13,45 @@ public final class Empty implements Vector, SquareMatrix {
 	private Empty() { }
 
 	@Override
-	public <V extends Vector> V set(int row, double value) {
+	public Vector set(int row, double value) {
 		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
-	public <V extends Vector> V set(Range rows, Vector values) {
+	public Empty set(Range rows, Vector values) {
 		throw new IndexOutOfBoundsException();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty slice(Range range) {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Empty subset(int[] indeces) {
-		return this;
+	public Empty subset(int...indeces) {
+		throw new IndexOutOfBoundsException();
 	}
-
+	
 	@Override
-	public <M extends Matrix> M set(int row, int col, double value) {
+	public Empty subset(int start, int end) {
 		throw new IndexOutOfBoundsException();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <M extends Matrix> M appendColumns(Matrix a) {
-		return (M)a;
+	public Matrix set(int row, int col, double value) {
+		throw new IndexOutOfBoundsException();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <M extends Matrix> M appendRows(Matrix a) {
-		return (M)a;
+	public Matrix appendColumns(Matrix a) {
+		return a;
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+	public Matrix appendRows(Matrix a) {
+		return a;
+	}
+
 	@Override
 	public Empty plus(Matrix a) {
 		if (!a.isEmpty() && !a.isScalar()) {
@@ -59,13 +60,11 @@ public final class Empty implements Vector, SquareMatrix {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty plus(double a) {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty minus(Matrix a) {
 		if (!a.isEmpty() && !a.isScalar()) {
@@ -74,13 +73,11 @@ public final class Empty implements Vector, SquareMatrix {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty minus(double a) {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty multipliedBy(Matrix a) {
 		if (!a.isEmpty() && !a.isScalar()) {
@@ -89,7 +86,6 @@ public final class Empty implements Vector, SquareMatrix {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty arrayMultipliedBy(Matrix a) {
 		if (!a.isEmpty() && !a.isScalar()) {
@@ -98,19 +94,16 @@ public final class Empty implements Vector, SquareMatrix {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty times(double a) {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty abs() {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Empty transpose() {
 		return this;
@@ -172,8 +165,8 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public int[] sort(int column) {
-		return new int[0];
+	public Empty sort(int column) {
+		return this;
 	}
 
 	@Override
@@ -227,6 +220,14 @@ public final class Empty implements Vector, SquareMatrix {
 	@Override
 	public double trace() {
 		return 0;
+	}
+	
+	@Override
+	public Matrix insertRow(int row, double... values) {
+		if (row != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return LinAlg.matrix(LinAlg.row(values));
 	}
 
 }

@@ -4,13 +4,31 @@ public interface Vector extends Matrix {
 	
 	double get(int row);
 	
-	<V extends Vector> V set(int row, double value);
+	Vector set(int row, double value);
 	
-	<V extends Vector> V set(Range rows, Vector values);
+	Vector set(Range rows, Vector values);
 	
-	<V extends Vector> V slice(Range range);
+	Vector slice(Range range);
 	
-	<V extends Vector> V subset(int[] indeces);
+	Vector subset(int...indeces);
+	
+	Vector subset(int start, int end);
+	
+	Vector plus(Matrix a);
+
+	Vector plus(double a);
+
+	Vector minus(Matrix a);
+
+	Vector minus(double a);
+
+	Matrix multipliedBy(Matrix a);
+	
+	Matrix arrayMultipliedBy(Matrix a);
+
+	Vector times(double a);
+	
+	Vector abs();
 	
 	double dot(Vector b);
 	
