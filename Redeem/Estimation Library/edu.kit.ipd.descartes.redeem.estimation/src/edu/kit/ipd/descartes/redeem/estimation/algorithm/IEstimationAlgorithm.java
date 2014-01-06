@@ -8,7 +8,9 @@ import edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel;
 
 public interface IEstimationAlgorithm<S extends IStateModel<?>, O extends IObservationModel<?, ?>> {
 	
-	void initialize(S stateModel, O observationModel) throws InitializationException;
+	void initialize(S stateModel, O observationModel, int estimationWindow) throws InitializationException;
+	
+	void update() throws EstimationException;
 	
 	Vector estimate() throws EstimationException;
 	

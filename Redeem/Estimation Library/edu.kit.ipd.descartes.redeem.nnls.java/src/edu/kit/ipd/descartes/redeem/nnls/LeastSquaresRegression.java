@@ -1,9 +1,8 @@
 package edu.kit.ipd.descartes.redeem.nnls;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
-import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
@@ -37,10 +36,10 @@ public class LeastSquaresRegression
 	private IStateModel<Unconstrained> stateModel;
 	private ILinearOutputFunction outputFunction;
 
-	// contains all measured throughputs
-	private Matrix throughputs;
-	// contains all measured utilizations
-	private Vector utilizations;
+	// contains current measurements
+	private Matrix independentVariables;
+	private Vector dependentVariables;
+	private int numObservations;
 
 	private final int SIZE_OF_DOUBLE = 8;
 	private final int SIZE_OF_INT = 8;
@@ -52,9 +51,13 @@ public class LeastSquaresRegression
 
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
-			IObservationModel<ILinearOutputFunction, Scalar> observationModel) {
+			IObservationModel<ILinearOutputFunction, Scalar> observationModel, int estimationWindow) {
 		this.observationModel = observationModel;
 		this.stateModel = stateModel;
+		
+		independentVariables = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
+		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);
+		numObservations = 0;
 	}
 
 	/**
@@ -140,22 +143,28 @@ public class LeastSquaresRegression
 			result = vector(res);
 			return result;
 	}
+	
+	@Override
+	public void update() throws EstimationException {
+		outputFunction = observationModel.getOutputFunction(0);
+		
+		numObservations++;
+		
+		dependentVariables = dependentVariables.circshift(1).set(0, outputFunction.getObservedOutput());
+		independentVariables = independentVariables.circshift(1).setRow(0, outputFunction.getIndependentVariables());
+		
+	}
 
 	@Override
 	public Vector estimate() throws EstimationException {
-		if (observationModel.iterator().hasNext())
-			outputFunction = observationModel.iterator().next();
-
-		utilizations = (Vector) horzcat(utilizations,
-				vector(outputFunction.getObservedOutput()));
-		throughputs = vertcat(throughputs,
-				outputFunction.getIndependentVariables());
-
 		// when the sample size is small
-		if (utilizations.columns() < MIN_SIZE_OF_ESTIMATION)
+		if (numObservations < MIN_SIZE_OF_ESTIMATION) {
 			return vector(0);
-		else
-			return nnls(throughputs, utilizations);
+		} else if (numObservations < dependentVariables.rows()) {
+			return nnls(independentVariables.rows(0, numObservations - 1), dependentVariables.rows(0, numObservations - 1));
+		} else {
+			return nnls(independentVariables, dependentVariables);
+		}
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package edu.kit.ipd.descartes.redeem.ipopt.java;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.mean;
 import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
 import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
@@ -16,6 +18,7 @@ import com.sun.jna.ptr.DoubleByReference;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.algorithm.IEstimationAlgorithm;
+import edu.kit.ipd.descartes.redeem.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.HessianMatrixBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.models.diff.JacobiMatrixBuilder;
 import edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel;
@@ -90,14 +93,15 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 	private Pointer x; /* double[stateSize] : initial and solution vector */
 	private DoubleByReference obj; /* current objective value of optimization */
 	
+	private Matrix estimationBuffer;
 			
 	
 	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel, edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel, edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel, int)
 	 */
 	@Override
 	public void initialize(ConstantStateModel<? extends IStateConstraint> stateModel,
-			IObservationModel<IOutputFunction, Vector> observationModel) {
+			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) {
 		
 		initStateConstraints(stateModel.getConstraints());
 		
@@ -118,14 +122,16 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 		for (int i = 1; i <= stateSize; i++) {
 			nele_hess += i;
 		}
+		
+		estimationBuffer = matrix(estimationWindow, stateSize, Double.NaN);
 	}
 	
 
 	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm#estimate()
+	 * @see edu.kit.ipd.descartes.redeem.estimation.algorithm.IEstimationAlgorithm#update()
 	 */
 	@Override
-	public Vector estimate() {
+	public void update() {
 		if (stateSize < 0) {
 			throw new IllegalStateException("Method initialize() must be called before calling estimate().");
 		}		
@@ -152,8 +158,11 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 		  
 		/* free allocated memory */
 		IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
-
-		return estimate;
+	}
+	
+	@Override
+	public Vector estimate() throws EstimationException {
+		return mean(estimationBuffer, 0);
 	}
 	
 	private void initOptimizationState(IObservationModel<IOutputFunction, Vector> observationModel) {
