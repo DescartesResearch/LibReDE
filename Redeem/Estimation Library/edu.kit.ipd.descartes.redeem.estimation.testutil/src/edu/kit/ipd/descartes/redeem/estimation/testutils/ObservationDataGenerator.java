@@ -92,7 +92,7 @@ public class ObservationDataGenerator {
 
 	public void setDemands(Vector demands) {
 		if (demands.rows() != services.length * resources.length) {
-			throw new IllegalArgumentException("Size of demands amtrix does not match number of resources x services.");
+			throw new IllegalArgumentException("Size of demands matrix does not match number of resources x services.");
 		}
 		this.demands = demands;
 	}
@@ -123,7 +123,17 @@ public class ObservationDataGenerator {
 			}
 		});	
 		
-		final int bottleneckResource = max(weightedTotalDemand);
+		int maxIdx = -1;
+		double max = Double.MIN_VALUE;
+		for (int i = 0; i < weightedTotalDemand.rows(); i++) {
+			if (maxIdx < 0) {
+				maxIdx = i;
+			}
+			if (weightedTotalDemand.get(i) > max) {
+				maxIdx = i;
+			}
+		}
+		final int bottleneckResource = maxIdx;
 		
 		final double maxUtil = randUtil.nextDouble() * (upperUtilizationBound - lowerUtilizationBound) + lowerUtilizationBound;
 		

@@ -30,7 +30,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation1WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
-		RepositoryCursor view = generator.getRepository().getCursor(1);
+		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(view);
@@ -49,7 +49,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation4WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
-		RepositoryCursor view = generator.getRepository().getCursor(1);
+		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(view);
@@ -69,7 +69,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation1WC4R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 4);
-		RepositoryCursor view = generator.getRepository().getCursor(1);
+		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(view);
@@ -88,7 +88,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation4WC4R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 4);
-		RepositoryCursor view = generator.getRepository().getCursor(1);
+		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetric.UTILIZATION).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(view);
@@ -113,7 +113,7 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setLowerUtilizationBound(0.4);
 		generator.setUpperUtilizationBound(0.6);
-		RepositoryCursor view = generator.getRepository().getCursor(1);
+		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetric.UTILIZATION).forAllResources().average().using(view);
 		
@@ -134,7 +134,7 @@ public class ObservationDataGeneratorTest {
 	public void testNextObservation4WC1RWithNoMix() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setWorkloadMixVariation(0);
-		RepositoryCursor view = generator.getRepository().getCursor(1);
+		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
 		Query<Vector> tputData = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(view);
 		
