@@ -61,6 +61,14 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(res_i).average().using(repository);
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#isApplicable()
+	 */
+	@Override
+	public boolean isApplicable() {
+		return throughputQuery.hasData() && utilizationQuery.hasData();
+	}
 
 	/* (non-Javadoc)
 	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.ILinearOutputFunction#getIndependentVariables()

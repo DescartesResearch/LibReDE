@@ -73,6 +73,14 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		avgThroughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(repository);
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#isApplicable()
+	 */
+	@Override
+	public boolean isApplicable() {
+		return utilizationQuery.hasData() && avgResponseTimeQuery.hasData() && avgThroughputQuery.hasData();
+	}
 
 	/* (non-Javadoc)
 	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#getObservedOutput()

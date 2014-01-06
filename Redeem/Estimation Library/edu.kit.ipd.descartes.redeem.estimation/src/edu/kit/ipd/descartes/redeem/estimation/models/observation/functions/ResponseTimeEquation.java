@@ -1,6 +1,7 @@
 package edu.kit.ipd.descartes.redeem.estimation.models.observation.functions;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 
 import java.util.Arrays;
@@ -78,6 +79,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 	
 	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#isApplicable()
+	 */
+	@Override
+	public boolean isApplicable() {
+		return responseTimeQuery.hasData() && throughputQuery.hasData();
+	}
+	
+	/* (non-Javadoc)
 	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
@@ -92,7 +101,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	public double getCalculatedOutput(final Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.execute();
-		double X_total = X.sum();
+		double X_total = sum(X);
 		
 		for (Resource res_i : getSelectedResources()) {
 			Vector D_i = state.slice(getSystem().getState().getRange(res_i));

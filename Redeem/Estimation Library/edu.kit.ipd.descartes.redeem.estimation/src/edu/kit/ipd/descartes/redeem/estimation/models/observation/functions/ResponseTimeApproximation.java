@@ -39,6 +39,14 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		
 		individualResponseTimesQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(cls_r).average().using(repository);
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IOutputFunction#isApplicable()
+	 */
+	@Override
+	public boolean isApplicable() {
+		return individualResponseTimesQuery.hasData();
+	}
 
 	/* (non-Javadoc)
 	 * @see edu.kit.ipd.descartes.redeem.estimation.models.observation.functions.IDirectOutputFunction#getFactor()
