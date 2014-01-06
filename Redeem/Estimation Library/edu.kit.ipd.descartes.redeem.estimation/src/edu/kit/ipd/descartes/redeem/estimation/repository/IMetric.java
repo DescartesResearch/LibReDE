@@ -10,6 +10,10 @@ public interface IMetric {
 	
 	public TimeSeries retrieve(IMonitoringRepository repository, IModelEntity entity, double start, double end);
 
-	public double aggregate(TimeSeries series, Aggregation func);
-
+	public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func);
+	
+	public boolean hasData(IMonitoringRepository repository, IModelEntity entity, double aggregationInterval);
+	
+	public boolean isAggregationSupported(Aggregation aggregation);
+	
 }
