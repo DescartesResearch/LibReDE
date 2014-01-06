@@ -5,7 +5,6 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.sort;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
-import edu.kit.ipd.descartes.linalg.AggregateFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -72,7 +71,7 @@ public class TimeSeries {
 		this(sort(content, 0), 0, Math.max(content.rows(), 0));
 	}
 
-	public TimeSeries(Vector time, Vector data) {
+	public TimeSeries(Vector time, Matrix data) {
 		this(horzcat(time, data));
 	}
 	
@@ -96,14 +95,18 @@ public class TimeSeries {
 		if (content.isEmpty()) {
 			return empty();
 		}
-		return content.column(0).subset(offset, offset + length - 1);
+		return content.column(0).rows(offset, offset + length - 1);
 	}
 
-	public Vector getData() {
+	public Vector getData(int column) {
 		if (content.isEmpty()) {
 			return empty();
 		}
-		return content.column(1).subset(offset, offset + length - 1);
+		return content.column(column + 1).rows(offset, offset + length - 1);
+	}
+	
+	public Matrix getData() {
+		return content.columns(1, content.columns() - 1);
 	}
 	
 	public Interpolation getInterpolationMethod() {
@@ -118,27 +121,6 @@ public class TimeSeries {
 		return union(series);
 	}
 	
-	public TimeSeries aggregate(final Vector timestamps, final AggregateFunction func) {
-		int intervals = timestamps.rows();		
-		Matrix results = matrix(intervals - 1, 2, new MatrixFunction() {
-			@Override
-			public double cell(int row, int column) {
-				if (column == 0) {
-					return timestamps.get(row + 1);
-				} else if (column == 1) {
-					TimeSeries curInterval = subset(timestamps.get(row), timestamps.get(row + 1));
-					return func.aggregate(curInterval.getData());
-				}
-				throw new AssertionError();				
-			}			
-		});
-		return new TimeSeries(results);	
-	}
-	
-	public double aggregate(final AggregateFunction func) {
-		return func.aggregate(getData());
-	}
-
 	public TimeSeries resample(final Vector timestamps) {
 		Matrix resampled = matrix(timestamps.rows(), 2, new MatrixFunction() {			
 			@Override
@@ -146,7 +128,7 @@ public class TimeSeries {
 				if (column == 0) {
 					return timestamps.get(row);
 				} else {
-					return get(timestamps.get(row));
+					return get(timestamps.get(row), column - 1);
 				}
 			}
 		});
@@ -154,40 +136,43 @@ public class TimeSeries {
 		return new TimeSeries(resampled);
 	}
 
-	public TimeSeries addSample(double time, double value) {
+	public TimeSeries addSample(double time, double...values) {
 		double idx = interpolationSearch(time);
 		Matrix temp = content;
 		if (offset != 0 || length != content.rows()) {
-			temp = content.subset(offset, offset + length - 1);
+			temp = content.rows(offset, offset + length - 1);
 		}
 		TimeSeries ret;
+		double[] sample = new double[values.length + 1];
+		sample[0] = time;
+		System.arraycopy(values, 0, sample, 1, values.length);
 		if (idx > (offset + length - 1)) {
-			ret = new TimeSeries(temp.insertRow(temp.rows(), time, value));
+			ret = new TimeSeries(temp.insertRow(temp.rows(), vector(sample)));
 		} else if (idx < offset) {
-			ret = new TimeSeries(temp.insertRow(0, time, value));
+			ret = new TimeSeries(temp.insertRow(0, vector(sample)));
 		} else if (Math.floor(idx) != idx) {
-			ret = new TimeSeries(temp.insertRow((int)Math.floor(idx) - offset, time, value));
+			ret = new TimeSeries(temp.insertRow((int)Math.floor(idx) - offset, vector(sample)));
 		} else {
 			// exact match -> add behind existing sample
-			ret = new TimeSeries(temp.insertRow((int)idx + 1 - offset, time, value));
+			ret = new TimeSeries(temp.insertRow((int)idx + 1 - offset, vector(sample)));
 		}
 		ret.setInterpolationMethod(interpolation);
 		return ret;
 	}
 	
-	public double timeWeightedMean(TimeSeries userWeights) {
-		return mean(true, userWeights);
+	public double timeWeightedMean(int column, TimeSeries userWeights) {
+		return mean(column, true, userWeights);
 	}
 	
-	public double timeWeightedMean() {
-		return mean(true, null);
+	public double timeWeightedMean(int column) {
+		return mean(column, true, null);
 	}
 	
-	public double mean() {
-		return mean(false, null);
+	public double mean(int column) {
+		return mean(column, false, null);
 	}
 	
-	private double mean(boolean timeWeighted, TimeSeries userWeights) {
+	private double mean(int column, boolean timeWeighted, TimeSeries userWeights) {
 		if (isEmpty()) {
 			return Double.NaN;
 		}
@@ -196,7 +181,7 @@ public class TimeSeries {
 			double total = 0.0;
 			int n = 0;
 			for (int i = offset; i < (offset + length); i++) {
-				double value = content.get(i, 1);
+				double value = content.get(i, column + 1);
 				if (!Double.isNaN(value)) {
 					total += value;
 					n++;
@@ -215,11 +200,11 @@ public class TimeSeries {
 			for(int i = offset; i < n; i++) {				
 				double curTs = Math.min(endTime, content.get(i, 0));
 				double lastTs = Math.max(startTime, (i > 0) ? content.get(i - 1, 0) : Double.NEGATIVE_INFINITY);
-				double value = get(curTs);
+				double value = get(curTs, column);
 				if (!Double.isNaN(value)) {
 					double weight = curTs - lastTs;
 					if (userWeights != null) {
-						weight = weight * userWeights.subset(lastTs, curTs).sum();
+						weight = weight * userWeights.subset(lastTs, curTs).sum(0);
 					}
 					total += weight * value;
 					totalWeight += weight;
@@ -233,11 +218,11 @@ public class TimeSeries {
 		}
 	}
 	
-	public double min() {
+	public double min(int column) {
 		double min = Double.MAX_VALUE;
 		int n = 0;
 		for (int i = offset; i < (offset + length); i++) {
-			min = Math.min(content.get(i, 1), min);
+			min = Math.min(content.get(i, column + 1), min);
 			n++;
 		}
 		if (n == 0) {
@@ -247,11 +232,11 @@ public class TimeSeries {
 		}
 	}
 	
-	public double max() {
+	public double max(int column) {
 		double max = Double.MIN_VALUE;
 		int n = 0;
 		for (int i = offset; i < (offset + length); i++) {
-			max = Math.max(content.get(i, 1), max);
+			max = Math.max(content.get(i, column + 1), max);
 			n++;
 		}
 		if (n == 0) {
@@ -261,10 +246,10 @@ public class TimeSeries {
 		}
 	}
 	
-	public double sum() {
+	public double sum(int column) {
 		double sum = 0.0;
 		for (int i = offset; i < (offset + length); i++) {
-			sum += content.get(i, 1);
+			sum += content.get(i, column + 1);
 		}
 		return sum;
 	}
@@ -273,12 +258,11 @@ public class TimeSeries {
 		if (startTime > endTime) {
 			throw new IllegalArgumentException("Start time must be less or equal than end time.");
 		}
-		if ((startTime < this.startTime) || (endTime > this.endTime)) {
-			throw new IllegalArgumentException("Requested subset is not contained by this time series.");
-		}
-		
-		if (startTime == endTime) {
+		if (isEmpty() || startTime == endTime) {
 			return EMPTY;
+		}		
+		if ((startTime < this.startTime) || (endTime > this.endTime)) {
+			throw new IllegalArgumentException("Requested subset [" + startTime + ", " + endTime + ") is not contained by this series time range [" + this.startTime + ", " + this.endTime + ").");
 		}
 		
 		double idx1 = interpolationSearch(startTime);
@@ -298,7 +282,7 @@ public class TimeSeries {
 		return ret;
 	}
 
-	public double get(double timestamp) {
+	public double get(double timestamp, int column) {
 		double idx = interpolationSearch(timestamp);
 		if (idx <= -1 || idx >= content.rows()) {
 			return Double.NaN;
@@ -307,7 +291,7 @@ public class TimeSeries {
 			return interpolation.interpolate(content, timestamp, (int)Math.floor(idx), (int)Math.ceil(idx));
 		}
 
-		return content.get((int)idx, 1);
+		return content.get((int)idx, column + 1);
 	}
 	
 	public double getAverageTimeIncrement() {
@@ -357,7 +341,7 @@ public class TimeSeries {
 			} else if (cur > timestamp) {
 				lastIdx = Math.max(pos - 1, 0);
 			} else if (cur < timestamp) {
-				firstIdx = pos + 1;
+				firstIdx = Math.min(pos + 1, content.rows() - 1);
 			}
 			first = content.get(firstIdx, 0);
 			last = content.get(lastIdx, 0);
@@ -412,7 +396,7 @@ public class TimeSeries {
 	}
 
 	public boolean isEmpty() {
-		return (length == 0) && (startTime == endTime);
+		return content.isEmpty();
 	}
 	
 	@Override
@@ -420,4 +404,7 @@ public class TimeSeries {
 		return "Timeseries(t=" + getTime() + ";v=" + getData() + ")";
 	}
 
+	public void setEndTime(double endTime) {
+		this.endTime = endTime;	
+	}
 }

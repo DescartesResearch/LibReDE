@@ -1,6 +1,8 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.empty;
+import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
 import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
@@ -11,6 +13,7 @@ import static org.fest.assertions.api.Assertions.offset;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.redeem.estimation.repository.TimeSeries.Interpolation;
 
@@ -38,7 +41,7 @@ public class TimeSeriesTest {
 	public void testCreate() {
 		TimeSeries tsNew = new TimeSeries(time1, data1);
 		assertThat(tsNew.getTime()).isEqualTo(time1, offset(1e-9));
-		assertThat(tsNew.getData()).isEqualTo(data1, offset(1e-9));
+		assertThat(tsNew.getData(0)).isEqualTo(data1, offset(1e-9));
 		assertThat(tsNew.getInterpolationMethod()).isEqualTo(Interpolation.NONE);
 	}
 	
@@ -48,25 +51,25 @@ public class TimeSeriesTest {
 		assertThat(tsAdd).isNotNull();
 		assertThat(tsAdd.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
 		assertThat(ts1.getTime()).isEqualTo(time1, offset(1e-9));
-		assertThat(ts1.getData()).isEqualTo(data1, offset(1e-9));
+		assertThat(ts1.getData(0)).isEqualTo(data1, offset(1e-9));
 		assertThat(tsAdd.getTime()).isEqualTo((Vector)vertcat(time1, scalar(4)), offset(1e-9));
-		assertThat(tsAdd.getData()).isEqualTo((Vector)vertcat(data1, scalar(0.4)), offset(1e-9));
+		assertThat(tsAdd.getData(0)).isEqualTo((Vector)vertcat(data1, scalar(0.4)), offset(1e-9));
 		
 		tsAdd = ts1.addSample(2.5, 0.25);
 		assertThat(tsAdd).isNotNull();
 		assertThat(tsAdd.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
 		assertThat(ts1.getTime()).isEqualTo(time1, offset(1e-9));
-		assertThat(ts1.getData()).isEqualTo(data1, offset(1e-9));
+		assertThat(ts1.getData(0)).isEqualTo(data1, offset(1e-9));
 		assertThat(tsAdd.getTime()).isEqualTo(vector(1,2,2.5,3), offset(1e-9));
-		assertThat(tsAdd.getData()).isEqualTo(vector(0.1,0.2,0.25,0.3), offset(1e-9));
+		assertThat(tsAdd.getData(0)).isEqualTo(vector(0.1,0.2,0.25,0.3), offset(1e-9));
 		
 		tsAdd = ts1.addSample(0, 0);
 		assertThat(tsAdd).isNotNull();
 		assertThat(tsAdd.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
 		assertThat(ts1.getTime()).isEqualTo(time1, offset(1e-9));
-		assertThat(ts1.getData()).isEqualTo(data1, offset(1e-9));
+		assertThat(ts1.getData(0)).isEqualTo(data1, offset(1e-9));
 		assertThat(tsAdd.getTime()).isEqualTo((Vector)vertcat(scalar(0), time1), offset(1e-9));
-		assertThat(tsAdd.getData()).isEqualTo((Vector)vertcat(scalar(0), data1), offset(1e-9));
+		assertThat(tsAdd.getData(0)).isEqualTo((Vector)vertcat(scalar(0), data1), offset(1e-9));
 	}
 	
 	@Test
@@ -79,8 +82,8 @@ public class TimeSeriesTest {
 	
 	@Test
 	public void testGet() {
-		double v1 = ts1.get(2);
-		double v2 = ts2.get(2);
+		double v1 = ts1.get(2, 0);
+		double v2 = ts2.get(2, 0);
 		assertThat(v1).isEqualTo(0.2);
 		assertThat(v2).isEqualTo(0.2);
 	}
@@ -88,21 +91,21 @@ public class TimeSeriesTest {
 	@Test
 	public void testGetNotFound() {
 		ts1.setInterpolationMethod(Interpolation.NONE);
-		double value = ts1.get(2.5);
+		double value = ts1.get(2.5, 0);
 		assertThat(value).isNaN();
 		ts1.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
-		value = ts1.get(2.5);
+		value = ts1.get(2.5, 0);
 		assertThat(value).isEqualTo(0.3, offset(1e-9));
 		ts1.setInterpolationMethod(Interpolation.LINEAR);
-		value = ts1.get(2.5);
+		value = ts1.get(2.5, 0);
 		assertThat(value).isEqualTo(0.25, offset(1e-9));
 	}
 	
 	@Test
 	public void testGetOutOfBounds() {
-		double value = ts1.get(-1.0);
+		double value = ts1.get(-1.0, 0);
 		assertThat(value).isNaN();
-		value = ts1.get(4.0);
+		value = ts1.get(4.0, 0);
 		assertThat(value).isNaN();
 	}
 	
@@ -111,38 +114,38 @@ public class TimeSeriesTest {
 		ts2.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
 		
 		// Test in the middle of the range
-		double r = ts2.subset(2, 4).timeWeightedMean();
+		double r = ts2.subset(2, 4).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.35, offset(1e-5));
 		
 		// Test border cases
-		r = ts2.subset(0, 1).timeWeightedMean();
+		r = ts2.subset(0, 1).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.1, offset(1e-9));
 				
-		r = ts2.subset(4, 5).timeWeightedMean();
+		r = ts2.subset(4, 5).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.5, offset(1e-9));
 
 		// Test single timestamp		
-		r = ts2.subset(3, 3).timeWeightedMean();
+		r = ts2.subset(3, 3).timeWeightedMean(0);
 		assertThat(r).isNaN();
 		
 		// Test out of range cases
-		r = ts2.subset(0.25, 0.75).timeWeightedMean();
+		r = ts2.subset(0.25, 0.75).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.1, offset(1e-5));
 		
-		r = ts2.subset(0.25, 5).timeWeightedMean();
+		r = ts2.subset(0.25, 5).timeWeightedMean(0);
 		assertThat(r).isEqualTo((0.75 * 0.1 + 0.2 + 0.3 + 0.4 + 0.5) / 4.75, offset(1e-5));
 		
 		// Test inbetween two elements
-		r = ts2.subset(2.25, 2.75).timeWeightedMean();
+		r = ts2.subset(2.25, 2.75).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.3, offset(1e-5));;
 				
-		r = ts2.subset(1.25, 3.75).timeWeightedMean();
+		r = ts2.subset(1.25, 3.75).timeWeightedMean(0);
 		assertThat(r).isEqualTo((0.75 * 0.2 + 0.3 + 0.75 * 0.4) / 2.5, offset(1e-5));
 				
-		r = ts2.subset(2.25, 3).timeWeightedMean();
+		r = ts2.subset(2.25, 3).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.3, offset(1e-9));
 				
-		r = ts2.subset(2, 2.75).timeWeightedMean();
+		r = ts2.subset(2, 2.75).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.3, offset(1e-9));
 	}
 	
@@ -152,10 +155,10 @@ public class TimeSeriesTest {
 		ts3.setInterpolationMethod(Interpolation.LINEAR);
 		ts3.setStartTime(0);
 		
-		double r = ts3.subset(0, 1).timeWeightedMean();
+		double r = ts3.subset(0, 1).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.1, offset(1e-9));
 		
-		r = ts3.subset(0, 1).mean();
+		r = ts3.subset(0, 1).mean(0);
 		assertThat(r).isEqualTo(0.1, offset(1e-9));
 	}
 	
@@ -165,55 +168,59 @@ public class TimeSeriesTest {
 		ts3.setInterpolationMethod(Interpolation.LINEAR);
 		ts3.setStartTime(2);
 		
-		double r = ts3.subset(2, 4).timeWeightedMean();
+		double r = ts3.subset(2, 4).timeWeightedMean(0);
 		assertThat(r).isEqualTo((0.3 + 0.4) / 2, offset(1e-5));
 		
-		r = ts3.subset(3, 6).timeWeightedMean();
+		r = ts3.subset(3, 6).timeWeightedMean(0);
 		assertThat(r).isEqualTo(0.4, offset(1e-5));	
 	}
 	
 	@Test
 	public void testMean() {
 		// Test in the middle of the range
-		double r = ts2.subset(2, 4).mean();
+		double r = ts2.subset(2, 4).mean(0);
 		assertThat(r).isEqualTo(0.35, offset(1e-5));
 		
 		// Test border cases
-		r = ts2.subset(0, 1).mean();
+		r = ts2.subset(0, 1).mean(0);
 		assertThat(r).isEqualTo(0.1, offset(1e-9));
 				
-		r = ts2.subset(4, 5).mean();
+		r = ts2.subset(4, 5).mean(0);
 		assertThat(r).isEqualTo(0.5, offset(1e-9));
 
 		// Test single timestamp		
-		r = ts2.subset(3, 3).mean();
+		r = ts2.subset(3, 3).mean(0);
 		assertThat(r).isNaN();
 		
 		// Test out of range  cases
-		r = ts2.subset(0.25, 0.75).mean();
+		r = ts2.subset(0.25, 0.75).mean(0);
 		assertThat(r).isNaN();
 		
-		r = ts2.subset(0.25, 5).mean();
+		r = ts2.subset(0.25, 5).mean(0);
 		assertThat(r).isEqualTo((0.1 + 0.2 + 0.3 + 0.4 + 0.5) / 5, offset(1e-5));
 		
 		// Test inbetween two elements
-		r = ts2.subset(2.25, 2.75).mean();
+		r = ts2.subset(2.25, 2.75).mean(0);
 		assertThat(r).isNaN();
 				
-		r = ts2.subset(1.25, 3.75).mean();
+		r = ts2.subset(1.25, 3.75).mean(0);
 		assertThat(r).isEqualTo(0.25, offset(1e-5));
 				
-		r = ts2.subset(2.25, 3).mean();
+		r = ts2.subset(2.25, 3).mean(0);
 		assertThat(r).isEqualTo(0.3, offset(1e-9));
 				
-		r = ts2.subset(2, 2.75).mean();
+		r = ts2.subset(2, 2.75).mean(0);
 		assertThat(r).isNaN();
 	}
 	
 	@Test
 	public void testSubset() {
+		// Test empty time series
+		TimeSeries r = TimeSeries.EMPTY.subset(1, 5);
+		assertThat(r.isEmpty()).isTrue();
+		
 		// Test in the middle of the range
-		TimeSeries r = ts2.subset(2, 4);
+		r = ts2.subset(2, 4);
 		assertThat(r).isNotNull();
 		assertThat(r.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
 		assertThat(r.getTime()).isEqualTo(vector(3, 4), offset(1e-9));
@@ -287,10 +294,19 @@ public class TimeSeriesTest {
 	@Test
 	public void testEmptyTimeSeries() {
 		TimeSeries tsempty = TimeSeries.EMPTY;
+		assertThat(tsempty.isEmpty());
 		assertThat(tsempty.getStartTime()).isNaN();
 		assertThat(tsempty.getEndTime()).isNaN();
 		assertThat(tsempty.getTime()).isEqualTo(empty());
-		assertThat(tsempty.getData()).isEqualTo(empty());
+		assertThat(tsempty.getData(0)).isEqualTo(empty());
+	}
+	
+	@Test
+	public void testGetData() {
+		TimeSeries ts = new TimeSeries(vector(1, 2), matrix(row(1, 1, 1), row(2, 2, 2)));
+		Matrix data = ts.getData();
+		assertThat(data.columns()).isEqualTo(3);
+		assertThat(data.rows()).isEqualTo(2);
 	}
 
 }

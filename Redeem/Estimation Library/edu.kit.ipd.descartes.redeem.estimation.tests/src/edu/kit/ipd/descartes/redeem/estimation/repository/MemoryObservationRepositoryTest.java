@@ -44,33 +44,11 @@ public class MemoryObservationRepositoryTest {
 	}
 
 	@Test
-	public void testStartAndEndTimestamp() {
-		assertThat(repo.getStartTimestamp()).isNaN();
-		assertThat(repo.getEndTimestamp()).isNaN();
-		
-		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1);
-		assertThat(repo.getStartTimestamp()).isEqualTo(2.0);
-		assertThat(repo.getEndTimestamp()).isEqualTo(8.0);
-		
-		repo.setData(StandardMetric.THROUGHPUT, services[0], ts2);
-		assertThat(repo.getStartTimestamp()).isEqualTo(4.0);
-		assertThat(repo.getEndTimestamp()).isEqualTo(8.0);
-		
-		repo.setData(StandardMetric.THROUGHPUT, services[1], ts3);
-		assertThat(repo.getStartTimestamp()).isEqualTo(10.0);
-		assertThat(repo.getEndTimestamp()).isEqualTo(8.0);
-		
-		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.getStartTimestamp()).isEqualTo(10.0);
-		assertThat(repo.getEndTimestamp()).isEqualTo(10.0);
-	}
-	
-	@Test
 	public void testSetAndGetData() {
 		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1);
-		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData().rows()).isEqualTo(5);
+		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(5);
 		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData().rows()).isEqualTo(6);
+		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(6);
 	}
 	
 	@Test
