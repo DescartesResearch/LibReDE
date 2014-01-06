@@ -9,16 +9,16 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.Service;
 
 public interface IMonitoringRepository {
 
-	public double getStartTimestamp();
-	public double getEndTimestamp();
 	public double getAggregationInterval(IMetric m, IModelEntity entity);
 	public TimeSeries getData(IMetric metric, IModelEntity entity);
 	public void setData(IMetric metric, IModelEntity entity, TimeSeries observations);
 	public void setAggregatedData(IMetric m, IModelEntity entity, TimeSeries aggregatedObservations);
 	public void setAggregatedData(IMetric m, IModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval);
+	public boolean containsData(IMetric responseTime,
+			IModelEntity entity, double maximumAggregationInterval);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
-	public RepositoryCursor getCursor(int periodLength);
+	public RepositoryCursor getCursor(double startTime, double stepSize);
 }

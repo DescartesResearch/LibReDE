@@ -19,10 +19,11 @@ public enum StandardMetric implements IMetric {
 	UTILIZATION(AVERAGE) {	
 
 		@Override
-		public double aggregate(TimeSeries series, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
+				TimeSeries series = retrieve(repository, entity, start, end);
 				series.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
-				return series.timeWeightedMean();
+				return series.timeWeightedMean(0);
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -33,6 +34,12 @@ public enum StandardMetric implements IMetric {
 				IModelEntity entity, double start, double end) {
 			TimeSeries series = repository.getData(this, entity);
 			return series.subset(start, end);
+		}
+		
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			return repository.containsData(this, entity, aggregationInterval);
 		}
 
 	},
@@ -47,30 +54,43 @@ public enum StandardMetric implements IMetric {
 				TimeSeries resp = repository.getData(RESPONSE_TIME, entity);
 				double interval = repository.getAggregationInterval(RESPONSE_TIME, entity);
 				if (!resp.isEmpty() && (interval == 0.0)) {
-					ts = new TimeSeries(resp.getTime().minus(resp.getData()), ones(resp.getData().rows()));
-					repository.setData(ARRIVALS, entity, ts);
+					ts = new TimeSeries(resp.getTime().minus(resp.getData(0)), ones(resp.getData(0).rows()));
+					ts.setStartTime(resp.getStartTime());
+					ts.setEndTime(ts.getEndTime());
 					return ts.subset(start, end);
+				} else {
+					return TimeSeries.EMPTY;
 				}
 			}
 			return ts.subset(start, end);
 		}
 
 		@Override
-		public double aggregate(TimeSeries series, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = retrieve(repository, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
 			case SUM: {
-				return series.sum();
+				return series.sum(0);
 			}
 			case MINIMUM: {
-				return series.min();
+				return series.min(0);
 			}
 			case MAXIMUM: {
-				return series.max();
+				return series.max(0);
 			}
 			default:
 				throw new IllegalArgumentException();
 			}
+		}
+		
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			if (repository.containsData(this, entity, aggregationInterval)) {
+				return true;
+			}
+			return repository.containsData(RESPONSE_TIME, entity, 0.0);
 		}
 
 	},
@@ -84,45 +104,58 @@ public enum StandardMetric implements IMetric {
 				TimeSeries resp = repository.getData(RESPONSE_TIME, entity);
 				double interval = repository.getAggregationInterval(RESPONSE_TIME, entity);
 				if (!resp.isEmpty() && (interval == 0.0)) {
-					ts = new TimeSeries(resp.getTime(), ones(resp.getData().rows()));
-					repository.setData(DEPARTURES, entity, ts);
+					ts = new TimeSeries(resp.getTime(), ones(resp.getData(0).rows()));
+					ts.setStartTime(resp.getStartTime());
+					ts.setEndTime(resp.getEndTime());
 					return ts.subset(start, end);
+				} else {
+					return TimeSeries.EMPTY;
 				}
 			}		
 			return ts.subset(start, end);
 		}
 
 		@Override
-		public double aggregate(TimeSeries series, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = retrieve(repository, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
 			case SUM: {
-				return series.sum();
+				return series.sum(0);
 			}
 			case MINIMUM: {
-				return series.min();
+				return series.min(0);
 			}
 			case MAXIMUM: {
-				return series.max();
+				return series.max(0);
 			}
 			default:
 				throw new IllegalArgumentException();
 			}
+		}
+		
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			if (repository.containsData(this, entity, aggregationInterval)) {
+				return true;
+			}
+			return repository.containsData(RESPONSE_TIME, entity, 0.0);
 		}
 
 	},
 	ARRIVAL_RATE(AVERAGE) {
 
 		@Override
-		public double aggregate(TimeSeries series, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
-				TimeSeries ts = repository.getData(this, entity);
+				TimeSeries ts = retrieve(repository, entity, start, end);
 				if (ts.isEmpty()) {
 					double arrivals = StandardMetric.ARRIVALS.aggregate(repository,
 							entity, start, end, SUM);
 					return arrivals / (end - start);
 				}
-				return ts.timeWeightedMean(start, end);
+				return ts.timeWeightedMean(0);
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -131,21 +164,31 @@ public enum StandardMetric implements IMetric {
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
 				IModelEntity entity, double start, double end) {
-			throw new AssertionError();
+			TimeSeries series = repository.getData(this, entity);
+			return series.subset(start, end);
+		}
+		
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			if (repository.containsData(this, entity, aggregationInterval)) {
+				return true;
+			}
+			return ARRIVALS.hasData(repository, entity, aggregationInterval);
 		}
 	},
 	THROUGHPUT(AVERAGE) {
 
 		@Override
-		public double aggregate(TimeSeries series, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
-				TimeSeries ts = repository.getData(this, entity);
+				TimeSeries ts = retrieve(repository, entity, start, end);
 				if (ts.isEmpty()) {
 					double departures = StandardMetric.DEPARTURES.aggregate(repository,
 							entity, start, end, SUM);
 					return departures / (end - start);
 				}
-				return ts.timeWeightedMean(start, end);
+				return ts.timeWeightedMean(0);
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -154,38 +197,47 @@ public enum StandardMetric implements IMetric {
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
 				IModelEntity entity, double start, double end) {
-			throw new AssertionError();
+			TimeSeries series = repository.getData(this, entity);
+			return series.subset(start, end);
+		}
+		
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			if (repository.containsData(this, entity, aggregationInterval)) {
+				return true;
+			}
+			return DEPARTURES.hasData(repository, entity, aggregationInterval);
 		}
 
 	},
 	RESPONSE_TIME(NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
 		@Override
-		public double aggregate(TimeSeries series, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = retrieve(repository, entity, start, end);
 			switch (func) {
 			case AVERAGE: {
-				TimeSeries ts = repository.getData(this, entity);
 				double interval = repository.getAggregationInterval(this,
 						entity);
 				if (interval > 0) {
-					TimeSeries weights = THROUGHPUT.retrieveAll(repository, entity);
+					TimeSeries weights = THROUGHPUT.retrieve(repository, entity, start, end);
 					if (weights.isEmpty()) {
-						weights = DEPARTURES.retrieveAll(repository, entity);
+						weights = DEPARTURES.retrieve(repository, entity, start, end);
 					}
 					if (weights.isEmpty()) {
 						throw new IllegalStateException();
 					}
-					return ts.timeWeightedMean(start, end, weights);
+					return series.timeWeightedMean(0, weights);
 				} else {
-					return ts.mean(start, end);
+					return series.mean(0);
 				}
 			}
 			case MAXIMUM: {
-				TimeSeries ts = repository.getData(this, entity);
-				return series.max();
+				return series.max(0);
 			}
 			case MINIMUM: {
-				return series.min();
+				return series.min(0);
 			}
 			default:
 				throw new IllegalArgumentException();
@@ -201,11 +253,19 @@ public enum StandardMetric implements IMetric {
 				TimeSeries departures = repository.getData(DEPARTURES, entity);
 				if (!arriv.isEmpty() && !departures.isEmpty()) {
 					ts = new TimeSeries(departures.getTime(), departures.getTime().minus(arriv.getTime()));
-					repository.setData(this, entity, ts);
 					return ts.subset(start, end);
 				}				
 			}
 			return ts.subset(start, end);
+		}
+		
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			if (repository.containsData(this, entity, aggregationInterval)) {
+				return true;
+			}
+			return DEPARTURES.hasData(repository, entity, 0.0) && ARRIVALS.hasData(repository, entity, 0.0);
 		}
 
 	};

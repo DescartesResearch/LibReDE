@@ -27,7 +27,7 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1);
+		RepositoryCursor cur = repository.getCursor(0, 1);
 		
 		for (int i = 3; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
@@ -43,7 +43,7 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts2);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1);
+		RepositoryCursor cur = repository.getCursor(0, 1);
 		
 		for (int i = 0; i < 5; i++) {
 			assertThat(cur.next()).isTrue();
@@ -58,7 +58,7 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1);
+		RepositoryCursor cur = repository.getCursor(0, 1);
 		
 		for (int i = 3; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
@@ -84,7 +84,7 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(3);
+		RepositoryCursor cur = repository.getCursor(0, 3);
 		
 		for (int i = 5; i <= 8; i+=3) {
 			assertThat(cur.next()).isTrue();
@@ -100,13 +100,13 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(100);
+		RepositoryCursor cur = repository.getCursor(0, 100);
 		assertThat(cur.next()).isFalse();		
 	}
 	
 	@Test
 	public void testEmptyCursor() {		
-		RepositoryCursor cur = repository.getCursor(1);
+		RepositoryCursor cur = repository.getCursor(0, 1);
 		assertThat(cur.next()).isFalse();
 		assertThat(cur.getCurrentIntervalStart()).isNaN();
 		assertThat(cur.getCurrentIntervalEnd()).isNaN();

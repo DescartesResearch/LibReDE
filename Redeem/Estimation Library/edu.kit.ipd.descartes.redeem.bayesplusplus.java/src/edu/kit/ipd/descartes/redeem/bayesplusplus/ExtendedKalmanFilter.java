@@ -184,7 +184,7 @@ public class ExtendedKalmanFilter implements
 		}
 	}
 
-	private void update() throws EstimationException {
+	private void updateState() throws EstimationException {
 		if (BayesPlusPlusLibrary.update(nativeScheme) == BayesPlusPlusLibrary.ERROR) {
 			throw new EstimationException("Error in update phase: " + BayesPlusPlusLibrary.get_last_error());
 		}
@@ -225,20 +225,12 @@ public class ExtendedKalmanFilter implements
 		super.finalize();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * edu.kit.ipd.descartes.redeem.estimation.models.algorithm.IEstimationAlgorithm
-	 * #
-	 * initialize(edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel
-	 * ,
-	 * edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel
-	 * )
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.redeem.estimation.models.state.IStateModel, edu.kit.ipd.descartes.redeem.estimation.models.observation.IObservationModel, int)
 	 */
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
-			IObservationModel<IOutputFunction, Vector> observationModel) throws InitializationException {
+			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
 		this.stateSize = stateModel.getStateSize();
 		this.outputSize = observationModel.getOutputSize();
 
@@ -251,6 +243,18 @@ public class ExtendedKalmanFilter implements
 		initNativeObservationModel();
 		initNativeKalmanFilter();
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.redeem.estimation.algorithm.IEstimationAlgorithm#update()
+	 */
+	@Override
+	public void update() throws EstimationException {
+		predict();
+
+		observe(observationModel.getObservedOutput());
+
+		updateState();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -261,12 +265,6 @@ public class ExtendedKalmanFilter implements
 	 */
 	@Override
 	public Vector estimate() throws EstimationException {
-		predict();
-
-		observe(observationModel.getObservedOutput());
-
-		update();
-
 		return getCurrentEstimate();
 	}
 

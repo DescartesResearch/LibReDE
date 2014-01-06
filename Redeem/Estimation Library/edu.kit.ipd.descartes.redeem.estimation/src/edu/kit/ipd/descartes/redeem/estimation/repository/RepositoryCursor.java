@@ -1,6 +1,7 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
@@ -105,22 +106,20 @@ public class RepositoryCursor {
 	
 	private IMonitoringRepository repository;
 	private double currentTime;
-	private double interval;
+	private double endTime;
+	private double stepSize;
 	private Map<SeriesCacheKey, TimeSeries> seriesCache = new HashMap<SeriesCacheKey, TimeSeries>();
 	private Map<AggregationCacheKey, Double> aggregationCache = new HashMap<AggregationCacheKey, Double>();
 	
-	public RepositoryCursor(IMonitoringRepository repository, double interval) {
+	public RepositoryCursor(IMonitoringRepository repository, double startTime, double stepSize) {
 		this.repository = repository;
-		this.interval = interval;
-		this.currentTime = repository.getStartTimestamp();
+		this.stepSize = stepSize;
+		this.currentTime = startTime;
 	}
 	
 	public boolean next() {
-		if (Double.isNaN(currentTime)) {
-			currentTime = repository.getStartTimestamp();
-		}
-		if (currentTime + interval <= repository.getEndTimestamp()) {
-			currentTime += interval;
+		if (currentTime + stepSize <= endTime) {
+			currentTime += stepSize;
 			seriesCache.clear();
 			aggregationCache.clear();
 			return true;
@@ -129,15 +128,23 @@ public class RepositoryCursor {
 	}
 	
 	public double getCurrentIntervalStart() {
-		return currentTime - interval;
+		return currentTime - stepSize;
 	}
 	
 	public double getCurrentIntervalLength() {
-		return interval;
+		return stepSize;
 	}
 	
 	public double getCurrentIntervalEnd() {
 		return currentTime;
+	}
+	
+	public double getEndTime() {
+		return endTime;
+	}
+	
+	public void setEndTime(double endTime) {
+		this.endTime = endTime;
 	}
 	
 	public TimeSeries getValues(IMetric metric, IModelEntity entity) {
@@ -153,8 +160,7 @@ public class RepositoryCursor {
 	public double getAggregatedValue(IMetric metric, IModelEntity entity, Aggregation func) {
 		AggregationCacheKey key = new AggregationCacheKey(metric, entity, func);
 		if (!aggregationCache.containsKey(key)) {
-			TimeSeries series = metric.retrieve(repository, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
-			double value = metric.aggregate(series, func);
+			double value = metric.aggregate(repository, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
 			aggregationCache.put(key, value);
 			return value;
 		}		
@@ -163,5 +169,21 @@ public class RepositoryCursor {
 	
 	public IMonitoringRepository getRepository() {
 		return repository;
+	}
+
+	public boolean hasData(IMetric metric, List<IModelEntity> entities,
+			Aggregation aggregation) {
+		if (metric.isAggregationSupported(aggregation)) {
+			boolean data = true;
+			for (IModelEntity e : entities) {
+				if (aggregation == Aggregation.NONE) {
+					data = data && metric.hasData(repository, e, 0.0);
+				} else {
+					data = data && metric.hasData(repository, e, stepSize);
+				}
+			}
+			return data;
+		}
+		return false;
 	}
 }

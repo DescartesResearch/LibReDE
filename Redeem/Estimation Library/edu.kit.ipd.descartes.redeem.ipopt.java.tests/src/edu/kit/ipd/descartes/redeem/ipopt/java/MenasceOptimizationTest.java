@@ -31,7 +31,7 @@ public class MenasceOptimizationTest {
 	}
 
 	@Test
-	public void testOneServiceOneResource() {
+	public void testOneServiceOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
 
 		Vector demands = vector(0.05);
@@ -39,7 +39,7 @@ public class MenasceOptimizationTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		RepositoryCursor cursor = generator.getRepository().getCursor(1);
+		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
 		Vector initialEstimate = vector(0.01);
 		stateModel = new ConstantStateModel<>(1, initialEstimate);
@@ -50,13 +50,15 @@ public class MenasceOptimizationTest {
 		stateModel.addConstraint(new UtilizationConstraint(workload, cursor, workload.getResources().get(0)));
 
 		MenasceOptimization optim = new MenasceOptimization();
-		optim.initialize(stateModel, observationModel);
+		optim.initialize(stateModel, observationModel, 10);
 
 		long start = System.nanoTime();
 
 		for (int i = 0; i < ITERATIONS; i++) {
 			generator.nextObservation();
 			cursor.next();
+			
+			optim.update();
 
 			Vector estimates = optim.estimate();
 
@@ -72,7 +74,7 @@ public class MenasceOptimizationTest {
 	}
 	
 	@Test
-	public void testFiveServicesOneResource() {
+	public void testFiveServicesOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
 
 		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
@@ -80,7 +82,7 @@ public class MenasceOptimizationTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		RepositoryCursor cursor = generator.getRepository().getCursor(1);
+		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 		stateModel = new ConstantStateModel<>(5, initialEstimate);
@@ -94,13 +96,15 @@ public class MenasceOptimizationTest {
 		stateModel.addConstraint(new UtilizationConstraint(workload, cursor, workload.getResources().get(0)));
 
 		MenasceOptimization optim = new MenasceOptimization();
-		optim.initialize(stateModel, observationModel);
+		optim.initialize(stateModel, observationModel, 10);
 
 		long start = System.nanoTime();
 
 		for (int i = 0; i < ITERATIONS; i++) {
 			generator.nextObservation();
 			cursor.next();
+			
+			optim.update();
 
 			Vector estimates = optim.estimate();
 			

@@ -35,7 +35,7 @@ public class UtilizationLawTest {
 		generator.setRandomDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		cursor = generator.getRepository().getCursor(1);
+		cursor = generator.getRepository().getCursor(0, 1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
 		law = new UtilizationLaw(workload, cursor, resource);

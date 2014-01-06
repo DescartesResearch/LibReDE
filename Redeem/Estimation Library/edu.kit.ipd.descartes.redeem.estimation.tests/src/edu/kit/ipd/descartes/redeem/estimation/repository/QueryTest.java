@@ -120,7 +120,7 @@ public class QueryTest {
 	// }
 	@Test
 	public void testAllQuery() {
-		RepositoryCursor cursor = repository.getCursor(1);
+		RepositoryCursor cursor = repository.getCursor(0, 1);
 		assertThat(cursor.next()).isTrue();
 		
 		Query<Vector> respSingle = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(services[1]).all().using(cursor);

@@ -1,10 +1,8 @@
 package edu.kit.ipd.descartes.redeem.estimation.repository;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import edu.kit.ipd.descartes.redeem.estimation.workload.IModelEntity;
 import edu.kit.ipd.descartes.redeem.estimation.workload.Resource;
@@ -70,8 +68,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private Map<DataKey, DataEntry> data = new HashMap<DataKey, DataEntry>();
-	private double minimumTimestamp = Double.NaN;
-	private double maximumTimestamp = Double.NaN;
 	private WorkloadDescription workload;	
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
@@ -117,9 +113,17 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		entry.data = observations;
 		entry.aggregationInterval = aggregationInterval;
-		
-		minimumTimestamp = Double.NaN;
-		maximumTimestamp = Double.NaN;
+	}
+	
+	@Override
+	public boolean containsData(IMetric m,
+			IModelEntity entity, double maximumAggregationInterval) {
+		DataKey key = new DataKey(m, entity);
+		DataEntry entry = data.get(key);
+		if (entry == null) {
+			return false;
+		}
+		return entry.aggregationInterval <= maximumAggregationInterval;
 	}
 	
 	@Override
@@ -131,41 +135,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	public List<Service> listServices() {
 		return workload.getServices();
 	}
-
-	@Override
-	public double getStartTimestamp() {
-		if (Double.isNaN(minimumTimestamp)) {
-			minimumTimestamp = Double.NEGATIVE_INFINITY;
-			for (DataEntry entry : data.values()) {
-				if (entry.data.getStartTime() > minimumTimestamp) {
-					minimumTimestamp = entry.data.getStartTime();
-				}
-			}
-		}
-		if (Double.isInfinite(minimumTimestamp)) {
-			return Double.NaN;
-		}
-		return minimumTimestamp;
-	}
-
-	@Override
-	public double getEndTimestamp() {
-		if (Double.isNaN(maximumTimestamp)) {
-			maximumTimestamp = Double.POSITIVE_INFINITY;
-			for (DataEntry entry : data.values()) {
-				if (entry.data.getEndTime() < maximumTimestamp) {
-					maximumTimestamp = entry.data.getEndTime();
-				}
-			}
-		}
-		if (Double.isInfinite(maximumTimestamp)) {
-			return Double.NaN;
-		}
-		return maximumTimestamp;
-	}
 	
 	@Override
-	public RepositoryCursor getCursor(int interval) {
-		return new RepositoryCursor(this, interval);
+	public RepositoryCursor getCursor(double startTime, double stepSize) {
+		return new RepositoryCursor(this, startTime, stepSize);
 	}
 }

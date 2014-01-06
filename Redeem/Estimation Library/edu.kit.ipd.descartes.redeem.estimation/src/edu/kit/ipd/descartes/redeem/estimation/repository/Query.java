@@ -64,7 +64,7 @@ public final class Query<T extends Vector> {
 			if (aggregation != Aggregation.NONE) {
 				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, entities.get(0), aggregation));
 			} else {
-				return (T)repositoryCursor.getValues(metric, entities.get(0)).getData();
+				return (T)repositoryCursor.getValues(metric, entities.get(0)).getData(0);
 			}			
 		}
 	}
@@ -89,5 +89,9 @@ public final class Query<T extends Vector> {
 		} else if (type == Type.ALL_SERVICES) {
 			entities.addAll(repositoryCursor.getRepository().listServices());
 		}		
+	}
+
+	public boolean hasData() {
+		return repositoryCursor.hasData(metric, entities, aggregation);
 	}
 }
