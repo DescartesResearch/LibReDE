@@ -39,13 +39,13 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public double mean() {
-		return value;
+	public double aggregate(AggregationFunction func) {
+		return func.apply(Double.NaN, value);
 	}
 	
 	@Override
-	public double sum() {
-		return value;
+	public Vector aggregate(AggregationFunction func, int dimension) {
+		return new Scalar(aggregate(func));
 	}
 
 	@Override
@@ -113,10 +113,27 @@ public class Scalar implements Vector, SquareMatrix {
 		}
 		return this;
 	}
+	
+	@Override
+	public Scalar rows(int start, int end) {
+		if (start != 0 || end != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+
 
 	@Override
 	public Scalar column(int column) {
 		if (column != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+	
+	@Override
+	public Scalar columns(int start, int end) {
+		if (start != 0 || end != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
@@ -151,6 +168,14 @@ public class Scalar implements Vector, SquareMatrix {
 			throw new IllegalArgumentException();
 		}
 		return new Scalar(value * ((Scalar) a).value);
+	}
+	
+	@Override
+	public Scalar arrayDividedBy(Matrix a) {
+		if (!a.isScalar()) {
+			throw new IllegalArgumentException();
+		}
+		return new Scalar(value / ((Scalar) a).value);
 	}
 
 	@Override
@@ -253,18 +278,29 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public Vector insertRow(int row, double... values) {
-		if (values.length != 1) {
+	public Vector insertRow(int row, Vector values) {
+		if (values.rows() != 1) {
 			throw new IllegalArgumentException();
 		}
 		if (row < 0 || row > 1) {
 			throw new IndexOutOfBoundsException();
 		}
 		if (row == 0) {
-			return new ColtVector(values[0], value);
+			return new ColtVector(values.get(0), value);
 		} else {
-			return new ColtVector(value, values[0]);
+			return new ColtVector(value, values.get(0));
 		}
+	}
+	
+	@Override
+	public Matrix setRow(int row, Vector values) {
+		if (values.rows() != 1) {
+			throw new IllegalArgumentException();
+		}
+		if (row < 0 || row > 1) {
+			throw new IndexOutOfBoundsException();
+		}
+		return new Scalar(values.get(0));
 	}
 	
 	@Override
@@ -295,5 +331,10 @@ public class Scalar implements Vector, SquareMatrix {
 	@Override
 	public double trace() {
 		return value;
+	}
+	
+	@Override
+	public Scalar circshift(int rows) {
+		return this;
 	}
 }

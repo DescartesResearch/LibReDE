@@ -5,6 +5,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
+import edu.kit.ipd.descartes.linalg.AggregationFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
@@ -87,13 +88,21 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public double sum() {
-		return delegate.zSum();
+	public double aggregate(AggregationFunction func) {
+		int n = delegate.size();
+		double aggr = Double.NaN;
+		for (int i = 0; i < n; i++) {
+			aggr = func.apply(aggr, delegate.getQuick(i));
+		}
+		return aggr;
 	}
-
+	
 	@Override
-	public double mean() {
-		return sum() / rows();
+	public Vector aggregate(AggregationFunction func, int dimension) {
+		if (dimension > 0) {
+			throw new IllegalArgumentException();
+		}
+		return new Scalar(aggregate(func));
 	}
 	
 	@Override
@@ -135,6 +144,15 @@ public class ColtVector extends AbstractVector {
 		
 		DoubleMatrix1D res = copyVector();
 		res.assign(getColtVector(a).delegate, Functions.mult);
+		return new ColtVector(res);
+	}
+	
+	@Override
+	public ColtVector arrayDividedBy(Matrix a) {
+		checkOperandsSameSize(a);
+		
+		DoubleMatrix1D res = copyVector();
+		res.assign(getColtVector(a).delegate, Functions.div);
 		return new ColtVector(res);
 	}
 
@@ -225,6 +243,22 @@ public class ColtVector extends AbstractVector {
 		}
 		return this;
 	}
+	
+	@Override
+	public ColtVector columns(int start, int end) {
+		if (start != 0 || end != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+	
+	@Override
+	public Vector rows(int start, int end) {
+		if (start == end) {
+			return row(start);
+		}
+		return new ColtVector(delegate.viewPart(start, (end - start + 1)));
+	}
 
 	@Override
 	public double[][] toArray2D() {
@@ -290,22 +324,13 @@ public class ColtVector extends AbstractVector {
 	}
 	
 	@Override
-	public Vector subset(int start, int end) {
-		if (start == end) {
-			return new Scalar(delegate.get(start));
-		} else {
-			return new ColtVector(delegate.viewPart(start, (end - start + 1)));
-		}
-	}
-
-	@Override
 	public Vector row(int row) {
 		return new Scalar(delegate.get(row));
 	}
 	
 	@Override
-	public Vector insertRow(int row, double... values) {
-		if (values.length != 1) {
+	public Vector insertRow(int row, Vector values) {
+		if (values.rows() != 1) {
 			throw new IllegalArgumentException();
 		}
 		if (row < 0 || row > delegate.size()) {
@@ -316,11 +341,38 @@ public class ColtVector extends AbstractVector {
 		if (row > 0) {
 			temp.viewPart(0, row).assign(delegate.viewPart(0, row));
 		}
-		temp.viewPart(row, 1).assign(values[0]);
+		temp.viewPart(row, 1).assign(values.get(0));
 		if (row < n) {
 			temp.viewPart(row + 1, n - row).assign(delegate.viewPart(row, n - row));
 		}
 		return new ColtVector(temp);
+	}
+	
+	@Override
+	public Vector setRow(int row, Vector values) {
+		if (values.rows() != 1) {
+			throw new IllegalArgumentException();
+		}
+		return set(row, values.get(0));
+	}
+	
+	@Override
+	public Vector circshift(int rows) {
+		int n = delegate.size();
+		int offset = rows % n; // in case rows would result in several rounds of shifting (rows >= delegate.rows())
+		if (offset != 0) {
+			int[] shifted = new int[n];
+			for (int i = 0; i < n; i++) {
+				int shift = (i + offset) % n;
+				if (shift < 0) {
+					shifted[n + shift] = i;
+				} else {
+					shifted[shift] = i;
+				}
+			}
+			return new ColtVector(delegate.viewSelection(shifted));			
+		}
+		return this;
 	}
 	
 	private DoubleMatrix1D newVector() {

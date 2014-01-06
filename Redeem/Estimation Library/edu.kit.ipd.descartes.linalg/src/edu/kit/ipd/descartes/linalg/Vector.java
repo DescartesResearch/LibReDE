@@ -12,7 +12,7 @@ public interface Vector extends Matrix {
 	
 	Vector subset(int...indeces);
 	
-	Vector subset(int start, int end);
+	Vector rows(int start, int end);
 	
 	Vector plus(Matrix a);
 
@@ -24,7 +24,9 @@ public interface Vector extends Matrix {
 
 	Matrix multipliedBy(Matrix a);
 	
-	Matrix arrayMultipliedBy(Matrix a);
+	Vector arrayMultipliedBy(Matrix a);
+	
+	Vector arrayDividedBy(Matrix a);
 
 	Vector times(double a);
 	
@@ -32,5 +34,5 @@ public interface Vector extends Matrix {
 	
 	double dot(Vector b);
 	
-	double mean();	
+	Vector circshift(int rows);
 }

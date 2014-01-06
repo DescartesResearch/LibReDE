@@ -1,6 +1,6 @@
 package edu.kit.ipd.descartes.linalg.backend;
 
-import edu.kit.ipd.descartes.linalg.LinAlg;
+import edu.kit.ipd.descartes.linalg.AggregationFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.SquareMatrix;
@@ -32,11 +32,6 @@ public final class Empty implements Vector, SquareMatrix {
 		throw new IndexOutOfBoundsException();
 	}
 	
-	@Override
-	public Empty subset(int start, int end) {
-		throw new IndexOutOfBoundsException();
-	}
-
 	@Override
 	public Matrix set(int row, int col, double value) {
 		throw new IndexOutOfBoundsException();
@@ -93,6 +88,14 @@ public final class Empty implements Vector, SquareMatrix {
 		}
 		return this;
 	}
+	
+	@Override
+	public Empty arrayDividedBy(Matrix a) {
+		if (!a.isEmpty() && !a.isScalar()) {
+			throw new IllegalArgumentException();
+		}
+		return this;
+	}
 
 	@Override
 	public Empty times(double a) {
@@ -128,9 +131,19 @@ public final class Empty implements Vector, SquareMatrix {
 	public Vector row(int row) {
 		return this;
 	}
+	
+	@Override
+	public Vector rows(int start, int end) {
+		return this;
+	}
 
 	@Override
 	public Vector column(int column) {
+		return this;
+	}
+	
+	@Override
+	public Matrix columns(int start, int end) {
 		return this;
 	}
 
@@ -156,11 +169,6 @@ public final class Empty implements Vector, SquareMatrix {
 
 	@Override
 	public double norm2() {
-		return Double.NaN;
-	}
-
-	@Override
-	public double sum() {
 		return Double.NaN;
 	}
 
@@ -193,11 +201,6 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public double mean() {
-		return Double.NaN;
-	}
-
-	@Override
 	public double det() {
 		return 1;
 	}
@@ -223,11 +226,31 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public Matrix insertRow(int row, double... values) {
+	public Matrix insertRow(int row, Vector vector) {
 		if (row != 0) {
 			throw new IndexOutOfBoundsException();
 		}
-		return LinAlg.matrix(LinAlg.row(values));
+		return vector;
+	}
+	
+	@Override
+	public Matrix setRow(int row, Vector values) {
+		return insertRow(row, values);
+	}
+	
+	@Override
+	public Vector circshift(int rows) {
+		return this;
+	}
+	
+	@Override
+	public double aggregate(AggregationFunction func) {
+		return Double.NaN;
+	}
+	
+	@Override
+	public Vector aggregate(AggregationFunction func, int dimension) {
+		return this;
 	}
 
 }

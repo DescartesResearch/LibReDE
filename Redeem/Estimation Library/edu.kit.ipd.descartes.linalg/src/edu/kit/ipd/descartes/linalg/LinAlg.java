@@ -122,6 +122,42 @@ public class LinAlg {
 			});
 		}
 	}
+	
+	/**
+	 * Create a new <code>Matrix</code> instance initialized with the given
+	 * value.
+	 * 
+	 * @param rows
+	 *            number of rows (rows >= 0).
+	 * @param columns
+	 *            number of columns (columns >= 0).
+	 * @param value
+	 *            a double value.
+	 * @return a <code>Matrix</code>, <code>SquareMatrix</code>,
+	 *         <code>Vector</code>, or <code>Scalar</code> instance.
+	 * @throws IllegalArgumentException
+	 *             if rows < 0 or columns < 0.
+	 * @since 1.0
+	 */
+	public static Matrix matrix(int rows, int columns, double value) {
+		if (columns < 0 || rows < 0) {
+			throw new IllegalArgumentException();
+		} else if (columns <= 1) {
+			if (columns == 0 || rows == 0) {
+				return empty();
+			} else if (rows == 1) {
+				return new Scalar(value);
+			} else {
+				return FACTORY.createVector(rows, value);
+			}
+		} else {
+			if (columns == rows) {
+				return FACTORY.createSquareMatrix(rows, value);
+			} else {
+				return FACTORY.createMatrix(rows, columns, value);
+			}
+		}
+	}
 
 	/**
 	 * Create a new <code>Matrix</code> instance initialized with the given
@@ -245,6 +281,55 @@ public class LinAlg {
 	}
 
 	/**
+	 * Concatenates a set of vectors vertically.
+	 * 
+	 * @param first
+	 *            base vector.
+	 * @param others
+	 *            vectors to concatenate.
+	 * @return concatenated vector.
+	 * @since 1.0
+	 */
+	public static Vector vertcat(Vector first, Vector... others) {
+		return (Vector)vertcat((Matrix)first, (Matrix[])others);
+	}
+	
+	/**
+	 * Concatenates an array of matrices vertically.
+	 * 
+	 * @param matrices
+	 *            array of matrix (matrices.length >= 1).
+	 * @return concatenated matrix.
+	 * @throws IllegalArgumentException
+	 *             if matrices.length < 1.
+	 * @since 1.0
+	 */
+	public static Matrix vertcat(Matrix[] matrices) {
+		if (matrices.length < 1) {
+			throw new IllegalArgumentException();
+		}
+		Matrix res = matrices[0];
+		for (int i = 1; i < matrices.length; i++) {
+			res = res.appendRows(matrices[i]);
+		}
+		return res;
+	}
+
+	/**
+	 * Concatenates an array of vectors vertically.
+	 * 
+	 * @param vectors
+	 *            array of vectors (vectors.length >= 1).
+	 * @return concatenated vector.
+	 * @throws IllegalArgumentException
+	 *             if vectors.length < 1.
+	 * @since 1.0
+	 */
+	public static Vector vertcat(Vector[] vectors) {
+		return (Vector)vertcat((Matrix[])vectors);
+	}
+
+	/**
 	 * Concatenates a set of matrices horizontally.
 	 * 
 	 * @param first
@@ -262,6 +347,27 @@ public class LinAlg {
 		return res;
 	}
 
+	/**
+	 * Concatenates an array of matrices horizontally.
+	 * 
+	 * @param matrices
+	 *            array of matrix (matrices.length >= 1)..
+	 * @return concatenated matrix.
+	 * @throws IllegalArgumentException
+	 *             if matrices.length < 1.
+	 * @since 1.0
+	 */
+	public static Matrix horzcat(Matrix[] matrices) {
+		if (matrices.length < 1) {
+			throw new IllegalArgumentException();
+		}
+		Matrix res = matrices[0];
+		for (int i = 1; i < matrices.length; i++) {
+			res = res.appendColumns(matrices[i]);
+		}
+		return res;
+	}
+	
 	/**
 	 * Replicates the given <code>Matrix</code> the specified times in vertical
 	 * and/or horizontal direction.
@@ -330,25 +436,51 @@ public class LinAlg {
 	}
 
 	/**
-	 * Arithmetic mean of all elements in <code>Vector</code>.
+	 * Arithmetic mean of all elements (except NaN) in <code>Matrix</code>.
 	 * 
 	 * @param a
 	 * @return mean(a)
 	 * @wince 1.0
 	 */
-	public static double mean(Vector a) {
-		return a.mean();
+	public static double mean(Matrix a) {
+		return a.aggregate(AggregationFunction.SUM) / a.aggregate(AggregationFunction.COUNT);
+	}
+	
+	/**
+	 * Arithmetic mean of all elements (except NaN) in <code>Matrix</code> for each row or column.
+	 * 
+	 * @param a
+	 * @param dimension 0 if for each row, 1 if for each column
+	 * @return mean(a) for each row or column
+	 * @wince 1.0
+	 */
+	public static Vector mean(Matrix a, int dimension) {
+		Vector sum = a.aggregate(AggregationFunction.SUM, dimension);
+		Vector count = a.aggregate(AggregationFunction.COUNT, dimension);
+		return sum.arrayDividedBy(count) ;
 	}
 
 	/**
-	 * Sum of all elements in <code>Matrix</code>.
+	 * Sum of all elements (except NaN) in <code>Matrix</code>.
 	 * 
 	 * @param a
 	 * @return sum(a)
 	 * @since 1.0
 	 */
 	public static double sum(Matrix a) {
-		return a.sum();
+		return a.aggregate(AggregationFunction.SUM);
+	}
+	
+	/**
+	 * Sum of all elements (except NaN) in <code>Matrix</code> for each row or column..
+	 * 
+	 * @param a
+	 * @param dimension 0 if for each row, 1 if for each column
+	 * @return sum(a) for each row or column
+	 * @since 1.0
+	 */
+	public static Vector sum(Matrix a, int dimension) {
+		return a.aggregate(AggregationFunction.SUM, dimension);
 	}
 
 	/**
@@ -418,7 +550,8 @@ public class LinAlg {
 	 * @param fill
 	 *            default value for all elements
 	 * @return new <code>SquareMatrix</code>, or <code>Scalar<code> instance
-	 * @throws IllegalArgumentException if size < 0
+	 * @throws IllegalArgumentException
+	 *             if size < 0
 	 * @since 1.0
 	 */
 	public static SquareMatrix square(int size, double fill) {
@@ -569,7 +702,7 @@ public class LinAlg {
 			return FACTORY.createVector(rows, 1);
 		}
 	}
-
+	
 	/**
 	 * Creates a new n x 1 vector filled with the specified values.
 	 * 
@@ -614,40 +747,48 @@ public class LinAlg {
 	}
 
 	/**
-	 * Returns the minimum value of a vector.
+	 * Returns the minimum value of a matrix.
 	 * 
 	 * @param v
 	 * @return min(v)
 	 * @since 1.0
 	 */
-	public static int min(Vector v) {
-		double min = Double.MAX_VALUE;
-		int idx = -1;
-		for (int i = 0; i < v.rows(); i++) {
-			if (v.get(i) < min) {
-				min = v.get(i);
-				idx = i;
-			}
-		}
-		return idx;
+	public static double min(Matrix v) {
+		return v.aggregate(AggregationFunction.MINIMUM);
+	}
+	
+	/**
+	 * Returns the minimum value of a matrix for each row or column.
+	 * 
+	 * @param v
+	 * @param if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
+	 * @return min(v) per row/column
+	 * @since 1.0
+	 */
+	public static Vector min(Matrix v, int dimension) {
+		return v.aggregate(AggregationFunction.MINIMUM, dimension);
 	}
 
 	/**
-	 * Returns the maximum value of a vector.
+	 * Returns the maximum value of a matrix.
 	 * 
 	 * @param v
 	 * @return max(v)
 	 * @since 1.0
 	 */
-	public static int max(Vector v) {
-		double max = Double.MIN_VALUE;
-		int idx = -1;
-		for (int i = 0; i < v.rows(); i++) {
-			if (v.get(i) > max) {
-				max = v.get(i);
-				idx = i;
-			}
-		}
-		return idx;
+	public static double max(Matrix v) {
+		return v.aggregate(AggregationFunction.MAXIMUM);
+	}
+	
+	/**
+	 * Returns the maximum value of a matrix for each row or column.
+	 * 
+	 * @param v
+	 * @param if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
+	 * @return min(v) per row/column
+	 * @since 1.0
+	 */
+	public static Vector max(Matrix v, int dimension) {
+		return v.aggregate(AggregationFunction.MAXIMUM, dimension);
 	}
 }

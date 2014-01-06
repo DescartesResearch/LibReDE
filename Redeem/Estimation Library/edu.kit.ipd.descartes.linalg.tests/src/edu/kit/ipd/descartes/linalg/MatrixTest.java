@@ -287,4 +287,35 @@ public class MatrixTest {
 							row(B[1][0], B[1][1], B[1][2])
 						), offset(1e-9));
 	}
+	
+	@Test
+	public void testCircShift() {
+		Matrix c = a.circshift(1);
+		assertThat(c).isEqualTo(
+						matrix(
+							row(A[1][0], A[1][1], A[1][2]),
+							row(A[0][0], A[0][1], A[0][2])
+						), offset(1e-9));
+		
+		c = a.circshift(2);
+		assertThat(c).isEqualTo(
+						matrix(
+							row(A[0][0], A[0][1], A[0][2]),
+							row(A[1][0], A[1][1], A[1][2])
+						), offset(1e-9));
+		c = transpose(a).circshift(2);
+		assertThat(c).isEqualTo(
+						matrix(
+							row(A[0][1], A[1][1]), 
+							row(A[0][2], A[1][2]),
+							row(A[0][0], A[1][0])
+						), offset(1e-9));		
+		c = transpose(a).circshift(-2);
+		assertThat(c).isEqualTo(
+						matrix(							 
+							row(A[0][2], A[1][2]),
+							row(A[0][0], A[1][0]),
+							row(A[0][1], A[1][1])
+						), offset(1e-9));
+	}
 }

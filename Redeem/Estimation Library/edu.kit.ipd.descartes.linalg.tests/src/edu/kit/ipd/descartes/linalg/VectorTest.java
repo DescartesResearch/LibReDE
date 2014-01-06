@@ -265,4 +265,19 @@ public class VectorTest {
 	public void testSubsetIllegal() {
 		a.subset(10, 11);
 	}
+	
+	@Test
+	public void testCircShift() {
+		Matrix c = a.circshift(1);
+		assertThat(c).isEqualTo(vector(A[2], A[0], A[1]), offset(1e-9));
+		
+		c = a.circshift(4);
+		assertThat(c).isEqualTo(vector(A[2], A[0], A[1]), offset(1e-9));
+		
+		c = a.circshift(2);
+		assertThat(c).isEqualTo(vector(A[1], A[2], A[0]), offset(1e-9));
+		
+		c = a.circshift(-2);
+		assertThat(c).isEqualTo(vector(A[2], A[0], A[1]), offset(1e-9));
+	}
 }

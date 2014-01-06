@@ -1,5 +1,6 @@
 package edu.kit.ipd.descartes.linalg;
 
+
 public interface Matrix {
 
 	/**
@@ -80,6 +81,8 @@ public interface Matrix {
 	 * @since 1.0
 	 */
 	Vector row(int row);
+	
+	Matrix rows(int start, int end);
 
 	/**
 	 * Returns a column vector.
@@ -91,6 +94,8 @@ public interface Matrix {
 	 * @since 1.0
 	 */
 	Vector column(int column);
+	
+	Matrix columns(int start, int end);
 
 	/**
 	 * @return true if matrix is a vector (n x 1), false otherwise.
@@ -120,14 +125,14 @@ public interface Matrix {
 	Matrix multipliedBy(Matrix a);
 
 	Matrix arrayMultipliedBy(Matrix a);
+	
+	Matrix arrayDividedBy(Matrix a);
 
 	Matrix times(double a);
 
 	double norm1();
 
 	double norm2();
-
-	double sum();
 
 	Matrix abs();
 
@@ -137,7 +142,15 @@ public interface Matrix {
 
 	Matrix sort(int column);
 
-	Matrix insertRow(int row, double... values);
+	Matrix insertRow(int row, Vector values);
+	
+	Matrix setRow(int row, Vector values);
+	
+	Matrix circshift(int rows);
+	
+	double aggregate(AggregationFunction func);
+	
+	Vector aggregate(AggregationFunction func, int dimension);
 
 	/*
 	 * Conversion functions

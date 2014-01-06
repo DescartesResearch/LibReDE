@@ -1,10 +1,15 @@
 package edu.kit.ipd.descartes.linalg.backend.colt;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
+
+import java.util.Arrays;
+
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
+import edu.kit.ipd.descartes.linalg.AggregationFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Scalar;
@@ -62,6 +67,14 @@ public class ColtMatrix extends AbstractMatrix {
 	public ColtVector row(int row) {
 		return new ColtVector(delegate.viewRow(row));
 	}
+	
+	@Override
+	public Matrix rows(int start, int end) {
+		if (start == end) {
+			return row(start);
+		}
+		return new ColtMatrix(delegate.viewPart(start, 0, (end - start + 1), delegate.columns()));
+	}
 
 	@Override
 	public Vector column(int column) {
@@ -69,6 +82,14 @@ public class ColtMatrix extends AbstractMatrix {
 			return new Scalar(delegate.get(0, column));
 		}
 		return new ColtVector(delegate.viewColumn(column));
+	}
+	
+	@Override
+	public Matrix columns(int start, int end) {
+		if (start == end) {
+			return column(start);
+		}
+		return new ColtMatrix(delegate.viewPart(0, start, delegate.rows(), (end - start + 1)));
 	}
 
 	@Override
@@ -121,11 +142,6 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 
 	@Override
-	public double sum() {
-		return delegate.zSum();
-	}
-
-	@Override
 	public double norm1() {
 		return ALG.norm1(delegate);
 	}
@@ -168,6 +184,15 @@ public class ColtMatrix extends AbstractMatrix {
 		
 		DoubleMatrix2D res = copyMatrix();
 		res.assign(toColtMatrix(a).delegate, Functions.mult);
+		return new ColtMatrix(res);
+	}
+	
+	@Override
+	public Matrix arrayDividedBy(Matrix a) {
+		checkOperandsSameSize(a);
+		
+		DoubleMatrix2D res = copyMatrix();
+		res.assign(toColtMatrix(a).delegate, Functions.div);
 		return new ColtMatrix(res);
 	}
 
@@ -264,10 +289,10 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public Matrix insertRow(int row, double... values) {
+	public Matrix insertRow(int row, Vector values) {
 		int n = delegate.rows();
 		int m = delegate.columns();
-		if (values.length != m) {
+		if (values.rows() != m) {
 			throw new IllegalArgumentException();
 		}
 		if (row < 0 || row > n) {
@@ -278,11 +303,79 @@ public class ColtMatrix extends AbstractMatrix {
 		if (row > 0) {
 			temp.viewPart(0, 0, row, m).assign(delegate.viewPart(0, 0, row, m));
 		}
-		temp.viewPart(row, 0, 1, m).assign(new double[][] { values });
+		temp.viewPart(row, 0, 1, m).assign(new double[][] { values.toArray1D() });
 		if (row < n) {
 			temp.viewPart(row + 1, 0, n - row, m).assign(delegate.viewPart(row, 0, n - row, m));
 		}
 		return new ColtMatrix(temp);
+	}
+	
+	@Override
+	public Matrix setRow(int row, Vector values) {
+		int n = delegate.rows();
+		int m = delegate.columns();
+		if (values.rows() != m) {
+			throw new IllegalArgumentException();
+		}
+		if (row < 0 || row > n) {
+			throw new IndexOutOfBoundsException();
+		}
+		DoubleMatrix2D copy = copyMatrix();
+		copy.viewPart(row, 0, 1, m).assign(new double[][] { values.toArray1D() });
+		return new ColtMatrix(copy);
+	}
+	
+	@Override
+	public Matrix circshift(int rows) {
+		int n = delegate.rows();
+		int offset = rows % n; // in case rows would result in several rounds of shifting (rows >= delegate.rows())
+		if (offset != 0) {
+			int[] shifted = new int[n];
+			for (int i = 0; i < n; i++) {
+				int shift = (i + offset) % n;
+				if (shift < 0) {
+					shifted[n + shift] = i;
+				} else {
+					shifted[shift] = i;
+				}
+			}
+			return new ColtMatrix(delegate.viewSelection(shifted, null));			
+		}
+		return this;
+	}
+	
+	@Override
+	public double aggregate(AggregationFunction func) {
+		int n = delegate.rows();
+		int m = delegate.columns();
+		double aggr = Double.NaN;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				aggr = func.apply(aggr, delegate.getQuick(i, j));
+			}
+		}
+		return aggr;
+	}
+	
+	@Override
+	public Vector aggregate(AggregationFunction func, int dimension) {
+		if (dimension < 0 || dimension > 1) {
+			throw new IllegalArgumentException();
+		}
+		int n = delegate.rows();
+		int m = delegate.columns();
+		double[] aggr = new double[(dimension == 0) ? m : n];
+		Arrays.fill(aggr, Double.NaN);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				if (dimension == 1) {
+					aggr[i] = func.apply(aggr[i], delegate.getQuick(i, j));
+				} else {
+					aggr[j] = func.apply(aggr[j], delegate.getQuick(i, j));
+				}
+			}
+		}
+		return vector(aggr);
 	}
 	
 	protected DoubleMatrix1D newVector(int size) {
