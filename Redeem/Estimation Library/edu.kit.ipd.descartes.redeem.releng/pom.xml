@@ -132,7 +132,6 @@
 		<module>../edu.kit.ipd.descartes.redeem.estimation</module>
 		<module>../edu.kit.ipd.descartes.redeem.estimation.testutil</module>
 		<module>../edu.kit.ipd.descartes.redeem.estimation.tests</module>
-		<module>../edu.kit.ipd.descartes.redeem.matlab</module>
 		<module>../edu.kit.ipd.descartes.redeem.nativehelper</module>
 		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.java</module>
 		<module>../edu.kit.ipd.descartes.redeem.bayesplusplus.java.tests</module>

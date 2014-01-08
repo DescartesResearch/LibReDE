@@ -87,7 +87,7 @@
          unpack="false"/>
 
    <plugin
-         id="edu.kit.ipd.descartes.redeem.matlab"
+         id="edu.kit.ipd.descartes.redeem.frontend"
          download-size="0"
          install-size="0"
          version="0.0.0"
