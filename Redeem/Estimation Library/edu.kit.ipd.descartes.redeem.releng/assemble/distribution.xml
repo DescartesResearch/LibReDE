@@ -8,80 +8,75 @@
 		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
-	<moduleSets>
-		<moduleSet>
-			<useAllReactorProjects>true</useAllReactorProjects>
+
+	<dependencySets>
+		<dependencySet>
 			<includes>
 				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.releng.p2</include>
 			</includes>
-			<binaries>
-				<outputDirectory>lib</outputDirectory>
-				<unpack>true</unpack>
-				<unpackOptions>
-					<includes>
-						<include>plugins/*.jar</include>
-					</includes>
-					<excludes>
-						<exclude>plugins/org.eclipse.*.jar</exclude>
-					</excludes>
-				</unpackOptions>
-			</binaries>
-		</moduleSet>
-		<moduleSet>
-			<useAllReactorProjects>true</useAllReactorProjects>
-			<includes>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.java</include>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.java</include>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.java</include>
-			</includes>
-			<binaries>
-				<outputDirectory>lib/native/win32</outputDirectory>
-				<unpack>true</unpack>
-				<unpackOptions>
-					<includes>
-						<include>*.dll</include>
-					</includes>
-				</unpackOptions>
-			</binaries>
-		</moduleSet>
-		<moduleSet>
-			<useAllReactorProjects>true</useAllReactorProjects>
-			<includes>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.java</include>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.java</include>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.java</include>
-			</includes>
-			<binaries>
-				<outputDirectory>lib/native/linux</outputDirectory>
-				<unpack>true</unpack>
-				<unpackOptions>
-					<includes>
-						<include>*.so</include>
-					</includes>
-				</unpackOptions>
-			</binaries>
-		</moduleSet>
-		<moduleSet>
-			<useAllReactorProjects>true</useAllReactorProjects>
-			<includes>
-				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.matlab</include>
-			</includes>
-			<binaries>
-				<outputDirectory>.</outputDirectory>
-				<unpack>true</unpack>
-				<unpackOptions>
-					<includes>
-						<include>matlab/</include>
-					</includes>
-				</unpackOptions>
-			</binaries>
-		</moduleSet>
-	</moduleSets>
-	
-	<dependencySets>
-		<dependencySet>
-					
+			<outputDirectory>lib</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<includes>
+					<include>plugins/*.jar</include>
+				</includes>
+				<excludes>
+					<exclude>plugins/org.eclipse.*.jar</exclude>
+				</excludes>
+			</unpackOptions>
+			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
-	
+		<dependencySet>
+			<includes>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.java</include>
+			</includes>
+			<outputDirectory>lib/native/win32</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<includes>
+					<include>*.dll</include>
+				</includes>
+			</unpackOptions>
+			<useProjectArtifact>false</useProjectArtifact>	
+		</dependencySet>
+		<dependencySet>
+			<includes>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.bayesplusplus.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.ipopt.java</include>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.nnls.java</include>
+			</includes>
+			<outputDirectory>lib/native/linux</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<includes>
+					<include>*.so</include>
+				</includes>
+			</unpackOptions>
+			<useProjectArtifact>false</useProjectArtifact>
+		</dependencySet>
+		<dependencySet>
+			<includes>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.frontend</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<includes>
+					<include>matlab/**</include>
+				</includes>
+			</unpackOptions>
+			<useProjectArtifact>false</useProjectArtifact>
+		</dependencySet>
+		<dependencySet>
+			<includes>
+				<include>edu.kit.ipd.descartes.redeem:edu.kit.ipd.descartes.redeem.releng</include>
+			</includes>
+			<outputDirectory>doc</outputDirectory>
+			<unpack>true</unpack>
+			<useProjectArtifact>false</useProjectArtifact>
+			<useProjectAttachments>true</useProjectAttachments>
+		</dependencySet>	
 	</dependencySets>
 </assembly>
