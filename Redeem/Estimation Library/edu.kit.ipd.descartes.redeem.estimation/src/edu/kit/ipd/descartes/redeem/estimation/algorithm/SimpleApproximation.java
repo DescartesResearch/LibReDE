@@ -1,8 +1,13 @@
 package edu.kit.ipd.descartes.redeem.estimation.algorithm;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.empty;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
+import static edu.kit.ipd.descartes.linalg.LinAlg.max;
 import static edu.kit.ipd.descartes.linalg.LinAlg.mean;
+import static edu.kit.ipd.descartes.linalg.LinAlg.min;
+import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
+import edu.kit.ipd.descartes.linalg.AggregationFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
@@ -18,8 +23,12 @@ public class SimpleApproximation implements IEstimationAlgorithm<ConstantStateMo
 	
 	private ConstantStateModel<Unconstrained> stateModel;
 	private IObservationModel<IDirectOutputFunction, Vector> observationModel;
-	private Aggregation aggr = Aggregation.AVERAGE;
+	private Aggregation aggregation;
 	private Matrix buffer;
+	
+	public SimpleApproximation(Aggregation aggregation) {
+		this.aggregation = aggregation;
+	}
 
 	@Override
 	public void initialize(ConstantStateModel<Unconstrained> stateModel,
@@ -43,14 +52,23 @@ public class SimpleApproximation implements IEstimationAlgorithm<ConstantStateMo
 	}
 
 	@Override
-	public Vector estimate() throws EstimationException {		
-		return mean(buffer, 0);		
+	public Vector estimate() throws EstimationException {
+		switch(aggregation) {
+		case AVERAGE:
+			return mean(buffer, 0);
+		case MAXIMUM:
+			return max(buffer, 0);
+		case MINIMUM:
+			return min(buffer, 0);
+		case SUM:
+			return sum(buffer, 0);
+		case NONE:
+			return buffer.row(0);				
+		}
+		return empty();
 	}
 
 	@Override
 	public void destroy() {
 	}
-	
-	
-
 }

@@ -58,8 +58,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @param service - the service for which the response time is calculated
 	 * @param selectedResources - the list of resources which are involved during the processing of the service
 	 * 
-	 * @throws {@link NullPointerException} if any parameter is null
-	 * @thorws {@link IllegalArgumentException} if the list of services or resources is empty
+	 * @throws NullPointerException if any parameter is null
+	 * @throws IllegalArgumentException if the list of services or resources is empty
 	 */
 	public ResponseTimeEquation(WorkloadDescription system, RepositoryCursor repository,
 			Service service, List<Resource> selectedResources
