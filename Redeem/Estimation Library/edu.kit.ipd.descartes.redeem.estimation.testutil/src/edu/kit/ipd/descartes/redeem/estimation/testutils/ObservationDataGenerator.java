@@ -158,28 +158,28 @@ public class ObservationDataGenerator {
 		
 
 		for (int i = 0; i < services.length; i++) {
-			TimeSeries ts;
-			if (time == 1.0) {
-				ts = new TimeSeries(scalar(1.0), scalar(throughput.get(i)));
+			TimeSeries ts = repository.getData(StandardMetric.THROUGHPUT, services[i]);
+			if (ts.isEmpty()) {
+				ts = new TimeSeries(scalar(time), scalar(throughput.get(i)));
+				ts.setStartTime(0);
 			} else {
-				time += 1.0;
-				ts = repository.getData(StandardMetric.THROUGHPUT, services[i]);
 				ts = ts.addSample(time, throughput.get(i));
 			}
+			ts.setEndTime(time);
 			repository.setData(StandardMetric.THROUGHPUT, services[i], ts);	
 		}
 		
 		
 
 		for (int i = 0; i < resources.length; i++) {
-			TimeSeries ts;
-			if (time == 1.0) {
-				ts = new TimeSeries(scalar(1.0), scalar(utilization.get(i)));
+			TimeSeries ts = repository.getData(StandardMetric.UTILIZATION, resources[i]);
+			if (ts.isEmpty()) {
+				ts = new TimeSeries(scalar(time), scalar(utilization.get(i)));
+				ts.setStartTime(0);
 			} else {
-				time += 1.0;
-				ts = repository.getData(StandardMetric.UTILIZATION, resources[i]);
 				ts = ts.addSample(time, utilization.get(i));
 			}
+			ts.setEndTime(time);
 			repository.setData(StandardMetric.UTILIZATION, resources[i], ts);	
 		}
 	
@@ -189,16 +189,18 @@ public class ObservationDataGenerator {
 				sumRT += demands.get(r * services.length + i) / (1 - utilization.get(r));
 			}
 			
-			TimeSeries ts;
+			TimeSeries ts = repository.getData(StandardMetric.RESPONSE_TIME, services[i]);
 			if (time == 1.0) {
-				ts = new TimeSeries(scalar(1.0), scalar(sumRT));
+				ts = new TimeSeries(scalar(time), scalar(sumRT));
+				ts.setStartTime(0);
 			} else {
-				time += 1.0;
-				ts = repository.getData(StandardMetric.RESPONSE_TIME, services[i]);
 				ts = ts.addSample(time, sumRT);
 			}
+			ts.setEndTime(time);
 			repository.setData(StandardMetric.RESPONSE_TIME, services[i], ts);	
 		}
+		
+		time++;
 	}
 	
 	public IMonitoringRepository getRepository() {

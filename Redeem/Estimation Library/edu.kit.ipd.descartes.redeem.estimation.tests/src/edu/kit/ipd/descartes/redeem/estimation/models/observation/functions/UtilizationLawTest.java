@@ -36,6 +36,7 @@ public class UtilizationLawTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
 		law = new UtilizationLaw(workload, cursor, resource);

@@ -37,6 +37,7 @@ public class ResponseTimeEquationTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(1);
 		
 		service = workload.getServices().get(SERVICE_IDX);
 		

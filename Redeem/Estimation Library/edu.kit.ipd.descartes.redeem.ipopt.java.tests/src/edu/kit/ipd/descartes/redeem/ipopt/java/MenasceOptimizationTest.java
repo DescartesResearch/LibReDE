@@ -40,6 +40,7 @@ public class MenasceOptimizationTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(ITERATIONS);
 
 		Vector initialEstimate = vector(0.01);
 		stateModel = new ConstantStateModel<>(1, initialEstimate);
@@ -49,14 +50,17 @@ public class MenasceOptimizationTest {
 		
 		stateModel.addConstraint(new UtilizationConstraint(workload, cursor, workload.getResources().get(0)));
 
-		MenasceOptimization optim = new MenasceOptimization();
+		RecursiveOptimization optim = new RecursiveOptimization();
 		optim.initialize(stateModel, observationModel, 10);
 
 		long start = System.nanoTime();
 
-		for (int i = 0; i < ITERATIONS; i++) {
+		while(true) {
 			generator.nextObservation();
-			cursor.next();
+			
+			if (!cursor.next()) {
+				break;
+			}
 			
 			optim.update();
 
@@ -83,6 +87,7 @@ public class MenasceOptimizationTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(ITERATIONS);
 
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 		stateModel = new ConstantStateModel<>(5, initialEstimate);
@@ -95,7 +100,7 @@ public class MenasceOptimizationTest {
 		
 		stateModel.addConstraint(new UtilizationConstraint(workload, cursor, workload.getResources().get(0)));
 
-		MenasceOptimization optim = new MenasceOptimization();
+		RecursiveOptimization optim = new RecursiveOptimization();
 		optim.initialize(stateModel, observationModel, 10);
 
 		long start = System.nanoTime();

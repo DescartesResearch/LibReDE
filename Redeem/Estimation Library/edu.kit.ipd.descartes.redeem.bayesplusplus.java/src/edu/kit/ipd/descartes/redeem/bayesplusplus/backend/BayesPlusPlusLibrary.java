@@ -40,9 +40,9 @@ public final class BayesPlusPlusLibrary {
 	 *            the next state
 	 * @return a <code>Pointer</code> to the native object or null if an error
 	 *         occurred
-	 * @see http://bayesclasses.sourceforge.net/ClassDocumentation/html/
+	 * @see <a href="http://bayesclasses.sourceforge.net/ClassDocumentation/html/
 	 *      classBayesian__filter_1_1Linrz__predict__model
-	 *      .html#a8be6802abc71a157598c1102d6270703
+	 *      .html#a8be6802abc71a157598c1102d6270703">http://bayesclasses.sourceforge.net/</a>
 	 */
 	public static native Pointer create_linrz_predict_model(int x_size, int q_size, Callback ffunc);
 
@@ -120,8 +120,8 @@ public final class BayesPlusPlusLibrary {
 	 *            the next observation
 	 * @return a <code>Pointer</code> to the native object or null if an error
 	 *         occurred
-	 * @see http://bayesclasses.sourceforge.net/ClassDocumentation/html/
-	 *      classBayesian__filter_1_1Linrz__uncorrelated__observe__model.html
+	 * @see <a href="http://bayesclasses.sourceforge.net/ClassDocumentation/html/
+	 *      classBayesian__filter_1_1Linrz__uncorrelated__observe__model.html">http://bayesclasses.sourceforge.net/</a>
 	 */
 	public static native Pointer create_linrz_uncorrelated_observe_model(int x_size, int z_size, Callback hfunc);
 
@@ -176,8 +176,8 @@ public final class BayesPlusPlusLibrary {
 	 *            the size of the state vector
 	 * @return a <code>Pointer</code> to the native object or null if an error
 	 *         occurred
-	 * @see http://bayesclasses.sourceforge.net/ClassDocumentation/html/
-	 *      classBayesian__filter_1_1Covariance__scheme.html
+	 * @see <a href="http://bayesclasses.sourceforge.net/ClassDocumentation/html/
+	 *      classBayesian__filter_1_1Covariance__scheme.html">http://bayesclasses.sourceforge.net/</a>
 	 */
 	public static native Pointer create_covariance_scheme(int x_size);
 

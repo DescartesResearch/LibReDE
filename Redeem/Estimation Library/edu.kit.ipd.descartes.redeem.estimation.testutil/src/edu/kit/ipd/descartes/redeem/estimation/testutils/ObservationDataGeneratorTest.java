@@ -114,6 +114,7 @@ public class ObservationDataGeneratorTest {
 		generator.setLowerUtilizationBound(0.4);
 		generator.setUpperUtilizationBound(0.6);
 		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		view.setEndTime(10000);
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetric.UTILIZATION).forAllResources().average().using(view);
 		
@@ -135,6 +136,7 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setWorkloadMixVariation(0);
 		RepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		view.setEndTime(10000);
 		
 		Query<Vector> tputData = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(view);
 		

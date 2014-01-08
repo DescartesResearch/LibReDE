@@ -1,7 +1,7 @@
 package edu.kit.ipd.descartes.redeem.bayesplusplus;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
-import static edu.kit.ipd.descartes.linalg.LinAlg.row;
+import static edu.kit.ipd.descartes.linalg.LinAlg.mean;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper.nativeVector;
 import static edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper.toNative;
@@ -80,6 +80,8 @@ public class ExtendedKalmanFilter implements
 	private Matrix stateNoiseCoupling;
 
 	private Vector observeNoise;
+	
+	private Matrix estimates;
 
 	/*
 	 * Callback functions from native code. IMPORTANT: References to these
@@ -238,6 +240,8 @@ public class ExtendedKalmanFilter implements
 		this.stateModel = stateModel;
 		
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
+		
+		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
 
 		initNativeStateModel();
 		initNativeObservationModel();
@@ -254,6 +258,9 @@ public class ExtendedKalmanFilter implements
 		observe(observationModel.getObservedOutput());
 
 		updateState();
+		
+		Vector cur = getCurrentEstimate();
+		estimates = estimates.circshift(1).setRow(0, cur);
 	}
 
 	/*
@@ -265,7 +272,7 @@ public class ExtendedKalmanFilter implements
 	 */
 	@Override
 	public Vector estimate() throws EstimationException {
-		return getCurrentEstimate();
+		return mean(estimates, 0);
 	}
 
 	/*

@@ -20,7 +20,7 @@ import edu.kit.ipd.descartes.redeem.estimation.workload.WorkloadDescription;
 
 public class ZhangKalmanFilterTest {
 	
-	private static final int ITERATIONS = 100000;
+	private static final int ITERATIONS = 1000;
 	
 	private VectorObservationModel<IOutputFunction> observationModel;
 	private ConstantStateModel<Unconstrained> stateModel;
@@ -36,14 +36,14 @@ public class ZhangKalmanFilterTest {
 	}
 
 	@Test
-	public void testFilter1WC1R() throws Exception {
-		
+	public void testFilter1WC1R() throws Exception {		
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);		
 		Vector demands = vector(0.05);
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);		
+		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(ITERATIONS);
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.1);
@@ -80,7 +80,8 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);		
+		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(ITERATIONS);
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);

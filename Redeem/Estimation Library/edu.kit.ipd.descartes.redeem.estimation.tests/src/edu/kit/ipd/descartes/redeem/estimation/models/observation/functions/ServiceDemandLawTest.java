@@ -39,6 +39,7 @@ public class ServiceDemandLawTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
 		service = workload.getServices().get(SERVICE_IDX);

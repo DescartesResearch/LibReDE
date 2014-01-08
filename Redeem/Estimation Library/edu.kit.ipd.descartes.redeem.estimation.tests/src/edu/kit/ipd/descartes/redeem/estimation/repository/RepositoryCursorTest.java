@@ -23,13 +23,15 @@ public class RepositoryCursorTest {
 	IMonitoringRepository repository = new MemoryObservationRepository(new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services)));
 	
 	@Test
-	public void test1StepCursor() {		
+	public void test1StepCursor() {
+		ts1.setStartTime(1);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(0, 1);
+		RepositoryCursor cur = repository.getCursor(1, 1);
+		cur.setEndTime(8);
 		
-		for (int i = 3; i <= 8; i++) {
+		for (int i = 2; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
 			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 1);
 			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
@@ -39,28 +41,33 @@ public class RepositoryCursorTest {
 	}
 	
 	@Test
-	public void test1StepWithOffsetCursor() {		
+	public void test1StepWithOffsetCursor() {
+		ts1.setStartTime(1);
+		ts2.setStartTime(1.2);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts2);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(0, 1);
-		
-		for (int i = 0; i < 5; i++) {
+		RepositoryCursor cur = repository.getCursor(1.2, 1);
+		cur.setEndTime(7.2);
+
+		for (int i = 0; i < 6; i++) {
 			assertThat(cur.next()).isTrue();
-			assertThat(cur.getCurrentIntervalStart()).isEqualTo(2.2 + i);
-			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(3.2 + i);
+			assertThat(cur.getCurrentIntervalStart()).isEqualTo(1.2 + i, offset(1e-9));
+			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(2.2 + i, offset(1e-9));
 		}
 		assertThat(cur.next()).isFalse();		
 	}
 	
 	@Test
-	public void test1StepWithAddCursor() {		
+	public void test1StepWithAddCursor() {
+		ts1.setStartTime(1);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(0, 1);
+		RepositoryCursor cur = repository.getCursor(1, 1);
+		cur.setEndTime(8);
 		
-		for (int i = 3; i <= 8; i++) {
+		for (int i = 2; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
 			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 1);
 			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
@@ -70,6 +77,7 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1.addSample(10.0, 1.0));
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1.addSample(10.0, 1.0));
+		cur.setEndTime(10);
 		
 		for (int i = 9; i <= 10; i++) {
 			assertThat(cur.next()).isTrue();
@@ -80,13 +88,15 @@ public class RepositoryCursorTest {
 	}
 	
 	@Test
-	public void test3StepCursor() {		
+	public void test3StepCursor() {	
+		ts1.setStartTime(1);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(0, 3);
+		RepositoryCursor cur = repository.getCursor(1, 3);
+		cur.setEndTime(8);
 		
-		for (int i = 5; i <= 8; i+=3) {
+		for (int i = 4; i <= 8; i+=3) {
 			assertThat(cur.next()).isTrue();
 			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 3);
 			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
@@ -106,12 +116,13 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void testEmptyCursor() {		
-		RepositoryCursor cur = repository.getCursor(0, 1);
+		RepositoryCursor cur = repository.getCursor(1, 1);
+		cur.setEndTime(1);
 		assertThat(cur.next()).isFalse();
-		assertThat(cur.getCurrentIntervalStart()).isNaN();
-		assertThat(cur.getCurrentIntervalEnd()).isNaN();
 		
+		ts1.setStartTime(1);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
+		cur.setEndTime(8);
 		assertThat(cur.next()).isTrue();
 		assertThat(cur.getCurrentIntervalStart()).isEqualTo(ts1.getStartTime(), offset(1e-9));
 		assertThat(cur.getCurrentIntervalEnd()).isEqualTo(ts1.getStartTime() + 1.0, offset(1e-9));

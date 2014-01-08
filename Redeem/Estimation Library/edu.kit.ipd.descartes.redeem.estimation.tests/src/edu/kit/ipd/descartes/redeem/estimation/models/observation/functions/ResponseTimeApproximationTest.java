@@ -12,6 +12,7 @@ import org.junit.Test;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
+import edu.kit.ipd.descartes.redeem.estimation.repository.Aggregation;
 import edu.kit.ipd.descartes.redeem.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.redeem.estimation.repository.Query;
 import edu.kit.ipd.descartes.redeem.estimation.repository.QueryBuilder;
@@ -43,12 +44,13 @@ public class ResponseTimeApproximationTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
+		cursor.setEndTime(1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
 		service = workload.getServices().get(SERVICE_IDX);
 		stateIdx = workload.getState().getIndex(resource, service);
 		
-		law = new ResponseTimeApproximation(workload, cursor, resource, service);
+		law = new ResponseTimeApproximation(workload, cursor, resource, service, Aggregation.AVERAGE);
 		state = generator.getDemands();
 		
 		generator.nextObservation();

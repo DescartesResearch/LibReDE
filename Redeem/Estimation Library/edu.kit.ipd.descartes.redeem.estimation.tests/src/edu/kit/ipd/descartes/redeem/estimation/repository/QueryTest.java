@@ -50,20 +50,27 @@ public class QueryTest {
 
 		TimeSeries cpuUtilTable = new TimeSeries(timestamps,
 				utilMeasurements.column(0));
+		cpuUtilTable.setStartTime(0);
 		TimeSeries hd1UtilTable = new TimeSeries(timestamps,
 				utilMeasurements.column(1));
+		hd1UtilTable.setStartTime(0);
 		TimeSeries hd2UtilTable = new TimeSeries(timestamps,
 				utilMeasurements.column(2));
-
+		hd2UtilTable.setStartTime(0);
+		
 		TimeSeries addServTputTable = new TimeSeries(timestamps,
 				throughputMeasurements.column(0));
+		addServTputTable.setStartTime(0);
 		TimeSeries payServTputTable = new TimeSeries(timestamps,
 				throughputMeasurements.column(1));
+		payServTputTable.setStartTime(0);
 		
 		TimeSeries addServRtTable = new TimeSeries(timestamps,
 				rtMeasurements.column(0));
+		addServRtTable.setStartTime(0);
 		TimeSeries payServRtTable = new TimeSeries(timestamps,
 				rtMeasurements.column(1));
+		payServRtTable.setStartTime(0);
 
 		repository = new MemoryObservationRepository(new WorkloadDescription(
 				Arrays.asList(resources), Arrays.asList(services)));
@@ -120,13 +127,14 @@ public class QueryTest {
 	// }
 	@Test
 	public void testAllQuery() {
-		RepositoryCursor cursor = repository.getCursor(0, 1);
+		RepositoryCursor cursor = repository.getCursor(0, 5);
+		cursor.setEndTime(5);
 		assertThat(cursor.next()).isTrue();
 		
 		Query<Vector> respSingle = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(services[1]).all().using(cursor);
 		Vector result = respSingle.execute();
 		
-		assertThat(result).isEqualTo(vector(rtMeasurements.get(1, 1)), offset(1e-9));
+		assertThat(result).isEqualTo(rtMeasurements.column(1), offset(1e-9));
 		
 	}
 
