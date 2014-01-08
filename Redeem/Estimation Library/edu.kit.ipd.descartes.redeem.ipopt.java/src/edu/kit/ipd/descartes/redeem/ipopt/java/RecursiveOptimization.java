@@ -37,7 +37,7 @@ import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptOptionKeyword;
 import edu.kit.ipd.descartes.redeem.ipopt.java.backend.IpoptOptionValue;
 import edu.kit.ipd.descartes.redeem.nativehelper.NativeHelper;
 
-public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
+public class RecursiveOptimization implements IEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
 
 	private final static double OPTION_TOL_VALUE = 1e-7;
 	private final static double OPTION_LNP_LOWER_BOUND_INF_VALUE = -1e+19;
@@ -155,6 +155,7 @@ public class MenasceOptimization implements IEstimationAlgorithm<ConstantStateMo
 		} else {
 			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
 		}
+		estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);
 		  
 		/* free allocated memory */
 		IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
