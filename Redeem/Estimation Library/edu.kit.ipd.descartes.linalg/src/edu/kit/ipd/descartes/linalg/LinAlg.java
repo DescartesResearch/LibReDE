@@ -255,7 +255,7 @@ public class LinAlg {
 	 * @param values
 	 *            double values of current row
 	 * @return double array
-	 * @see #matrix(double[]...)
+	 * @see LinAlg#matrix(double[]...)
 	 * @since 1.0
 	 */
 	public static double[] row(double... values) {
@@ -440,7 +440,7 @@ public class LinAlg {
 	 * 
 	 * @param a
 	 * @return mean(a)
-	 * @wince 1.0
+	 * @since 1.0
 	 */
 	public static double mean(Matrix a) {
 		return a.aggregate(AggregationFunction.SUM) / a.aggregate(AggregationFunction.COUNT);
@@ -452,7 +452,7 @@ public class LinAlg {
 	 * @param a
 	 * @param dimension 0 if for each row, 1 if for each column
 	 * @return mean(a) for each row or column
-	 * @wince 1.0
+	 * @since 1.0
 	 */
 	public static Vector mean(Matrix a, int dimension) {
 		Vector sum = a.aggregate(AggregationFunction.SUM, dimension);
@@ -574,7 +574,7 @@ public class LinAlg {
 	 * @param init
 	 *            a function f(x,y) := z
 	 * @return new <code>SquareMatrix</code>, or <code>Scalar<code> instance
-	 * @throw {@link IllegalArgumentException} if size < 0
+	 * @throws IllegalArgumentException if size < 0
 	 * @since 1.0
 	 */
 	public static SquareMatrix square(int size, MatrixFunction init) {
@@ -761,7 +761,7 @@ public class LinAlg {
 	 * Returns the minimum value of a matrix for each row or column.
 	 * 
 	 * @param v
-	 * @param if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
+	 * @param dimension if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
 	 * @return min(v) per row/column
 	 * @since 1.0
 	 */
@@ -784,7 +784,7 @@ public class LinAlg {
 	 * Returns the maximum value of a matrix for each row or column.
 	 * 
 	 * @param v
-	 * @param if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
+	 * @param dimension if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
 	 * @return min(v) per row/column
 	 * @since 1.0
 	 */
