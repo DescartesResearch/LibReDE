@@ -108,6 +108,37 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>license-maven-plugin</artifactId> 
+				<version>1.5</version> <configuration> <licenseName>librede_license</licenseName> 
+				<licenseResolver>${project.baseUri}/license</licenseResolver> <inceptionYear>2014</inceptionYear> 
+				</configuration> <executions> <execution> <id>first</id> <goals> <goal>update-file-header</goal> 
+				</goals> <phase>process-sources</phase> </execution> </executions> </plugin> -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<header>license/header.txt</header>
+					<aggregate>true</aggregate>
+					<properties>
+						<owner>Mycila</owner>
+						<year>${project.inceptionYear}</year>
+						<email>mathieu.carbou@gmail.com</email>
+					</properties>
+					<excludes>
+						<exclude>**/*.xml</exclude>
+						<exclude>**/*.properties</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
