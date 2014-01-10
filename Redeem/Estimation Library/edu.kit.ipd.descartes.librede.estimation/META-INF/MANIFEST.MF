@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Estimation
+Bundle-SymbolicName: edu.kit.ipd.descartes.librede.estimation
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: edu.kit.ipd.descartes.librede.estimation.algorithm,
+ edu.kit.ipd.descartes.librede.estimation.exceptions,
+ edu.kit.ipd.descartes.librede.estimation.models.diff,
+ edu.kit.ipd.descartes.librede.estimation.models.observation,
+ edu.kit.ipd.descartes.librede.estimation.models.observation.functions,
+ edu.kit.ipd.descartes.librede.estimation.models.state,
+ edu.kit.ipd.descartes.librede.estimation.models.state.constraints,
+ edu.kit.ipd.descartes.librede.estimation.repository,
+ edu.kit.ipd.descartes.librede.estimation.workload
+Import-Package: edu.kit.ipd.descartes.linalg

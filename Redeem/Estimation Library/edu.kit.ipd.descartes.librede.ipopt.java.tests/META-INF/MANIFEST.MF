@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IPopt Tests
+Bundle-SymbolicName: edu.kit.ipd.descartes.librede.ipopt.java.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: edu.kit.ipd.descartes.librede.ipopt.java;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: edu.kit.ipd.descartes.linalg.testutil,
+ edu.kit.ipd.descartes.librede.estimation.repository,
+ edu.kit.ipd.descartes.librede.estimation.testutils,
+ edu.kit.ipd.descartes.librede.estimation.workload,
+ org.fest.assertions.api
+Require-Bundle: org.junit;bundle-version="4.11.0"

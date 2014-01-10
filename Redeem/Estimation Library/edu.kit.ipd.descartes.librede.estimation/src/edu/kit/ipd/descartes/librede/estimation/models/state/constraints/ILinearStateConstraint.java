@@ -1,0 +1,9 @@
+package edu.kit.ipd.descartes.librede.estimation.models.state.constraints;
+
+import edu.kit.ipd.descartes.linalg.Vector;
+
+public interface ILinearStateConstraint extends IStateConstraint {
+	
+
+
+}

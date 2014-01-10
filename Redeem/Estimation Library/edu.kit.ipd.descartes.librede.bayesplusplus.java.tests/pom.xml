@@ -6,7 +6,7 @@
 		<maven>3.0</maven>
 	</prerequisites>
 
-	<artifactId>edu.kit.ipd.descartes.linalg.tests</artifactId>
+	<artifactId>edu.kit.ipd.descartes.librede.bayesplusplus.java.tests</artifactId>
 
 	<packaging>eclipse-test-plugin</packaging>
 

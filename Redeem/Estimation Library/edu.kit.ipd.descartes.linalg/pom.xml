@@ -11,9 +11,9 @@
 	<packaging>eclipse-plugin</packaging>	
 	
 	<parent>
-		<groupId>edu.kit.ipd.descartes.redeem</groupId>
-		<artifactId>edu.kit.ipd.descartes.redeem.releng</artifactId>
+		<groupId>edu.kit.ipd.descartes.librede</groupId>
+		<artifactId>edu.kit.ipd.descartes.librede.releng</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../edu.kit.ipd.descartes.redeem.releng</relativePath>
+		<relativePath>../edu.kit.ipd.descartes.librede.releng</relativePath>
 	</parent>
 </project>

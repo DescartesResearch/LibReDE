@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: edu.kit.ipd.descartes.librede.bayesplusplus.java.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: edu.kit.ipd.descartes.librede.bayesplusplus.java;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.junit;bundle-version="4.11.0"
+Import-Package: edu.kit.ipd.descartes.librede.estimation.repository,
+ edu.kit.ipd.descartes.librede.estimation.testutils,
+ edu.kit.ipd.descartes.librede.estimation.workload

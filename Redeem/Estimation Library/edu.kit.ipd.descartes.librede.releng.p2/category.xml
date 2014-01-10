@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/edu.kit.ipd.descartes.librede.feature_1.0.0.qualifier.jar" id="edu.kit.ipd.descartes.librede.feature" version="1.0.0.qualifier">
+      <category name="librede.category"/>
+   </feature>
+   <category-def name="librede.category" label="LibReDE"/>
+</site>

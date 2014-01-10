@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: edu.kit.ipd.descartes.librede.estimation.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: edu.kit.ipd.descartes.librede.estimation;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: edu.kit.ipd.descartes.linalg,
+ edu.kit.ipd.descartes.linalg.testutil,
+ edu.kit.ipd.descartes.librede.estimation.testutils,
+ org.fest.assertions.api
+Require-Bundle: org.junit;bundle-version="4.11.0"
