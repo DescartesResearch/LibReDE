@@ -122,13 +122,14 @@
 					<header>license/header.txt</header>
 					<aggregate>true</aggregate>
 					<properties>
-						<owner>Mycila</owner>
+						<owner>Simon Spinner</owner>
 						<year>${project.inceptionYear}</year>
-						<email>mathieu.carbou@gmail.com</email>
+						<email>simon.spinner@kit.edu</email>
 					</properties>
 					<excludes>
 						<exclude>**/*.xml</exclude>
 						<exclude>**/*.properties</exclude>
+						<exclude>**/*.html</exclude>
 					</excludes>
 				</configuration>
 				<executions>

@@ -79,4 +79,13 @@
 			<useProjectAttachments>true</useProjectAttachments>
 		</dependencySet>	
 	</dependencySets>
+	<fileSets>
+		<fileSet>
+			<directory>license</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>epl-v10.html</include>
+			</includes>
+		</fileSet>
+	</fileSets>
 </assembly>
