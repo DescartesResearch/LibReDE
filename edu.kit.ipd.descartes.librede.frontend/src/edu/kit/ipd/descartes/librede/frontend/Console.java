@@ -60,6 +60,7 @@ import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.frontend.EstimationHelper.EstimationResult;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
@@ -133,51 +134,21 @@ public class Console implements IApplication {
 	}
 	
 	private void execute() throws Exception {
-		WorkloadDescription workload = createWorkloadDescription();
-		IMonitoringRepository repository = createRepository(workload);
-		RepositoryCursor cursor = repository.getCursor(startTime, interval);
-		cursor.setEndTime(endTime);
-		IEstimationApproach estimator = EstimationApproachFactory.newEstimationApproach(approach);
-		
-		if (estimator != null) {
-			estimator.initialize(workload, cursor, window, iterative);
-			TimeSeries estimates = estimator.execute();
-			writeResults(estimates);
-		} else {
-			log.error("Unkown estimation approach: " + approach);
-			throw new IllegalArgumentException();
-		}		
-	}
+		WorkloadDescription workload = EstimationHelper.createWorkloadDescription(services, resources);
+		IMonitoringRepository repo = EstimationHelper.createRepository(workload, endTime);
+		loadRepository(repo, workload);
+//		EstimationResult result = EstimationHelper.runEstimation(approach, workload, repo, startTime, interval, window, iterative);
+//		writeResults(result.estimates);
+		List<EstimationResult> result = EstimationHelper.runEstimationWithCrossValidation(approach, workload, repo, startTime, interval, window, iterative);
+		System.out.println("");
+	}	
+
 	
-	private WorkloadDescription createWorkloadDescription() {
-		List<Service> srv = new ArrayList<Service>(services.length);
-		List<Resource> res = new ArrayList<Resource>(resources.length);
-		
-		StringBuilder serviceNames = new StringBuilder("Services: ");
-		for (String s : services) {
-			srv.add(new Service(s));
-			serviceNames.append(s).append(" ");
-		}
-		log.info(serviceNames);
-		
-		StringBuilder resourceNames = new StringBuilder("Resources: ");
-		for (String r : resources) {
-			res.add(new Resource(r));
-			resourceNames.append(r).append(" ");
-		}
-		log.info(resourceNames);
-		return new WorkloadDescription(res, srv);
-	}
-	
-	private IMonitoringRepository createRepository(WorkloadDescription workload) throws IOException {
-		MemoryObservationRepository repo = new MemoryObservationRepository(workload);
-		
-		loadTraceFiles(utilization, repo, workload, StandardMetric.UTILIZATION);
-		loadTraceFiles(throughput, repo, workload, StandardMetric.THROUGHPUT);
-		loadTraceFiles(responsetime, repo, workload, StandardMetric.RESPONSE_TIME);
-		loadTraceFiles(metrics, repo, workload, null);
-		
-		return repo;
+	private void loadRepository(IMonitoringRepository repository, WorkloadDescription workload) throws IOException {
+		loadTraceFiles(utilization, repository, workload, StandardMetric.UTILIZATION);
+		loadTraceFiles(throughput, repository, workload, StandardMetric.THROUGHPUT);
+		loadTraceFiles(responsetime, repository, workload, StandardMetric.RESPONSE_TIME);
+		loadTraceFiles(metrics, repository, workload, null);
 	}
 	
 	private void loadTraceFiles(Map<String, String> files, IMonitoringRepository repository, WorkloadDescription workload, IMetric metric) throws IOException {
