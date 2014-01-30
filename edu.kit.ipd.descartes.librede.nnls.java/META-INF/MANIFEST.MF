@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Java
 Bundle-SymbolicName: edu.kit.ipd.descartes.librede.nnls.java
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: edu.kit.ipd.descartes.librede.nnls
 Bundle-Activator: edu.kit.ipd.descartes.librede.nnls.NNLSActivator
