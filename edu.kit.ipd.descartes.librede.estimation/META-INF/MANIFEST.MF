@@ -16,3 +16,5 @@ Export-Package: edu.kit.ipd.descartes.librede.estimation.algorithm,
  edu.kit.ipd.descartes.librede.estimation.workload
 Import-Package: cern.jet.random.sampling;version="1.2.0",
  edu.kit.ipd.descartes.linalg,
+ org.apache.commons.math3.optim;version="3.2.0",
+ org.apache.commons.math3.optim.linear;version="3.2.0"
