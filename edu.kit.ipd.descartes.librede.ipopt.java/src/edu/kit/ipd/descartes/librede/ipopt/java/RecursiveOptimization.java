@@ -176,7 +176,7 @@ public class RecursiveOptimization implements IEstimationAlgorithm<ConstantState
 		int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, obj, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
 		
 		Vector estimate = zeros(stateSize);		
-		if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED) {
+		if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED || status == IpoptLibrary.IP_ACCEPTABLE_LEVEL) {
 			estimate = nativeVector(stateSize, x);		
 		} else {
 			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
