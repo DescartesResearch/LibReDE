@@ -256,7 +256,7 @@ public final class Empty implements Vector, SquareMatrix {
 		if (row != 0) {
 			throw new IndexOutOfBoundsException();
 		}
-		return vector;
+		return vector.transpose();
 	}
 	
 	@Override
