@@ -1,4 +1,4 @@
-function [estimates] = rde(approach, services, resources, startTime, endTime, varargin)
+function [estimates, relErrUtil, relErrResp] = rde(approach, services, resources, startTime, endTime, varargin)
 
 options = struct(...
     'Util', [], ...
@@ -9,7 +9,8 @@ options = struct(...
     'TputInterval', 0, ...
     'StepSize', 1, ...
     'Iterative', 0, ...
-    'Window', 1);
+    'Window', 1, ...
+    'ProcessorCount', ones(length(resources)));
 
 optionNames = fieldnames(options);
 
@@ -44,9 +45,10 @@ load_classes();
 
 import java.util.*;
 import edu.kit.ipd.descartes.linalg.*;
-import edu.kit.ipd.descartes.redeem.estimation.workload.*;
-import edu.kit.ipd.descartes.redeem.estimation.repository.*;
-import edu.kit.ipd.descartes.redeem.approaches.*;
+import edu.kit.ipd.descartes.librede.estimation.workload.*;
+import edu.kit.ipd.descartes.librede.estimation.repository.*;
+import edu.kit.ipd.descartes.librede.approaches.*;
+import edu.kit.ipd.descartes.librede.frontend.*;
 
 if iscell(services)
     serviceNames = services;
@@ -76,14 +78,14 @@ end
 
 resList = ArrayList(length(resourceNames));
 for i=1:length(resourceNames)
-    res = Resource(resourceNames{i});
+    res = Resource(resourceNames{i}, options.ProcessorCount(i));
     resList.add(res);
 end
 
 workload = WorkloadDescription(resList, serviceList);
 repo = MemoryObservationRepository(workload);
+repo.setCurrentTime(endTime);
 cursor = repo.getCursor(startTime, options.StepSize);
-cursor.setEndTime(endTime);
 
 if ~isempty(options.Util)
     util = options.Util;
@@ -148,12 +150,14 @@ if ~isempty(options.Tput)
     end
 end
 
-estimator = EstimationApproachFactory.newEstimationApproach(approach);
-if ~isempty(estimator)
-	estimator.initialize(workload, cursor, options.Window, options.Iterative);
-    estimates = estimator.execute();
-else
-	error('Unkown estimation approach: ' + approach);
+result = EstimationHelper.runEstimationWithCrossValidation(approach, workload, repo, startTime, options.StepSize, options.Window, options.Iterative);
+
+for i=1:result.size()
+    run = result.get(i - 1);
+    curEst = result.estimates.getData().toArray1D();
+    curErrUtil = result.relativeUtilizationError.toArray1D();
+    curErrResp = result.relativeResponseTimeError.toArray1D();
 end
+
 
 end
