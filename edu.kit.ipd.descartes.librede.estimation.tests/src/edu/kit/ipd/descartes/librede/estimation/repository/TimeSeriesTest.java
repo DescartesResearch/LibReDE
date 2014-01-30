@@ -97,6 +97,15 @@ public class TimeSeriesTest {
 		assertThat(ts1.getData(0)).isEqualTo(data1, offset(1e-9));
 		assertThat(tsAdd.getTime()).isEqualTo((Vector)vertcat(scalar(0), time1), offset(1e-9));
 		assertThat(tsAdd.getData(0)).isEqualTo((Vector)vertcat(scalar(0), data1), offset(1e-9));
+		
+		tsAdd = TimeSeries.EMPTY.addSample(1, 0.1);
+		assertThat(tsAdd).isNotNull();
+		assertThat(tsAdd.getTime()).isEqualTo(scalar(1), offset(1e-9));
+		assertThat(tsAdd.getData(0)).isEqualTo(scalar(0.1), offset(1e-9));
+		
+		tsAdd = tsAdd.addSample(2, 0.2);
+		assertThat(tsAdd.getTime()).isEqualTo(vector(1, 2), offset(1e-9));
+		assertThat(tsAdd.getData(0)).isEqualTo(vector(0.1, 0.2), offset(1e-9));
 	}
 	
 	@Test

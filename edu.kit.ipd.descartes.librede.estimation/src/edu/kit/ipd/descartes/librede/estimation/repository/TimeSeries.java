@@ -31,6 +31,7 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.horzcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.sort;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
+import static edu.kit.ipd.descartes.linalg.LinAlg.row;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -163,24 +164,31 @@ public class TimeSeries {
 	}
 
 	public TimeSeries addSample(double time, double...values) {
-		double idx = interpolationSearch(time);
-		Matrix temp = content;
-		if (offset != 0 || length != content.rows()) {
-			temp = content.rows(offset, offset + length - 1);
-		}
-		TimeSeries ret;
 		double[] sample = new double[values.length + 1];
 		sample[0] = time;
 		System.arraycopy(values, 0, sample, 1, values.length);
-		if (idx > (offset + length - 1)) {
-			ret = new TimeSeries(temp.insertRow(temp.rows(), vector(sample)));
-		} else if (idx < offset) {
-			ret = new TimeSeries(temp.insertRow(0, vector(sample)));
-		} else if (Math.floor(idx) != idx) {
-			ret = new TimeSeries(temp.insertRow((int)Math.floor(idx) - offset, vector(sample)));
-		} else {
-			// exact match -> add behind existing sample
-			ret = new TimeSeries(temp.insertRow((int)idx + 1 - offset, vector(sample)));
+		TimeSeries ret;
+		
+		if (isEmpty()) {
+			Matrix temp = matrix(row(sample));
+			ret = new TimeSeries(temp);
+		} else {	
+			double idx = interpolationSearch(time);
+			Matrix temp = content;
+			if (offset != 0 || length != content.rows()) {
+				temp = content.rows(offset, offset + length - 1);
+			}
+	
+			if (idx > (offset + length - 1)) {
+				ret = new TimeSeries(temp.insertRow(temp.rows(), vector(sample)));
+			} else if (idx < offset) {
+				ret = new TimeSeries(temp.insertRow(0, vector(sample)));
+			} else if (Math.floor(idx) != idx) {
+				ret = new TimeSeries(temp.insertRow((int)Math.floor(idx) - offset, vector(sample)));
+			} else {
+				// exact match -> add behind existing sample
+				ret = new TimeSeries(temp.insertRow((int)idx + 1 - offset, vector(sample)));
+			}
 		}
 		ret.setInterpolationMethod(interpolation);
 		return ret;
