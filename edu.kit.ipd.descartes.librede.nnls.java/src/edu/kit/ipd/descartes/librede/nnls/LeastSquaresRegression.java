@@ -178,7 +178,6 @@ public class LeastSquaresRegression
 		
 		dependentVariables = dependentVariables.circshift(1).set(0, outputFunction.getObservedOutput());
 		independentVariables = independentVariables.circshift(1).setRow(0, outputFunction.getIndependentVariables());
-		
 	}
 
 	@Override
