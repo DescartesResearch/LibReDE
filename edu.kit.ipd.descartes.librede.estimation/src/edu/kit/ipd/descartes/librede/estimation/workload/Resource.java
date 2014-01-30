@@ -33,7 +33,7 @@ public class Resource implements IModelEntity {
 	
 	private final UUID id;
 	private final String name;
-	private final int parallelServers;
+	private int parallelServers;
 		
 	public Resource(String name) {
 		this(name, 1);
@@ -57,6 +57,9 @@ public class Resource implements IModelEntity {
 		return parallelServers;
 	}
 
+	public void setNumberOfParallelServers(int parallelServers) {
+		this.parallelServers = parallelServers;
+	}
 	
 	@Override
 	public int hashCode() {
