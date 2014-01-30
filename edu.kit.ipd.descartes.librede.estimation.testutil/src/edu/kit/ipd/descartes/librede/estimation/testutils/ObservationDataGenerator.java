@@ -226,6 +226,8 @@ public class ObservationDataGenerator {
 			repository.setData(StandardMetric.RESPONSE_TIME, services[i], ts);	
 		}
 		
+		repository.setCurrentTime(time);
+		
 		time++;
 	}
 	

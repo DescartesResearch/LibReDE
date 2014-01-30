@@ -26,66 +26,74 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
-
-import java.util.Arrays;
-
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
+import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 
 /**
- * This output function implements the Utilization Law:
+ * This output function describes the relationship between the per-service utilization and the resource demands. 
+ * It implements the Service Demand Law:
  * 
- * U_{i} = \sum_{r = 1}^{N} X_{r} * D_{i,r}
+ * D_{i,r} = \frac{U_{i,r}}{X_{r}}
  * 
  * with
  * <ul>
- * 	<li>U_{i} is the utilization of resource i
- * 	<li>N is the number of services</li>
  *  <li>D_{i,r} is the resource demand of resource i and service r</li>
+ *  <li>U_{i,r} is the utilization at resource i due to service r</li>
  *  <li>X_{r} is the throughput of service r</li>
+ * </ul>
+ * 
+ * The per-service utilization U_{i,r} is calculated from the aggregate utilization U_{i} according to the
+ * following apportioning scheme:
+ * 
+ * U_{i,r} = \frac{U_{i} * R_{r} * X_{r}}{\sum_{v = 1}^{N} R_{v} * X_{v}}
+ * 
+ * with
+ * <ul>
+ *  <li>U_{i,r} is the utilization at resource i due to service r</li>
+ *  <li>U_{i} is the aggregate utilization at resource i</li>
+ *  <li>R_{r} is the average response time of service r</li>
+ *  <li>X_{r} is the average throughput of service r</li>
  * </ul>
  * 
  * @author Simon Spinner (simon.spinner@kit.edu)
  * @version 1.0
  */
-public class UtilizationLaw extends AbstractLinearOutputFunction {
+public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	
 	private Resource res_i;
+	private Service cls_r;
 	
-	private final Query<Vector> throughputQuery;
-	private final Query<Scalar> utilizationQuery;
+	private Query<Scalar> busyTimeQuery;
+	private Query<Scalar> sumDeparturesQuery;
 	
-	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
-	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
 	
 	/**
 	 * Creates a new instance.
 	 * 
 	 * @param system - the model of the system
-	 * @param repository - the repository with current measurement data
+	 * @param repository - the view of the repository with current measurement data
+	 * @param service - the service for which the utilization is calculated
 	 * @param resource - the resource for which the utilization is calculated
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public UtilizationLaw(WorkloadDescription system, IRepositoryCursor repository,
-			Resource resource) {
-		super(system, Arrays.asList(resource), system.getServices());
+	public ServiceDemandLaw2(WorkloadDescription system, IRepositoryCursor repository,
+			Resource resource,
+			Service service) {
+		super(system, resource, service);
 		
-		this.res_i = resource;
+		res_i = resource;
+		cls_r = service;
 		
-		variables = zeros(system.getState().getStateSize());
-		varFocusedRange = system.getState().getRange(resource);
-		
-		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
-		utilizationQuery = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(res_i).average().using(repository);
+		busyTimeQuery = QueryBuilder.select(StandardMetric.BUSY_TIME).forResource(res_i).sum().using(repository);
+		sumDeparturesQuery = QueryBuilder.select(StandardMetric.DEPARTURES).forService(service).sum().using(repository);
 	}
 	
 	/* (non-Javadoc)
@@ -93,16 +101,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public boolean isApplicable() {
-		return throughputQuery.hasData() && utilizationQuery.hasData();
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ILinearOutputFunction#getIndependentVariables()
-	 */
-	@Override
-	public Vector getIndependentVariables() {
-		Vector X = throughputQuery.execute();
-		return variables.set(varFocusedRange, X);
+		return busyTimeQuery.hasData() && sumDeparturesQuery.hasData();
 	}
 
 	/* (non-Javadoc)
@@ -110,7 +109,22 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		return utilizationQuery.execute().getValue() * this.res_i.getNumberOfParallelServers();
+		double C = sumDeparturesQuery.execute().getValue();
+		double B = busyTimeQuery.execute().getValue();
+		
+		if (C == 0) {
+			return 0;
+		} else {
+			return B / C;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IDirectOutputFunction#getFactor()
+	 */
+	@Override
+	public double getFactor() {
+		return 1;
 	}
 
 }
