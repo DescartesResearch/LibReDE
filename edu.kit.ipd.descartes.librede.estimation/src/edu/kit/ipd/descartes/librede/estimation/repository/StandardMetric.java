@@ -41,6 +41,61 @@ import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries.Interpolat
 import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 
 public enum StandardMetric implements IMetric {
+	
+	IDLE_TIME(SUM) {
+		@Override
+		public TimeSeries retrieve(IMonitoringRepository repository,
+				IModelEntity entity, double start, double end) {
+			TimeSeries series = repository.getData(this, entity);
+			return series.subset(start, end);
+		}
+
+		@Override
+		public double aggregate(IMonitoringRepository repository,
+				IModelEntity entity, double start, double end, Aggregation func) {
+			if (isAggregationSupported(func)) {
+				TimeSeries series = retrieve(repository, entity, start, end);
+				series.setInterpolationMethod(Interpolation.LINEAR);
+				return series.sum(0);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			return repository.containsData(this, entity, aggregationInterval);
+		}
+	},
+	
+	BUSY_TIME(SUM) {
+
+		@Override
+		public TimeSeries retrieve(IMonitoringRepository repository,
+				IModelEntity entity, double start, double end) {
+			TimeSeries series = repository.getData(this, entity);
+			return series.subset(start, end);
+		}
+
+		@Override
+		public double aggregate(IMonitoringRepository repository,
+				IModelEntity entity, double start, double end, Aggregation func) {
+			if (isAggregationSupported(func)) {
+				TimeSeries series = retrieve(repository, entity, start, end);
+				series.setInterpolationMethod(Interpolation.LINEAR);
+				return series.sum(0);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			return repository.containsData(this, entity, aggregationInterval);
+		}		
+	},
 
 	UTILIZATION(AVERAGE) {	
 
@@ -65,7 +120,10 @@ public enum StandardMetric implements IMetric {
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
 				IModelEntity entity, double aggregationInterval) {
-			return repository.containsData(this, entity, aggregationInterval);
+			if (repository.containsData(this, entity, aggregationInterval)) {
+				return true;
+			}
+			return repository.containsData(BUSY_TIME, entity, aggregationInterval) && repository.containsData(IDLE_TIME, entity, aggregationInterval);
 		}
 
 	},
