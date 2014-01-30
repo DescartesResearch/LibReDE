@@ -36,7 +36,6 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.librede.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.librede.estimation.repository.MemoryObservationRepository;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
@@ -59,9 +58,9 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1, 1);
-		cur.setEndTime(8);
-		
+		repository.setCurrentTime(8);
+		IRepositoryCursor cur = repository.getCursor(1, 1);
+	
 		for (int i = 2; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
 			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 1);
@@ -78,8 +77,8 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts2);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1.2, 1);
-		cur.setEndTime(7.2);
+		repository.setCurrentTime(7.2);
+		IRepositoryCursor cur = repository.getCursor(1.2, 1);
 
 		for (int i = 0; i < 6; i++) {
 			assertThat(cur.next()).isTrue();
@@ -95,8 +94,8 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1, 1);
-		cur.setEndTime(8);
+		repository.setCurrentTime(8);
+		IRepositoryCursor cur = repository.getCursor(1, 1);
 		
 		for (int i = 2; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
@@ -108,7 +107,7 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1.addSample(10.0, 1.0));
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1.addSample(10.0, 1.0));
-		cur.setEndTime(10);
+		repository.setCurrentTime(10);
 		
 		for (int i = 9; i <= 10; i++) {
 			assertThat(cur.next()).isTrue();
@@ -124,8 +123,8 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(1, 3);
-		cur.setEndTime(8);
+		repository.setCurrentTime(8);
+		IRepositoryCursor cur = repository.getCursor(1, 3);
 		
 		for (int i = 4; i <= 8; i+=3) {
 			assertThat(cur.next()).isTrue();
@@ -141,19 +140,19 @@ public class RepositoryCursorTest {
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], ts1);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], ts1);
-		RepositoryCursor cur = repository.getCursor(0, 100);
+		IRepositoryCursor cur = repository.getCursor(0, 100);
 		assertThat(cur.next()).isFalse();		
 	}
 	
 	@Test
-	public void testEmptyCursor() {		
-		RepositoryCursor cur = repository.getCursor(1, 1);
-		cur.setEndTime(1);
+	public void testEmptyCursor() {
+		repository.setCurrentTime(1);
+		IRepositoryCursor cur = repository.getCursor(1, 1);
 		assertThat(cur.next()).isFalse();
 		
 		ts1.setStartTime(1);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], ts1);
-		cur.setEndTime(8);
+		repository.setCurrentTime(8);
 		assertThat(cur.next()).isTrue();
 		assertThat(cur.getCurrentIntervalStart()).isEqualTo(ts1.getStartTime(), offset(1e-9));
 		assertThat(cur.getCurrentIntervalEnd()).isEqualTo(ts1.getStartTime() + 1.0, offset(1e-9));

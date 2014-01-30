@@ -46,7 +46,6 @@ import org.junit.Test;
 import edu.kit.ipd.descartes.librede.estimation.repository.MemoryObservationRepository;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
@@ -113,6 +112,8 @@ public class QueryTest {
 		repository.setData(StandardMetric.THROUGHPUT, services[1], payServTputTable);
 		repository.setData(StandardMetric.RESPONSE_TIME, services[0], addServRtTable);
 		repository.setData(StandardMetric.RESPONSE_TIME, services[1], payServRtTable);
+		
+		repository.setCurrentTime(5);
 	}
 
 	@After
@@ -159,8 +160,7 @@ public class QueryTest {
 	// }
 	@Test
 	public void testAllQuery() {
-		RepositoryCursor cursor = repository.getCursor(0, 5);
-		cursor.setEndTime(5);
+		IRepositoryCursor cursor = repository.getCursor(0, 5);
 		assertThat(cursor.next()).isTrue();
 		
 		Query<Vector> respSingle = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(services[1]).all().using(cursor);

@@ -39,7 +39,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.Res
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -68,8 +68,7 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(ITERATIONS);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.1);
@@ -106,8 +105,7 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(ITERATIONS);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);

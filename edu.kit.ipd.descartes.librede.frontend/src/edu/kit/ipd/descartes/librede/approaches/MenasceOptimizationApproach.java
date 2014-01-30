@@ -34,7 +34,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.Res
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
@@ -46,7 +46,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	
 	@Override
 	public void initialize(WorkloadDescription workload,
-			RepositoryCursor cursor, int estimationWindow, boolean iterative)
+			IRepositoryCursor cursor, int estimationWindow, boolean iterative)
 			throws InitializationException {
 		super.initialize(workload, cursor, estimationWindow, iterative);
 		

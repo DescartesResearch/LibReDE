@@ -28,9 +28,9 @@ package edu.kit.ipd.descartes.librede.estimation.models.state.constraints;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
@@ -45,7 +45,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	
 	private Query<Vector> throughputQuery;
 	
-	public UtilizationConstraint(WorkloadDescription system, RepositoryCursor repository, Resource resource) {
+	public UtilizationConstraint(WorkloadDescription system, IRepositoryCursor repository, Resource resource) {
 		this.system = system;
 		this.res_i = resource;
 		

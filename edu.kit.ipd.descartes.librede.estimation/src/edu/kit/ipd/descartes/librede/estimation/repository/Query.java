@@ -47,10 +47,10 @@ public final class Query<T extends Vector> {
 	private Query.Type type;
 	private IMetric metric;
 	private List<IModelEntity> entities = new ArrayList<IModelEntity>();
-	private RepositoryCursor repositoryCursor;
+	private IRepositoryCursor repositoryCursor;
 	
 	protected Query(Aggregation aggregation, Type type, IMetric metric,
-			IModelEntity entity, RepositoryCursor repositoryCursor) {
+			IModelEntity entity, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
 		this.type = type;

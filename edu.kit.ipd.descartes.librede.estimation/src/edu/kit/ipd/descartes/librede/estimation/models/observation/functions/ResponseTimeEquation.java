@@ -34,9 +34,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
@@ -87,7 +87,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @throws NullPointerException if any parameter is null
 	 * @throws IllegalArgumentException if the list of services or resources is empty
 	 */
-	public ResponseTimeEquation(WorkloadDescription system, RepositoryCursor repository,
+	public ResponseTimeEquation(WorkloadDescription system, IRepositoryCursor repository,
 			Service service, List<Resource> selectedResources
 			) {
 		super(system, selectedResources, Arrays.asList(service));

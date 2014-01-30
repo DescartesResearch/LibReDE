@@ -127,7 +127,7 @@ public class QueryBuilder {
 	}
 	
 	public class UsingClause<T extends Vector> {
-		public Query<T> using(RepositoryCursor repository) {
+		public Query<T> using(IRepositoryCursor repository) {
 			return new Query<T>(aggregation, type, metric, entity, repository);
 		}
 	}

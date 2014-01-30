@@ -27,9 +27,9 @@
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
@@ -59,7 +59,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ResponseTimeApproximation(WorkloadDescription system, RepositoryCursor repository, Resource resource,
+	public ResponseTimeApproximation(WorkloadDescription system, IRepositoryCursor repository, Resource resource,
 			Service service, Aggregation aggregation) {
 		super(system, resource, service);
 		

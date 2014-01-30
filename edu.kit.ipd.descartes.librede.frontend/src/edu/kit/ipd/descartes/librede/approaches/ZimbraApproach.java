@@ -40,7 +40,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinear
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.StateBoundsConstraint;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
@@ -57,7 +57,7 @@ public class ZimbraApproach implements IEstimationApproach {
 	private Vector curCpuEstimates;
 	private LeastSquaresRegression cpuEstimator;
 	private RecursiveOptimization systemEstimator;
-	private RepositoryCursor cursor;
+	private IRepositoryCursor cursor;
 	private WorkloadDescription workload;
 	private boolean iterative;
 	
@@ -81,7 +81,7 @@ public class ZimbraApproach implements IEstimationApproach {
 	
 	@Override
 	public void initialize(WorkloadDescription workload,
-			RepositoryCursor cursor, int estimationWindow, boolean iterative)
+			IRepositoryCursor cursor, int estimationWindow, boolean iterative)
 			throws InitializationException {
 		this.workload = workload;
 		this.cursor = cursor;

@@ -26,9 +26,9 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
@@ -86,7 +86,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ServiceDemandLaw(WorkloadDescription system, RepositoryCursor repository,
+	public ServiceDemandLaw(WorkloadDescription system, IRepositoryCursor repository,
 			Resource resource,
 			Service service) {
 		super(system, resource, service);

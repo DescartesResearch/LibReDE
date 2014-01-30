@@ -29,7 +29,7 @@ package edu.kit.ipd.descartes.librede.approaches;
 import edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
@@ -40,11 +40,11 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 	private boolean iterative;
 	private WorkloadDescription workload;
 	private IEstimationAlgorithm<?, ?> estimator;
-	private RepositoryCursor cursor;
+	private IRepositoryCursor cursor;
 	
 	@Override
 	public void initialize(WorkloadDescription workload,
-			RepositoryCursor cursor, int estimationWindow, boolean iterative)
+			IRepositoryCursor cursor, int estimationWindow, boolean iterative)
 			throws InitializationException {
 		this.workload = workload;
 		this.cursor = cursor;

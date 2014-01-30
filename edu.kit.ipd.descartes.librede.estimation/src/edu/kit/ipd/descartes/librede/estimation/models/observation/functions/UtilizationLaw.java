@@ -30,9 +30,9 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 
 import java.util.Arrays;
 
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
@@ -75,7 +75,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public UtilizationLaw(WorkloadDescription system, RepositoryCursor repository,
+	public UtilizationLaw(WorkloadDescription system, IRepositoryCursor repository,
 			Resource resource) {
 		super(system, Arrays.asList(resource), system.getServices());
 		

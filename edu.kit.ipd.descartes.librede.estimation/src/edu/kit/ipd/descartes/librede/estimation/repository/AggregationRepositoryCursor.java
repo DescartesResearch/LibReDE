@@ -33,7 +33,7 @@ import java.util.Map;
 import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 
 
-public class RepositoryCursor {
+public class AggregationRepositoryCursor implements IRepositoryCursor {
 	
 	private static class SeriesCacheKey {
 		
@@ -132,19 +132,24 @@ public class RepositoryCursor {
 	
 	private IMonitoringRepository repository;
 	private double currentTime;
-	private double endTime;
+	private double startTime;
 	private double stepSize;
 	private Map<SeriesCacheKey, TimeSeries> seriesCache = new HashMap<SeriesCacheKey, TimeSeries>();
 	private Map<AggregationCacheKey, Double> aggregationCache = new HashMap<AggregationCacheKey, Double>();
 	
-	public RepositoryCursor(IMonitoringRepository repository, double startTime, double stepSize) {
+	public AggregationRepositoryCursor(IMonitoringRepository repository, double startTime, double stepSize) {
 		this.repository = repository;
 		this.stepSize = stepSize;
+		this.startTime = startTime;
 		this.currentTime = startTime;
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#next()
+	 */
+	@Override
 	public boolean next() {
-		if (currentTime + stepSize <= endTime) {
+		if (currentTime + stepSize <= repository.getCurrentTime()) {
 			currentTime += stepSize;
 			seriesCache.clear();
 			aggregationCache.clear();
@@ -152,27 +157,50 @@ public class RepositoryCursor {
 		}
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#seek(int)
+	 */
+	@Override
+	public boolean seek(int interval) {
+		double newCurrentTime = startTime + stepSize * interval;
+		if (newCurrentTime <= repository.getCurrentTime()) {
+			currentTime = newCurrentTime;
+			seriesCache.clear();
+			aggregationCache.clear();
+			return true;
+		}
+		return false;
+	}
 	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getCurrentIntervalStart()
+	 */
+	@Override
 	public double getCurrentIntervalStart() {
 		return currentTime - stepSize;
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getCurrentIntervalLength()
+	 */
+	@Override
 	public double getCurrentIntervalLength() {
 		return stepSize;
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getCurrentIntervalEnd()
+	 */
+	@Override
 	public double getCurrentIntervalEnd() {
 		return currentTime;
 	}
 	
-	public double getEndTime() {
-		return endTime;
-	}
-	
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
-	}
-	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getValues(edu.kit.ipd.descartes.librede.estimation.repository.IMetric, edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity)
+	 */
+	@Override
 	public TimeSeries getValues(IMetric metric, IModelEntity entity) {
 		SeriesCacheKey key = new SeriesCacheKey(metric, entity);
 		if (!seriesCache.containsKey(key)) {
@@ -183,6 +211,10 @@ public class RepositoryCursor {
 		return seriesCache.get(key);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getAggregatedValue(edu.kit.ipd.descartes.librede.estimation.repository.IMetric, edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity, edu.kit.ipd.descartes.librede.estimation.repository.Aggregation)
+	 */
+	@Override
 	public double getAggregatedValue(IMetric metric, IModelEntity entity, Aggregation func) {
 		AggregationCacheKey key = new AggregationCacheKey(metric, entity, func);
 		if (!aggregationCache.containsKey(key)) {
@@ -193,10 +225,18 @@ public class RepositoryCursor {
 		return aggregationCache.get(key);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getRepository()
+	 */
+	@Override
 	public IMonitoringRepository getRepository() {
 		return repository;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#hasData(edu.kit.ipd.descartes.librede.estimation.repository.IMetric, java.util.List, edu.kit.ipd.descartes.librede.estimation.repository.Aggregation)
+	 */
+	@Override
 	public boolean hasData(IMetric metric, List<IModelEntity> entities,
 			Aggregation aggregation) {
 		if (metric.isAggregationSupported(aggregation)) {
@@ -211,5 +251,10 @@ public class RepositoryCursor {
 			return data;
 		}
 		return false;
+	}
+	
+	@Override
+	public int getAvailableIntervals() {
+		return (int) ((repository.getCurrentTime() - startTime) / stepSize);
 	}
 }

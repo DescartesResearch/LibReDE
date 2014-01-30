@@ -24,18 +24,34 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.approaches;
+package edu.kit.ipd.descartes.librede.estimation.repository;
 
-import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import java.util.List;
 
-public interface IEstimationApproach {
+import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
+
+public interface IRepositoryCursor {
+
+	boolean next();
 	
-	void initialize(WorkloadDescription workload, IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException;
-	
-	TimeSeries execute() throws EstimationException;
+	boolean seek(int interval);
+
+	double getCurrentIntervalStart();
+
+	double getCurrentIntervalLength();
+
+	double getCurrentIntervalEnd();
+
+	TimeSeries getValues(IMetric metric, IModelEntity entity);
+
+	double getAggregatedValue(IMetric metric,
+			IModelEntity entity, Aggregation func);
+
+	IMonitoringRepository getRepository();
+
+	boolean hasData(IMetric metric,
+			List<IModelEntity> entities, Aggregation aggregation);
+
+	int getAvailableIntervals();
 
 }

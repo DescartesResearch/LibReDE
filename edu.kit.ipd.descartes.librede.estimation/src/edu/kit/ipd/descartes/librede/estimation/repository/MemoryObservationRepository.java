@@ -94,7 +94,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private Map<DataKey, DataEntry> data = new HashMap<DataKey, DataEntry>();
-	private WorkloadDescription workload;	
+	private WorkloadDescription workload;
+	private double currentTime;
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
@@ -163,7 +164,17 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	@Override
-	public RepositoryCursor getCursor(double startTime, double stepSize) {
-		return new RepositoryCursor(this, startTime, stepSize);
+	public IRepositoryCursor getCursor(double startTime, double stepSize) {
+		return new AggregationRepositoryCursor(this, startTime, stepSize);
+	}
+	
+	@Override
+	public double getCurrentTime() {
+		return currentTime;
+	}
+	
+	@Override
+	public void setCurrentTime(double currentTime) {
+		this.currentTime = currentTime;
 	}
 }

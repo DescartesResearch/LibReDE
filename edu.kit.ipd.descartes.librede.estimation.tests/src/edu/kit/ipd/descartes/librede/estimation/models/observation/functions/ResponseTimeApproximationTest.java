@@ -37,9 +37,9 @@ import org.junit.Test;
 
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ResponseTimeApproximation;
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.testutils.Differentiation;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
@@ -62,7 +62,7 @@ public class ResponseTimeApproximationTest {
 	private Resource resource;
 	private Service service;
 	private int stateIdx;
-	private RepositoryCursor cursor;
+	private IRepositoryCursor cursor;
 
 	@Before
 	public void setUp() throws Exception {
@@ -71,7 +71,6 @@ public class ResponseTimeApproximationTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
 		service = workload.getServices().get(SERVICE_IDX);

@@ -39,7 +39,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.Res
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
@@ -66,8 +66,7 @@ public class MenasceOptimizationTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(ITERATIONS);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
 		Vector initialEstimate = vector(0.01);
 		stateModel = new ConstantStateModel<>(1, initialEstimate);
@@ -82,12 +81,10 @@ public class MenasceOptimizationTest {
 
 		long start = System.nanoTime();
 
-		while(true) {
+		for (int i = 0; i < ITERATIONS; i++) {
 			generator.nextObservation();
 			
-			if (!cursor.next()) {
-				break;
-			}
+			cursor.next();
 			
 			optim.update();
 
@@ -113,8 +110,7 @@ public class MenasceOptimizationTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		RepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(ITERATIONS);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 		stateModel = new ConstantStateModel<>(5, initialEstimate);

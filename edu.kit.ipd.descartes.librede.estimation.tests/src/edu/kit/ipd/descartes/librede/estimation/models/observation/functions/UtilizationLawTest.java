@@ -36,8 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.testutils.Differentiation;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
@@ -52,7 +52,7 @@ public class UtilizationLawTest {
 	
 	private ObservationDataGenerator generator;
 	private UtilizationLaw law;
-	private RepositoryCursor cursor;
+	private IRepositoryCursor cursor;
 	private Vector state;
 	private Resource resource;
 
@@ -63,7 +63,6 @@ public class UtilizationLawTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
 		law = new UtilizationLaw(workload, cursor, resource);

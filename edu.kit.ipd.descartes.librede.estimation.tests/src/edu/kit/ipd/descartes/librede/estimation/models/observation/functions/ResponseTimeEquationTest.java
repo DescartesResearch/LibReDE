@@ -35,9 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ResponseTimeEquation;
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.RepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.testutils.Differentiation;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
@@ -53,7 +53,7 @@ public class ResponseTimeEquationTest {
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeEquation law;
-	private RepositoryCursor cursor;
+	private IRepositoryCursor cursor;
 	private Service service;
 	private Vector state;
 
@@ -64,7 +64,6 @@ public class ResponseTimeEquationTest {
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
-		cursor.setEndTime(1);
 		
 		service = workload.getServices().get(SERVICE_IDX);
 		

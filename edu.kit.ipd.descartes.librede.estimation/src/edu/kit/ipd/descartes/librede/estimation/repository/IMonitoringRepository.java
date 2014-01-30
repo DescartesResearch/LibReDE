@@ -46,5 +46,8 @@ public interface IMonitoringRepository {
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
-	public RepositoryCursor getCursor(double startTime, double stepSize);
+	public IRepositoryCursor getCursor(double startTime, double stepSize);
+	
+	public double getCurrentTime();
+	public void setCurrentTime(double currentTime);
 }
