@@ -27,7 +27,6 @@
 package edu.kit.ipd.descartes.librede.nnls;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
-import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
@@ -37,13 +36,15 @@ import com.sun.jna.Memory;
 import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
 
-import edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm;
+import edu.kit.ipd.descartes.librede.estimation.algorithm.AbstractEstimationAlgorithm;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
+import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ILinearOutputFunction;
 import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.nnls.backend.NNLSLibrary;
+import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -55,11 +56,8 @@ import edu.kit.ipd.descartes.linalg.Vector;
  * 
  */
 public class LeastSquaresRegression
-		implements
-		IEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<ILinearOutputFunction, Scalar>> {
+		extends AbstractEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<ILinearOutputFunction, Scalar>> {
 
-	private IObservationModel<ILinearOutputFunction, Scalar> observationModel;
-	private IStateModel<Unconstrained> stateModel;
 	private ILinearOutputFunction outputFunction;
 
 	// contains current measurements
@@ -77,9 +75,8 @@ public class LeastSquaresRegression
 
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
-			IObservationModel<ILinearOutputFunction, Scalar> observationModel, int estimationWindow) {
-		this.observationModel = observationModel;
-		this.stateModel = stateModel;
+			IObservationModel<ILinearOutputFunction, Scalar> observationModel, int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, estimationWindow);
 		
 		independentVariables = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
 		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);
@@ -172,7 +169,7 @@ public class LeastSquaresRegression
 	
 	@Override
 	public void update() throws EstimationException {
-		outputFunction = observationModel.getOutputFunction(0);
+		outputFunction = getObservationModel().getOutputFunction(0);
 		
 		numObservations++;
 		
@@ -184,7 +181,7 @@ public class LeastSquaresRegression
 	public Vector estimate() throws EstimationException {
 		// when the sample size is small
 		if (numObservations < MIN_SIZE_OF_ESTIMATION) {
-			return vector(0);
+			return LinAlg.zeros(getStateModel().getStateSize());
 		} else if (numObservations < dependentVariables.rows()) {
 			return nnls(independentVariables.rows(0, numObservations - 1), dependentVariables.rows(0, numObservations - 1));
 		} else {

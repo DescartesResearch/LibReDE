@@ -26,12 +26,12 @@
  */
 package edu.kit.ipd.descartes.librede.ipopt.java;
 
-import static edu.kit.ipd.descartes.librede.nativehelper.NativeHelper.*;
+import static edu.kit.ipd.descartes.librede.nativehelper.NativeHelper.nativeVector;
+import static edu.kit.ipd.descartes.librede.nativehelper.NativeHelper.toNative;
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.mean;
 import static edu.kit.ipd.descartes.linalg.LinAlg.norm2;
 import static edu.kit.ipd.descartes.linalg.LinAlg.transpose;
-import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vertcat;
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 
@@ -41,8 +41,9 @@ import java.util.List;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
 
-import edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm;
+import edu.kit.ipd.descartes.librede.estimation.algorithm.AbstractEstimationAlgorithm;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
+import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.HessianMatrixBuilder;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.JacobiMatrixBuilder;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
@@ -63,7 +64,7 @@ import edu.kit.ipd.descartes.librede.nativehelper.NativeHelper;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-public class RecursiveOptimization implements IEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
+public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
 
 	private final static double OPTION_TOL_VALUE = 1e-7;
 	private final static double OPTION_LNP_LOWER_BOUND_INF_VALUE = -1e+19;
@@ -127,7 +128,9 @@ public class RecursiveOptimization implements IEstimationAlgorithm<ConstantState
 	 */
 	@Override
 	public void initialize(ConstantStateModel<? extends IStateConstraint> stateModel,
-			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) {
+			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, estimationWindow);
+		
 		
 		initStateConstraints(stateModel.getConstraints());
 		
