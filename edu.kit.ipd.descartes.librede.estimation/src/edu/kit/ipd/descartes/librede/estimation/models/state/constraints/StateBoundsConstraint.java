@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.state.constraints;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -70,6 +72,11 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public Matrix getSecondDerivatives(Vector x) {
 		return null;
+	}
+
+	@Override
+	public boolean isApplicable(List<String> messages) {
+		return true;
 	}
 
 }

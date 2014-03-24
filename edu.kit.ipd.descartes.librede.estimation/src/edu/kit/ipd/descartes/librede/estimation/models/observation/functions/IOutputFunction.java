@@ -26,11 +26,13 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public interface IOutputFunction {
 	
-	boolean isApplicable();
+	boolean isApplicable(List<String> messages);
 	
 	double getObservedOutput();
 	
