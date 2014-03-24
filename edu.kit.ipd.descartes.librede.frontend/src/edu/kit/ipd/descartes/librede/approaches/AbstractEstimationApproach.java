@@ -26,9 +26,15 @@
  */
 package edu.kit.ipd.descartes.librede.approaches;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
+import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
+import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
+import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.IStateConstraint;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
@@ -53,6 +59,20 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 	
 	protected void setEstimationAlgorithm(IEstimationAlgorithm<?, ?> estimator) {
 		this.estimator = estimator;
+	}
+	
+	@Override
+	public boolean checkPreconditions(List<String> messages) {
+		boolean result = true;
+		IObservationModel<?, ?> observationModel  = this.estimator.getObservationModel();
+		for (IOutputFunction func : observationModel) {
+			result = result && func.isApplicable(messages);
+		}
+		IStateModel<?> stateModel = this.estimator.getStateModel();
+		for (IStateConstraint constr : stateModel.getConstraints()) {
+			result = result && constr.isApplicable(messages);
+		}
+		return result;
 	}
 	
 	@Override

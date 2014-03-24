@@ -60,11 +60,6 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
 		for (Service service : workload.getServices()) {
 			ResponseTimeEquation func = new ResponseTimeEquation(workload, cursor, service, workload.getResources());
-			
-			if (!func.isApplicable()) {
-				throw new InitializationException("The service demand law output function is not applicable.");
-			}
-			
 			observationModel.addOutputFunction(func);
 		}
 

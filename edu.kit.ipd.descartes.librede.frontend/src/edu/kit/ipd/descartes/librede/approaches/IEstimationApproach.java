@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.approaches;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
@@ -35,6 +37,8 @@ import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 public interface IEstimationApproach {
 	
 	void initialize(WorkloadDescription workload, IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException;
+	
+	boolean checkPreconditions(List<String> messages);
 	
 	TimeSeries execute() throws EstimationException;
 
