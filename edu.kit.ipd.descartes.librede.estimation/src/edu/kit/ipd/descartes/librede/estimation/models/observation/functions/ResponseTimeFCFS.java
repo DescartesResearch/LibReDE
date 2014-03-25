@@ -28,56 +28,44 @@ package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
 import java.util.List;
 
+import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
+import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
+import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.linalg.Scalar;
 
-public abstract class AbstractOutputFunction implements IOutputFunction {
+public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	
-	private WorkloadDescription system;
-	private List<Resource> selectedResources;
-	private List<Service> selectedClasses;
+	private Query<Scalar> responseTimeQuery;
+	private Query<Scalar> queueLengthQuery;
 
-	protected AbstractOutputFunction(WorkloadDescription system, List<Resource> selectedResources,
-			List<Service> selectedClasses) {		
-		if (system == null || selectedResources == null || selectedClasses == null) {
-			throw new NullPointerException();
-		}
-		if (selectedResources.size() < 1 || selectedClasses.size() < 1) {
-			throw new IllegalArgumentException();
-		}
+	public  ResponseTimeFCFS(WorkloadDescription system, IRepositoryCursor repository,
+			Resource resource, Service service) {
+		super(system, resource, service);
 		
-		this.system = system;
-		this.selectedResources = selectedResources;
-		this.selectedClasses = selectedClasses;
+		responseTimeQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(repository);
+		queueLengthQuery = QueryBuilder.select(StandardMetric.QUEUE_LENGTH_SEEN_ON_ARRIVAL).forResource(resource).average().using(repository);
 	}
 
-	public WorkloadDescription getSystem() {
-		return system;
+	@Override
+	public boolean isApplicable(List<String> messages) {
+		boolean result = true;
+		result = result && checkQueryPrecondition(responseTimeQuery, messages);
+		result = result && checkQueryPrecondition(queueLengthQuery, messages);
+		return result;
 	}
 
-	public List<Resource> getSelectedResources() {
-		return selectedResources;
+	@Override
+	public double getObservedOutput() {
+		return responseTimeQuery.execute().getValue();
 	}
 
-	public List<Service> getSelectedWorkloadClasses() {
-		return selectedClasses;
-	}	
-	
-	protected boolean checkQueryPrecondition(Query<?> query, List<String> messages) {
-		if (!query.hasData()) {
-			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
-			msg.append("metric = ").append(query.getMetric().toString()).append(" ");
-			msg.append("entities = { ");
-			for(IModelEntity entity : query.getEntities()) {
-				msg.append(entity.getName()).append(" ");
-			}
-			msg.append(" } ");
-			messages.add(msg.toString());
-			return false;
-		}
-		return true;
+	@Override
+	public double getFactor() {
+		return queueLengthQuery.execute().plus(1).getValue();
 	}
+
 }

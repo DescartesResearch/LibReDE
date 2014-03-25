@@ -29,6 +29,7 @@ package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 
 import java.util.Arrays;
+import java.util.List;
 
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
@@ -92,8 +93,11 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override
-	public boolean isApplicable() {
-		return throughputQuery.hasData() && utilizationQuery.hasData();
+	public boolean isApplicable(List<String> messages) {
+		boolean result = true;
+		result = result && checkQueryPrecondition(throughputQuery, messages);
+		result = result && checkQueryPrecondition(utilizationQuery, messages);
+		return result;
 	}
 
 	/* (non-Javadoc)

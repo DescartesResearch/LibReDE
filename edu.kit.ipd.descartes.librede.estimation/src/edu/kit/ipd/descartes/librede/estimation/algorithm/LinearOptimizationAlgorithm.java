@@ -26,8 +26,6 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.algorithm;
 
-import org.apache.commons.math3.optim.linear.SimplexSolver;
-
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
@@ -36,7 +34,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-public class LinearOptimizationAlgorithm implements IEstimationAlgorithm<IStateModel<ILinearStateConstraint>, IObservationModel<ILinearOutputFunction, Vector>> {
+public class LinearOptimizationAlgorithm extends AbstractEstimationAlgorithm<IStateModel<ILinearStateConstraint>, IObservationModel<ILinearOutputFunction, Vector>> {
 
 	@Override
 	public void initialize(IStateModel<ILinearStateConstraint> stateModel,

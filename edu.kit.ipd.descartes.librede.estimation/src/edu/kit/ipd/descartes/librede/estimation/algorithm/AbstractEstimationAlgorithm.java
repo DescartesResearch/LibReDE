@@ -24,18 +24,32 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
+package edu.kit.ipd.descartes.librede.estimation.algorithm;
 
-import java.util.List;
+import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
+import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
 
-import edu.kit.ipd.descartes.linalg.Vector;
+public abstract class AbstractEstimationAlgorithm<S extends IStateModel<?>, O extends IObservationModel<?, ?>> implements IEstimationAlgorithm<S, O> {
+	
+	private S stateModel;
+	private O observationModel;
+	
+	@Override
+	public void initialize(S stateModel, O observationModel,
+			int estimationWindow) throws InitializationException {
+		this.stateModel = stateModel;
+		this.observationModel = observationModel;
+	}
 
-public interface IOutputFunction {
-	
-	boolean isApplicable(List<String> messages);
-	
-	double getObservedOutput();
-	
-	double getCalculatedOutput(Vector state);
-	
+	@Override
+	public S getStateModel() {
+		return stateModel;
+	}
+
+	@Override
+	public O getObservationModel() {
+		return observationModel;
+	}
+
 }

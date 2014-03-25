@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.state.constraints;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public final class Unconstrained implements IStateConstraint {
@@ -47,6 +49,11 @@ public final class Unconstrained implements IStateConstraint {
 	@Override
 	public double getValue(Vector state) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isApplicable(List<String> messages) {
+		return true;
 	}
 
 }

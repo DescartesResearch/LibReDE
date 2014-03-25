@@ -57,22 +57,12 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
 		for (Service serv : workload.getServices()) {
 			ResponseTimeEquation func = new ResponseTimeEquation(workload, cursor, serv, workload.getResources());
-			
-			if (!func.isApplicable()) {
-				throw new InitializationException("The response time equation output function is not applicable.");
-			}
-			
 			observationModel.addOutputFunction(func);
 		}
 		
 		
 		for (Resource res : workload.getResources()) {
 			UtilizationLaw func = new UtilizationLaw(workload, cursor, res);
-		
-			if (!func.isApplicable()) {
-				throw new InitializationException("The utilization law output function is not applicable.");
-			}
-			
 			observationModel.addOutputFunction(func);
 		}
 

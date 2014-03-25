@@ -31,6 +31,7 @@ import java.util.List;
 import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
+import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 
 
 public interface IMonitoringRepository {
@@ -50,4 +51,5 @@ public interface IMonitoringRepository {
 	
 	public double getCurrentTime();
 	public void setCurrentTime(double currentTime);
+	public WorkloadDescription getWorkload();
 }

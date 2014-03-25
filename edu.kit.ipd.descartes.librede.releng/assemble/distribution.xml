@@ -65,6 +65,7 @@
 			<unpackOptions>
 				<includes>
 					<include>matlab/**</include>
+					<include>console/**</include>
 				</includes>
 			</unpackOptions>
 			<useProjectArtifact>false</useProjectArtifact>
