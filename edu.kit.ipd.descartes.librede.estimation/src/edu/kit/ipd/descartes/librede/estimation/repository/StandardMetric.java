@@ -352,6 +352,37 @@ public enum StandardMetric implements IMetric {
 			return DEPARTURES.hasData(repository, entity, 0.0) && ARRIVALS.hasData(repository, entity, 0.0);
 		}
 
+	},
+	QUEUE_LENGTH_SEEN_ON_ARRIVAL(NONE, AVERAGE, MINIMUM, MAXIMUM) {
+
+		@Override
+		public TimeSeries retrieve(IMonitoringRepository repository,
+				IModelEntity entity, double start, double end) {
+			return repository.getData(this, entity).subset(start, end);
+		}
+
+		@Override
+		public double aggregate(IMonitoringRepository repository,
+				IModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = retrieve(repository, entity, start, end);
+			switch(func) {
+			case AVERAGE:
+				return series.mean(0);
+			case MINIMUM:
+				return series.min(0);
+			case MAXIMUM:
+				return series.max(0);
+			default:
+				throw new IllegalArgumentException();
+			}
+		}
+
+		@Override
+		public boolean hasData(IMonitoringRepository repository,
+				IModelEntity entity, double aggregationInterval) {
+			return repository.containsData(this, entity, aggregationInterval);
+		}
+		
 	};
 
 	private final UUID id;
