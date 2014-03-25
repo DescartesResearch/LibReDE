@@ -10,35 +10,37 @@ import edu.kit.ipd.descartes.librede.estimation.repository.*;
 import edu.kit.ipd.descartes.librede.approaches.*;
 import edu.kit.ipd.descartes.librede.frontend.*;
 
+workload = repository.getWorkload();
+
 if strcmpi(metric, 'utilization')
     m = StandardMetric.UTILIZATION;
     if iscell(entities)
         e = cell(length(entities));
         for i=1:length(entities)
-            e{i} = Resource(entities{i});
+            e{i} = workload.getResource(entities{i});
         end
     else
-        e = {Resource(entities)};
+        e = {workload.getResource(entities)};
     end
 elseif strcmpi(metric, 'response_time')
     m = StandardMetric.RESPONSE_TIME;
     if iscell(entities)
         e = cell(length(entities));
         for i=1:length(entities)
-            e{i} = Service(entities{i});
+            e{i} = workload.getService(entities{i});
         end
     else
-        e = {Service(entities)};
+        e = {workload.getService(entities)};
     end
 elseif strcmpi(metric, 'throughput')
     m = StandardMetric.THROUGHPUT;
     if iscell(entities)
         e = cell(length(entities));
         for i=1:length(entities)
-            e{i} = Service(entities{i});
+            e{i} = workload.getService(entities{i});
         end
     else
-        e = {Service(entities)};
+        e = {workload.getService(entities)};
     end
 end
 

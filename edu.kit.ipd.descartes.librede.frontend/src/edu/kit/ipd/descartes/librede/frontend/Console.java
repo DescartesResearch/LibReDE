@@ -126,6 +126,9 @@ public class Console {
 
 			if (outputDirectory == null) {
 				outputDirectory = currentPath.toFile();
+			} else {
+				outputDirectory = new File(currentPath.toFile(), outputDirectory.toString());
+				outputDirectory.mkdirs();
 			}
 			log.info("Base directory: " + outputDirectory);
 

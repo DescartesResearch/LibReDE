@@ -11,6 +11,8 @@ import edu.kit.ipd.descartes.librede.estimation.repository.*;
 import edu.kit.ipd.descartes.librede.approaches.*;
 import edu.kit.ipd.descartes.librede.frontend.*;
 
+org.apache.log4j.BasicConfigurator.configure();
+
 if iscell(services)
     serviceNames = services;
 else
