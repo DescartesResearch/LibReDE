@@ -36,15 +36,15 @@ import edu.kit.ipd.descartes.linalg.Vector;
 public class QueryBuilder {
 	
 	private Query.Type type;
-	private StandardMetric metric;
+	private IMetric metric;
 	private IModelEntity entity;
 	private Aggregation aggregation;
 	
-	private QueryBuilder(StandardMetric metric) {
+	private QueryBuilder(IMetric metric) {
 		this.metric = metric;
 	}
 	
-	public static SelectClause select(StandardMetric metric) {
+	public static SelectClause select(IMetric metric) {
 		QueryBuilder builder = new QueryBuilder(metric);
 		return builder.new SelectClause();
 	}
