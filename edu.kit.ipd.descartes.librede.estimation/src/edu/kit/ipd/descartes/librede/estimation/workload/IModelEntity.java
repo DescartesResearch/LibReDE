@@ -28,10 +28,30 @@ package edu.kit.ipd.descartes.librede.estimation.workload;
 
 import java.util.UUID;
 
+/**
+ * This represents a generic system entity in the workload description. Each
+ * entity provides instrumentation points for which observation data can be
+ * collected. Examples for system entities are resources or services.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ * @version 1.0
+ */
 public interface IModelEntity {
-	
+
+	/**
+	 * A unique identifier for this entity.
+	 * 
+	 * @return a UUID
+	 * @since 1.0
+	 */
 	UUID getId();
-	
+
+	/**
+	 * A human-readable name for this entity.
+	 * 
+	 * @return a String
+	 * @since 1.0
+	 */
 	String getName();
 
 }
