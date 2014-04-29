@@ -31,9 +31,9 @@ setlocal enabledelayedexpansion
 set basepath=%~dp0
 set classpath=
 
-pushd
+pushd .
 cd %basepath%\..
 for /r %%a in (lib\plugins\*) do set classpath=!classpath!;%%a
 popd
 
-java -cp %classpath% -Dsystem.library.path=%basepath%\..\lib\native edu.kit.ipd.descartes.librede.frontend.Console %*
+java -cp %classpath% -Djava.library.path=%basepath%\..\lib\native\win32 -Djna.library.path=%basepath%\..\lib\native\win32 edu.kit.ipd.descartes.librede.frontend.Console %*
