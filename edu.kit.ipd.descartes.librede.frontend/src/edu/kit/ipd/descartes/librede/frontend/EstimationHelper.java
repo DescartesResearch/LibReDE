@@ -27,7 +27,11 @@
 package edu.kit.ipd.descartes.librede.frontend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -46,28 +50,48 @@ import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.LinAlg;
+import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public class EstimationHelper {
 	
 	public static class EstimationResult {
 		
-		public final TimeSeries estimates;
-		public final Vector relativeUtilizationError;
-		public final Vector relativeResponseTimeError;
+		public final List<TimeSeries> estimates;
+		public final MatrixBuilder lastEstimates;
+		public final MatrixBuilder relativeUtilizationError;
+		public final MatrixBuilder relativeResponseTimeError;
 		
-		public EstimationResult(TimeSeries estimates) {
-			this(estimates, LinAlg.empty(), LinAlg.empty());
+		public EstimationResult(WorkloadDescription workload) {
+			estimates = new ArrayList<TimeSeries>();
+			relativeUtilizationError = new MatrixBuilder(workload.getResources().size());
+			relativeResponseTimeError = new MatrixBuilder(workload.getServices().size());
+			lastEstimates =  new MatrixBuilder(workload.getResources().size() * workload.getServices().size());
 		}
 		
-		public EstimationResult(TimeSeries estimates,
-				Vector relativeUtilizationError,
-				Vector relativeResponseTimeError) {
-			super();
-			this.estimates = estimates;
-			this.relativeUtilizationError = relativeUtilizationError;
-			this.relativeResponseTimeError = relativeResponseTimeError;
-		}		
+		public void addEstimates(TimeSeries curEstimates) {
+			estimates.add(curEstimates);
+			lastEstimates.addRow(curEstimates.getData().row(curEstimates.samples() - 1));
+		}
+		
+		public void addFold(TimeSeries curEstimates, Vector curUtilError, Vector curRespTimeError) {
+			addEstimates(curEstimates);
+			relativeUtilizationError.addRow(curUtilError);
+			relativeResponseTimeError.addRow(curRespTimeError);
+		}
+		
+		public Vector getMeanRelativeUtilizationError() {
+			return LinAlg.mean(relativeUtilizationError.toMatrix(), 0);
+		}
+		
+		public Vector getMeanRelativeResponseTimeError() {
+			return LinAlg.mean(relativeResponseTimeError.toMatrix(), 0);
+		}
+		
+		public Vector getMeanEstimates() {
+			return LinAlg.mean(lastEstimates.toMatrix(), 0);
+		}
+	
 	}
 	
 	private static final Logger log = Logger.getLogger(EstimationHelper.class);
@@ -98,12 +122,22 @@ public class EstimationHelper {
 		return repo;
 	}
 	
-	public static EstimationResult runEstimation(String approach, WorkloadDescription workload, IMonitoringRepository repository, double startTime, double interval, int window, boolean iterative) throws Exception {
-		IRepositoryCursor cursor = repository.getCursor(startTime, interval);
-		return new EstimationResult(initAndExecuteEstimation(approach, workload, window, iterative,
-				cursor));
+	public static Map<String, EstimationResult> runEstimation(String[] approaches, IMonitoringRepository repository, double startTime, double interval, int window, boolean iterative) throws Exception {
+		Map<String, EstimationResult> allResults = new HashMap<String, EstimationResult>();
+		if (approaches == null) {
+			approaches = EstimationApproachFactory.getEstimationApproaches();
+		}
+		for (String currentApproach : approaches) {
+			EstimationResult result = new EstimationResult(repository.getWorkload());
+			IRepositoryCursor cursor = repository.getCursor(startTime, interval);
+			TimeSeries estimates = initAndExecuteEstimation(currentApproach, repository.getWorkload(), window, iterative,
+					cursor);
+			result.addEstimates(estimates);
+			allResults.put(currentApproach, result);
+		}
+		return allResults;
 	}
-
+	
 	private static TimeSeries initAndExecuteEstimation(String approach,
 			WorkloadDescription workload, int window, boolean iterative,
 			IRepositoryCursor cursor) throws InstantiationException,
@@ -113,39 +147,58 @@ public class EstimationHelper {
 		
 		if (estimator != null) {
 			estimator.initialize(workload, cursor, window, iterative);
-			TimeSeries estimates = estimator.execute();
-			return estimates;
+			List<String> messages = new LinkedList<String>();
+			if (estimator.checkPreconditions(messages)) {
+				TimeSeries estimates = estimator.execute();
+				return estimates;
+			} else {
+				log.warn("Preconditions of approach " + approach + " are not fulfilled. Skip estimation approach.");
+				for (String msg : messages) {
+					log.info(msg);
+				}
+				return TimeSeries.EMPTY;
+			}
 		} else {
 			log.error("Unkown estimation approach: " + approach);
 			throw new IllegalArgumentException();
 		}
 	}
 	
-	public static List<EstimationResult> runEstimationWithCrossValidation(String approach, WorkloadDescription workload, IMonitoringRepository repository, double startTime, double interval, int window, boolean iterative) throws Exception {
-		int kfold = 4;
-		List<EstimationResult> results = new ArrayList<EstimationResult>();
-		CrossValidationCursor cursor = new CrossValidationCursor(repository.getCursor(startTime, interval), kfold);
-		cursor.initPartitions();
-		for (int i = 0; i < kfold; i++) {
-			cursor.startTrainingPhase(i);
-			TimeSeries estimates = initAndExecuteEstimation(approach, workload, window, iterative, cursor);
-			Vector state = estimates.getData().row(estimates.samples() - 1);
-			
-			cursor.startValidationPhase(i);
-			
-			UtilizationValidator utilValidator = new UtilizationValidator(workload, cursor);
-			ResponseTimeValidator respValidator = new ResponseTimeValidator(workload, cursor);
-			while(cursor.next()) {
-				utilValidator.predict(state);
-				respValidator.predict(state);
-			}
-			
-			Vector relErrUtil = utilValidator.getPredictionError();
-			Vector relErrResp = respValidator.getPredictionError();
-			
-			results.add(new EstimationResult(estimates, relErrUtil, relErrResp));
+	public static Map<String, EstimationResult> runEstimationWithCrossValidation(String[] approaches, IMonitoringRepository repository, double startTime, double interval, int window, boolean iterative, int kfold) throws Exception {
+		Map<String, EstimationResult> allResults = new HashMap<String, EstimationResult>();
+		if (approaches == null) {
+			approaches = EstimationApproachFactory.getEstimationApproaches();
 		}
-		return results;
+		for (String currentApproach : approaches) {
+			EstimationResult result = new EstimationResult(repository.getWorkload());
+			CrossValidationCursor cursor = new CrossValidationCursor(repository.getCursor(startTime, interval), kfold);
+			cursor.initPartitions();
+			for (int i = 0; i < kfold; i++) {
+				log.info("Running repetition " + (i + 1) + " of estimation approach " + currentApproach);
+				cursor.startTrainingPhase(i);
+				TimeSeries estimates = initAndExecuteEstimation(currentApproach, repository.getWorkload(), window, iterative, cursor);
+				if (estimates.isEmpty()) {
+					break;
+				}
+				Vector state = estimates.getData().row(estimates.samples() - 1);
+				
+				cursor.startValidationPhase(i);
+				
+				UtilizationValidator utilValidator = new UtilizationValidator(repository.getWorkload(), cursor);
+				ResponseTimeValidator respValidator = new ResponseTimeValidator(repository.getWorkload(), cursor);
+				while(cursor.next()) {
+					utilValidator.predict(state);
+					respValidator.predict(state);
+				}
+				
+				Vector relErrUtil = utilValidator.getPredictionError();
+				Vector relErrResp = respValidator.getPredictionError();
+				
+				result.addFold(estimates, relErrUtil, relErrResp);
+			}
+			allResults.put(currentApproach, result);			
+		}
+		return allResults;
 	}
 
 }

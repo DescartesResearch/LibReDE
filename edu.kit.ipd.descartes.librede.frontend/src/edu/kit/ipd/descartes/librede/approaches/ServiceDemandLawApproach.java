@@ -58,11 +58,6 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 		for (Resource res : workload.getResources()) {
 			for (Service service : workload.getServices()) {
 				ServiceDemandLaw func = new ServiceDemandLaw(workload, cursor, res, service);
-				
-				if (!func.isApplicable()) {
-					throw new InitializationException("The service demand law output function is not applicable.");
-				}
-				
 				observationModel.addOutputFunction(func);
 			}
 		}

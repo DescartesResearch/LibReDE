@@ -108,8 +108,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override
-	public boolean isApplicable() {
-		return responseTimeQuery.hasData() && throughputQuery.hasData();
+	public boolean isApplicable(List<String> messages) {
+		boolean result = true;
+		result = result && checkQueryPrecondition(responseTimeQuery, messages);
+		result = result && checkQueryPrecondition(throughputQuery, messages);
+		return result;
 	}
 	
 	/* (non-Javadoc)

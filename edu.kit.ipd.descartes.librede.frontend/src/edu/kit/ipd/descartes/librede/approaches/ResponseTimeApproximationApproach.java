@@ -59,11 +59,6 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
 		for (int i = 0; i < stateSize; i++) {
 			ResponseTimeApproximation func = new ResponseTimeApproximation(workload, cursor, res, workload.getServices().get(i), Aggregation.AVERAGE);
-			
-			if (!func.isApplicable()) {
-				throw new InitializationException("The response time approximation output function is not applicable.");
-			}
-			
 			observationModel.addOutputFunction(func);
 		}		
 		

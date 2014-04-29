@@ -41,5 +41,9 @@ public interface IEstimationAlgorithm<S extends IStateModel<?>, O extends IObser
 	Vector estimate() throws EstimationException;
 	
 	void destroy();
+	
+	S getStateModel();
+	
+	O getObservationModel();
 
 }

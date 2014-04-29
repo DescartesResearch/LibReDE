@@ -40,15 +40,12 @@ import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IDi
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
-import edu.kit.ipd.descartes.linalg.AggregationFunction;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 
-public class SimpleApproximation implements IEstimationAlgorithm<ConstantStateModel<Unconstrained>, IObservationModel<IDirectOutputFunction, Vector>> {
+public class SimpleApproximation extends AbstractEstimationAlgorithm<ConstantStateModel<Unconstrained>, IObservationModel<IDirectOutputFunction, Vector>> {
 	
-	private ConstantStateModel<Unconstrained> stateModel;
-	private IObservationModel<IDirectOutputFunction, Vector> observationModel;
 	private Aggregation aggregation;
 	private Matrix buffer;
 	
@@ -59,19 +56,18 @@ public class SimpleApproximation implements IEstimationAlgorithm<ConstantStateMo
 	@Override
 	public void initialize(ConstantStateModel<Unconstrained> stateModel,
 			IObservationModel<IDirectOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
-		this.stateModel = stateModel;
-		this.observationModel = observationModel;
+		super.initialize(stateModel, observationModel, estimationWindow);
 		this.buffer = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
 	}
 	
 	@Override
 	public void update() throws EstimationException {
-		final Vector output = observationModel.getObservedOutput();		
+		final Vector output = getObservationModel().getObservedOutput();		
 		
 		Vector currentEstimate = vector(output.rows(), new VectorFunction() {			
 			@Override
 			public double cell(int row) {
-				return output.get(row) / observationModel.getOutputFunction(row).getFactor();
+				return output.get(row) / getObservationModel().getOutputFunction(row).getFactor();
 			}
 		});
 		buffer = buffer.circshift(1).setRow(0, currentEstimate);		

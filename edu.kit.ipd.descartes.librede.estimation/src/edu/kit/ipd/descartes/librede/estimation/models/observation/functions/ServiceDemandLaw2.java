@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
@@ -34,7 +36,6 @@ import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Scalar;
-import edu.kit.ipd.descartes.linalg.Vector;
 
 /**
  * This output function describes the relationship between the per-service utilization and the resource demands. 
@@ -100,8 +101,11 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override
-	public boolean isApplicable() {
-		return busyTimeQuery.hasData() && sumDeparturesQuery.hasData();
+	public boolean isApplicable(List<String> messages) {
+		boolean result = true;
+		result = result && checkQueryPrecondition(busyTimeQuery, messages);
+		result = result && checkQueryPrecondition(sumDeparturesQuery, messages);
+		return result;
 	}
 
 	/* (non-Javadoc)

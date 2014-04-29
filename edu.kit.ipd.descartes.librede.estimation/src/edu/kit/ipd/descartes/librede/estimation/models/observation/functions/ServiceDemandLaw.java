@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
@@ -104,8 +106,12 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override
-	public boolean isApplicable() {
-		return utilizationQuery.hasData() && avgResponseTimeQuery.hasData() && avgThroughputQuery.hasData();
+	public boolean isApplicable(List<String> messages) {
+		boolean result = true;
+		result = result && checkQueryPrecondition(utilizationQuery, messages);
+		result = result && checkQueryPrecondition(avgResponseTimeQuery, messages);
+		result = result && checkQueryPrecondition(avgThroughputQuery, messages);
+		return result;
 	}
 
 	/* (non-Javadoc)

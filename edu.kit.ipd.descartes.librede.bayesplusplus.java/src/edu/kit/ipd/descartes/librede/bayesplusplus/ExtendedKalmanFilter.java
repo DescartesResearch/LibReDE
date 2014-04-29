@@ -37,7 +37,7 @@ import com.sun.jna.Pointer;
 import edu.kit.ipd.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import edu.kit.ipd.descartes.librede.bayesplusplus.backend.FCallback;
 import edu.kit.ipd.descartes.librede.bayesplusplus.backend.HCallback;
-import edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm;
+import edu.kit.ipd.descartes.librede.estimation.algorithm.AbstractEstimationAlgorithm;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.JacobiMatrixBuilder;
@@ -51,8 +51,8 @@ import edu.kit.ipd.descartes.linalg.MatrixFunction;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 
-public class ExtendedKalmanFilter implements
-		IEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<IOutputFunction, Vector>> {
+public class ExtendedKalmanFilter extends
+		AbstractEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<IOutputFunction, Vector>> {
 
 	// Callback function from native library for the observation model
 	private class HFunction implements HCallback {
@@ -259,6 +259,8 @@ public class ExtendedKalmanFilter implements
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
 			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, estimationWindow);
+		
 		this.stateSize = stateModel.getStateSize();
 		this.outputSize = observationModel.getOutputSize();
 

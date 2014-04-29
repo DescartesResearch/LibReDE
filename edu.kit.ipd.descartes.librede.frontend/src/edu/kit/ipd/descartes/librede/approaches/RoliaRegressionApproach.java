@@ -57,9 +57,6 @@ public class RoliaRegressionApproach extends AbstractEstimationApproach {
 
 		
 		UtilizationLaw func = new UtilizationLaw(workload, cursor, workload.getResources().get(0));		
-		if (!func.isApplicable()) {
-			throw new InitializationException("The utilization law output function is not applicable.");
-		}
 		ScalarObservationModel<ILinearOutputFunction> observationModel = new ScalarObservationModel<ILinearOutputFunction>(func);
 	
 		LeastSquaresRegression lsq = new LeastSquaresRegression();
