@@ -27,6 +27,9 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.ScalarObservationModel;
@@ -152,6 +155,12 @@ public class ZimbraApproach implements IEstimationApproach {
 		}
 		
 
+	}
+
+	@Override
+	public boolean checkPreconditions(List<String> messages) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
@@ -84,8 +86,10 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 * @see edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override
-	public boolean isApplicable() {
-		return individualResponseTimesQuery.hasData();
+	public boolean isApplicable(List<String> messages) {
+		boolean result = true;
+		result = result && checkQueryPrecondition(individualResponseTimesQuery, messages);
+		return result;
 	}
 
 	/* (non-Javadoc)

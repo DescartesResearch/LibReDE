@@ -8,7 +8,7 @@ if isempty(loaded)
     dpath = javaclasspath('-dynamic');
     for i = 1:size(jars,1)
         if isempty(strfind(dpath, jars(i).name))
-            javaaddpath(fullfile('../lib/plugins', jars(i).name));
+            javaaddpath(fullfile(basePath, '/lib/plugins', jars(i).name));
         end
     end
     

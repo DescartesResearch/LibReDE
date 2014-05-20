@@ -27,11 +27,15 @@
 package edu.kit.ipd.descartes.librede.estimation.models.state.constraints;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+
+import java.util.List;
+
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
+import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
@@ -77,6 +81,22 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public Matrix getSecondDerivatives(Vector x) {
 		return zeros(x.rows(), x.rows());
+	}
+	
+	@Override
+	public boolean isApplicable(List<String> messages) {
+		if (!throughputQuery.hasData()) {
+			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
+			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
+			msg.append("entities = { ");
+			for(IModelEntity entity : throughputQuery.getEntities()) {
+				msg.append(entity.getName()).append(" ");
+			}
+			msg.append(" } ");
+			messages.add(msg.toString());
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -56,11 +56,6 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
 		for (Resource res : workload.getResources()) {
 			UtilizationLaw func = new UtilizationLaw(workload, cursor, res);
-		
-			if (!func.isApplicable()) {
-				throw new InitializationException("The utilization law output function is not applicable.");
-			}
-			
 			observationModel.addOutputFunction(func);
 		}
 

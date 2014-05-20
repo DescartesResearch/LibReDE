@@ -26,6 +26,8 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.state.constraints;
 
+import java.util.List;
+
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public interface IStateConstraint {
@@ -35,5 +37,7 @@ public interface IStateConstraint {
 	double getUpperBound();
 	
 	double getValue(Vector state);
+	
+	boolean isApplicable(List<String> messages);
 	
 }

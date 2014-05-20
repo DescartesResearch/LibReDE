@@ -177,4 +177,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	public void setCurrentTime(double currentTime) {
 		this.currentTime = currentTime;
 	}
+	
+	@Override
+	public WorkloadDescription getWorkload()  {
+		return workload;
+	}
 }

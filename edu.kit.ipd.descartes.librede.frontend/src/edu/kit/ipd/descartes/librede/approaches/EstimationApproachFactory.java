@@ -42,6 +42,10 @@ public class EstimationApproachFactory {
 		approaches.put(MenasceOptimizationApproach.NAME, MenasceOptimizationApproach.class);
 	}
 	
+	public static String[] getEstimationApproaches() {
+		return approaches.keySet().toArray(new String[approaches.size()]);
+	}
+	
 	public static IEstimationApproach newEstimationApproach(String name) throws InstantiationException, IllegalAccessException {
 		Class<?> cls = approaches.get(name);
 		if (cls != null) {
