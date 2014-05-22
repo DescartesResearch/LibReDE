@@ -366,8 +366,22 @@ public enum StandardMetric implements IMetric {
 				IModelEntity entity, double start, double end, Aggregation func) {
 			TimeSeries series = retrieve(repository, entity, start, end);
 			switch(func) {
-			case AVERAGE:
-				return series.mean(0);
+			case AVERAGE: {
+				double interval = repository.getAggregationInterval(this,
+						entity);
+				if (interval > 0) {
+					TimeSeries weights = THROUGHPUT.retrieve(repository, entity, start, end);
+					if (weights.isEmpty()) {
+						weights = DEPARTURES.retrieve(repository, entity, start, end);
+					}
+					if (weights.isEmpty()) {
+						throw new IllegalStateException();
+					}
+					return series.timeWeightedMean(0, weights);
+				} else {
+					return series.mean(0);
+				}
+			}
 			case MINIMUM:
 				return series.min(0);
 			case MAXIMUM:
