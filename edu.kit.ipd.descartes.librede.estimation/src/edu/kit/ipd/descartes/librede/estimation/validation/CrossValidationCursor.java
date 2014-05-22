@@ -152,6 +152,11 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 	
 	@Override
+	public boolean seek(double newTime) {
+		return delegate.seek(newTime);
+	}
+	
+	@Override
 	public int getAvailableIntervals() {
 		throw new UnsupportedOperationException();
 	}
