@@ -12,15 +12,39 @@
 	<packaging>pom</packaging>
 
 	<organization>
-		<url>http://qpme.sourceforge.net</url>
-		<name>Karlsruhe Institute of Technology (KIT)</name>
+		<url>https://bitbucket.org/librede/librede</url>
+		<name>University of Wuerzburg</name>
 	</organization>
 
 	<properties>
 		<tycho-version>0.20.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
+	<distributionManagement>
+		<repository>
+			<id>se-uw-nexus</id>
+			<name>Releases</name>
+			<url>http://win2007.informatik.uni-wuerzburg.de:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>se-uw-nexus</id>
+			<name>Snapshots</name>
+			<url>http://win2007.informatik.uni-wuerzburg.de:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>se-uw-nexus</id>
+			<name>Public Repositories</name>
+			<url>http://win2007.informatik.uni-wuerzburg.de:8081/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -100,7 +124,7 @@
 					<properties>
 						<owner>Simon Spinner</owner>
 						<year>${project.inceptionYear}</year>
-						<email>simon.spinner@kit.edu</email>
+						<email>simon.spinner@uni-wuerzburg.de</email>
 					</properties>
 					<excludes>
 						<exclude>**/*.xml</exclude>
