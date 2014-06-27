@@ -35,6 +35,8 @@ public interface IRepositoryCursor {
 	boolean next();
 	
 	boolean seek(int interval);
+	
+	boolean seek(double newTime);
 
 	double getCurrentIntervalStart();
 

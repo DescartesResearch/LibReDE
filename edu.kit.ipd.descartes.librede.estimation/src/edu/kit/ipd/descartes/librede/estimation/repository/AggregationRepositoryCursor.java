@@ -174,6 +174,20 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 	
 	/* (non-Javadoc)
+	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#seek(int)
+	 */
+	@Override
+	public boolean seek(double newCurrentTime) {
+		if (newCurrentTime <= repository.getCurrentTime()) {
+			currentTime = newCurrentTime;
+			seriesCache.clear();
+			aggregationCache.clear();
+			return true;
+		}
+		return false;
+	}
+	
+	/* (non-Javadoc)
 	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getCurrentIntervalStart()
 	 */
 	@Override

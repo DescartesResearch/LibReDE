@@ -28,44 +28,97 @@ package edu.kit.ipd.descartes.librede.estimation.workload;
 
 import java.util.UUID;
 
-
+/**
+ * Represents a computing resource (e.g., CPU, hard disk, etc.) in a system.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ * @version 1.0
+ */
 public class Resource implements IModelEntity {
-	
+
 	private final UUID id;
 	private final String name;
 	private int parallelServers;
-		
+
+	/**
+	 * Creates a new instance
+	 * 
+	 * @param name
+	 */
 	public Resource(String name) {
 		this(name, 1);
 	}
-	
+
+	/**
+	 * @param name
+	 * @param parallelServers
+	 * @throws IllegalArgumentException
+	 *             if parallelServers <= 0
+	 */
 	public Resource(String name, int parallelServers) {
+		if (parallelServers <= 0) {
+			throw new IllegalArgumentException();
+		}
+
 		this.id = UUID.randomUUID();
 		this.name = name;
 		this.parallelServers = parallelServers;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity#getId()
+	 */
 	public UUID getId() {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity#getName()
+	 */
 	public String getName() {
 		return name;
 	}
-	
+
+	/**
+	 * @return the number of servers available to process requests in parallel.
+	 */
 	public int getNumberOfParallelServers() {
 		return parallelServers;
 	}
 
+	/**
+	 * Sets the number of parallel server for this resource.
+	 * 
+	 * @param parallelServers
+	 */
 	public void setNumberOfParallelServers(int parallelServers) {
+		if (parallelServers <= 0) {
+			throw new IllegalArgumentException();
+		}
 		this.parallelServers = parallelServers;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		return id.hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -83,6 +136,11 @@ public class Resource implements IModelEntity {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "Resource: " + name;

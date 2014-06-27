@@ -28,18 +28,25 @@ package edu.kit.ipd.descartes.librede.estimation.workload;
 
 import java.util.UUID;
 
-
+/**
+ * A service represents a functional endpoint of the system that processes
+ * requests of a certain type. It corresponds to the concept of a workload class
+ * in the queueing theory.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ * @version 1.0
+ */
 public class Service implements IModelEntity {
-	
+
 	private final UUID id;
-	private final String name;	
+	private final String name;
 
 	public Service(String name) {
 		super();
 		this.id = UUID.randomUUID();
 		this.name = name;
 	}
-	
+
 	@Override
 	public UUID getId() {
 		return id;
@@ -49,8 +56,6 @@ public class Service implements IModelEntity {
 		return name;
 	}
 
-
-	
 	@Override
 	public int hashCode() {
 		return id.hashCode();
@@ -77,5 +82,5 @@ public class Service implements IModelEntity {
 	public String toString() {
 		return "Service: " + name;
 	}
-	
+
 }
