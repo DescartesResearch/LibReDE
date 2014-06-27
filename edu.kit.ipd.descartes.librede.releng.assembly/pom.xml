@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>edu.kit.ipd.descartes.librede.releng.assembly</artifactId>
-	<packaging>pom</packaging>
+	<packaging>eclipse-repository</packaging>
 	<parent>
 		<groupId>edu.kit.ipd.descartes.librede</groupId>
 		<artifactId>edu.kit.ipd.descartes.librede.releng</artifactId>
@@ -10,80 +10,47 @@
 		<relativePath>../edu.kit.ipd.descartes.librede.releng</relativePath>
 	</parent>
 	
-	<dependencies>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.releng.p2</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.releng</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<classifier>javadoc</classifier>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.frontend</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.linalg</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.bayesplusplus.java</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.estimation</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.feature</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.ipopt.java</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.nativehelper</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.kit.ipd.descartes.librede</groupId>
-			<artifactId>edu.kit.ipd.descartes.librede.nnls.java</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>dist-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>assemble/distribution.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-antrun-plugin</artifactId>
+        		<version>1.6</version>
+        		<executions>
+          			<execution>
+            			<phase>package</phase>
+        				<configuration>
+          					<target>
+            					<ant antfile="build.xml">
+              						<property name="librede.standalone.dir" value="${project.build.directory}/standalone"/>
+					                <property name="librede.plugin.jars.location" value="${project.build.directory}/repository/plugins"/>
+            					</ant>
+          					</target>
+        				</configuration>
+        				<goals>
+          					<goal>run</goal>
+        				</goals>
+          			</execution>
+        		</executions>
+      		</plugin>
+      		<plugin>
+        		<artifactId>maven-assembly-plugin</artifactId>
+       			<version>2.4</version>
+        		<configuration>
+          			<descriptors>
+            			<descriptor>assemble/standalone.xml</descriptor>
+          			</descriptors>
+        		</configuration>
+        		<executions>
+	          		<execution>
+	            		<id>make-assembly</id>
+	            		<phase>package</phase>
+	            		<goals>
+	              			<goal>single</goal>
+	            		</goals>
+	          		</execution>
+        		</executions>
+        	</plugin>        		
+   		</plugins>
 	</build>
 </project>
