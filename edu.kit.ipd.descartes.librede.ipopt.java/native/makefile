@@ -10,7 +10,7 @@ HEADERS = 	$(wildcard *.hpp)
 
 OBJS = 		$(addprefix $(BUILD_DIR)/,$(SOURCES:%.cpp=%.obj))
 
-LIBS = -L$(IPOPT_LIB) -lipopt -lcoinmumps -lpthread -lgfortran -lquadmath -lm -lcoinmetis -lcoinlapack -lcoinblas -lm 
+LIBS = -L$(IPOPT_LIB) -lipopt -lcoinmumps -lcoinmetis -lcoinlapack -lcoinblas 
 
 TARGET = $(LIB_PREFIX)$(LIB_NAME).$(LIB_EXTENSION)
 
