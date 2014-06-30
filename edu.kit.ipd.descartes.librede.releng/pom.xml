@@ -131,6 +131,7 @@
 				</executions>
 			</plugin>
 			
+			<!-- Report test coverage -->
 			<plugin>
         		<groupId>org.jacoco</groupId>
         		<artifactId>jacoco-maven-plugin</artifactId>
@@ -149,6 +150,25 @@
 	          		</execution>
 	        	</executions>
       		</plugin>
+      		
+      		<plugin>
+   				<groupId>org.apache.maven.plugins</groupId>
+   				<artifactId>maven-checkstyle-plugin</artifactId>
+   				<version>2.12.1</version>
+   				<executions>
+     				<execution>
+       					<id>validate</id>
+       					<phase>validate</phase>
+       					<configuration>
+							<sourceDirectory>src</sourceDirectory>
+							<failOnViolation>false</failOnViolation>
+						</configuration>
+       					<goals>
+         					<goal>check</goal>
+       					</goals>
+     				</execution>
+   				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
