@@ -12,7 +12,7 @@
 			<directory>${project.build.directory}/standalone</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
-				<include>*</include>
+				<include>**/*</include>
 			</includes>
 		</fileSet>
 	</fileSets>

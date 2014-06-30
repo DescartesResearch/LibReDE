@@ -19,6 +19,9 @@
 	<properties>
 		<tycho-version>0.20.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+    	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+    	<sonar.jacoco.reportPath>../edu.kit.ipd.descartes.librede.releng/jacoco.exec</sonar.jacoco.reportPath>
 	</properties>
 	<distributionManagement>
 		<repository>
@@ -46,19 +49,6 @@
 		</repository>
 	</repositories>
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.4</version>
-					<configuration>
-						<descriptors>
-							<descriptor>assemble/distribution.xml</descriptor>
-						</descriptors>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -140,13 +130,32 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+        		<groupId>org.jacoco</groupId>
+        		<artifactId>jacoco-maven-plugin</artifactId>
+        		<version>0.6.4.201312101107</version>
+        		<executions>
+          			<execution>
+            			<goals>
+              				<goal>prepare-agent</goal>
+            			</goals>
+            			<configuration>
+            				<includes>
+            					<include>edu.kit.*</include>
+            				</includes>
+	              			<destFile>${sonar.jacoco.reportPath}</destFile>
+	            		</configuration>
+	          		</execution>
+	        	</executions>
+      		</plugin>
 		</plugins>
 	</build>
 
 	<modules>
 		<module>../edu.kit.ipd.descartes.librede.releng.platform</module>
 		<module>../edu.kit.ipd.descartes.librede.releng.p2</module>
-		<module>../edu.kit.ipd.descartes.librede.releng.assembly</module>
+		<module>../edu.kit.ipd.descartes.librede.releng.standalone</module>
 		<module>../edu.kit.ipd.descartes.librede.feature</module>
 		<module>../edu.kit.ipd.descartes.linalg</module>
 		<module>../edu.kit.ipd.descartes.linalg.tests</module>
