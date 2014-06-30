@@ -146,7 +146,7 @@
 	<modules>
 		<module>../edu.kit.ipd.descartes.librede.releng.platform</module>
 		<module>../edu.kit.ipd.descartes.librede.releng.p2</module>
-		<module>../edu.kit.ipd.descartes.librede.releng.assembly</module>
+		<module>../edu.kit.ipd.descartes.librede.releng.standalone</module>
 		<module>../edu.kit.ipd.descartes.librede.feature</module>
 		<module>../edu.kit.ipd.descartes.linalg</module>
 		<module>../edu.kit.ipd.descartes.linalg.tests</module>
