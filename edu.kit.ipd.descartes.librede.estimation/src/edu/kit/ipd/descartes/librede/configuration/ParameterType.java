@@ -1,5 +1,5 @@
 package edu.kit.ipd.descartes.librede.configuration;
 
 public enum ParameterType {
-	STRING
+	STRING, PATH, BOOLEAN, INTEGER, DOUBLE
 }
