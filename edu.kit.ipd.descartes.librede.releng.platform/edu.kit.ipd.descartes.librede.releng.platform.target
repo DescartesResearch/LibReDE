@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="environment" sequenceNumber="31">
+<?pde version="3.8"?><target name="environment" sequenceNumber="34">
 <locations>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.platform.sdk" version="4.3.1.M20130911-1000"/>
-<repository location="http://download.eclipse.org/releases/kepler/"/>
-</location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.apache.commons.math3" version="3.2.0"/>
 <unit id="org.easytesting.fest-util" version="1.2.5"/>
@@ -25,6 +21,11 @@
 <unit id="org.kohsuke.args4j" version="2.0.21.v201301150030"/>
 <unit id="org.mockito" version="1.8.4.v201303031500"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.sdk.feature.group" version="4.3.2.v20140221-1852"/>
+<unit id="org.eclipse.emf.sdk.feature.group" version="2.9.2.v20140203-1126"/>
+<repository location="http://download.eclipse.org/releases/kepler/"/>
 </location>
 </locations>
 </target>
