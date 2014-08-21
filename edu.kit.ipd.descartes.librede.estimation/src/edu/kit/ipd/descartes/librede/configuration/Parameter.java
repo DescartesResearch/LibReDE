@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.METHOD})
+@Target(value = {ElementType.FIELD})
 public @interface Parameter {
-
+	String name();
+	String label();
+	boolean required() default true;
 }
