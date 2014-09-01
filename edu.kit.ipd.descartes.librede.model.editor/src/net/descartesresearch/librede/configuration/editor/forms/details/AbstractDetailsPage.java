@@ -4,11 +4,12 @@ import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
 
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IManagedForm;
 
 public abstract class AbstractDetailsPage implements IDetailsPage {
-	
+
 	protected IManagedForm managedForm;
 	protected EditingDomain domain;
 	protected LibredeConfiguration model;

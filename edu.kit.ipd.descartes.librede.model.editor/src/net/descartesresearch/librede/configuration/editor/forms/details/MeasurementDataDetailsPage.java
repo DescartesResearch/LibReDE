@@ -24,6 +24,7 @@ import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
@@ -123,6 +124,7 @@ public class MeasurementDataDetailsPage extends AbstractDetailsPage {
 
 		comboDataProviderViewer
 				.setContentProvider(new ObservableListContentProvider());
+		comboDataProviderViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		comboDataProviderViewer
 				.setInput(EMFEditProperties
 						.list(domain,
@@ -216,7 +218,7 @@ public class MeasurementDataDetailsPage extends AbstractDetailsPage {
 
 		resourcesTableViewer
 				.setContentProvider(new ObservableListContentProvider());
-		resourcesTableViewer.setLabelProvider(new LabelProvider());
+		resourcesTableViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		resourcesTableViewer
 				.setInput(EMFEditProperties
 						.list(domain,
@@ -237,7 +239,7 @@ public class MeasurementDataDetailsPage extends AbstractDetailsPage {
 
 		servicesTableViewer
 				.setContentProvider(new ObservableListContentProvider());
-		servicesTableViewer.setLabelProvider(new LabelProvider());
+		servicesTableViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		servicesTableViewer
 				.setInput(EMFEditProperties
 						.list(domain,

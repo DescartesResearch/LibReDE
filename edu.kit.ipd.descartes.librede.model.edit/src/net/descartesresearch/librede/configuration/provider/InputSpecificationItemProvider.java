@@ -5,18 +5,13 @@ package net.descartesresearch.librede.configuration.provider;
 
 import java.util.Collection;
 import java.util.List;
-
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
 import net.descartesresearch.librede.configuration.InputSpecification;
-
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.ResourceLocator;
-
 import org.eclipse.emf.ecore.EStructuralFeature;
-
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
@@ -35,11 +30,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 public class InputSpecificationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider,
-		IStructuredItemContentProvider,
-		ITreeItemContentProvider,
-		IItemLabelProvider,
-		IItemPropertySource {
+		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
