@@ -3,41 +3,39 @@
 package net.descartesresearch.librede.configuration.impl;
 
 import java.util.Collection;
-
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
+import net.descartesresearch.librede.configuration.DataSourceConfiguration;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
-import net.descartesresearch.librede.configuration.TimeSeries;
-
+import net.descartesresearch.librede.configuration.TraceConfiguration;
 import org.eclipse.emf.common.notify.Notification;
-
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
-
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Time Series</b></em>'.
+ * An implementation of the model object '<em><b>Trace Configuration</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl#getMetric <em>Metric</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl#getUnit <em>Unit</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl#getResources <em>Resources</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl#getServices <em>Services</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl#getInterval <em>Interval</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl#getMetric <em>Metric</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl#getResources <em>Resources</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl#getServices <em>Services</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl#getData <em>Data</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements TimeSeries {
+public class TraceConfigurationImpl extends MinimalEObjectImpl.Container implements TraceConfiguration {
 	/**
 	 * The default value of the '{@link #getMetric() <em>Metric</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -106,7 +104,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 * @generated
 	 * @ordered
 	 */
-	protected static final double INTERVAL_EDEFAULT = 0.0;
+	protected static final long INTERVAL_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getInterval() <em>Interval</em>}' attribute.
@@ -116,14 +114,24 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 * @generated
 	 * @ordered
 	 */
-	protected double interval = INTERVAL_EDEFAULT;
+	protected long interval = INTERVAL_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getData() <em>Data</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getData()
+	 * @generated
+	 * @ordered
+	 */
+	protected DataSourceConfiguration data;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected TimeSeriesImpl() {
+	protected TraceConfigurationImpl() {
 		super();
 	}
 
@@ -134,7 +142,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ConfigurationPackage.Literals.TIME_SERIES;
+		return ConfigurationPackage.Literals.TRACE_CONFIGURATION;
 	}
 
 	/**
@@ -155,7 +163,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 		String oldMetric = metric;
 		metric = newMetric;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TIME_SERIES__METRIC, oldMetric, metric));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
 	}
 
 	/**
@@ -176,7 +184,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 		String oldUnit = unit;
 		unit = newUnit;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TIME_SERIES__UNIT, oldUnit, unit));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
 	}
 
 	/**
@@ -186,7 +194,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 */
 	public EList<Resource> getResources() {
 		if (resources == null) {
-			resources = new EObjectResolvingEList<Resource>(Resource.class, this, ConfigurationPackage.TIME_SERIES__RESOURCES);
+			resources = new EObjectResolvingEList<Resource>(Resource.class, this, ConfigurationPackage.TRACE_CONFIGURATION__RESOURCES);
 		}
 		return resources;
 	}
@@ -198,7 +206,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 */
 	public EList<Service> getServices() {
 		if (services == null) {
-			services = new EObjectResolvingEList<Service>(Service.class, this, ConfigurationPackage.TIME_SERIES__SERVICES);
+			services = new EObjectResolvingEList<Service>(Service.class, this, ConfigurationPackage.TRACE_CONFIGURATION__SERVICES);
 		}
 		return services;
 	}
@@ -208,7 +216,7 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public double getInterval() {
+	public long getInterval() {
 		return interval;
 	}
 
@@ -217,11 +225,68 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setInterval(double newInterval) {
-		double oldInterval = interval;
+	public void setInterval(long newInterval) {
+		long oldInterval = interval;
 		interval = newInterval;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TIME_SERIES__INTERVAL, oldInterval, interval));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, oldInterval, interval));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public DataSourceConfiguration getData() {
+		return data;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetData(DataSourceConfiguration newData, NotificationChain msgs) {
+		DataSourceConfiguration oldData = data;
+		data = newData;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__DATA, oldData, newData);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setData(DataSourceConfiguration newData) {
+		if (newData != data) {
+			NotificationChain msgs = null;
+			if (data != null)
+				msgs = ((InternalEObject)data).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.TRACE_CONFIGURATION__DATA, null, msgs);
+			if (newData != null)
+				msgs = ((InternalEObject)newData).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.TRACE_CONFIGURATION__DATA, null, msgs);
+			msgs = basicSetData(newData, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__DATA, newData, newData));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+				return basicSetData(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -232,16 +297,18 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.TIME_SERIES__METRIC:
+			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				return getMetric();
-			case ConfigurationPackage.TIME_SERIES__UNIT:
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				return getUnit();
-			case ConfigurationPackage.TIME_SERIES__RESOURCES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__RESOURCES:
 				return getResources();
-			case ConfigurationPackage.TIME_SERIES__SERVICES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__SERVICES:
 				return getServices();
-			case ConfigurationPackage.TIME_SERIES__INTERVAL:
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return getInterval();
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+				return getData();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -255,22 +322,25 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.TIME_SERIES__METRIC:
+			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				setMetric((String)newValue);
 				return;
-			case ConfigurationPackage.TIME_SERIES__UNIT:
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				setUnit((String)newValue);
 				return;
-			case ConfigurationPackage.TIME_SERIES__RESOURCES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__RESOURCES:
 				getResources().clear();
 				getResources().addAll((Collection<? extends Resource>)newValue);
 				return;
-			case ConfigurationPackage.TIME_SERIES__SERVICES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__SERVICES:
 				getServices().clear();
 				getServices().addAll((Collection<? extends Service>)newValue);
 				return;
-			case ConfigurationPackage.TIME_SERIES__INTERVAL:
-				setInterval((Double)newValue);
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				setInterval((Long)newValue);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+				setData((DataSourceConfiguration)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -284,20 +354,23 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.TIME_SERIES__METRIC:
+			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				setMetric(METRIC_EDEFAULT);
 				return;
-			case ConfigurationPackage.TIME_SERIES__UNIT:
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				setUnit(UNIT_EDEFAULT);
 				return;
-			case ConfigurationPackage.TIME_SERIES__RESOURCES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__RESOURCES:
 				getResources().clear();
 				return;
-			case ConfigurationPackage.TIME_SERIES__SERVICES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__SERVICES:
 				getServices().clear();
 				return;
-			case ConfigurationPackage.TIME_SERIES__INTERVAL:
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval(INTERVAL_EDEFAULT);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+				setData((DataSourceConfiguration)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -311,16 +384,18 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.TIME_SERIES__METRIC:
+			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				return METRIC_EDEFAULT == null ? metric != null : !METRIC_EDEFAULT.equals(metric);
-			case ConfigurationPackage.TIME_SERIES__UNIT:
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				return UNIT_EDEFAULT == null ? unit != null : !UNIT_EDEFAULT.equals(unit);
-			case ConfigurationPackage.TIME_SERIES__RESOURCES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__RESOURCES:
 				return resources != null && !resources.isEmpty();
-			case ConfigurationPackage.TIME_SERIES__SERVICES:
+			case ConfigurationPackage.TRACE_CONFIGURATION__SERVICES:
 				return services != null && !services.isEmpty();
-			case ConfigurationPackage.TIME_SERIES__INTERVAL:
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return interval != INTERVAL_EDEFAULT;
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+				return data != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -345,4 +420,4 @@ public class TimeSeriesImpl extends MinimalEObjectImpl.Container implements Time
 		return result.toString();
 	}
 
-} //TimeSeriesImpl
+} //TraceConfigurationImpl

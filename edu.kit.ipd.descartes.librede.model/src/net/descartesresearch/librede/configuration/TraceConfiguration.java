@@ -8,25 +8,26 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Time Series</b></em>'.
+ * A representation of the model object '<em><b>Trace Configuration</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.TimeSeries#getMetric <em>Metric</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TimeSeries#getUnit <em>Unit</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TimeSeries#getResources <em>Resources</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TimeSeries#getServices <em>Services</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TimeSeries#getInterval <em>Interval</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getResources <em>Resources</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getServices <em>Services</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getData <em>Data</em>}</li>
  * </ul>
  * </p>
  *
- * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTimeSeries()
+ * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration()
  * @model
  * @generated
  */
-public interface TimeSeries extends EObject {
+public interface TraceConfiguration extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Metric</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -37,14 +38,14 @@ public interface TimeSeries extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Metric</em>' attribute.
 	 * @see #setMetric(String)
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTimeSeries_Metric()
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Metric()
 	 * @model required="true"
 	 * @generated
 	 */
 	String getMetric();
 
 	/**
-	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TimeSeries#getMetric <em>Metric</em>}' attribute.
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Metric</em>' attribute.
@@ -63,14 +64,14 @@ public interface TimeSeries extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Unit</em>' attribute.
 	 * @see #setUnit(String)
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTimeSeries_Unit()
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Unit()
 	 * @model
 	 * @generated
 	 */
 	String getUnit();
 
 	/**
-	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TimeSeries#getUnit <em>Unit</em>}' attribute.
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Unit</em>' attribute.
@@ -89,7 +90,7 @@ public interface TimeSeries extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Resources</em>' reference list.
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTimeSeries_Resources()
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Resources()
 	 * @model
 	 * @generated
 	 */
@@ -105,7 +106,7 @@ public interface TimeSeries extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Services</em>' reference list.
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTimeSeries_Services()
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Services()
 	 * @model
 	 * @generated
 	 */
@@ -121,21 +122,47 @@ public interface TimeSeries extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interval</em>' attribute.
-	 * @see #setInterval(double)
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTimeSeries_Interval()
+	 * @see #setInterval(long)
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Interval()
 	 * @model default="0"
 	 * @generated
 	 */
-	double getInterval();
+	long getInterval();
 
 	/**
-	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TimeSeries#getInterval <em>Interval</em>}' attribute.
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Interval</em>' attribute.
 	 * @see #getInterval()
 	 * @generated
 	 */
-	void setInterval(double value);
+	void setInterval(long value);
 
-} // TimeSeries
+	/**
+	 * Returns the value of the '<em><b>Data</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Data</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Data</em>' containment reference.
+	 * @see #setData(DataSourceConfiguration)
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Data()
+	 * @model containment="true" required="true"
+	 * @generated
+	 */
+	DataSourceConfiguration getData();
+
+	/**
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getData <em>Data</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Data</em>' containment reference.
+	 * @see #getData()
+	 * @generated
+	 */
+	void setData(DataSourceConfiguration value);
+
+} // TraceConfiguration

@@ -4,9 +4,11 @@ package net.descartesresearch.librede.configuration.impl;
 
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.DataSource;
-import net.descartesresearch.librede.configuration.EstimationApproach;
+import net.descartesresearch.librede.configuration.DataProviderConfiguration;
+import net.descartesresearch.librede.configuration.DataSourceConfiguration;
+import net.descartesresearch.librede.configuration.EstimationApproachConfiguration;
 import net.descartesresearch.librede.configuration.EstimationSpecification;
+import net.descartesresearch.librede.configuration.ExporterConfiguration;
 import net.descartesresearch.librede.configuration.InputSpecification;
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.OutputSpecification;
@@ -14,17 +16,16 @@ import net.descartesresearch.librede.configuration.Parameter;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.SchedulingStrategy;
 import net.descartesresearch.librede.configuration.Service;
-import net.descartesresearch.librede.configuration.TimeSeries;
+import net.descartesresearch.librede.configuration.TraceConfiguration;
 import net.descartesresearch.librede.configuration.ValidationSpecification;
+import net.descartesresearch.librede.configuration.ValidatorConfiguration;
 import net.descartesresearch.librede.configuration.WorkloadDescription;
-
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
@@ -46,7 +47,14 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass dataSourceEClass = null;
+	private EClass dataProviderConfigurationEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass dataSourceConfigurationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -67,7 +75,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass estimationApproachEClass = null;
+	private EClass estimationApproachConfigurationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -95,7 +103,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass timeSeriesEClass = null;
+	private EClass traceConfigurationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -117,6 +125,20 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	private EClass validationSpecificationEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass validatorConfigurationEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass exporterConfigurationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -227,7 +249,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getLibredeConfiguration_Ouptut() {
+	public EReference getLibredeConfiguration_Output() {
 		return (EReference)libredeConfigurationEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -245,8 +267,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getDataSource() {
-		return dataSourceEClass;
+	public EClass getDataProviderConfiguration() {
+		return dataProviderConfigurationEClass;
 	}
 
 	/**
@@ -254,8 +276,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDataSource_Name() {
-		return (EAttribute)dataSourceEClass.getEStructuralFeatures().get(0);
+	public EReference getDataProviderConfiguration_Parameters() {
+		return (EReference)dataProviderConfigurationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -263,8 +285,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getDataSource_Configuration() {
-		return (EReference)dataSourceEClass.getEStructuralFeatures().get(1);
+	public EAttribute getDataProviderConfiguration_Type() {
+		return (EAttribute)dataProviderConfigurationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -272,8 +294,35 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDataSource_Type() {
-		return (EAttribute)dataSourceEClass.getEStructuralFeatures().get(2);
+	public EClass getDataSourceConfiguration() {
+		return dataSourceConfigurationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getDataSourceConfiguration_DataProvider() {
+		return (EReference)dataSourceConfigurationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getDataSourceConfiguration_Parameters() {
+		return (EReference)dataSourceConfigurationEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getDataSourceConfiguration_Type() {
+		return (EAttribute)dataSourceConfigurationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -317,7 +366,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInputSpecification_DataSources() {
+	public EReference getInputSpecification_DataProviders() {
 		return (EReference)inputSpecificationEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -335,8 +384,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getEstimationApproach() {
-		return estimationApproachEClass;
+	public EClass getEstimationApproachConfiguration() {
+		return estimationApproachConfigurationEClass;
 	}
 
 	/**
@@ -344,8 +393,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getEstimationApproach_Class() {
-		return (EAttribute)estimationApproachEClass.getEStructuralFeatures().get(0);
+	public EAttribute getEstimationApproachConfiguration_Type() {
+		return (EAttribute)estimationApproachConfigurationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -353,8 +402,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getEstimationApproach_Configuration() {
-		return (EReference)estimationApproachEClass.getEStructuralFeatures().get(1);
+	public EReference getEstimationApproachConfiguration_Parameters() {
+		return (EReference)estimationApproachConfigurationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -364,6 +413,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 */
 	public EClass getOutputSpecification() {
 		return outputSpecificationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getOutputSpecification_Exporters() {
+		return (EReference)outputSpecificationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -425,8 +483,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getTimeSeries() {
-		return timeSeriesEClass;
+	public EClass getTraceConfiguration() {
+		return traceConfigurationEClass;
 	}
 
 	/**
@@ -434,8 +492,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTimeSeries_Metric() {
-		return (EAttribute)timeSeriesEClass.getEStructuralFeatures().get(0);
+	public EAttribute getTraceConfiguration_Metric() {
+		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -443,8 +501,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTimeSeries_Unit() {
-		return (EAttribute)timeSeriesEClass.getEStructuralFeatures().get(1);
+	public EAttribute getTraceConfiguration_Unit() {
+		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -452,8 +510,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTimeSeries_Resources() {
-		return (EReference)timeSeriesEClass.getEStructuralFeatures().get(2);
+	public EReference getTraceConfiguration_Resources() {
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -461,8 +519,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTimeSeries_Services() {
-		return (EReference)timeSeriesEClass.getEStructuralFeatures().get(3);
+	public EReference getTraceConfiguration_Services() {
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -470,8 +528,17 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTimeSeries_Interval() {
-		return (EAttribute)timeSeriesEClass.getEStructuralFeatures().get(4);
+	public EAttribute getTraceConfiguration_Interval() {
+		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTraceConfiguration_Data() {
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -533,6 +600,69 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getValidationSpecification_Validators() {
+		return (EReference)validationSpecificationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getValidatorConfiguration() {
+		return validatorConfigurationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getValidatorConfiguration_Type() {
+		return (EAttribute)validatorConfigurationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getValidatorConfiguration_Parameters() {
+		return (EReference)validatorConfigurationEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getExporterConfiguration() {
+		return exporterConfigurationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getExporterConfiguration_Type() {
+		return (EAttribute)exporterConfigurationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getExporterConfiguration_Parameters() {
+		return (EReference)exporterConfigurationEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EEnum getSchedulingStrategy() {
 		return schedulingStrategyEEnum;
 	}
@@ -569,27 +699,27 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEReference(libredeConfigurationEClass, LIBREDE_CONFIGURATION__WORKLOAD_DESCRIPTION);
 		createEReference(libredeConfigurationEClass, LIBREDE_CONFIGURATION__INPUT);
 		createEReference(libredeConfigurationEClass, LIBREDE_CONFIGURATION__ESTIMATION);
-		createEReference(libredeConfigurationEClass, LIBREDE_CONFIGURATION__OUPTUT);
+		createEReference(libredeConfigurationEClass, LIBREDE_CONFIGURATION__OUTPUT);
 		createEReference(libredeConfigurationEClass, LIBREDE_CONFIGURATION__VALIDATION);
 
-		dataSourceEClass = createEClass(DATA_SOURCE);
-		createEAttribute(dataSourceEClass, DATA_SOURCE__NAME);
-		createEReference(dataSourceEClass, DATA_SOURCE__CONFIGURATION);
-		createEAttribute(dataSourceEClass, DATA_SOURCE__TYPE);
+		dataProviderConfigurationEClass = createEClass(DATA_PROVIDER_CONFIGURATION);
+		createEReference(dataProviderConfigurationEClass, DATA_PROVIDER_CONFIGURATION__PARAMETERS);
+		createEAttribute(dataProviderConfigurationEClass, DATA_PROVIDER_CONFIGURATION__TYPE);
 
 		workloadDescriptionEClass = createEClass(WORKLOAD_DESCRIPTION);
 		createEReference(workloadDescriptionEClass, WORKLOAD_DESCRIPTION__RESOURCES);
 		createEReference(workloadDescriptionEClass, WORKLOAD_DESCRIPTION__SERVICES);
 
 		inputSpecificationEClass = createEClass(INPUT_SPECIFICATION);
-		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__DATA_SOURCES);
+		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__DATA_PROVIDERS);
 		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__OBSERVATIONS);
 
-		estimationApproachEClass = createEClass(ESTIMATION_APPROACH);
-		createEAttribute(estimationApproachEClass, ESTIMATION_APPROACH__CLASS);
-		createEReference(estimationApproachEClass, ESTIMATION_APPROACH__CONFIGURATION);
+		estimationApproachConfigurationEClass = createEClass(ESTIMATION_APPROACH_CONFIGURATION);
+		createEAttribute(estimationApproachConfigurationEClass, ESTIMATION_APPROACH_CONFIGURATION__TYPE);
+		createEReference(estimationApproachConfigurationEClass, ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS);
 
 		outputSpecificationEClass = createEClass(OUTPUT_SPECIFICATION);
+		createEReference(outputSpecificationEClass, OUTPUT_SPECIFICATION__EXPORTERS);
 
 		resourceEClass = createEClass(RESOURCE);
 		createEAttribute(resourceEClass, RESOURCE__NAME);
@@ -599,12 +729,13 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		serviceEClass = createEClass(SERVICE);
 		createEAttribute(serviceEClass, SERVICE__NAME);
 
-		timeSeriesEClass = createEClass(TIME_SERIES);
-		createEAttribute(timeSeriesEClass, TIME_SERIES__METRIC);
-		createEAttribute(timeSeriesEClass, TIME_SERIES__UNIT);
-		createEReference(timeSeriesEClass, TIME_SERIES__RESOURCES);
-		createEReference(timeSeriesEClass, TIME_SERIES__SERVICES);
-		createEAttribute(timeSeriesEClass, TIME_SERIES__INTERVAL);
+		traceConfigurationEClass = createEClass(TRACE_CONFIGURATION);
+		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
+		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__UNIT);
+		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__RESOURCES);
+		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__SERVICES);
+		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__INTERVAL);
+		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__DATA);
 
 		parameterEClass = createEClass(PARAMETER);
 		createEAttribute(parameterEClass, PARAMETER__NAME);
@@ -614,6 +745,20 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEReference(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__APPROACHES);
 
 		validationSpecificationEClass = createEClass(VALIDATION_SPECIFICATION);
+		createEReference(validationSpecificationEClass, VALIDATION_SPECIFICATION__VALIDATORS);
+
+		dataSourceConfigurationEClass = createEClass(DATA_SOURCE_CONFIGURATION);
+		createEReference(dataSourceConfigurationEClass, DATA_SOURCE_CONFIGURATION__DATA_PROVIDER);
+		createEAttribute(dataSourceConfigurationEClass, DATA_SOURCE_CONFIGURATION__TYPE);
+		createEReference(dataSourceConfigurationEClass, DATA_SOURCE_CONFIGURATION__PARAMETERS);
+
+		validatorConfigurationEClass = createEClass(VALIDATOR_CONFIGURATION);
+		createEAttribute(validatorConfigurationEClass, VALIDATOR_CONFIGURATION__TYPE);
+		createEReference(validatorConfigurationEClass, VALIDATOR_CONFIGURATION__PARAMETERS);
+
+		exporterConfigurationEClass = createEClass(EXPORTER_CONFIGURATION);
+		createEAttribute(exporterConfigurationEClass, EXPORTER_CONFIGURATION__TYPE);
+		createEReference(exporterConfigurationEClass, EXPORTER_CONFIGURATION__PARAMETERS);
 
 		// Create enums
 		schedulingStrategyEEnum = createEEnum(SCHEDULING_STRATEGY);
@@ -653,30 +798,33 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEReference(getLibredeConfiguration_WorkloadDescription(), this.getWorkloadDescription(), null, "workloadDescription", null, 1, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getLibredeConfiguration_Input(), this.getInputSpecification(), null, "input", null, 1, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getLibredeConfiguration_Estimation(), this.getEstimationSpecification(), null, "estimation", null, 1, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getLibredeConfiguration_Ouptut(), this.getOutputSpecification(), null, "ouptut", null, 1, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getLibredeConfiguration_Validation(), this.getValidationSpecification(), null, "validation", null, 0, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getLibredeConfiguration_Output(), this.getOutputSpecification(), null, "output", null, 1, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getLibredeConfiguration_Validation(), this.getValidationSpecification(), null, "validation", null, 1, 1, LibredeConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(dataSourceEClass, DataSource.class, "DataSource", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDataSource_Name(), ecorePackage.getEString(), "name", null, 1, 1, DataSource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getDataSource_Configuration(), this.getParameter(), null, "configuration", null, 0, -1, DataSource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDataSource_Type(), ecorePackage.getEString(), "type", null, 1, 1, DataSource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(dataProviderConfigurationEClass, DataProviderConfiguration.class, "DataProviderConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getDataProviderConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, DataProviderConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		EGenericType g1 = createEGenericType(ecorePackage.getEJavaClass());
+		EGenericType g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEAttribute(getDataProviderConfiguration_Type(), g1, "type", null, 1, 1, DataProviderConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workloadDescriptionEClass, WorkloadDescription.class, "WorkloadDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getWorkloadDescription_Resources(), this.getResource(), null, "resources", null, 0, -1, WorkloadDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getWorkloadDescription_Services(), this.getService(), null, "services", null, 0, -1, WorkloadDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(inputSpecificationEClass, InputSpecification.class, "InputSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInputSpecification_DataSources(), this.getDataSource(), null, "dataSources", null, 1, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInputSpecification_Observations(), this.getTimeSeries(), null, "observations", null, 0, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInputSpecification_DataProviders(), this.getDataProviderConfiguration(), null, "dataProviders", null, 1, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInputSpecification_Observations(), this.getTraceConfiguration(), null, "observations", null, 0, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(estimationApproachEClass, EstimationApproach.class, "EstimationApproach", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		EGenericType g1 = createEGenericType(ecorePackage.getEJavaClass());
-		EGenericType g2 = createEGenericType();
+		initEClass(estimationApproachConfigurationEClass, EstimationApproachConfiguration.class, "EstimationApproachConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		g1 = createEGenericType(ecorePackage.getEJavaClass());
+		g2 = createEGenericType();
 		g1.getETypeArguments().add(g2);
-		initEAttribute(getEstimationApproach_Class(), g1, "class", null, 1, 1, EstimationApproach.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getEstimationApproach_Configuration(), this.getParameter(), null, "configuration", null, 0, -1, EstimationApproach.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEstimationApproachConfiguration_Type(), g1, "type", null, 1, 1, EstimationApproachConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEstimationApproachConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, EstimationApproachConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(outputSpecificationEClass, OutputSpecification.class, "OutputSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getOutputSpecification_Exporters(), this.getExporterConfiguration(), null, "exporters", null, 0, -1, OutputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(resourceEClass, Resource.class, "Resource", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getResource_Name(), ecorePackage.getEString(), "name", null, 1, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -686,21 +834,45 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(serviceEClass, Service.class, "Service", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getService_Name(), ecorePackage.getEString(), "name", null, 1, 1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(timeSeriesEClass, TimeSeries.class, "TimeSeries", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTimeSeries_Metric(), ecorePackage.getEString(), "metric", null, 1, 1, TimeSeries.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTimeSeries_Unit(), ecorePackage.getEString(), "unit", null, 0, 1, TimeSeries.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTimeSeries_Resources(), this.getResource(), null, "resources", null, 0, -1, TimeSeries.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTimeSeries_Services(), this.getService(), null, "services", null, 0, -1, TimeSeries.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTimeSeries_Interval(), ecorePackage.getEDouble(), "interval", "0", 0, 1, TimeSeries.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getTraceConfiguration_Metric(), ecorePackage.getEString(), "metric", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTraceConfiguration_Unit(), ecorePackage.getEString(), "unit", null, 0, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTraceConfiguration_Resources(), this.getResource(), null, "resources", null, 0, -1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTraceConfiguration_Services(), this.getService(), null, "services", null, 0, -1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTraceConfiguration_Interval(), ecorePackage.getELong(), "interval", "0", 0, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTraceConfiguration_Data(), this.getDataSourceConfiguration(), null, "data", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(parameterEClass, Parameter.class, "Parameter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getParameter_Name(), ecorePackage.getEString(), "name", null, 1, 1, Parameter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getParameter_Value(), ecorePackage.getEString(), "value", null, 1, 1, Parameter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(estimationSpecificationEClass, EstimationSpecification.class, "EstimationSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getEstimationSpecification_Approaches(), this.getEstimationApproach(), null, "approaches", null, 0, -1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEstimationSpecification_Approaches(), this.getEstimationApproachConfiguration(), null, "approaches", null, 0, -1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(validationSpecificationEClass, ValidationSpecification.class, "ValidationSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getValidationSpecification_Validators(), this.getValidatorConfiguration(), null, "validators", null, 0, -1, ValidationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(dataSourceConfigurationEClass, DataSourceConfiguration.class, "DataSourceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getDataSourceConfiguration_DataProvider(), this.getDataProviderConfiguration(), null, "dataProvider", null, 1, 1, DataSourceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(ecorePackage.getEJavaClass());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEAttribute(getDataSourceConfiguration_Type(), g1, "type", null, 1, 1, DataSourceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDataSourceConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, DataSourceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(validatorConfigurationEClass, ValidatorConfiguration.class, "ValidatorConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		g1 = createEGenericType(ecorePackage.getEJavaClass());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEAttribute(getValidatorConfiguration_Type(), g1, "type", null, 1, 1, ValidatorConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getValidatorConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, ValidatorConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(exporterConfigurationEClass, ExporterConfiguration.class, "ExporterConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		g1 = createEGenericType(ecorePackage.getEJavaClass());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEAttribute(getExporterConfiguration_Type(), g1, "type", null, 1, 1, ExporterConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getExporterConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, ExporterConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(schedulingStrategyEEnum, SchedulingStrategy.class, "SchedulingStrategy");

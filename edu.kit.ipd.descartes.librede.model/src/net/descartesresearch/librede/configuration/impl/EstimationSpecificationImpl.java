@@ -3,20 +3,14 @@
 package net.descartesresearch.librede.configuration.impl;
 
 import java.util.Collection;
-
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.EstimationApproach;
+import net.descartesresearch.librede.configuration.EstimationApproachConfiguration;
 import net.descartesresearch.librede.configuration.EstimationSpecification;
-
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -42,7 +36,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<EstimationApproach> approaches;
+	protected EList<EstimationApproachConfiguration> approaches;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -68,9 +62,9 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<EstimationApproach> getApproaches() {
+	public EList<EstimationApproachConfiguration> getApproaches() {
 		if (approaches == null) {
-			approaches = new EObjectContainmentEList<EstimationApproach>(EstimationApproach.class, this, ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES);
+			approaches = new EObjectContainmentEList<EstimationApproachConfiguration>(EstimationApproachConfiguration.class, this, ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES);
 		}
 		return approaches;
 	}
@@ -114,7 +108,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 		switch (featureID) {
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES:
 				getApproaches().clear();
-				getApproaches().addAll((Collection<? extends EstimationApproach>)newValue);
+				getApproaches().addAll((Collection<? extends EstimationApproachConfiguration>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

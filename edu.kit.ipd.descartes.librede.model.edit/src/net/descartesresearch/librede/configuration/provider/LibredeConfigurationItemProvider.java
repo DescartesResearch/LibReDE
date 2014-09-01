@@ -80,7 +80,7 @@ public class LibredeConfigurationItemProvider
 			childrenFeatures.add(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__WORKLOAD_DESCRIPTION);
 			childrenFeatures.add(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__INPUT);
 			childrenFeatures.add(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION);
-			childrenFeatures.add(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__OUPTUT);
+			childrenFeatures.add(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__OUTPUT);
 			childrenFeatures.add(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__VALIDATION);
 		}
 		return childrenFeatures;
@@ -137,7 +137,7 @@ public class LibredeConfigurationItemProvider
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__WORKLOAD_DESCRIPTION:
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__INPUT:
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__ESTIMATION:
-			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT:
+			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT:
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__VALIDATION:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
@@ -173,7 +173,7 @@ public class LibredeConfigurationItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__OUPTUT,
+				(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__OUTPUT,
 				 ConfigurationFactory.eINSTANCE.createOutputSpecification()));
 
 		newChildDescriptors.add

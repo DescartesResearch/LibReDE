@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.EstimationApproach;
+import net.descartesresearch.librede.configuration.ValidatorConfiguration;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
@@ -29,12 +29,12 @@ import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 /**
- * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.EstimationApproach} object.
+ * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.ValidatorConfiguration} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class EstimationApproachItemProvider 
+public class ValidatorConfigurationItemProvider 
 	extends ItemProviderAdapter
 	implements
 		IEditingDomainItemProvider,
@@ -48,7 +48,7 @@ public class EstimationApproachItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EstimationApproachItemProvider(AdapterFactory adapterFactory) {
+	public ValidatorConfigurationItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -63,25 +63,25 @@ public class EstimationApproachItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addClassPropertyDescriptor(object);
+			addTypePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Class feature.
+	 * This adds a property descriptor for the Type feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addClassPropertyDescriptor(Object object) {
+	protected void addTypePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_EstimationApproach_class_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationApproach_class_feature", "_UI_EstimationApproach_type"),
-				 ConfigurationPackage.Literals.ESTIMATION_APPROACH__CLASS,
+				 getString("_UI_ValidatorConfiguration_type_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_ValidatorConfiguration_type_feature", "_UI_ValidatorConfiguration_type"),
+				 ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__TYPE,
 				 true,
 				 false,
 				 false,
@@ -102,7 +102,7 @@ public class EstimationApproachItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.ESTIMATION_APPROACH__CONFIGURATION);
+			childrenFeatures.add(ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__PARAMETERS);
 		}
 		return childrenFeatures;
 	}
@@ -121,14 +121,14 @@ public class EstimationApproachItemProvider
 	}
 
 	/**
-	 * This returns EstimationApproach.gif.
+	 * This returns ValidatorConfiguration.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/EstimationApproach"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/ValidatorConfiguration"));
 	}
 
 	/**
@@ -139,11 +139,11 @@ public class EstimationApproachItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		Class labelValue = ((EstimationApproach)object).getClass_();
+		Class labelValue = ((ValidatorConfiguration)object).getType();
 		String label = labelValue == null ? null : labelValue.toString();
 		return label == null || label.length() == 0 ?
-			getString("_UI_EstimationApproach_type") :
-			getString("_UI_EstimationApproach_type") + " " + label;
+			getString("_UI_ValidatorConfiguration_type") :
+			getString("_UI_ValidatorConfiguration_type") + " " + label;
 	}
 	
 
@@ -158,11 +158,11 @@ public class EstimationApproachItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(EstimationApproach.class)) {
-			case ConfigurationPackage.ESTIMATION_APPROACH__CLASS:
+		switch (notification.getFeatureID(ValidatorConfiguration.class)) {
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__TYPE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
-			case ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION:
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -182,7 +182,7 @@ public class EstimationApproachItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.ESTIMATION_APPROACH__CONFIGURATION,
+				(ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__PARAMETERS,
 				 ConfigurationFactory.eINSTANCE.createParameter()));
 	}
 

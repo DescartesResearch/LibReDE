@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
 public interface EstimationSpecification extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Approaches</b></em>' containment reference list.
-	 * The list contents are of type {@link net.descartesresearch.librede.configuration.EstimationApproach}.
+	 * The list contents are of type {@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Approaches</em>' containment reference list isn't clear,
@@ -37,6 +37,6 @@ public interface EstimationSpecification extends EObject {
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<EstimationApproach> getApproaches();
+	EList<EstimationApproachConfiguration> getApproaches();
 
 } // EstimationSpecification

@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
  *   <li>{@link net.descartesresearch.librede.configuration.impl.LibredeConfigurationImpl#getWorkloadDescription <em>Workload Description</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.LibredeConfigurationImpl#getInput <em>Input</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.LibredeConfigurationImpl#getEstimation <em>Estimation</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.LibredeConfigurationImpl#getOuptut <em>Ouptut</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.LibredeConfigurationImpl#getOutput <em>Output</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.LibredeConfigurationImpl#getValidation <em>Validation</em>}</li>
  * </ul>
  * </p>
@@ -68,14 +68,14 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 	protected EstimationSpecification estimation;
 
 	/**
-	 * The cached value of the '{@link #getOuptut() <em>Ouptut</em>}' containment reference.
+	 * The cached value of the '{@link #getOutput() <em>Output</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getOuptut()
+	 * @see #getOutput()
 	 * @generated
 	 * @ordered
 	 */
-	protected OutputSpecification ouptut;
+	protected OutputSpecification output;
 
 	/**
 	 * The cached value of the '{@link #getValidation() <em>Validation</em>}' containment reference.
@@ -240,8 +240,8 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public OutputSpecification getOuptut() {
-		return ouptut;
+	public OutputSpecification getOutput() {
+		return output;
 	}
 
 	/**
@@ -249,11 +249,11 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetOuptut(OutputSpecification newOuptut, NotificationChain msgs) {
-		OutputSpecification oldOuptut = ouptut;
-		ouptut = newOuptut;
+	public NotificationChain basicSetOutput(OutputSpecification newOutput, NotificationChain msgs) {
+		OutputSpecification oldOutput = output;
+		output = newOutput;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT, oldOuptut, newOuptut);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT, oldOutput, newOutput);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -264,18 +264,18 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setOuptut(OutputSpecification newOuptut) {
-		if (newOuptut != ouptut) {
+	public void setOutput(OutputSpecification newOutput) {
+		if (newOutput != output) {
 			NotificationChain msgs = null;
-			if (ouptut != null)
-				msgs = ((InternalEObject)ouptut).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT, null, msgs);
-			if (newOuptut != null)
-				msgs = ((InternalEObject)newOuptut).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT, null, msgs);
-			msgs = basicSetOuptut(newOuptut, msgs);
+			if (output != null)
+				msgs = ((InternalEObject)output).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT, null, msgs);
+			if (newOutput != null)
+				msgs = ((InternalEObject)newOutput).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT, null, msgs);
+			msgs = basicSetOutput(newOutput, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT, newOuptut, newOuptut));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT, newOutput, newOutput));
 	}
 
 	/**
@@ -335,8 +335,8 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 				return basicSetInput(null, msgs);
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__ESTIMATION:
 				return basicSetEstimation(null, msgs);
-			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT:
-				return basicSetOuptut(null, msgs);
+			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT:
+				return basicSetOutput(null, msgs);
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__VALIDATION:
 				return basicSetValidation(null, msgs);
 		}
@@ -357,8 +357,8 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 				return getInput();
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__ESTIMATION:
 				return getEstimation();
-			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT:
-				return getOuptut();
+			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT:
+				return getOutput();
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__VALIDATION:
 				return getValidation();
 		}
@@ -382,8 +382,8 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__ESTIMATION:
 				setEstimation((EstimationSpecification)newValue);
 				return;
-			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT:
-				setOuptut((OutputSpecification)newValue);
+			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT:
+				setOutput((OutputSpecification)newValue);
 				return;
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__VALIDATION:
 				setValidation((ValidationSpecification)newValue);
@@ -409,8 +409,8 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__ESTIMATION:
 				setEstimation((EstimationSpecification)null);
 				return;
-			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT:
-				setOuptut((OutputSpecification)null);
+			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT:
+				setOutput((OutputSpecification)null);
 				return;
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__VALIDATION:
 				setValidation((ValidationSpecification)null);
@@ -433,8 +433,8 @@ public class LibredeConfigurationImpl extends MinimalEObjectImpl.Container imple
 				return input != null;
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__ESTIMATION:
 				return estimation != null;
-			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUPTUT:
-				return ouptut != null;
+			case ConfigurationPackage.LIBREDE_CONFIGURATION__OUTPUT:
+				return output != null;
 			case ConfigurationPackage.LIBREDE_CONFIGURATION__VALIDATION:
 				return validation != null;
 		}

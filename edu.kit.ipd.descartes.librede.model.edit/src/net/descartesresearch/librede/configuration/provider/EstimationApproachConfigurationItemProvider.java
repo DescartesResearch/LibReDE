@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.DataSource;
+import net.descartesresearch.librede.configuration.EstimationApproachConfiguration;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
@@ -29,12 +29,12 @@ import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 /**
- * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.DataSource} object.
+ * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class DataSourceItemProvider 
+public class EstimationApproachConfigurationItemProvider 
 	extends ItemProviderAdapter
 	implements
 		IEditingDomainItemProvider,
@@ -48,7 +48,7 @@ public class DataSourceItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DataSourceItemProvider(AdapterFactory adapterFactory) {
+	public EstimationApproachConfigurationItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -63,32 +63,9 @@ public class DataSourceItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addNamePropertyDescriptor(object);
 			addTypePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
-	}
-
-	/**
-	 * This adds a property descriptor for the Name feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addNamePropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_DataSource_name_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_DataSource_name_feature", "_UI_DataSource_type"),
-				 ConfigurationPackage.Literals.DATA_SOURCE__NAME,
-				 true,
-				 false,
-				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
-				 null));
 	}
 
 	/**
@@ -102,9 +79,9 @@ public class DataSourceItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_DataSource_type_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_DataSource_type_feature", "_UI_DataSource_type"),
-				 ConfigurationPackage.Literals.DATA_SOURCE__TYPE,
+				 getString("_UI_EstimationApproachConfiguration_type_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationApproachConfiguration_type_feature", "_UI_EstimationApproachConfiguration_type"),
+				 ConfigurationPackage.Literals.ESTIMATION_APPROACH_CONFIGURATION__TYPE,
 				 true,
 				 false,
 				 false,
@@ -125,7 +102,7 @@ public class DataSourceItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.DATA_SOURCE__CONFIGURATION);
+			childrenFeatures.add(ConfigurationPackage.Literals.ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS);
 		}
 		return childrenFeatures;
 	}
@@ -144,14 +121,14 @@ public class DataSourceItemProvider
 	}
 
 	/**
-	 * This returns DataSource.gif.
+	 * This returns EstimationApproachConfiguration.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/DataSource"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/EstimationApproachConfiguration"));
 	}
 
 	/**
@@ -162,10 +139,11 @@ public class DataSourceItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((DataSource)object).getName();
+		Class labelValue = ((EstimationApproachConfiguration)object).getType();
+		String label = labelValue == null ? null : labelValue.toString();
 		return label == null || label.length() == 0 ?
-			getString("_UI_DataSource_type") :
-			getString("_UI_DataSource_type") + " " + label;
+			getString("_UI_EstimationApproachConfiguration_type") :
+			getString("_UI_EstimationApproachConfiguration_type") + " " + label;
 	}
 	
 
@@ -180,12 +158,11 @@ public class DataSourceItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(DataSource.class)) {
-			case ConfigurationPackage.DATA_SOURCE__NAME:
-			case ConfigurationPackage.DATA_SOURCE__TYPE:
+		switch (notification.getFeatureID(EstimationApproachConfiguration.class)) {
+			case ConfigurationPackage.ESTIMATION_APPROACH_CONFIGURATION__TYPE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
-			case ConfigurationPackage.DATA_SOURCE__CONFIGURATION:
+			case ConfigurationPackage.ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -205,7 +182,7 @@ public class DataSourceItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.DATA_SOURCE__CONFIGURATION,
+				(ConfigurationPackage.Literals.ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS,
 				 ConfigurationFactory.eINSTANCE.createParameter()));
 	}
 

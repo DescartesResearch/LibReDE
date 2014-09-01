@@ -72,8 +72,8 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createLibredeConfigurationAdapter();
 			}
 			@Override
-			public Adapter caseDataSource(DataSource object) {
-				return createDataSourceAdapter();
+			public Adapter caseDataProviderConfiguration(DataProviderConfiguration object) {
+				return createDataProviderConfigurationAdapter();
 			}
 			@Override
 			public Adapter caseWorkloadDescription(WorkloadDescription object) {
@@ -84,8 +84,8 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createInputSpecificationAdapter();
 			}
 			@Override
-			public Adapter caseEstimationApproach(EstimationApproach object) {
-				return createEstimationApproachAdapter();
+			public Adapter caseEstimationApproachConfiguration(EstimationApproachConfiguration object) {
+				return createEstimationApproachConfigurationAdapter();
 			}
 			@Override
 			public Adapter caseOutputSpecification(OutputSpecification object) {
@@ -100,8 +100,8 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createServiceAdapter();
 			}
 			@Override
-			public Adapter caseTimeSeries(TimeSeries object) {
-				return createTimeSeriesAdapter();
+			public Adapter caseTraceConfiguration(TraceConfiguration object) {
+				return createTraceConfigurationAdapter();
 			}
 			@Override
 			public Adapter caseParameter(Parameter object) {
@@ -114,6 +114,18 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseValidationSpecification(ValidationSpecification object) {
 				return createValidationSpecificationAdapter();
+			}
+			@Override
+			public Adapter caseDataSourceConfiguration(DataSourceConfiguration object) {
+				return createDataSourceConfigurationAdapter();
+			}
+			@Override
+			public Adapter caseValidatorConfiguration(ValidatorConfiguration object) {
+				return createValidatorConfigurationAdapter();
+			}
+			@Override
+			public Adapter caseExporterConfiguration(ExporterConfiguration object) {
+				return createExporterConfigurationAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -150,16 +162,30 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.DataSource <em>Data Source</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.DataProviderConfiguration <em>Data Provider Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.descartesresearch.librede.configuration.DataSource
+	 * @see net.descartesresearch.librede.configuration.DataProviderConfiguration
 	 * @generated
 	 */
-	public Adapter createDataSourceAdapter() {
+	public Adapter createDataProviderConfigurationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.DataSourceConfiguration <em>Data Source Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.DataSourceConfiguration
+	 * @generated
+	 */
+	public Adapter createDataSourceConfigurationAdapter() {
 		return null;
 	}
 
@@ -192,16 +218,16 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.EstimationApproach <em>Estimation Approach</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration <em>Estimation Approach Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.descartesresearch.librede.configuration.EstimationApproach
+	 * @see net.descartesresearch.librede.configuration.EstimationApproachConfiguration
 	 * @generated
 	 */
-	public Adapter createEstimationApproachAdapter() {
+	public Adapter createEstimationApproachConfigurationAdapter() {
 		return null;
 	}
 
@@ -248,16 +274,16 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.TimeSeries <em>Time Series</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration
 	 * @generated
 	 */
-	public Adapter createTimeSeriesAdapter() {
+	public Adapter createTraceConfigurationAdapter() {
 		return null;
 	}
 
@@ -300,6 +326,34 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createValidationSpecificationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.ValidatorConfiguration <em>Validator Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.ValidatorConfiguration
+	 * @generated
+	 */
+	public Adapter createValidatorConfigurationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.ExporterConfiguration <em>Exporter Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.ExporterConfiguration
+	 * @generated
+	 */
+	public Adapter createExporterConfigurationAdapter() {
 		return null;
 	}
 

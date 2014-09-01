@@ -77,7 +77,7 @@ public class InputSpecificationItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES);
+			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_PROVIDERS);
 			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS);
 		}
 		return childrenFeatures;
@@ -131,7 +131,7 @@ public class InputSpecificationItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(InputSpecification.class)) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
@@ -152,13 +152,13 @@ public class InputSpecificationItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES,
-				 ConfigurationFactory.eINSTANCE.createDataSource()));
+				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_PROVIDERS,
+				 ConfigurationFactory.eINSTANCE.createDataProviderConfiguration()));
 
 		newChildDescriptors.add
 			(createChildParameter
 				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS,
-				 ConfigurationFactory.eINSTANCE.createTimeSeries()));
+				 ConfigurationFactory.eINSTANCE.createTraceConfiguration()));
 	}
 
 	/**

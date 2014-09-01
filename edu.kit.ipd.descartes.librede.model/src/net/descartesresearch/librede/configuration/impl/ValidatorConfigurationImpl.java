@@ -5,8 +5,8 @@ package net.descartesresearch.librede.configuration.impl;
 import java.util.Collection;
 
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.EstimationApproach;
 import net.descartesresearch.librede.configuration.Parameter;
+import net.descartesresearch.librede.configuration.ValidatorConfiguration;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -24,45 +24,45 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Estimation Approach</b></em>'.
+ * An implementation of the model object '<em><b>Validator Configuration</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.EstimationApproachImpl#getClass_ <em>Class</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.EstimationApproachImpl#getConfiguration <em>Configuration</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.ValidatorConfigurationImpl#getType <em>Type</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.ValidatorConfigurationImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class EstimationApproachImpl extends MinimalEObjectImpl.Container implements EstimationApproach {
+public class ValidatorConfigurationImpl extends MinimalEObjectImpl.Container implements ValidatorConfiguration {
 	/**
-	 * The cached value of the '{@link #getClass_() <em>Class</em>}' attribute.
+	 * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getClass_()
+	 * @see #getType()
 	 * @generated
 	 * @ordered
 	 */
-	protected Class<?> class_;
+	protected Class<?> type;
 
 	/**
-	 * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' containment reference list.
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getConfiguration()
+	 * @see #getParameters()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Parameter> configuration;
+	protected EList<Parameter> parameters;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected EstimationApproachImpl() {
+	protected ValidatorConfigurationImpl() {
 		super();
 	}
 
@@ -73,7 +73,7 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ConfigurationPackage.Literals.ESTIMATION_APPROACH;
+		return ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION;
 	}
 
 	/**
@@ -81,8 +81,8 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Class<?> getClass_() {
-		return class_;
+	public Class<?> getType() {
+		return type;
 	}
 
 	/**
@@ -90,11 +90,11 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setClass(Class<?> newClass) {
-		Class<?> oldClass = class_;
-		class_ = newClass;
+	public void setType(Class<?> newType) {
+		Class<?> oldType = type;
+		type = newType;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_APPROACH__CLASS, oldClass, class_));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.VALIDATOR_CONFIGURATION__TYPE, oldType, type));
 	}
 
 	/**
@@ -102,11 +102,11 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Parameter> getConfiguration() {
-		if (configuration == null) {
-			configuration = new EObjectContainmentEList<Parameter>(Parameter.class, this, ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION);
+	public EList<Parameter> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Parameter>(Parameter.class, this, ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS);
 		}
-		return configuration;
+		return parameters;
 	}
 
 	/**
@@ -117,8 +117,8 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION:
-				return ((InternalEList<?>)getConfiguration()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS:
+				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -131,10 +131,10 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.ESTIMATION_APPROACH__CLASS:
-				return getClass_();
-			case ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION:
-				return getConfiguration();
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__TYPE:
+				return getType();
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS:
+				return getParameters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -148,12 +148,12 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.ESTIMATION_APPROACH__CLASS:
-				setClass((Class<?>)newValue);
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__TYPE:
+				setType((Class<?>)newValue);
 				return;
-			case ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION:
-				getConfiguration().clear();
-				getConfiguration().addAll((Collection<? extends Parameter>)newValue);
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS:
+				getParameters().clear();
+				getParameters().addAll((Collection<? extends Parameter>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -167,11 +167,11 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.ESTIMATION_APPROACH__CLASS:
-				setClass((Class<?>)null);
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__TYPE:
+				setType((Class<?>)null);
 				return;
-			case ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION:
-				getConfiguration().clear();
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS:
+				getParameters().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -185,10 +185,10 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.ESTIMATION_APPROACH__CLASS:
-				return class_ != null;
-			case ConfigurationPackage.ESTIMATION_APPROACH__CONFIGURATION:
-				return configuration != null && !configuration.isEmpty();
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__TYPE:
+				return type != null;
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION__PARAMETERS:
+				return parameters != null && !parameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -203,10 +203,10 @@ public class EstimationApproachImpl extends MinimalEObjectImpl.Container impleme
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (class: ");
-		result.append(class_);
+		result.append(" (type: ");
+		result.append(type);
 		result.append(')');
 		return result.toString();
 	}
 
-} //EstimationApproachImpl
+} //ValidatorConfigurationImpl
