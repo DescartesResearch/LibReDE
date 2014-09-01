@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated librede -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="net.descartesresearch.librede.configuration.presentation.ConfigurationModelWizardID"
+            name="%_UI_ConfigurationModelWizard_label"
+            class="net.descartesresearch.librede.configuration.presentation.ConfigurationModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/ConfigurationModelFile.gif">
+         <description>%_UI_ConfigurationModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated librede -->
+      <editor
+            class="net.descartesresearch.librede.configuration.presentation.ConfigurationEditor"
+            contributorClass="net.descartesresearch.librede.configuration.presentation.ConfigurationActionBarContributor"
+            extensions="configuration"
+            filenames="*.librede"
+            icon="icons/full/obj16/ConfigurationModelFile.gif"
+            id="net.descartesresearch.librede.configuration.presentation.ConfigurationEditorID"
+            name="%_UI_ConfigurationEditor_label">
+      </editor>
+   </extension>
+
+</plugin>
