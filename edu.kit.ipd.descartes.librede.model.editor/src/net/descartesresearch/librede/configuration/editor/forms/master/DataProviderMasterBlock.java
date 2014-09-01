@@ -25,11 +25,12 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IDetailsPage;
@@ -41,8 +42,8 @@ import edu.kit.ipd.descartes.librede.factory.ComponentRegistry;
 
 public class DataProviderMasterBlock extends AbstractMasterBlockWithButtons implements ISelectionChangedListener, IDetailsPageProvider {
 
-	private List lstProviders;
-	private ListViewer lstProvidersViewer;
+	private Table tableProviders;
+	private TableViewer tableProvidersViewer;
 
 	/**
 	 * Create the master details block.
@@ -76,18 +77,18 @@ public class DataProviderMasterBlock extends AbstractMasterBlockWithButtons impl
 
 	@Override
 	protected Control createItemsList(Composite composite) {
-		lstProvidersViewer = new ListViewer(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		lstProviders = lstProvidersViewer.getList();
+		tableProvidersViewer = new TableViewer(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		tableProviders = tableProvidersViewer.getTable();
 		
-		lstProvidersViewer.setContentProvider(new ObservableListContentProvider());
-		lstProvidersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
+		tableProvidersViewer.setContentProvider(new ObservableListContentProvider());
+		tableProvidersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		IObservableList l = EMFEditProperties.list(domain, 
 				FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__INPUT, ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_PROVIDERS)
 				).observe(model);
-		lstProvidersViewer.setInput(l);
-		lstProvidersViewer.addSelectionChangedListener(this);
+		tableProvidersViewer.setInput(l);
+		tableProvidersViewer.addSelectionChangedListener(this);
 		
-		return lstProviders;
+		return tableProviders;
 	}
 
 	@Override
@@ -123,11 +124,11 @@ public class DataProviderMasterBlock extends AbstractMasterBlockWithButtons impl
 
 	@Override
 	protected void handleRemove() {
-		IStructuredSelection selection = (IStructuredSelection)lstProvidersViewer.getSelection();
+		IStructuredSelection selection = (IStructuredSelection)tableProvidersViewer.getSelection();
 		Iterator<?> iterator = selection.iterator();
 		while(iterator.hasNext()) {
 			Object o = iterator.next();
-			if (o instanceof DataSourceConfiguration) {
+			if (o instanceof DataProviderConfiguration) {
 				domain.getCommandStack().execute(RemoveCommand.create(domain, o));
 			}
 		}		
