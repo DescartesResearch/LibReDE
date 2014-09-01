@@ -9,6 +9,5 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE})
-public @interface Parameterizable {
-
+public @interface Component {
 }

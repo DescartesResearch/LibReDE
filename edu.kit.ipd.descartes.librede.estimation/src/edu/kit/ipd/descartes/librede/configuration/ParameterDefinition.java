@@ -9,8 +9,9 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.FIELD})
-public @interface Parameter {
+public @interface ParameterDefinition {
 	String name();
 	String label();
+	String defaultValue() default "";
 	boolean required() default true;
 }
