@@ -21,12 +21,12 @@ import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IDetailsPage;
@@ -38,8 +38,8 @@ import edu.kit.ipd.descartes.librede.factory.ComponentRegistry;
 
 public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements IDetailsPageProvider {
 	
-	private List lstExporters;
-	private ListViewer lstExportersViewer;
+	private Table tableExporters;
+	private TableViewer tableExportersViewer;
 
 	public OutputMasterBlock(AbstractEstimationConfigurationFormPage page,
 			EditingDomain domain, LibredeConfiguration model) {
@@ -72,11 +72,11 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 
 	@Override
 	protected void handleRemove() {
-		IStructuredSelection selection = (IStructuredSelection)lstExportersViewer.getSelection();
+		IStructuredSelection selection = (IStructuredSelection)tableExportersViewer.getSelection();
 		Iterator<?> iterator = selection.iterator();
 		while(iterator.hasNext()) {
 			Object o = iterator.next();
-			if (o instanceof DataSourceConfiguration) {
+			if (o instanceof ExporterConfiguration) {
 				domain.getCommandStack().execute(RemoveCommand.create(domain, o));
 			}
 		}		
@@ -89,18 +89,18 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 
 	@Override
 	protected Control createItemsList(Composite parent) {
-		lstExportersViewer = new ListViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		lstExporters = lstExportersViewer.getList();
+		tableExportersViewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		tableExporters = tableExportersViewer.getTable();
 		
-		lstExportersViewer.setContentProvider(new ObservableListContentProvider());
-		lstExportersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
+		tableExportersViewer.setContentProvider(new ObservableListContentProvider());
+		tableExportersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		IObservableList l = EMFEditProperties.list(domain, 
 				FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__OUTPUT, ConfigurationPackage.Literals.OUTPUT_SPECIFICATION__EXPORTERS)
 				).observe(model);
-		lstExportersViewer.setInput(l);
-		lstExportersViewer.addSelectionChangedListener(this);
+		tableExportersViewer.setInput(l);
+		tableExportersViewer.addSelectionChangedListener(this);
 		
-		return lstExporters;
+		return tableExporters;
 	}
 
 	@Override
