@@ -6,14 +6,16 @@ package net.descartesresearch.librede.configuration.provider;
 import java.util.Collection;
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.TimeSeries;
+import net.descartesresearch.librede.configuration.TraceConfiguration;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.common.util.ResourceLocator;
 
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
@@ -26,12 +28,12 @@ import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 /**
- * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.TimeSeries} object.
+ * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.TraceConfiguration} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class TimeSeriesItemProvider 
+public class TraceConfigurationItemProvider 
 	extends ItemProviderAdapter
 	implements
 		IEditingDomainItemProvider,
@@ -45,7 +47,7 @@ public class TimeSeriesItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public TimeSeriesItemProvider(AdapterFactory adapterFactory) {
+	public TraceConfigurationItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -80,9 +82,9 @@ public class TimeSeriesItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_TimeSeries_metric_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TimeSeries_metric_feature", "_UI_TimeSeries_type"),
-				 ConfigurationPackage.Literals.TIME_SERIES__METRIC,
+				 getString("_UI_TraceConfiguration_metric_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_metric_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__METRIC,
 				 true,
 				 false,
 				 false,
@@ -102,9 +104,9 @@ public class TimeSeriesItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_TimeSeries_unit_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TimeSeries_unit_feature", "_UI_TimeSeries_type"),
-				 ConfigurationPackage.Literals.TIME_SERIES__UNIT,
+				 getString("_UI_TraceConfiguration_unit_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_unit_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__UNIT,
 				 true,
 				 false,
 				 false,
@@ -124,9 +126,9 @@ public class TimeSeriesItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_TimeSeries_resources_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TimeSeries_resources_feature", "_UI_TimeSeries_type"),
-				 ConfigurationPackage.Literals.TIME_SERIES__RESOURCES,
+				 getString("_UI_TraceConfiguration_resources_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_resources_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__RESOURCES,
 				 true,
 				 false,
 				 true,
@@ -146,9 +148,9 @@ public class TimeSeriesItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_TimeSeries_services_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TimeSeries_services_feature", "_UI_TimeSeries_type"),
-				 ConfigurationPackage.Literals.TIME_SERIES__SERVICES,
+				 getString("_UI_TraceConfiguration_services_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_services_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__SERVICES,
 				 true,
 				 false,
 				 true,
@@ -168,26 +170,56 @@ public class TimeSeriesItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_TimeSeries_interval_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TimeSeries_interval_feature", "_UI_TimeSeries_type"),
-				 ConfigurationPackage.Literals.TIME_SERIES__INTERVAL,
+				 getString("_UI_TraceConfiguration_interval_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_interval_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.REAL_VALUE_IMAGE,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
 				 null,
 				 null));
 	}
 
 	/**
-	 * This returns TimeSeries.gif.
+	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
+	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
+	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
+		if (childrenFeatures == null) {
+			super.getChildrenFeatures(object);
+			childrenFeatures.add(ConfigurationPackage.Literals.TRACE_CONFIGURATION__DATA);
+		}
+		return childrenFeatures;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EStructuralFeature getChildFeature(Object object, Object child) {
+		// Check the type of the specified child object and return the proper feature to use for
+		// adding (see {@link AddCommand}) it as a child.
+
+		return super.getChildFeature(object, child);
+	}
+
+	/**
+	 * This returns TraceConfiguration.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/TimeSeries"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/TraceConfiguration"));
 	}
 
 	/**
@@ -198,10 +230,10 @@ public class TimeSeriesItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((TimeSeries)object).getMetric();
+		String label = ((TraceConfiguration)object).getMetric();
 		return label == null || label.length() == 0 ?
-			getString("_UI_TimeSeries_type") :
-			getString("_UI_TimeSeries_type") + " " + label;
+			getString("_UI_TraceConfiguration_type") :
+			getString("_UI_TraceConfiguration_type") + " " + label;
 	}
 	
 
@@ -216,11 +248,14 @@ public class TimeSeriesItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(TimeSeries.class)) {
-			case ConfigurationPackage.TIME_SERIES__METRIC:
-			case ConfigurationPackage.TIME_SERIES__UNIT:
-			case ConfigurationPackage.TIME_SERIES__INTERVAL:
+		switch (notification.getFeatureID(TraceConfiguration.class)) {
+			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
 		super.notifyChanged(notification);
@@ -236,6 +271,11 @@ public class TimeSeriesItemProvider
 	@Override
 	protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.TRACE_CONFIGURATION__DATA,
+				 ConfigurationFactory.eINSTANCE.createDataSourceConfiguration()));
 	}
 
 	/**

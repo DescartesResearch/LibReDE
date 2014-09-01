@@ -95,13 +95,13 @@ public interface ConfigurationPackage extends EPackage {
 	int LIBREDE_CONFIGURATION__ESTIMATION = 2;
 
 	/**
-	 * The feature id for the '<em><b>Ouptut</b></em>' containment reference.
+	 * The feature id for the '<em><b>Output</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int LIBREDE_CONFIGURATION__OUPTUT = 3;
+	int LIBREDE_CONFIGURATION__OUTPUT = 3;
 
 	/**
 	 * The feature id for the '<em><b>Validation</b></em>' containment reference.
@@ -131,32 +131,23 @@ public interface ConfigurationPackage extends EPackage {
 	int LIBREDE_CONFIGURATION_OPERATION_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.DataSourceImpl <em>Data Source</em>}' class.
+	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.DataProviderConfigurationImpl <em>Data Provider Configuration</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.descartesresearch.librede.configuration.impl.DataSourceImpl
-	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getDataSource()
+	 * @see net.descartesresearch.librede.configuration.impl.DataProviderConfigurationImpl
+	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getDataProviderConfiguration()
 	 * @generated
 	 */
-	int DATA_SOURCE = 1;
+	int DATA_PROVIDER_CONFIGURATION = 1;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DATA_SOURCE__NAME = 0;
-
-	/**
-	 * The feature id for the '<em><b>Configuration</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int DATA_SOURCE__CONFIGURATION = 1;
+	int DATA_PROVIDER_CONFIGURATION__PARAMETERS = 0;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -165,25 +156,35 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int DATA_SOURCE__TYPE = 2;
+	int DATA_PROVIDER_CONFIGURATION__TYPE = 1;
 
 	/**
-	 * The number of structural features of the '<em>Data Source</em>' class.
+	 * The number of structural features of the '<em>Data Provider Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DATA_SOURCE_FEATURE_COUNT = 3;
+	int DATA_PROVIDER_CONFIGURATION_FEATURE_COUNT = 2;
 
 	/**
-	 * The number of operations of the '<em>Data Source</em>' class.
+	 * The number of operations of the '<em>Data Provider Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int DATA_SOURCE_OPERATION_COUNT = 0;
+	int DATA_PROVIDER_CONFIGURATION_OPERATION_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl <em>Data Source Configuration</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl
+	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getDataSourceConfiguration()
+	 * @generated
+	 */
+	int DATA_SOURCE_CONFIGURATION = 12;
 
 	/**
 	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.WorkloadDescriptionImpl <em>Workload Description</em>}' class.
@@ -242,13 +243,13 @@ public interface ConfigurationPackage extends EPackage {
 	int INPUT_SPECIFICATION = 3;
 
 	/**
-	 * The feature id for the '<em><b>Data Sources</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Data Providers</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INPUT_SPECIFICATION__DATA_SOURCES = 0;
+	int INPUT_SPECIFICATION__DATA_PROVIDERS = 0;
 
 	/**
 	 * The feature id for the '<em><b>Observations</b></em>' containment reference list.
@@ -278,50 +279,50 @@ public interface ConfigurationPackage extends EPackage {
 	int INPUT_SPECIFICATION_OPERATION_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.EstimationApproachImpl <em>Estimation Approach</em>}' class.
+	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.EstimationApproachConfigurationImpl <em>Estimation Approach Configuration</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.descartesresearch.librede.configuration.impl.EstimationApproachImpl
-	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getEstimationApproach()
+	 * @see net.descartesresearch.librede.configuration.impl.EstimationApproachConfigurationImpl
+	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getEstimationApproachConfiguration()
 	 * @generated
 	 */
-	int ESTIMATION_APPROACH = 4;
+	int ESTIMATION_APPROACH_CONFIGURATION = 4;
 
 	/**
-	 * The feature id for the '<em><b>Class</b></em>' attribute.
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_APPROACH__CLASS = 0;
+	int ESTIMATION_APPROACH_CONFIGURATION__TYPE = 0;
 
 	/**
-	 * The feature id for the '<em><b>Configuration</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_APPROACH__CONFIGURATION = 1;
+	int ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS = 1;
 
 	/**
-	 * The number of structural features of the '<em>Estimation Approach</em>' class.
+	 * The number of structural features of the '<em>Estimation Approach Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_APPROACH_FEATURE_COUNT = 2;
+	int ESTIMATION_APPROACH_CONFIGURATION_FEATURE_COUNT = 2;
 
 	/**
-	 * The number of operations of the '<em>Estimation Approach</em>' class.
+	 * The number of operations of the '<em>Estimation Approach Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_APPROACH_OPERATION_COUNT = 0;
+	int ESTIMATION_APPROACH_CONFIGURATION_OPERATION_COUNT = 0;
 
 	/**
 	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.OutputSpecificationImpl <em>Output Specification</em>}' class.
@@ -334,13 +335,22 @@ public interface ConfigurationPackage extends EPackage {
 	int OUTPUT_SPECIFICATION = 5;
 
 	/**
+	 * The feature id for the '<em><b>Exporters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OUTPUT_SPECIFICATION__EXPORTERS = 0;
+
+	/**
 	 * The number of structural features of the '<em>Output Specification</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int OUTPUT_SPECIFICATION_FEATURE_COUNT = 0;
+	int OUTPUT_SPECIFICATION_FEATURE_COUNT = 1;
 
 	/**
 	 * The number of operations of the '<em>Output Specification</em>' class.
@@ -444,14 +454,14 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE_OPERATION_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl <em>Time Series</em>}' class.
+	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.descartesresearch.librede.configuration.impl.TimeSeriesImpl
-	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getTimeSeries()
+	 * @see net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl
+	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getTraceConfiguration()
 	 * @generated
 	 */
-	int TIME_SERIES = 8;
+	int TRACE_CONFIGURATION = 8;
 
 	/**
 	 * The feature id for the '<em><b>Metric</b></em>' attribute.
@@ -460,7 +470,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES__METRIC = 0;
+	int TRACE_CONFIGURATION__METRIC = 0;
 
 	/**
 	 * The feature id for the '<em><b>Unit</b></em>' attribute.
@@ -469,7 +479,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES__UNIT = 1;
+	int TRACE_CONFIGURATION__UNIT = 1;
 
 	/**
 	 * The feature id for the '<em><b>Resources</b></em>' reference list.
@@ -478,7 +488,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES__RESOURCES = 2;
+	int TRACE_CONFIGURATION__RESOURCES = 2;
 
 	/**
 	 * The feature id for the '<em><b>Services</b></em>' reference list.
@@ -487,7 +497,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES__SERVICES = 3;
+	int TRACE_CONFIGURATION__SERVICES = 3;
 
 	/**
 	 * The feature id for the '<em><b>Interval</b></em>' attribute.
@@ -496,25 +506,34 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES__INTERVAL = 4;
+	int TRACE_CONFIGURATION__INTERVAL = 4;
 
 	/**
-	 * The number of structural features of the '<em>Time Series</em>' class.
+	 * The feature id for the '<em><b>Data</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES_FEATURE_COUNT = 5;
+	int TRACE_CONFIGURATION__DATA = 5;
 
 	/**
-	 * The number of operations of the '<em>Time Series</em>' class.
+	 * The number of structural features of the '<em>Trace Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TIME_SERIES_OPERATION_COUNT = 0;
+	int TRACE_CONFIGURATION_FEATURE_COUNT = 6;
+
+	/**
+	 * The number of operations of the '<em>Trace Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION_OPERATION_COUNT = 0;
 
 	/**
 	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.ParameterImpl <em>Parameter</em>}' class.
@@ -610,13 +629,22 @@ public interface ConfigurationPackage extends EPackage {
 	int VALIDATION_SPECIFICATION = 11;
 
 	/**
+	 * The feature id for the '<em><b>Validators</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VALIDATION_SPECIFICATION__VALIDATORS = 0;
+
+	/**
 	 * The number of structural features of the '<em>Validation Specification</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VALIDATION_SPECIFICATION_FEATURE_COUNT = 0;
+	int VALIDATION_SPECIFICATION_FEATURE_COUNT = 1;
 
 	/**
 	 * The number of operations of the '<em>Validation Specification</em>' class.
@@ -628,6 +656,143 @@ public interface ConfigurationPackage extends EPackage {
 	int VALIDATION_SPECIFICATION_OPERATION_COUNT = 0;
 
 	/**
+	 * The feature id for the '<em><b>Data Provider</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DATA_SOURCE_CONFIGURATION__DATA_PROVIDER = 0;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DATA_SOURCE_CONFIGURATION__TYPE = 1;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DATA_SOURCE_CONFIGURATION__PARAMETERS = 2;
+
+	/**
+	 * The number of structural features of the '<em>Data Source Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DATA_SOURCE_CONFIGURATION_FEATURE_COUNT = 3;
+
+	/**
+	 * The number of operations of the '<em>Data Source Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DATA_SOURCE_CONFIGURATION_OPERATION_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.ValidatorConfigurationImpl <em>Validator Configuration</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.descartesresearch.librede.configuration.impl.ValidatorConfigurationImpl
+	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getValidatorConfiguration()
+	 * @generated
+	 */
+	int VALIDATOR_CONFIGURATION = 13;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VALIDATOR_CONFIGURATION__TYPE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VALIDATOR_CONFIGURATION__PARAMETERS = 1;
+
+	/**
+	 * The number of structural features of the '<em>Validator Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VALIDATOR_CONFIGURATION_FEATURE_COUNT = 2;
+
+	/**
+	 * The number of operations of the '<em>Validator Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VALIDATOR_CONFIGURATION_OPERATION_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl <em>Exporter Configuration</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl
+	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getExporterConfiguration()
+	 * @generated
+	 */
+	int EXPORTER_CONFIGURATION = 14;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPORTER_CONFIGURATION__TYPE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPORTER_CONFIGURATION__PARAMETERS = 1;
+
+	/**
+	 * The number of structural features of the '<em>Exporter Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPORTER_CONFIGURATION_FEATURE_COUNT = 2;
+
+	/**
+	 * The number of operations of the '<em>Exporter Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPORTER_CONFIGURATION_OPERATION_COUNT = 0;
+
+	/**
 	 * The meta object id for the '{@link net.descartesresearch.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -635,7 +800,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getSchedulingStrategy()
 	 * @generated
 	 */
-	int SCHEDULING_STRATEGY = 12;
+	int SCHEDULING_STRATEGY = 15;
 
 
 	/**
@@ -682,15 +847,15 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getLibredeConfiguration_Estimation();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getOuptut <em>Ouptut</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getOutput <em>Output</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Ouptut</em>'.
-	 * @see net.descartesresearch.librede.configuration.LibredeConfiguration#getOuptut()
+	 * @return the meta object for the containment reference '<em>Output</em>'.
+	 * @see net.descartesresearch.librede.configuration.LibredeConfiguration#getOutput()
 	 * @see #getLibredeConfiguration()
 	 * @generated
 	 */
-	EReference getLibredeConfiguration_Ouptut();
+	EReference getLibredeConfiguration_Output();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getValidation <em>Validation</em>}'.
@@ -704,47 +869,79 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getLibredeConfiguration_Validation();
 
 	/**
-	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.DataSource <em>Data Source</em>}'.
+	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.DataProviderConfiguration <em>Data Provider Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Data Source</em>'.
-	 * @see net.descartesresearch.librede.configuration.DataSource
+	 * @return the meta object for class '<em>Data Provider Configuration</em>'.
+	 * @see net.descartesresearch.librede.configuration.DataProviderConfiguration
 	 * @generated
 	 */
-	EClass getDataSource();
+	EClass getDataProviderConfiguration();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.DataSource#getName <em>Name</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.DataProviderConfiguration#getParameters <em>Parameters</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.descartesresearch.librede.configuration.DataSource#getName()
-	 * @see #getDataSource()
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.descartesresearch.librede.configuration.DataProviderConfiguration#getParameters()
+	 * @see #getDataProviderConfiguration()
 	 * @generated
 	 */
-	EAttribute getDataSource_Name();
+	EReference getDataProviderConfiguration_Parameters();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.DataSource#getConfiguration <em>Configuration</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Configuration</em>'.
-	 * @see net.descartesresearch.librede.configuration.DataSource#getConfiguration()
-	 * @see #getDataSource()
-	 * @generated
-	 */
-	EReference getDataSource_Configuration();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.DataSource#getType <em>Type</em>}'.
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.DataProviderConfiguration#getType <em>Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Type</em>'.
-	 * @see net.descartesresearch.librede.configuration.DataSource#getType()
-	 * @see #getDataSource()
+	 * @see net.descartesresearch.librede.configuration.DataProviderConfiguration#getType()
+	 * @see #getDataProviderConfiguration()
 	 * @generated
 	 */
-	EAttribute getDataSource_Type();
+	EAttribute getDataProviderConfiguration_Type();
+
+	/**
+	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.DataSourceConfiguration <em>Data Source Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Data Source Configuration</em>'.
+	 * @see net.descartesresearch.librede.configuration.DataSourceConfiguration
+	 * @generated
+	 */
+	EClass getDataSourceConfiguration();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.descartesresearch.librede.configuration.DataSourceConfiguration#getDataProvider <em>Data Provider</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Data Provider</em>'.
+	 * @see net.descartesresearch.librede.configuration.DataSourceConfiguration#getDataProvider()
+	 * @see #getDataSourceConfiguration()
+	 * @generated
+	 */
+	EReference getDataSourceConfiguration_DataProvider();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.DataSourceConfiguration#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.descartesresearch.librede.configuration.DataSourceConfiguration#getParameters()
+	 * @see #getDataSourceConfiguration()
+	 * @generated
+	 */
+	EReference getDataSourceConfiguration_Parameters();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.DataSourceConfiguration#getType <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Type</em>'.
+	 * @see net.descartesresearch.librede.configuration.DataSourceConfiguration#getType()
+	 * @see #getDataSourceConfiguration()
+	 * @generated
+	 */
+	EAttribute getDataSourceConfiguration_Type();
 
 	/**
 	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.WorkloadDescription <em>Workload Description</em>}'.
@@ -789,15 +986,15 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getInputSpecification();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.InputSpecification#getDataSources <em>Data Sources</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.InputSpecification#getDataProviders <em>Data Providers</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Data Sources</em>'.
-	 * @see net.descartesresearch.librede.configuration.InputSpecification#getDataSources()
+	 * @return the meta object for the containment reference list '<em>Data Providers</em>'.
+	 * @see net.descartesresearch.librede.configuration.InputSpecification#getDataProviders()
 	 * @see #getInputSpecification()
 	 * @generated
 	 */
-	EReference getInputSpecification_DataSources();
+	EReference getInputSpecification_DataProviders();
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.InputSpecification#getObservations <em>Observations</em>}'.
@@ -811,36 +1008,36 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getInputSpecification_Observations();
 
 	/**
-	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.EstimationApproach <em>Estimation Approach</em>}'.
+	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration <em>Estimation Approach Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Estimation Approach</em>'.
-	 * @see net.descartesresearch.librede.configuration.EstimationApproach
+	 * @return the meta object for class '<em>Estimation Approach Configuration</em>'.
+	 * @see net.descartesresearch.librede.configuration.EstimationApproachConfiguration
 	 * @generated
 	 */
-	EClass getEstimationApproach();
+	EClass getEstimationApproachConfiguration();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.EstimationApproach#getClass_ <em>Class</em>}'.
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration#getType <em>Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Class</em>'.
-	 * @see net.descartesresearch.librede.configuration.EstimationApproach#getClass_()
-	 * @see #getEstimationApproach()
+	 * @return the meta object for the attribute '<em>Type</em>'.
+	 * @see net.descartesresearch.librede.configuration.EstimationApproachConfiguration#getType()
+	 * @see #getEstimationApproachConfiguration()
 	 * @generated
 	 */
-	EAttribute getEstimationApproach_Class();
+	EAttribute getEstimationApproachConfiguration_Type();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.EstimationApproach#getConfiguration <em>Configuration</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration#getParameters <em>Parameters</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Configuration</em>'.
-	 * @see net.descartesresearch.librede.configuration.EstimationApproach#getConfiguration()
-	 * @see #getEstimationApproach()
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.descartesresearch.librede.configuration.EstimationApproachConfiguration#getParameters()
+	 * @see #getEstimationApproachConfiguration()
 	 * @generated
 	 */
-	EReference getEstimationApproach_Configuration();
+	EReference getEstimationApproachConfiguration_Parameters();
 
 	/**
 	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.OutputSpecification <em>Output Specification</em>}'.
@@ -851,6 +1048,17 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getOutputSpecification();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.OutputSpecification#getExporters <em>Exporters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Exporters</em>'.
+	 * @see net.descartesresearch.librede.configuration.OutputSpecification#getExporters()
+	 * @see #getOutputSpecification()
+	 * @generated
+	 */
+	EReference getOutputSpecification_Exporters();
 
 	/**
 	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.Resource <em>Resource</em>}'.
@@ -917,69 +1125,80 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getService_Name();
 
 	/**
-	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.TimeSeries <em>Time Series</em>}'.
+	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Time Series</em>'.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries
+	 * @return the meta object for class '<em>Trace Configuration</em>'.
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration
 	 * @generated
 	 */
-	EClass getTimeSeries();
+	EClass getTraceConfiguration();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.TimeSeries#getMetric <em>Metric</em>}'.
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Metric</em>'.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries#getMetric()
-	 * @see #getTimeSeries()
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration#getMetric()
+	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EAttribute getTimeSeries_Metric();
+	EAttribute getTraceConfiguration_Metric();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.TimeSeries#getUnit <em>Unit</em>}'.
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Unit</em>'.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries#getUnit()
-	 * @see #getTimeSeries()
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration#getUnit()
+	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EAttribute getTimeSeries_Unit();
+	EAttribute getTraceConfiguration_Unit();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.descartesresearch.librede.configuration.TimeSeries#getResources <em>Resources</em>}'.
+	 * Returns the meta object for the reference list '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getResources <em>Resources</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Resources</em>'.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries#getResources()
-	 * @see #getTimeSeries()
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration#getResources()
+	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EReference getTimeSeries_Resources();
+	EReference getTraceConfiguration_Resources();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.descartesresearch.librede.configuration.TimeSeries#getServices <em>Services</em>}'.
+	 * Returns the meta object for the reference list '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getServices <em>Services</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference list '<em>Services</em>'.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries#getServices()
-	 * @see #getTimeSeries()
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration#getServices()
+	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EReference getTimeSeries_Services();
+	EReference getTraceConfiguration_Services();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.TimeSeries#getInterval <em>Interval</em>}'.
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Interval</em>'.
-	 * @see net.descartesresearch.librede.configuration.TimeSeries#getInterval()
-	 * @see #getTimeSeries()
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration#getInterval()
+	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EAttribute getTimeSeries_Interval();
+	EAttribute getTraceConfiguration_Interval();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getData <em>Data</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Data</em>'.
+	 * @see net.descartesresearch.librede.configuration.TraceConfiguration#getData()
+	 * @see #getTraceConfiguration()
+	 * @generated
+	 */
+	EReference getTraceConfiguration_Data();
 
 	/**
 	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.Parameter <em>Parameter</em>}'.
@@ -1043,6 +1262,81 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getValidationSpecification();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.ValidationSpecification#getValidators <em>Validators</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Validators</em>'.
+	 * @see net.descartesresearch.librede.configuration.ValidationSpecification#getValidators()
+	 * @see #getValidationSpecification()
+	 * @generated
+	 */
+	EReference getValidationSpecification_Validators();
+
+	/**
+	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.ValidatorConfiguration <em>Validator Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Validator Configuration</em>'.
+	 * @see net.descartesresearch.librede.configuration.ValidatorConfiguration
+	 * @generated
+	 */
+	EClass getValidatorConfiguration();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.ValidatorConfiguration#getType <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Type</em>'.
+	 * @see net.descartesresearch.librede.configuration.ValidatorConfiguration#getType()
+	 * @see #getValidatorConfiguration()
+	 * @generated
+	 */
+	EAttribute getValidatorConfiguration_Type();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.ValidatorConfiguration#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.descartesresearch.librede.configuration.ValidatorConfiguration#getParameters()
+	 * @see #getValidatorConfiguration()
+	 * @generated
+	 */
+	EReference getValidatorConfiguration_Parameters();
+
+	/**
+	 * Returns the meta object for class '{@link net.descartesresearch.librede.configuration.ExporterConfiguration <em>Exporter Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Exporter Configuration</em>'.
+	 * @see net.descartesresearch.librede.configuration.ExporterConfiguration
+	 * @generated
+	 */
+	EClass getExporterConfiguration();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.descartesresearch.librede.configuration.ExporterConfiguration#getType <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Type</em>'.
+	 * @see net.descartesresearch.librede.configuration.ExporterConfiguration#getType()
+	 * @see #getExporterConfiguration()
+	 * @generated
+	 */
+	EAttribute getExporterConfiguration_Type();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.descartesresearch.librede.configuration.ExporterConfiguration#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.descartesresearch.librede.configuration.ExporterConfiguration#getParameters()
+	 * @see #getExporterConfiguration()
+	 * @generated
+	 */
+	EReference getExporterConfiguration_Parameters();
 
 	/**
 	 * Returns the meta object for enum '{@link net.descartesresearch.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
@@ -1112,12 +1406,12 @@ public interface ConfigurationPackage extends EPackage {
 		EReference LIBREDE_CONFIGURATION__ESTIMATION = eINSTANCE.getLibredeConfiguration_Estimation();
 
 		/**
-		 * The meta object literal for the '<em><b>Ouptut</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Output</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference LIBREDE_CONFIGURATION__OUPTUT = eINSTANCE.getLibredeConfiguration_Ouptut();
+		EReference LIBREDE_CONFIGURATION__OUTPUT = eINSTANCE.getLibredeConfiguration_Output();
 
 		/**
 		 * The meta object literal for the '<em><b>Validation</b></em>' containment reference feature.
@@ -1128,30 +1422,22 @@ public interface ConfigurationPackage extends EPackage {
 		EReference LIBREDE_CONFIGURATION__VALIDATION = eINSTANCE.getLibredeConfiguration_Validation();
 
 		/**
-		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.DataSourceImpl <em>Data Source</em>}' class.
+		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.DataProviderConfigurationImpl <em>Data Provider Configuration</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.descartesresearch.librede.configuration.impl.DataSourceImpl
-		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getDataSource()
+		 * @see net.descartesresearch.librede.configuration.impl.DataProviderConfigurationImpl
+		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getDataProviderConfiguration()
 		 * @generated
 		 */
-		EClass DATA_SOURCE = eINSTANCE.getDataSource();
+		EClass DATA_PROVIDER_CONFIGURATION = eINSTANCE.getDataProviderConfiguration();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute DATA_SOURCE__NAME = eINSTANCE.getDataSource_Name();
-
-		/**
-		 * The meta object literal for the '<em><b>Configuration</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference DATA_SOURCE__CONFIGURATION = eINSTANCE.getDataSource_Configuration();
+		EReference DATA_PROVIDER_CONFIGURATION__PARAMETERS = eINSTANCE.getDataProviderConfiguration_Parameters();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
@@ -1159,7 +1445,41 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute DATA_SOURCE__TYPE = eINSTANCE.getDataSource_Type();
+		EAttribute DATA_PROVIDER_CONFIGURATION__TYPE = eINSTANCE.getDataProviderConfiguration_Type();
+
+		/**
+		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl <em>Data Source Configuration</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl
+		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getDataSourceConfiguration()
+		 * @generated
+		 */
+		EClass DATA_SOURCE_CONFIGURATION = eINSTANCE.getDataSourceConfiguration();
+
+		/**
+		 * The meta object literal for the '<em><b>Data Provider</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference DATA_SOURCE_CONFIGURATION__DATA_PROVIDER = eINSTANCE.getDataSourceConfiguration_DataProvider();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference DATA_SOURCE_CONFIGURATION__PARAMETERS = eINSTANCE.getDataSourceConfiguration_Parameters();
+
+		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute DATA_SOURCE_CONFIGURATION__TYPE = eINSTANCE.getDataSourceConfiguration_Type();
 
 		/**
 		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.WorkloadDescriptionImpl <em>Workload Description</em>}' class.
@@ -1198,12 +1518,12 @@ public interface ConfigurationPackage extends EPackage {
 		EClass INPUT_SPECIFICATION = eINSTANCE.getInputSpecification();
 
 		/**
-		 * The meta object literal for the '<em><b>Data Sources</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Data Providers</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INPUT_SPECIFICATION__DATA_SOURCES = eINSTANCE.getInputSpecification_DataSources();
+		EReference INPUT_SPECIFICATION__DATA_PROVIDERS = eINSTANCE.getInputSpecification_DataProviders();
 
 		/**
 		 * The meta object literal for the '<em><b>Observations</b></em>' containment reference list feature.
@@ -1214,30 +1534,30 @@ public interface ConfigurationPackage extends EPackage {
 		EReference INPUT_SPECIFICATION__OBSERVATIONS = eINSTANCE.getInputSpecification_Observations();
 
 		/**
-		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.EstimationApproachImpl <em>Estimation Approach</em>}' class.
+		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.EstimationApproachConfigurationImpl <em>Estimation Approach Configuration</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.descartesresearch.librede.configuration.impl.EstimationApproachImpl
-		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getEstimationApproach()
+		 * @see net.descartesresearch.librede.configuration.impl.EstimationApproachConfigurationImpl
+		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getEstimationApproachConfiguration()
 		 * @generated
 		 */
-		EClass ESTIMATION_APPROACH = eINSTANCE.getEstimationApproach();
+		EClass ESTIMATION_APPROACH_CONFIGURATION = eINSTANCE.getEstimationApproachConfiguration();
 
 		/**
-		 * The meta object literal for the '<em><b>Class</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ESTIMATION_APPROACH__CLASS = eINSTANCE.getEstimationApproach_Class();
+		EAttribute ESTIMATION_APPROACH_CONFIGURATION__TYPE = eINSTANCE.getEstimationApproachConfiguration_Type();
 
 		/**
-		 * The meta object literal for the '<em><b>Configuration</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ESTIMATION_APPROACH__CONFIGURATION = eINSTANCE.getEstimationApproach_Configuration();
+		EReference ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS = eINSTANCE.getEstimationApproachConfiguration_Parameters();
 
 		/**
 		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.OutputSpecificationImpl <em>Output Specification</em>}' class.
@@ -1248,6 +1568,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EClass OUTPUT_SPECIFICATION = eINSTANCE.getOutputSpecification();
+
+		/**
+		 * The meta object literal for the '<em><b>Exporters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference OUTPUT_SPECIFICATION__EXPORTERS = eINSTANCE.getOutputSpecification_Exporters();
 
 		/**
 		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.ResourceImpl <em>Resource</em>}' class.
@@ -1302,14 +1630,14 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute SERVICE__NAME = eINSTANCE.getService_Name();
 
 		/**
-		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.TimeSeriesImpl <em>Time Series</em>}' class.
+		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.descartesresearch.librede.configuration.impl.TimeSeriesImpl
-		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getTimeSeries()
+		 * @see net.descartesresearch.librede.configuration.impl.TraceConfigurationImpl
+		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getTraceConfiguration()
 		 * @generated
 		 */
-		EClass TIME_SERIES = eINSTANCE.getTimeSeries();
+		EClass TRACE_CONFIGURATION = eINSTANCE.getTraceConfiguration();
 
 		/**
 		 * The meta object literal for the '<em><b>Metric</b></em>' attribute feature.
@@ -1317,7 +1645,7 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TIME_SERIES__METRIC = eINSTANCE.getTimeSeries_Metric();
+		EAttribute TRACE_CONFIGURATION__METRIC = eINSTANCE.getTraceConfiguration_Metric();
 
 		/**
 		 * The meta object literal for the '<em><b>Unit</b></em>' attribute feature.
@@ -1325,7 +1653,7 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TIME_SERIES__UNIT = eINSTANCE.getTimeSeries_Unit();
+		EAttribute TRACE_CONFIGURATION__UNIT = eINSTANCE.getTraceConfiguration_Unit();
 
 		/**
 		 * The meta object literal for the '<em><b>Resources</b></em>' reference list feature.
@@ -1333,7 +1661,7 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TIME_SERIES__RESOURCES = eINSTANCE.getTimeSeries_Resources();
+		EReference TRACE_CONFIGURATION__RESOURCES = eINSTANCE.getTraceConfiguration_Resources();
 
 		/**
 		 * The meta object literal for the '<em><b>Services</b></em>' reference list feature.
@@ -1341,7 +1669,7 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TIME_SERIES__SERVICES = eINSTANCE.getTimeSeries_Services();
+		EReference TRACE_CONFIGURATION__SERVICES = eINSTANCE.getTraceConfiguration_Services();
 
 		/**
 		 * The meta object literal for the '<em><b>Interval</b></em>' attribute feature.
@@ -1349,7 +1677,15 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TIME_SERIES__INTERVAL = eINSTANCE.getTimeSeries_Interval();
+		EAttribute TRACE_CONFIGURATION__INTERVAL = eINSTANCE.getTraceConfiguration_Interval();
+
+		/**
+		 * The meta object literal for the '<em><b>Data</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRACE_CONFIGURATION__DATA = eINSTANCE.getTraceConfiguration_Data();
 
 		/**
 		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.ParameterImpl <em>Parameter</em>}' class.
@@ -1404,6 +1740,66 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EClass VALIDATION_SPECIFICATION = eINSTANCE.getValidationSpecification();
+
+		/**
+		 * The meta object literal for the '<em><b>Validators</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VALIDATION_SPECIFICATION__VALIDATORS = eINSTANCE.getValidationSpecification_Validators();
+
+		/**
+		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.ValidatorConfigurationImpl <em>Validator Configuration</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.descartesresearch.librede.configuration.impl.ValidatorConfigurationImpl
+		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getValidatorConfiguration()
+		 * @generated
+		 */
+		EClass VALIDATOR_CONFIGURATION = eINSTANCE.getValidatorConfiguration();
+
+		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute VALIDATOR_CONFIGURATION__TYPE = eINSTANCE.getValidatorConfiguration_Type();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VALIDATOR_CONFIGURATION__PARAMETERS = eINSTANCE.getValidatorConfiguration_Parameters();
+
+		/**
+		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl <em>Exporter Configuration</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl
+		 * @see net.descartesresearch.librede.configuration.impl.ConfigurationPackageImpl#getExporterConfiguration()
+		 * @generated
+		 */
+		EClass EXPORTER_CONFIGURATION = eINSTANCE.getExporterConfiguration();
+
+		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPORTER_CONFIGURATION__TYPE = eINSTANCE.getExporterConfiguration_Type();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPORTER_CONFIGURATION__PARAMETERS = eINSTANCE.getExporterConfiguration_Parameters();
 
 		/**
 		 * The meta object literal for the '{@link net.descartesresearch.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

@@ -72,9 +72,9 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ConfigurationPackage.DATA_SOURCE: {
-				DataSource dataSource = (DataSource)theEObject;
-				T result = caseDataSource(dataSource);
+			case ConfigurationPackage.DATA_PROVIDER_CONFIGURATION: {
+				DataProviderConfiguration dataProviderConfiguration = (DataProviderConfiguration)theEObject;
+				T result = caseDataProviderConfiguration(dataProviderConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -90,9 +90,9 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ConfigurationPackage.ESTIMATION_APPROACH: {
-				EstimationApproach estimationApproach = (EstimationApproach)theEObject;
-				T result = caseEstimationApproach(estimationApproach);
+			case ConfigurationPackage.ESTIMATION_APPROACH_CONFIGURATION: {
+				EstimationApproachConfiguration estimationApproachConfiguration = (EstimationApproachConfiguration)theEObject;
+				T result = caseEstimationApproachConfiguration(estimationApproachConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -114,9 +114,9 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ConfigurationPackage.TIME_SERIES: {
-				TimeSeries timeSeries = (TimeSeries)theEObject;
-				T result = caseTimeSeries(timeSeries);
+			case ConfigurationPackage.TRACE_CONFIGURATION: {
+				TraceConfiguration traceConfiguration = (TraceConfiguration)theEObject;
+				T result = caseTraceConfiguration(traceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -135,6 +135,24 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 			case ConfigurationPackage.VALIDATION_SPECIFICATION: {
 				ValidationSpecification validationSpecification = (ValidationSpecification)theEObject;
 				T result = caseValidationSpecification(validationSpecification);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: {
+				DataSourceConfiguration dataSourceConfiguration = (DataSourceConfiguration)theEObject;
+				T result = caseDataSourceConfiguration(dataSourceConfiguration);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION: {
+				ValidatorConfiguration validatorConfiguration = (ValidatorConfiguration)theEObject;
+				T result = caseValidatorConfiguration(validatorConfiguration);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.EXPORTER_CONFIGURATION: {
+				ExporterConfiguration exporterConfiguration = (ExporterConfiguration)theEObject;
+				T result = caseExporterConfiguration(exporterConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -158,17 +176,32 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Data Source</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Data Provider Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Data Source</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Data Provider Configuration</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseDataSource(DataSource object) {
+	public T caseDataProviderConfiguration(DataProviderConfiguration object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Data Source Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Data Source Configuration</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseDataSourceConfiguration(DataSourceConfiguration object) {
 		return null;
 	}
 
@@ -203,17 +236,17 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Estimation Approach</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Estimation Approach Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Estimation Approach</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Estimation Approach Configuration</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseEstimationApproach(EstimationApproach object) {
+	public T caseEstimationApproachConfiguration(EstimationApproachConfiguration object) {
 		return null;
 	}
 
@@ -263,17 +296,17 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Time Series</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Trace Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Time Series</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Trace Configuration</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTimeSeries(TimeSeries object) {
+	public T caseTraceConfiguration(TraceConfiguration object) {
 		return null;
 	}
 
@@ -319,6 +352,36 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseValidationSpecification(ValidationSpecification object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Validator Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Validator Configuration</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseValidatorConfiguration(ValidatorConfiguration object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Exporter Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Exporter Configuration</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExporterConfiguration(ExporterConfiguration object) {
 		return null;
 	}
 

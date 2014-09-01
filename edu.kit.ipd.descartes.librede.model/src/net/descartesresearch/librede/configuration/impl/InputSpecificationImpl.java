@@ -3,21 +3,15 @@
 package net.descartesresearch.librede.configuration.impl;
 
 import java.util.Collection;
-
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.DataSource;
+import net.descartesresearch.librede.configuration.DataProviderConfiguration;
 import net.descartesresearch.librede.configuration.InputSpecification;
-import net.descartesresearch.librede.configuration.TimeSeries;
-
+import net.descartesresearch.librede.configuration.TraceConfiguration;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -28,7 +22,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.InputSpecificationImpl#getDataSources <em>Data Sources</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.InputSpecificationImpl#getDataProviders <em>Data Providers</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.InputSpecificationImpl#getObservations <em>Observations</em>}</li>
  * </ul>
  * </p>
@@ -37,14 +31,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class InputSpecificationImpl extends MinimalEObjectImpl.Container implements InputSpecification {
 	/**
-	 * The cached value of the '{@link #getDataSources() <em>Data Sources</em>}' containment reference list.
+	 * The cached value of the '{@link #getDataProviders() <em>Data Providers</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getDataSources()
+	 * @see #getDataProviders()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<DataSource> dataSources;
+	protected EList<DataProviderConfiguration> dataProviders;
 
 	/**
 	 * The cached value of the '{@link #getObservations() <em>Observations</em>}' containment reference list.
@@ -54,7 +48,7 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<TimeSeries> observations;
+	protected EList<TraceConfiguration> observations;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -80,11 +74,11 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<DataSource> getDataSources() {
-		if (dataSources == null) {
-			dataSources = new EObjectContainmentEList<DataSource>(DataSource.class, this, ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES);
+	public EList<DataProviderConfiguration> getDataProviders() {
+		if (dataProviders == null) {
+			dataProviders = new EObjectContainmentEList<DataProviderConfiguration>(DataProviderConfiguration.class, this, ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS);
 		}
-		return dataSources;
+		return dataProviders;
 	}
 
 	/**
@@ -92,9 +86,9 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<TimeSeries> getObservations() {
+	public EList<TraceConfiguration> getObservations() {
 		if (observations == null) {
-			observations = new EObjectContainmentEList<TimeSeries>(TimeSeries.class, this, ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS);
+			observations = new EObjectContainmentEList<TraceConfiguration>(TraceConfiguration.class, this, ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS);
 		}
 		return observations;
 	}
@@ -107,8 +101,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
-				return ((InternalEList<?>)getDataSources()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
+				return ((InternalEList<?>)getDataProviders()).basicRemove(otherEnd, msgs);
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				return ((InternalEList<?>)getObservations()).basicRemove(otherEnd, msgs);
 		}
@@ -123,8 +117,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
-				return getDataSources();
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
+				return getDataProviders();
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				return getObservations();
 		}
@@ -140,13 +134,13 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
-				getDataSources().clear();
-				getDataSources().addAll((Collection<? extends DataSource>)newValue);
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
+				getDataProviders().clear();
+				getDataProviders().addAll((Collection<? extends DataProviderConfiguration>)newValue);
 				return;
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				getObservations().clear();
-				getObservations().addAll((Collection<? extends TimeSeries>)newValue);
+				getObservations().addAll((Collection<? extends TraceConfiguration>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -160,8 +154,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
-				getDataSources().clear();
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
+				getDataProviders().clear();
 				return;
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				getObservations().clear();
@@ -178,8 +172,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
-				return dataSources != null && !dataSources.isEmpty();
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
+				return dataProviders != null && !dataProviders.isEmpty();
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				return observations != null && !observations.isEmpty();
 		}

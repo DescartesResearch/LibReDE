@@ -95,26 +95,49 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.DataSource} instances.
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.DataProviderConfiguration} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected DataSourceItemProvider dataSourceItemProvider;
+	protected DataProviderConfigurationItemProvider dataProviderConfigurationItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.DataSource}.
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.DataProviderConfiguration}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public Adapter createDataSourceAdapter() {
-		if (dataSourceItemProvider == null) {
-			dataSourceItemProvider = new DataSourceItemProvider(this);
+	public Adapter createDataProviderConfigurationAdapter() {
+		if (dataProviderConfigurationItemProvider == null) {
+			dataProviderConfigurationItemProvider = new DataProviderConfigurationItemProvider(this);
 		}
 
-		return dataSourceItemProvider;
+		return dataProviderConfigurationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.DataSourceConfiguration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected DataSourceConfigurationItemProvider dataSourceConfigurationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.DataSourceConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createDataSourceConfigurationAdapter() {
+		if (dataSourceConfigurationItemProvider == null) {
+			dataSourceConfigurationItemProvider = new DataSourceConfigurationItemProvider(this);
+		}
+
+		return dataSourceConfigurationItemProvider;
 	}
 
 	/**
@@ -164,26 +187,26 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.EstimationApproach} instances.
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected EstimationApproachItemProvider estimationApproachItemProvider;
+	protected EstimationApproachConfigurationItemProvider estimationApproachConfigurationItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.EstimationApproach}.
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.EstimationApproachConfiguration}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public Adapter createEstimationApproachAdapter() {
-		if (estimationApproachItemProvider == null) {
-			estimationApproachItemProvider = new EstimationApproachItemProvider(this);
+	public Adapter createEstimationApproachConfigurationAdapter() {
+		if (estimationApproachConfigurationItemProvider == null) {
+			estimationApproachConfigurationItemProvider = new EstimationApproachConfigurationItemProvider(this);
 		}
 
-		return estimationApproachItemProvider;
+		return estimationApproachConfigurationItemProvider;
 	}
 
 	/**
@@ -256,26 +279,26 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.TimeSeries} instances.
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.TraceConfiguration} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected TimeSeriesItemProvider timeSeriesItemProvider;
+	protected TraceConfigurationItemProvider traceConfigurationItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.TimeSeries}.
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.TraceConfiguration}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public Adapter createTimeSeriesAdapter() {
-		if (timeSeriesItemProvider == null) {
-			timeSeriesItemProvider = new TimeSeriesItemProvider(this);
+	public Adapter createTraceConfigurationAdapter() {
+		if (traceConfigurationItemProvider == null) {
+			traceConfigurationItemProvider = new TraceConfigurationItemProvider(this);
 		}
 
-		return timeSeriesItemProvider;
+		return traceConfigurationItemProvider;
 	}
 
 	/**
@@ -345,6 +368,52 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		}
 
 		return validationSpecificationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.ValidatorConfiguration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ValidatorConfigurationItemProvider validatorConfigurationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.ValidatorConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createValidatorConfigurationAdapter() {
+		if (validatorConfigurationItemProvider == null) {
+			validatorConfigurationItemProvider = new ValidatorConfigurationItemProvider(this);
+		}
+
+		return validatorConfigurationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.ExporterConfiguration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ExporterConfigurationItemProvider exporterConfigurationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.ExporterConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createExporterConfigurationAdapter() {
+		if (exporterConfigurationItemProvider == null) {
+			exporterConfigurationItemProvider = new ExporterConfigurationItemProvider(this);
+		}
+
+		return exporterConfigurationItemProvider;
 	}
 
 	/**
@@ -447,17 +516,20 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	 */
 	public void dispose() {
 		if (libredeConfigurationItemProvider != null) libredeConfigurationItemProvider.dispose();
-		if (dataSourceItemProvider != null) dataSourceItemProvider.dispose();
+		if (dataProviderConfigurationItemProvider != null) dataProviderConfigurationItemProvider.dispose();
 		if (workloadDescriptionItemProvider != null) workloadDescriptionItemProvider.dispose();
 		if (inputSpecificationItemProvider != null) inputSpecificationItemProvider.dispose();
-		if (estimationApproachItemProvider != null) estimationApproachItemProvider.dispose();
+		if (estimationApproachConfigurationItemProvider != null) estimationApproachConfigurationItemProvider.dispose();
 		if (outputSpecificationItemProvider != null) outputSpecificationItemProvider.dispose();
 		if (resourceItemProvider != null) resourceItemProvider.dispose();
 		if (serviceItemProvider != null) serviceItemProvider.dispose();
-		if (timeSeriesItemProvider != null) timeSeriesItemProvider.dispose();
+		if (traceConfigurationItemProvider != null) traceConfigurationItemProvider.dispose();
 		if (parameterItemProvider != null) parameterItemProvider.dispose();
 		if (estimationSpecificationItemProvider != null) estimationSpecificationItemProvider.dispose();
 		if (validationSpecificationItemProvider != null) validationSpecificationItemProvider.dispose();
+		if (dataSourceConfigurationItemProvider != null) dataSourceConfigurationItemProvider.dispose();
+		if (validatorConfigurationItemProvider != null) validatorConfigurationItemProvider.dispose();
+		if (exporterConfigurationItemProvider != null) exporterConfigurationItemProvider.dispose();
 	}
 
 }

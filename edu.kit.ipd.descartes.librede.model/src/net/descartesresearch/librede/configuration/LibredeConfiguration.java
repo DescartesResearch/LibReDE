@@ -15,7 +15,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getWorkloadDescription <em>Workload Description</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getInput <em>Input</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getEstimation <em>Estimation</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getOuptut <em>Ouptut</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getOutput <em>Output</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getValidation <em>Validation</em>}</li>
  * </ul>
  * </p>
@@ -104,30 +104,30 @@ public interface LibredeConfiguration extends EObject {
 	void setEstimation(EstimationSpecification value);
 
 	/**
-	 * Returns the value of the '<em><b>Ouptut</b></em>' containment reference.
+	 * Returns the value of the '<em><b>Output</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Ouptut</em>' containment reference isn't clear,
+	 * If the meaning of the '<em>Output</em>' containment reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Ouptut</em>' containment reference.
-	 * @see #setOuptut(OutputSpecification)
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getLibredeConfiguration_Ouptut()
+	 * @return the value of the '<em>Output</em>' containment reference.
+	 * @see #setOutput(OutputSpecification)
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getLibredeConfiguration_Output()
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	OutputSpecification getOuptut();
+	OutputSpecification getOutput();
 
 	/**
-	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getOuptut <em>Ouptut</em>}' containment reference.
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.LibredeConfiguration#getOutput <em>Output</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Ouptut</em>' containment reference.
-	 * @see #getOuptut()
+	 * @param value the new value of the '<em>Output</em>' containment reference.
+	 * @see #getOutput()
 	 * @generated
 	 */
-	void setOuptut(OutputSpecification value);
+	void setOutput(OutputSpecification value);
 
 	/**
 	 * Returns the value of the '<em><b>Validation</b></em>' containment reference.
@@ -140,7 +140,7 @@ public interface LibredeConfiguration extends EObject {
 	 * @return the value of the '<em>Validation</em>' containment reference.
 	 * @see #setValidation(ValidationSpecification)
 	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getLibredeConfiguration_Validation()
-	 * @model containment="true"
+	 * @model containment="true" required="true"
 	 * @generated
 	 */
 	ValidationSpecification getValidation();

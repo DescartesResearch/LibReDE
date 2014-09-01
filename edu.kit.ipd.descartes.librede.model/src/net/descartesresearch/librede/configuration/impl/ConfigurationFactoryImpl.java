@@ -58,17 +58,20 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case ConfigurationPackage.LIBREDE_CONFIGURATION: return createLibredeConfiguration();
-			case ConfigurationPackage.DATA_SOURCE: return createDataSource();
+			case ConfigurationPackage.DATA_PROVIDER_CONFIGURATION: return createDataProviderConfiguration();
 			case ConfigurationPackage.WORKLOAD_DESCRIPTION: return createWorkloadDescription();
 			case ConfigurationPackage.INPUT_SPECIFICATION: return createInputSpecification();
-			case ConfigurationPackage.ESTIMATION_APPROACH: return createEstimationApproach();
+			case ConfigurationPackage.ESTIMATION_APPROACH_CONFIGURATION: return createEstimationApproachConfiguration();
 			case ConfigurationPackage.OUTPUT_SPECIFICATION: return createOutputSpecification();
 			case ConfigurationPackage.RESOURCE: return createResource();
 			case ConfigurationPackage.SERVICE: return createService();
-			case ConfigurationPackage.TIME_SERIES: return createTimeSeries();
+			case ConfigurationPackage.TRACE_CONFIGURATION: return createTraceConfiguration();
 			case ConfigurationPackage.PARAMETER: return createParameter();
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION: return createEstimationSpecification();
 			case ConfigurationPackage.VALIDATION_SPECIFICATION: return createValidationSpecification();
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: return createDataSourceConfiguration();
+			case ConfigurationPackage.VALIDATOR_CONFIGURATION: return createValidatorConfiguration();
+			case ConfigurationPackage.EXPORTER_CONFIGURATION: return createExporterConfiguration();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -119,9 +122,19 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DataSource createDataSource() {
-		DataSourceImpl dataSource = new DataSourceImpl();
-		return dataSource;
+	public DataProviderConfiguration createDataProviderConfiguration() {
+		DataProviderConfigurationImpl dataProviderConfiguration = new DataProviderConfigurationImpl();
+		return dataProviderConfiguration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public DataSourceConfiguration createDataSourceConfiguration() {
+		DataSourceConfigurationImpl dataSourceConfiguration = new DataSourceConfigurationImpl();
+		return dataSourceConfiguration;
 	}
 
 	/**
@@ -149,9 +162,9 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EstimationApproach createEstimationApproach() {
-		EstimationApproachImpl estimationApproach = new EstimationApproachImpl();
-		return estimationApproach;
+	public EstimationApproachConfiguration createEstimationApproachConfiguration() {
+		EstimationApproachConfigurationImpl estimationApproachConfiguration = new EstimationApproachConfigurationImpl();
+		return estimationApproachConfiguration;
 	}
 
 	/**
@@ -189,9 +202,9 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public TimeSeries createTimeSeries() {
-		TimeSeriesImpl timeSeries = new TimeSeriesImpl();
-		return timeSeries;
+	public TraceConfiguration createTraceConfiguration() {
+		TraceConfigurationImpl traceConfiguration = new TraceConfigurationImpl();
+		return traceConfiguration;
 	}
 
 	/**
@@ -222,6 +235,26 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public ValidationSpecification createValidationSpecification() {
 		ValidationSpecificationImpl validationSpecification = new ValidationSpecificationImpl();
 		return validationSpecification;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ValidatorConfiguration createValidatorConfiguration() {
+		ValidatorConfigurationImpl validatorConfiguration = new ValidatorConfigurationImpl();
+		return validatorConfiguration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExporterConfiguration createExporterConfiguration() {
+		ExporterConfigurationImpl exporterConfiguration = new ExporterConfigurationImpl();
+		return exporterConfiguration;
 	}
 
 	/**

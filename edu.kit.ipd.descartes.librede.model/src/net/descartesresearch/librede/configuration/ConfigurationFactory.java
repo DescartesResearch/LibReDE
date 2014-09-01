@@ -31,13 +31,22 @@ public interface ConfigurationFactory extends EFactory {
 	LibredeConfiguration createLibredeConfiguration();
 
 	/**
-	 * Returns a new object of class '<em>Data Source</em>'.
+	 * Returns a new object of class '<em>Data Provider Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Data Source</em>'.
+	 * @return a new object of class '<em>Data Provider Configuration</em>'.
 	 * @generated
 	 */
-	DataSource createDataSource();
+	DataProviderConfiguration createDataProviderConfiguration();
+
+	/**
+	 * Returns a new object of class '<em>Data Source Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Data Source Configuration</em>'.
+	 * @generated
+	 */
+	DataSourceConfiguration createDataSourceConfiguration();
 
 	/**
 	 * Returns a new object of class '<em>Workload Description</em>'.
@@ -58,13 +67,13 @@ public interface ConfigurationFactory extends EFactory {
 	InputSpecification createInputSpecification();
 
 	/**
-	 * Returns a new object of class '<em>Estimation Approach</em>'.
+	 * Returns a new object of class '<em>Estimation Approach Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Estimation Approach</em>'.
+	 * @return a new object of class '<em>Estimation Approach Configuration</em>'.
 	 * @generated
 	 */
-	EstimationApproach createEstimationApproach();
+	EstimationApproachConfiguration createEstimationApproachConfiguration();
 
 	/**
 	 * Returns a new object of class '<em>Output Specification</em>'.
@@ -94,13 +103,13 @@ public interface ConfigurationFactory extends EFactory {
 	Service createService();
 
 	/**
-	 * Returns a new object of class '<em>Time Series</em>'.
+	 * Returns a new object of class '<em>Trace Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Time Series</em>'.
+	 * @return a new object of class '<em>Trace Configuration</em>'.
 	 * @generated
 	 */
-	TimeSeries createTimeSeries();
+	TraceConfiguration createTraceConfiguration();
 
 	/**
 	 * Returns a new object of class '<em>Parameter</em>'.
@@ -128,6 +137,24 @@ public interface ConfigurationFactory extends EFactory {
 	 * @generated
 	 */
 	ValidationSpecification createValidationSpecification();
+
+	/**
+	 * Returns a new object of class '<em>Validator Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Validator Configuration</em>'.
+	 * @generated
+	 */
+	ValidatorConfiguration createValidatorConfiguration();
+
+	/**
+	 * Returns a new object of class '<em>Exporter Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Exporter Configuration</em>'.
+	 * @generated
+	 */
+	ExporterConfiguration createExporterConfiguration();
 
 	/**
 	 * Returns the package supported by this factory.
