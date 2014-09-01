@@ -4,7 +4,10 @@ Bundle-Name: Estimation
 Bundle-SymbolicName: edu.kit.ipd.descartes.librede.estimation
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: edu.kit.ipd.descartes.librede.estimation.algorithm,
+Export-Package: edu.kit.ipd.descartes.librede.configuration,
+ edu.kit.ipd.descartes.librede.datasource,
+ edu.kit.ipd.descartes.librede.datasource.csv,
+ edu.kit.ipd.descartes.librede.estimation.algorithm,
  edu.kit.ipd.descartes.librede.estimation.exceptions,
  edu.kit.ipd.descartes.librede.estimation.models.diff,
  edu.kit.ipd.descartes.librede.estimation.models.observation,
@@ -13,7 +16,10 @@ Export-Package: edu.kit.ipd.descartes.librede.estimation.algorithm,
  edu.kit.ipd.descartes.librede.estimation.models.state.constraints,
  edu.kit.ipd.descartes.librede.estimation.repository,
  edu.kit.ipd.descartes.librede.estimation.validation,
- edu.kit.ipd.descartes.librede.estimation.workload
+ edu.kit.ipd.descartes.librede.estimation.workload,
+ edu.kit.ipd.descartes.librede.export,
+ edu.kit.ipd.descartes.librede.export.csv,
+ edu.kit.ipd.descartes.librede.factory
 Import-Package: cern.jet.random.sampling;version="1.2.0",
  edu.kit.ipd.descartes.linalg,
  org.apache.commons.math3.optim;version="3.2.0",
