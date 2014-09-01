@@ -17,6 +17,7 @@ import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -92,6 +93,7 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 		lstExporters = lstExportersViewer.getList();
 		
 		lstExportersViewer.setContentProvider(new ObservableListContentProvider());
+		lstExportersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		IObservableList l = EMFEditProperties.list(domain, 
 				FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__OUTPUT, ConfigurationPackage.Literals.OUTPUT_SPECIFICATION__EXPORTERS)
 				).observe(model);

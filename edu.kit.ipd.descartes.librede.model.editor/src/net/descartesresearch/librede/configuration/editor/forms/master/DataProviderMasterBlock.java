@@ -19,6 +19,7 @@ import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -79,6 +80,7 @@ public class DataProviderMasterBlock extends AbstractMasterBlockWithButtons impl
 		lstProviders = lstProvidersViewer.getList();
 		
 		lstProvidersViewer.setContentProvider(new ObservableListContentProvider());
+		lstProvidersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		IObservableList l = EMFEditProperties.list(domain, 
 				FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__INPUT, ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_PROVIDERS)
 				).observe(model);

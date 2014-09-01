@@ -6,6 +6,7 @@ import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
 import net.descartesresearch.librede.configuration.WorkloadDescription;
+import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 
 import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.emf.common.command.Command;
@@ -17,6 +18,7 @@ import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.CellEditorProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
@@ -24,25 +26,19 @@ import org.eclipse.jface.databinding.viewers.ObservableMapCellLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -51,6 +47,12 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 public class WorkloadDescriptionFormPage extends AbstractEstimationConfigurationFormPage {
 
+	/*
+	 * The factory is need to create label/content providers for EMF model objects using the generated ones.
+	 */
+	protected ComposedAdapterFactory adapterFactory = 
+			   new ComposedAdapterFactory(ComposedAdapterFactory.Descriptor.Registry.INSTANCE);
+	
 	private Table tblResources;
 	private Table tblClasses;
 	private Composite resourcesComposite;
@@ -75,7 +77,7 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 	 * @wbp.eval.method.parameter id "Some id"
 	 * @wbp.eval.method.parameter title "Some title"
 	 */
-	public WorkloadDescriptionFormPage(FormEditor editor, String id,
+	public WorkloadDescriptionFormPage(ConfigurationEditor editor, String id,
 			String title, AdapterFactoryEditingDomain editingDomain, LibredeConfiguration model) {
 		super(editor, id, title, editingDomain, model);
 	}
@@ -229,6 +231,7 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 			
 			// Initialize presentation and editing support
 			tableViewerColumn.setLabelProvider(new ObservableMapCellLabelProvider(property.observeDetail(cp.getKnownElements())));
+			//tableViewerColumn.setLabelProvider(new AdapterFactoryLabelProvider(adapterFactory));
 			
 			// If attribute is enum create special combobox editor
 			if (attributes[i].getEType() instanceof EEnum) {
@@ -246,6 +249,7 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		}		
 		
 		tableViewer.setContentProvider(cp);
+		//tableViewer.setLabelProvider(new AdapterFactoryLabelProvider(adapterFactory));
 		tableViewer.setInput(EMFEditProperties.list(getEditingDomain(), object).observe(getModel()));
 	}
 

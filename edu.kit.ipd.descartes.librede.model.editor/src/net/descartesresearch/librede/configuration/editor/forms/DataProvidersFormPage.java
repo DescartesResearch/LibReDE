@@ -3,6 +3,7 @@ package net.descartesresearch.librede.configuration.editor.forms;
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.editor.forms.master.DataProviderMasterBlock;
 import net.descartesresearch.librede.configuration.editor.forms.master.MeasurementDataMasterBlock;
+import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.swt.widgets.Composite;
@@ -22,7 +23,7 @@ public class DataProvidersFormPage extends AbstractEstimationConfigurationFormPa
 	 * @wbp.eval.method.parameter id "Some id"
 	 * @wbp.eval.method.parameter title "Some title"
 	 */
-	public DataProvidersFormPage(FormEditor editor, String id, String title, AdapterFactoryEditingDomain editingDomain, LibredeConfiguration model) {
+	public DataProvidersFormPage(ConfigurationEditor editor, String id, String title, AdapterFactoryEditingDomain editingDomain, LibredeConfiguration model) {
 		super(editor, id, title, editingDomain, model);
 	}
 

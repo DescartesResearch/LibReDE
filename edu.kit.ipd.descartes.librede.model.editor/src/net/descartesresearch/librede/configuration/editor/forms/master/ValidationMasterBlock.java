@@ -14,6 +14,7 @@ import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -60,7 +61,7 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 
 		tableValidatorsViewer
 				.setContentProvider(new ObservableListContentProvider());
-		tableValidatorsViewer.setLabelProvider(new LabelProvider());
+		tableValidatorsViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 
 		IObservableList validators = new WritableList();
 		for (Class<?> cl : ComponentRegistry.INSTANCE

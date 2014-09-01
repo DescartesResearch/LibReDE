@@ -2,11 +2,10 @@ package net.descartesresearch.librede.configuration.editor.forms;
 
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.editor.forms.master.MeasurementDataMasterBlock;
+import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
@@ -21,7 +20,7 @@ public class MeasurementDataFormPage extends AbstractEstimationConfigurationForm
 	 * @wbp.eval.method.parameter id "Some id"
 	 * @wbp.eval.method.parameter title "Some title"
 	 */
-	public MeasurementDataFormPage(FormEditor editor, String id, String title, AdapterFactoryEditingDomain domain, LibredeConfiguration model) {
+	public MeasurementDataFormPage(ConfigurationEditor editor, String id, String title, AdapterFactoryEditingDomain domain, LibredeConfiguration model) {
 		super(editor, id, title, domain, model);
 	}
 

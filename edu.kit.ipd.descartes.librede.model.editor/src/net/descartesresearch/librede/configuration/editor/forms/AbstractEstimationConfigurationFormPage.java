@@ -1,10 +1,12 @@
 package net.descartesresearch.librede.configuration.editor.forms;
 
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
+import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
@@ -90,7 +92,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 	private LibredeConfiguration model;
 	private AdapterFactoryEditingDomain editingDomain;
 
-	public AbstractEstimationConfigurationFormPage(FormEditor editor,
+	public AbstractEstimationConfigurationFormPage(ConfigurationEditor editor,
 			String id, String title, AdapterFactoryEditingDomain editingDomain, LibredeConfiguration model) {
 		super(editor, id, title);
 		this.editingDomain = editingDomain;
@@ -103,5 +105,9 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 	
 	public AdapterFactoryEditingDomain getEditingDomain() {
 		return editingDomain;
+	}
+	
+	public AdapterFactory getAdapterFactory() {
+		return ((ConfigurationEditor)getEditor()).getAdapterFactory();
 	}
 }

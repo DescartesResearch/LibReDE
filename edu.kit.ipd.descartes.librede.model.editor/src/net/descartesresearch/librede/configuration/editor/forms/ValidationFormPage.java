@@ -1,18 +1,17 @@
 package net.descartesresearch.librede.configuration.editor.forms;
 
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
-import net.descartesresearch.librede.configuration.editor.forms.master.DataProviderMasterBlock;
 import net.descartesresearch.librede.configuration.editor.forms.master.ValidationMasterBlock;
+import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 public class ValidationFormPage extends AbstractEstimationConfigurationFormPage {
 
-	public ValidationFormPage(FormEditor editor, String id, String title,
+	public ValidationFormPage(ConfigurationEditor editor, String id, String title,
 			AdapterFactoryEditingDomain editingDomain,
 			LibredeConfiguration model) {
 		super(editor, id, title, editingDomain, model);

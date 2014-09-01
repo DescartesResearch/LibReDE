@@ -20,6 +20,7 @@ import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListTreeContentProvider;
 import org.eclipse.jface.databinding.viewers.TreeStructureAdvisor;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -167,7 +168,7 @@ public class MeasurementDataMasterBlock extends AbstractMasterBlockWithButtons {
 		toolkit.paintBordersFor(tree);	
 		
 		ObservableListTreeContentProvider cp = new ObservableListTreeContentProvider(new MeasurementTreeObservableFactory(), new MeasurementTreeStructureAdvisor());
-		
+		treeViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		treeViewer.setContentProvider(cp);
 		
 		IObservableList l = EMFEditProperties.list(domain, 

@@ -13,6 +13,8 @@ import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -82,9 +84,9 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 				false, 1, 1));
 		toolkit.paintBordersFor(tableApproaches);
 
+		tableApproachesViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		tableApproachesViewer
 				.setContentProvider(new ObservableListContentProvider());
-		tableApproachesViewer.setLabelProvider(new LabelProvider());
 
 		IObservableList approaches = new WritableList();
 		for (Class<?> cl : ComponentRegistry.INSTANCE
