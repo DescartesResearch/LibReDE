@@ -136,7 +136,7 @@ public class EstimationHelper {
 	}
 	
 	public static void loadRepository(LibredeConfiguration conf, IMonitoringRepository repo) {
-		Map<Class<?>, IDataSource> dataSources = new HashMap<>();
+		Map<Class<?>, IDataSource> dataSources = new HashMap<Class<?>, IDataSource>();
 		
 		for (TraceConfiguration trace : conf.getInput().getObservations()) {
 			if (trace instanceof FileTraceConfiguration) {
