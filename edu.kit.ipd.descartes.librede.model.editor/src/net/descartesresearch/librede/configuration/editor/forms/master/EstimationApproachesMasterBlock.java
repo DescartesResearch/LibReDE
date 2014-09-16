@@ -97,6 +97,7 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 			}
 		}
 		tableApproachesViewer.setInput(approaches);
+		tableApproachesViewer.addSelectionChangedListener(this);
 		
 		// Binding: All checked approaches are added to the model instance
 		masterBindingContext

@@ -80,6 +80,7 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 			}
 		}
 		tableValidatorsViewer.setInput(validators);
+		tableValidatorsViewer.addSelectionChangedListener(this);
 		
 		// Binding: All checked validators are added to the model instance
 		masterBindingContext
