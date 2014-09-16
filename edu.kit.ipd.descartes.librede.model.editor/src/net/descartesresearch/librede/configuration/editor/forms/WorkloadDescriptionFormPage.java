@@ -1,5 +1,7 @@
 package net.descartesresearch.librede.configuration.editor.forms;
 
+import java.io.ObjectInputStream.GetField;
+
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
@@ -51,6 +53,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -104,7 +107,7 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		toolkit.paintBordersFor(body);
 		
 		// Add run estimation toolbar button
-		form.getToolBarManager().add(new RunEstimationAction());
+		form.getToolBarManager().add(new RunEstimationAction(getModel()));
 		form.getToolBarManager().update(true);
 		
 		TableWrapLayout tableWrapLayout = new TableWrapLayout();

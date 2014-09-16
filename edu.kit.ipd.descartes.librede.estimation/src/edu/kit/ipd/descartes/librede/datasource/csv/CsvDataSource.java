@@ -37,7 +37,7 @@ public class CsvDataSource implements IDataSource {
 			int lineNumber = 0;
 			while ((line = reader.readLine()) != null) {
 				lineNumber++;
-				if (skipFirstLine && lineNumber == 1) {
+				if (!(skipFirstLine && lineNumber == 1)) {
 					if (!line.startsWith("#")) {
 						String[] fields = line.split(separators);
 						if (fields.length == 2) {
