@@ -29,6 +29,7 @@ package edu.kit.ipd.descartes.librede.estimation.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
@@ -37,6 +38,7 @@ import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;
 
+@Component(displayName = "Utilization Law Validator")
 public class UtilizationValidator implements Validator {
 	
 	private List<UtilizationLaw> utilLaw;
