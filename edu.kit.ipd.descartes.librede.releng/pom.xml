@@ -104,7 +104,7 @@
 					</environments>
 				</configuration>
 			</plugin>
-			<plugin>
+ 		<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>2.3</version>
@@ -190,6 +190,9 @@
 		<module>../edu.kit.ipd.descartes.librede.ipopt.java.tests</module>
 		<module>../edu.kit.ipd.descartes.librede.nnls.java</module>
 		<module>../edu.kit.ipd.descartes.librede.nnls.java.tests</module>
+		<module>../edu.kit.ipd.descartes.librede.model</module>
+		<module>../edu.kit.ipd.descartes.librede.model.edit</module>
+		<module>../edu.kit.ipd.descartes.librede.model.editor</module>
 		<module>../edu.kit.ipd.descartes.librede.frontend</module>
 		<module>../edu.kit.ipd.descartes.librede.doc</module>
 	</modules>
