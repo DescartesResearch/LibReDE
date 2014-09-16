@@ -42,7 +42,7 @@ import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 
 public enum StandardMetric implements IMetric {
 	
-	IDLE_TIME(SUM) {
+	IDLE_TIME("idle time", SUM) {
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
 				IModelEntity entity, double start, double end) {
@@ -69,7 +69,7 @@ public enum StandardMetric implements IMetric {
 		}
 	},
 	
-	BUSY_TIME(SUM) {
+	BUSY_TIME("busy time", SUM) {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
@@ -97,7 +97,7 @@ public enum StandardMetric implements IMetric {
 		}		
 	},
 
-	UTILIZATION(AVERAGE) {	
+	UTILIZATION("utilization", AVERAGE) {	
 
 		@Override
 		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
@@ -128,7 +128,7 @@ public enum StandardMetric implements IMetric {
 
 	},
 
-	ARRIVALS(NONE, SUM, MINIMUM, MAXIMUM) {
+	ARRIVALS("arrivals", NONE, SUM, MINIMUM, MAXIMUM) {
 		
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
@@ -178,7 +178,7 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	DEPARTURES(NONE, SUM, MINIMUM, MAXIMUM) {
+	DEPARTURES("departures", NONE, SUM, MINIMUM, MAXIMUM) {
 		
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
@@ -228,7 +228,7 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	ARRIVAL_RATE(AVERAGE) {
+	ARRIVAL_RATE("arrival rate", AVERAGE) {
 
 		@Override
 		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
@@ -261,7 +261,7 @@ public enum StandardMetric implements IMetric {
 			return ARRIVALS.hasData(repository, entity, aggregationInterval);
 		}
 	},
-	THROUGHPUT(AVERAGE) {
+	THROUGHPUT("throughput", AVERAGE) {
 
 		@Override
 		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
@@ -295,7 +295,7 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	RESPONSE_TIME(NONE, AVERAGE, MINIMUM, MAXIMUM) {
+	RESPONSE_TIME("reponse time", NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
 		@Override
 		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
@@ -353,7 +353,7 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	QUEUE_LENGTH_SEEN_ON_ARRIVAL(NONE, AVERAGE, MINIMUM, MAXIMUM) {
+	QUEUE_LENGTH_SEEN_ON_ARRIVAL("queue length seen on arrival", NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
@@ -400,11 +400,18 @@ public enum StandardMetric implements IMetric {
 	};
 
 	private final UUID id;
+	private String displayName;
 	private final EnumSet<Aggregation> supportedAggregations;
 
-	private StandardMetric(Aggregation... aggregations) {
+	private StandardMetric(String displayName, Aggregation... aggregations) {
 		id = UUID.randomUUID();
+		this.displayName = displayName;
 		supportedAggregations = EnumSet.copyOf(Arrays.asList(aggregations));
+	}
+	
+	@Override
+	public String getDisplayName() {
+		return displayName;
 	}
 	
 	@Override

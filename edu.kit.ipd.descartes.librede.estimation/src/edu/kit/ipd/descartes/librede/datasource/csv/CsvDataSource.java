@@ -6,7 +6,7 @@ import edu.kit.ipd.descartes.librede.configuration.ParameterDefinition;
 import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.datasource.IDataSource;
 
-@Component
+@Component(displayName = "CSV Data Source")
 public class CsvDataSource implements IDataSource {
 
 	@ParameterDefinition(name = "BaseDirectory", label = "Base Directory")

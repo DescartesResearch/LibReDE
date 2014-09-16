@@ -34,6 +34,8 @@ public interface IMetric {
 	
 	public UUID getId();
 	
+	public String getDisplayName();
+	
 	public TimeSeries retrieve(IMonitoringRepository repository, IModelEntity entity, double start, double end);
 
 	public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func);
