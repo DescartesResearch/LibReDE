@@ -27,6 +27,7 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
@@ -40,6 +41,7 @@ import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.librede.ipopt.java.RecursiveOptimization;
 
+@Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	
 	public static final String NAME = "MenasceOptimization";

@@ -27,6 +27,7 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.algorithm.SimpleApproximation;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
@@ -39,6 +40,7 @@ import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 
+@Component(displayName = "Approximation with Response Times")
 public class ResponseTimeApproximationApproach extends AbstractEstimationApproach {
 	
 	public static final String NAME = "ResponseTimeApproximation";
