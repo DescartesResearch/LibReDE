@@ -1,4 +1,4 @@
-package edu.kit.ipd.descartes.librede.configuration;
+package edu.kit.ipd.descartes.librede.factory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
