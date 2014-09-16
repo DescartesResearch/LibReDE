@@ -121,11 +121,25 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		tableWrapLayout.horizontalSpacing = 20;
 		managedForm.getForm().getBody().setLayout(tableWrapLayout);
 		
-		sctnResources = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR);
+		createServicesSection(managedForm);
+		
+		createResourcesSection(managedForm);
+		
+//		sctnImport = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR);
+//		sctnImport.setLayoutData(new TableWrapData(TableWrapData.FILL, TableWrapData.TOP, 1, 2));
+//		managedForm.getToolkit().paintBordersFor(sctnImport);
+//		sctnImport.setText("Import");
+//		sctnImport.setExpanded(true);
+	}
+
+	private void createResourcesSection(IManagedForm managedForm) {
+		sctnResources = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR | Section.DESCRIPTION);
 		TableWrapData twd_sctnResources = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB, 1, 1);
 		sctnResources.setLayoutData(twd_sctnResources);
 		managedForm.getToolkit().paintBordersFor(sctnResources);
 		sctnResources.setText("Resources");
+		sctnResources.descriptionVerticalSpacing = 10;
+		sctnResources.setDescription("List all processing resources for which resource demands should be determined.");
 		sctnResources.setExpanded(true);
 		
 		resourcesComposite = managedForm.getToolkit().createComposite(sctnResources, SWT.NONE);
@@ -170,11 +184,15 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		btnRemoveResource.setLayoutData(gd_btnRemoveResource);
 		btnRemoveResource.setText("Remove");
 		btnRemoveResource.addSelectionListener(new RemoveSelectionSelectionListener(tblViewerResources));
-		
-		sctnServices = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR);
+	}
+
+	private void createServicesSection(IManagedForm managedForm) {
+		sctnServices = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR | Section.DESCRIPTION);
 		TableWrapData twd_sctnServices = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB, 1, 1);
 		sctnServices.setLayoutData(twd_sctnServices);
 		managedForm.getToolkit().paintBordersFor(sctnServices);
+		sctnServices.descriptionVerticalSpacing = 10;
+		sctnServices.setDescription("Services (or workload classes) are groups of requests with similar resource demand behaviors.");
 		sctnServices.setText("Services");
 		sctnServices.setExpanded(true);
 		
@@ -219,12 +237,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		btnRemoveClass.setLayoutData(gd_btnRemoveClass);
 		btnRemoveClass.setText("Remove");
 		btnRemoveClass.addSelectionListener(new RemoveSelectionSelectionListener(tblViewerServices));
-		
-		sctnImport = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR);
-		sctnImport.setLayoutData(new TableWrapData(TableWrapData.FILL, TableWrapData.TOP, 1, 2));
-		managedForm.getToolkit().paintBordersFor(sctnImport);
-		sctnImport.setText("Import");
-		sctnImport.setExpanded(true);
 	}
 	
 
