@@ -7,6 +7,7 @@ import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
 import net.descartesresearch.librede.configuration.WorkloadDescription;
 import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
+import net.descartesresearch.librede.configuration.presentation.LibredeEditorPlugin;
 
 import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.emf.common.command.Command;
@@ -15,20 +16,29 @@ import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.CellEditorProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapCellLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -36,6 +46,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.IManagedForm;
@@ -47,12 +59,6 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 public class WorkloadDescriptionFormPage extends AbstractEstimationConfigurationFormPage {
 
-	/*
-	 * The factory is need to create label/content providers for EMF model objects using the generated ones.
-	 */
-	protected ComposedAdapterFactory adapterFactory = 
-			   new ComposedAdapterFactory(ComposedAdapterFactory.Descriptor.Registry.INSTANCE);
-	
 	private Table tblResources;
 	private Table tblClasses;
 	private Composite resourcesComposite;
@@ -91,6 +97,7 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		managedForm.getForm().setText("Workload Description");
 		FormToolkit toolkit = managedForm.getToolkit();
 		ScrolledForm form = managedForm.getForm();
+		form.setImage(ExtendedImageRegistry.INSTANCE.getImage(LibredeEditorPlugin.getPlugin().getImage("full/page/WorkloadDescription")));
 		Composite body = form.getBody();
 		toolkit.decorateFormHeading(form.getForm());
 		toolkit.paintBordersFor(body);
@@ -132,8 +139,8 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		tblResources.setLinesVisible(true);
 		
 		initTableFromEMF(tableComposite, tblViewerResources, 
-				FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__WORKLOAD_DESCRIPTION, ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__RESOURCES), 
-				new EAttribute[] {ConfigurationPackage.Literals.RESOURCE__NAME, ConfigurationPackage.Literals.RESOURCE__NUMBER_OF_SERVERS, ConfigurationPackage.Literals.RESOURCE__SCHEDULING_STRATEGY}, 
+				Resource.class,
+				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME, ConfigurationPackage.Literals.RESOURCE__NUMBER_OF_SERVERS, ConfigurationPackage.Literals.RESOURCE__SCHEDULING_STRATEGY },
 				new String[] { "Name", "Number of Servers", "Scheduling Strategy"});
 		
 				
@@ -182,8 +189,8 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		tblClasses.setLinesVisible(true);
 		
 		initTableFromEMF(tableComposite_1, tblViewerServices, 
-				FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__WORKLOAD_DESCRIPTION, ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__SERVICES), 
-				new EAttribute[] {ConfigurationPackage.Literals.SERVICE__NAME}, 
+				Service.class, 
+				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME },
 				new String[] { "Name" });
 		
 		btnNewClass = new Button(wclComposite, SWT.NONE);
@@ -213,44 +220,22 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 	}
 	
 
-	private void initTableFromEMF(Composite tableComposite, TableViewer tableViewer, FeaturePath object, EAttribute[] attributes, String[] headers) {
-		ObservableListContentProvider cp = new ObservableListContentProvider();
+	private void initTableFromEMF(Composite tableComposite, TableViewer tableViewer, Class<?> objectType, EStructuralFeature[] attributes, String[] headers) {
 		TableColumnLayout colLayout = new TableColumnLayout();
 		tableComposite.setLayout(colLayout);
 		
-		int i = 0;
-		for (EAttribute attr : attributes) {
-			// Binding model 
-			IValueProperty property = EMFEditProperties.value(getEditingDomain(), attr);			
-			
+		for (int i = 0; i < headers.length; i++) {
 			// Create column
 			TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 			TableColumn tableColumn = tableViewerColumn.getColumn();
-			colLayout.setColumnData(tableColumn, new ColumnPixelData(150));
+			colLayout.setColumnData(tableColumn, new ColumnWeightData(10, 50, true));
 			tableColumn.setText(headers[i]);
-			
-			// Initialize presentation and editing support
-			tableViewerColumn.setLabelProvider(new ObservableMapCellLabelProvider(property.observeDetail(cp.getKnownElements())));
-			//tableViewerColumn.setLabelProvider(new AdapterFactoryLabelProvider(adapterFactory));
-			
-			// If attribute is enum create special combobox editor
-			if (attributes[i].getEType() instanceof EEnum) {
-				tableViewerColumn.setEditingSupport(new AbstractEstimationConfigurationFormPage.ComboBoxFromEnumEditingSupport(
-						tableViewerColumn.getViewer(), bindingContext, property));
-			} else {
-				tableViewerColumn.setEditingSupport(ObservableValueEditingSupport.create(
-						tableViewerColumn.getViewer(), 
-						bindingContext, 
-						new TextCellEditor(tableViewer.getTable()), 
-						CellEditorProperties.control().value(WidgetProperties.text(SWT.Modify)), 
-						property));
-			}
-			i++;
-		}		
-		
-		tableViewer.setContentProvider(cp);
-		//tableViewer.setLabelProvider(new AdapterFactoryLabelProvider(adapterFactory));
-		tableViewer.setInput(EMFEditProperties.list(getEditingDomain(), object).observe(getModel()));
+			tableViewerColumn.setEditingSupport(EObjectEditingSupport.create(tableViewer, getEditingDomain(), attributes[i]));
+		}
+		tableViewer.setContentProvider(new AdapterFactoryContentProvider(getAdapterFactory()));
+		tableViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
+		tableViewer.addFilter(new ClassesViewerFilter(objectType));
+		tableViewer.setInput(getModel().getWorkloadDescription());
 	}
 
 	private void handleAddResource() {

@@ -1,25 +1,22 @@
 package net.descartesresearch.librede.configuration.editor.forms.details;
 
-import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
 
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IManagedForm;
 
 public abstract class AbstractDetailsPage implements IDetailsPage {
 
 	protected IManagedForm managedForm;
-	protected EditingDomain domain;
-	protected LibredeConfiguration model;
+	protected AdapterFactoryEditingDomain domain;
 	protected AbstractEstimationConfigurationFormPage page;
 	
-	public AbstractDetailsPage(AbstractEstimationConfigurationFormPage page, EditingDomain domain, LibredeConfiguration model) {
+	public AbstractDetailsPage(AbstractEstimationConfigurationFormPage page, AdapterFactoryEditingDomain domain) {
 		super();
 		this.page = page;
 		this.domain = domain;
-		this.model = model;
 	}
 
 	/**

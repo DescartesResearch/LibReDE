@@ -3,10 +3,11 @@ package net.descartesresearch.librede.configuration.editor.forms.master;
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
 
-import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -24,13 +25,38 @@ public abstract class AbstractMasterBlock extends MasterDetailsBlock implements 
 	protected FormToolkit toolkit;
 	protected AbstractEstimationConfigurationFormPage page;
 	protected SectionPart masterPart;
-	protected EditingDomain domain;
+	protected AdapterFactoryEditingDomain domain;
 	protected LibredeConfiguration model;
 	
-	public AbstractMasterBlock(AbstractEstimationConfigurationFormPage page, EditingDomain domain, LibredeConfiguration model) {
-		this.page = page;
+	public AbstractMasterBlock(AdapterFactoryEditingDomain domain, LibredeConfiguration model) {
 		this.domain = domain;
 		this.model = model;
+	}
+	
+	public void setFormPage(AbstractEstimationConfigurationFormPage page) {
+		this.page = page;
+	}
+	
+	@Override
+	protected void applyLayout(Composite parent) {
+		GridLayout layout = new GridLayout(2, true);
+		// Values from org.eclipse.pde.internal.ui.editor.FormLayoutFactory
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.marginTop = 12;
+		layout.marginBottom = 12;
+		layout.marginLeft = 6;
+		layout.marginRight = 6;
+		layout.horizontalSpacing = 20;
+		layout.verticalSpacing = 17;
+		parent.setLayout(layout);
+	}
+	
+	@Override
+	protected void applyLayoutData(SashForm sashForm) {
+		GridData data = new GridData(GridData.FILL_BOTH);
+		data.horizontalSpan = 2;
+		sashForm.setLayoutData(data);
 	}
 	
 	@Override
@@ -54,30 +80,14 @@ public abstract class AbstractMasterBlock extends MasterDetailsBlock implements 
 		Control list = createItemsList(composite);
 		GridData gd_list = new GridData(GridData.FILL_BOTH);
 		gd_list.verticalSpan = 2;
-		gd_list.widthHint = 50;
-		gd_list.heightHint = 50;
+		gd_list.widthHint = 100;
+		gd_list.heightHint = 100;
 		list.setLayoutData(gd_list);
 		
 		createButtons(composite);
 		
 		masterPart = new SectionPart(sctnMaster);
 		managedForm.addPart(masterPart);
-	}
-	
-	@Override
-	public void createContent(IManagedForm managedForm) {
-		super.createContent(managedForm);
-		 GridLayout layout = new GridLayout(1, false);
-		 // Values from org.eclipse.pde.internal.ui.editor.FormLayoutFactory
-		 layout.marginHeight = 0;
-		 layout.marginWidth = 0;
-		 layout.marginTop = 12;
-		 layout.marginBottom = 12;
-		 layout.marginLeft = 6;
-		 layout.marginRight = 6;
-		 layout.horizontalSpacing = 20;
-		 layout.verticalSpacing = 17;
-		 managedForm.getForm().getBody().setLayout(layout);
 	}
 	
 	@Override

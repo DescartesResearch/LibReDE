@@ -8,8 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
+import net.descartesresearch.librede.configuration.ConfigurationPackage;
 import net.descartesresearch.librede.configuration.Parameter;
 
+import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -226,6 +234,13 @@ public class ParametersBlock {
 	private Map<String, ParameterEditor> nameToEditor = new HashMap<>();
 	private Object input;
 	private Shell shell;
+	private EStructuralFeature parametersFeature;
+	private EditingDomain editingDomain;
+	
+	public ParametersBlock(EditingDomain domain, EStructuralFeature parametersFeature) {
+		this.editingDomain = domain;
+		this.parametersFeature = parametersFeature;
+	}
 	
 	public void setObjectType(Class<?> parameterizedType) {
 		if (parameterizedType.isAnnotationPresent(Component.class)) {
@@ -251,8 +266,6 @@ public class ParametersBlock {
 	
 	public void createControl(FormToolkit toolkit, Shell shell, Composite parent) {
 		this.shell = shell;
-		
-		parent.setLayout(new GridLayout(2, false));
 
 		for (ParameterEditor curEditor : editors) {
 			curEditor.createLabel(toolkit, parent);
@@ -272,17 +285,13 @@ public class ParametersBlock {
 	}
 	
 	private void addParameter(Parameter param) {
-		if (input instanceof List) {
-			List<Object> content = (List<Object>)input;
-			content.add(param);
-		}
+		Command cmd = AddCommand.create(editingDomain, input, parametersFeature, param);
+		editingDomain.getCommandStack().execute(cmd);
 	}
 	
 	private void removeParameter(Parameter param) {
-		if (input instanceof List) {
-			List<Object> content = (List<Object>)input;
-			content.remove(param);
-		}
+		Command cmd = RemoveCommand.create(editingDomain, param);
+		editingDomain.getCommandStack().execute(cmd);
 	}
 	
 	private void update() {

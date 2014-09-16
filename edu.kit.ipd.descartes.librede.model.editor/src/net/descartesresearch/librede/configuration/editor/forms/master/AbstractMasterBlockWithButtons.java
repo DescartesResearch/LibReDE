@@ -1,9 +1,8 @@
 package net.descartesresearch.librede.configuration.editor.forms.master;
 
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
-import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
 
-import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,10 +12,9 @@ import org.eclipse.swt.widgets.Composite;
 
 public abstract class AbstractMasterBlockWithButtons extends AbstractMasterBlock {
 
-	public AbstractMasterBlockWithButtons(
-			AbstractEstimationConfigurationFormPage page, EditingDomain domain,
+	public AbstractMasterBlockWithButtons(AdapterFactoryEditingDomain domain,
 			LibredeConfiguration model) {
-		super(page, domain, model);
+		super(domain, model);
 	}
 	
 	@Override
