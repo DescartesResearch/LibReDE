@@ -13,6 +13,7 @@ import net.descartesresearch.librede.configuration.Parameter;
 
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
@@ -299,8 +300,8 @@ public class ParametersBlock {
 			editor.reset();
 		}
 		
-		if (input instanceof List) {
-			List<?> content = (List<?>)input;
+		if (input instanceof EObject) {
+			List<?> content = (List<?>)((EObject)input).eGet(parametersFeature);
 			for (int i = 0; i < content.size(); i++) {
 				Parameter p = (Parameter)content.get(i);
 				ParameterEditor editor = nameToEditor.get(p.getName().toLowerCase());
