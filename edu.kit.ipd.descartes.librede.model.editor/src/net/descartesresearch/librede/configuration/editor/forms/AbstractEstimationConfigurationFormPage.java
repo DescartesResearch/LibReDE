@@ -1,5 +1,7 @@
 package net.descartesresearch.librede.configuration.editor.forms;
 
+import java.util.Collection;
+
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 
@@ -8,17 +10,33 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
+import org.eclipse.emf.edit.provider.IItemPropertySource;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -29,43 +47,104 @@ import org.eclipse.ui.forms.editor.FormPage;
 
 public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 
-	protected static class ComboBoxFromEnumEditingSupport extends
-			ObservableValueEditingSupport {
+	public static abstract class EObjectEditingSupport extends
+			EditingSupport {
+		protected TableViewer viewer;
+		protected EStructuralFeature attribute;
+		protected AdapterFactoryEditingDomain domain;
 
-		private IValueProperty model;
+		public EObjectEditingSupport(TableViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+			super(viewer);
+			this.attribute = attribute;
+			this.domain = domain;
+			this.viewer = viewer;
+		}
+		
+		public static EObjectEditingSupport create(TableViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+			if (attribute instanceof EReference || attribute.getEType() instanceof EEnum) {
+				return new ChoiceEObjectEditingSupport(viewer, domain, attribute);
+			}
+			return new TextEObjectEditingSupport(viewer, domain, attribute);
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+		
+		@Override
+		protected void setValue(Object element, Object value) {
+			Object oldValue = ((EObject)element).eGet(attribute);
+			if (((oldValue == null) && (value != null))
+					|| ((oldValue != null) && !oldValue.equals(value))) {
+				Command cmd = SetCommand.create(domain, element, attribute, value);
+				domain.getCommandStack().execute(cmd);
+			}
+		}
+
+	}
+	
+	protected static class ChoiceEObjectEditingSupport extends EObjectEditingSupport {
+		
 		private ComboBoxViewerCellEditor cellEditor;
-
-		public ComboBoxFromEnumEditingSupport(ColumnViewer viewer,
-				EMFDataBindingContext dbc, IValueProperty model) {
-			super(viewer, dbc);
-			this.model = model;
-
-			this.cellEditor = new ComboBoxViewerCellEditor(
-					(Composite) viewer.getControl(), SWT.READ_ONLY);
-			this.cellEditor.setLabelProvider(new LabelProvider());
-			this.cellEditor.setContentProvider(new ArrayContentProvider());
+		
+		public ChoiceEObjectEditingSupport(TableViewer viewer,
+				AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+			super(viewer, domain, attribute);
 		}
-
-		@Override
-		protected IObservableValue doCreateCellEditorObservable(
-				CellEditor cellEditor) {
-			return ViewerProperties.singleSelection().observe(
-					this.cellEditor.getViewer());
-		}
-
-		@Override
-		protected IObservableValue doCreateElementObservable(Object element,
-				ViewerCell cell) {
-			return model.observe(element);
-		}
-
+		
 		@Override
 		protected CellEditor getCellEditor(Object element) {
-			Object o = model.getValue(element);
-			cellEditor.setInput(o.getClass().getEnumConstants());
+			IItemPropertySource source = (IItemPropertySource)domain.getAdapterFactory().adapt(element, IItemPropertySource.class);
+			IItemPropertyDescriptor desc = source.getPropertyDescriptor(element, attribute);
+			
+			if (cellEditor == null) {
+				ComboBoxViewerCellEditor comboBoxEditor = new ComboBoxViewerCellEditor(viewer.getTable());
+				comboBoxEditor.setContentProvider(new ArrayContentProvider());
+				comboBoxEditor.setLabelProvider(new AdapterFactoryLabelProvider(domain.getAdapterFactory()));
+				cellEditor = comboBoxEditor;
+			}
+			
+			Collection<?> d = desc.getChoiceOfValues(element);
+			d.remove(null);
+			cellEditor.setInput(d);
 			return cellEditor;
 		}
 
+		@Override
+		protected Object getValue(Object element) {
+			return ((EObject)element).eGet(attribute);
+		}
+		
+	}
+	
+	protected static class TextEObjectEditingSupport extends EObjectEditingSupport {
+		
+		private TextCellEditor cellEditor;
+
+		public TextEObjectEditingSupport(TableViewer viewer,
+				AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+			super(viewer, domain, attribute);
+		}
+		
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			if (cellEditor == null) {
+				cellEditor = new TextCellEditor(viewer.getTable());
+			}
+			return cellEditor;
+		}
+		
+		@Override
+		protected Object getValue(Object element) {
+			return EcoreUtil.convertToString((EDataType) attribute.getEType(), ((EObject)element).eGet(attribute));
+		}
+		
+		@Override
+		protected void setValue(Object element, Object value) {
+			Object objValue = EcoreUtil.createFromString((EDataType) attribute.getEType(), (String)value);
+			super.setValue(element, objValue);
+		}
 	}
 
 	protected final class RemoveSelectionSelectionListener extends

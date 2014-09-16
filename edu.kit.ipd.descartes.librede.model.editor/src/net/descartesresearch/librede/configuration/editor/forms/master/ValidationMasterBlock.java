@@ -1,24 +1,24 @@
 package net.descartesresearch.librede.configuration.editor.forms.master;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.EstimationApproachConfiguration;
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.ValidatorConfiguration;
-import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
-import net.descartesresearch.librede.configuration.editor.forms.details.ValidationDetailsPage;
+import net.descartesresearch.librede.configuration.editor.forms.details.ParametersDetailsPage;
 
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
-import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -29,9 +29,8 @@ import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IDetailsPageProvider;
 import org.eclipse.ui.forms.IManagedForm;
 
-import edu.kit.ipd.descartes.librede.approaches.IEstimationApproach;
 import edu.kit.ipd.descartes.librede.estimation.validation.Validator;
-import edu.kit.ipd.descartes.librede.factory.ComponentRegistry;
+import edu.kit.ipd.descartes.librede.factory.Registry;
 
 public class ValidationMasterBlock extends AbstractMasterBlock implements IDetailsPageProvider {
 	
@@ -40,9 +39,8 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 
 	private EMFDataBindingContext masterBindingContext = new EMFDataBindingContext();
 
-	public ValidationMasterBlock(AbstractEstimationConfigurationFormPage page,
-			EditingDomain domain, LibredeConfiguration model) {
-		super(page, domain, model);
+	public ValidationMasterBlock(AdapterFactoryEditingDomain domain, LibredeConfiguration model) {
+		super(domain, model);
 	}
 
 	@Override
@@ -63,13 +61,23 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 				.setContentProvider(new ObservableListContentProvider());
 		tableValidatorsViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 
+		// We need to add the existing validators in the configuration first, so that the test for
+		// equality in the checked table binding works correctly. EMF always does an equality check on
+		// the object instance.
 		IObservableList validators = new WritableList();
-		for (Class<?> cl : ComponentRegistry.INSTANCE
+		Set<Class<?>> existingValidators = new HashSet<Class<?>>();
+		for (ValidatorConfiguration v : model.getValidation().getValidators()) {
+			validators.add(v);
+			existingValidators.add(v.getType());
+		}
+		for (Class<?> cl : Registry.INSTANCE
 				.getImplementationClasses(Validator.class)) {
-			ValidatorConfiguration a = ConfigurationFactory.eINSTANCE
-					.createValidatorConfiguration();
-			a.setType(cl);
-			validators.add(a);
+			if (!existingValidators.contains(cl)) {
+				ValidatorConfiguration a = ConfigurationFactory.eINSTANCE
+						.createValidatorConfiguration();
+				a.setType(cl);
+				validators.add(a);
+			}
 		}
 		tableValidatorsViewer.setInput(validators);
 		
@@ -109,7 +117,12 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 
 	@Override
 	public IDetailsPage getPage(Object key) {
-		return new ValidationDetailsPage(page, domain, model, (Class<?>)key);
+		return new ParametersDetailsPage(page, 
+				domain, 
+				"Validator Configuration", 
+				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION,
+				(Class<?>)key, 
+				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__PARAMETERS);
 	}
 
 }

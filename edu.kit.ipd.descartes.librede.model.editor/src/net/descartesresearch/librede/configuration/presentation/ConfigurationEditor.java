@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
-import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
-import net.descartesresearch.librede.configuration.editor.forms.DataProvidersFormPage;
-import net.descartesresearch.librede.configuration.editor.forms.EstimationApproachesFormPage;
-import net.descartesresearch.librede.configuration.editor.forms.MeasurementDataFormPage;
-import net.descartesresearch.librede.configuration.editor.forms.OutputFormPage;
+import net.descartesresearch.librede.configuration.editor.forms.EstimationFormPage;
+import net.descartesresearch.librede.configuration.editor.forms.MasterDetailsFormPage;
 import net.descartesresearch.librede.configuration.editor.forms.ValidationFormPage;
 import net.descartesresearch.librede.configuration.editor.forms.WorkloadDescriptionFormPage;
+import net.descartesresearch.librede.configuration.editor.forms.master.DataSourcesMasterBlock;
+import net.descartesresearch.librede.configuration.editor.forms.master.EstimationApproachesMasterBlock;
+import net.descartesresearch.librede.configuration.editor.forms.master.OutputMasterBlock;
+import net.descartesresearch.librede.configuration.editor.forms.master.TracesMasterBlock;
+import net.descartesresearch.librede.configuration.editor.forms.master.ValidationMasterBlock;
 import net.descartesresearch.librede.configuration.provider.ConfigurationItemProviderAdapterFactory;
 
 import org.eclipse.core.resources.IFile;
@@ -89,12 +91,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
@@ -926,7 +925,7 @@ public class ConfigurationEditor
 					//
 					contentOutlineViewer.setContentProvider(new AdapterFactoryContentProvider(adapterFactory));
 					contentOutlineViewer.setLabelProvider(new AdapterFactoryLabelProvider(adapterFactory));
-					contentOutlineViewer.setInput(editingDomain.getResourceSet());
+					contentOutlineViewer.setInput(editingDomain.getResourceSet().getResources().get(0).getContents().get(0));
 
 					// Make sure our popups work.
 					//
@@ -1401,19 +1400,23 @@ public class ConfigurationEditor
 	protected void addPages() {
 		LibredeConfiguration conf = (LibredeConfiguration) editingDomain.getResourceSet().getResources().get(0).getContents().get(0);
 		
-		AbstractEstimationConfigurationFormPage workload = new WorkloadDescriptionFormPage(this, "workloadmodel", "Workload Description", editingDomain, conf);
-		DataProvidersFormPage dataProviders = new DataProvidersFormPage(this, "dataproviders", "Data Providers", editingDomain, conf);
-		MeasurementDataFormPage measurements = new MeasurementDataFormPage(this, "measurements", "Measurements", editingDomain, conf);
-		EstimationApproachesFormPage approaches = new EstimationApproachesFormPage(this, "approaches", "Estimation Approaches", editingDomain, conf);
-		ValidationFormPage validation = new ValidationFormPage(this, "validation", "Validation", editingDomain, conf);
-		OutputFormPage output = new OutputFormPage(this, "output", "Output", editingDomain, conf);
 		try {
-			addPage(workload);
-			addPage(dataProviders);
-			addPage(measurements);
-			addPage(approaches);
-			addPage(validation);
-			addPage(output);
+			addPage(new WorkloadDescriptionFormPage(this, "workloadmodel", "Workload Description", editingDomain, conf));
+			
+			DataSourcesMasterBlock providerMasterBlock = new DataSourcesMasterBlock(editingDomain, conf);
+			addPage(new MasterDetailsFormPage(this, "datasources", "Data Sources", "full/page/DataSources.gif", editingDomain, conf, providerMasterBlock));
+			
+			TracesMasterBlock tracesMasterBlock = new TracesMasterBlock(editingDomain, conf);
+			addPage(new MasterDetailsFormPage(this, "traces", "Traces", "full/page/Traces", editingDomain, conf, tracesMasterBlock));
+			
+			EstimationApproachesMasterBlock approachesMasterBlock = new EstimationApproachesMasterBlock(editingDomain, conf);
+			addPage(new EstimationFormPage(this, "estimation", "Estimation", "full/page/Estimation", editingDomain, conf, approachesMasterBlock));
+			
+			ValidationMasterBlock validationMasterBlock = new ValidationMasterBlock(editingDomain, conf);
+			addPage(new ValidationFormPage(this, "validation", "Validation", "full/page/Validation", editingDomain, conf, validationMasterBlock));
+			
+			OutputMasterBlock outputMasterBlock = new OutputMasterBlock(editingDomain, conf);
+			addPage(new MasterDetailsFormPage(this, "output", "Output", "full/page/Output", editingDomain, conf, outputMasterBlock));
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}		
