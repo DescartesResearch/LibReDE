@@ -27,7 +27,7 @@
       <editor
             class="net.descartesresearch.librede.configuration.presentation.ConfigurationEditor"
             contributorClass="net.descartesresearch.librede.configuration.presentation.ConfigurationActionBarContributor"
-            extensions="configuration"
+            extensions="librede"
             filenames="*.librede"
             icon="icons/full/obj16/ConfigurationModelFile.gif"
             id="net.descartesresearch.librede.configuration.presentation.ConfigurationEditorID"
