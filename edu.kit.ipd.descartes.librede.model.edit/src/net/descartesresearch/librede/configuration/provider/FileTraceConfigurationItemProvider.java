@@ -3,42 +3,37 @@
 package net.descartesresearch.librede.configuration.provider;
 
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
+
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.Parameter;
+import net.descartesresearch.librede.configuration.FileTraceConfiguration;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.ResourceLocator;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
-import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
-import org.eclipse.emf.edit.provider.IItemPropertySource;
-import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
-import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
-import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
-import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
+import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
+import edu.kit.ipd.descartes.librede.factory.Registry;
+
 /**
- * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.Parameter} object.
+ * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.FileTraceConfiguration} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class ParameterItemProvider 
-	extends ItemProviderAdapter
-	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
+public class FileTraceConfigurationItemProvider extends TraceConfigurationItemProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ParameterItemProvider(AdapterFactory adapterFactory) {
+	public FileTraceConfigurationItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -53,26 +48,25 @@ public class ParameterItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addNamePropertyDescriptor(object);
-			addValuePropertyDescriptor(object);
+			addFilePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Name feature.
+	 * This adds a property descriptor for the File feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addNamePropertyDescriptor(Object object) {
+	protected void addFilePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Parameter_name_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Parameter_name_feature", "_UI_Parameter_type"),
-				 ConfigurationPackage.Literals.PARAMETER__NAME,
+				 getString("_UI_FileTraceConfiguration_file_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_FileTraceConfiguration_file_feature", "_UI_FileTraceConfiguration_type"),
+				 ConfigurationPackage.Literals.FILE_TRACE_CONFIGURATION__FILE,
 				 true,
 				 false,
 				 false,
@@ -82,50 +76,44 @@ public class ParameterItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Value feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addValuePropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_Parameter_value_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Parameter_value_feature", "_UI_Parameter_type"),
-				 ConfigurationPackage.Literals.PARAMETER__VALUE,
-				 true,
-				 false,
-				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
-				 null));
-	}
-
-	/**
-	 * This returns Parameter.gif.
+	 * This returns FileTraceConfiguration.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/Parameter"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/FileTraceConfiguration"));
 	}
 
 	/**
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((Parameter)object).getName();
-		return label == null || label.length() == 0 ?
-			getString("_UI_Parameter_type") :
-			getString("_UI_Parameter_type") + " " + label;
+		FileTraceConfiguration trace = (FileTraceConfiguration)object;
+		StringBuilder label = new StringBuilder();
+		if (trace.getFile() != null) {
+			File file = new File(trace.getFile());
+			label.append(file.getName());
+		} else {
+			label.append("No file");
+		}
+		label.append(" (");
+		IMetric metric = Registry.INSTANCE.getMetric(trace.getMetric());
+		if (metric != null) {
+			label.append(metric.getDisplayName());
+		}
+		if (trace.getInterval() == 0) {
+			label.append(", ").append("non-aggregated");
+		} else {
+			label.append(", ").append("aggregated");
+		}
+		label.append(")");
+		
+		return label.toString();
 	}
 	
 
@@ -140,9 +128,8 @@ public class ParameterItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Parameter.class)) {
-			case ConfigurationPackage.PARAMETER__NAME:
-			case ConfigurationPackage.PARAMETER__VALUE:
+		switch (notification.getFeatureID(FileTraceConfiguration.class)) {
+			case ConfigurationPackage.FILE_TRACE_CONFIGURATION__FILE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}
@@ -160,16 +147,27 @@ public class ParameterItemProvider
 	protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
 	}
-
+	
 	/**
-	 * Return the resource locator for this item provider's resources.
+	 * Return the column image for a column index.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
-	public ResourceLocator getResourceLocator() {
-		return LibredeEditPlugin.INSTANCE;
+	public Object getColumnImage(Object object, int columnIndex) {
+		return getImage(object);
+	}
+
+	/**
+	 * Return the column text for a column index.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		return getText(object);
 	}
 
 }

@@ -5,8 +5,10 @@ package net.descartesresearch.librede.configuration.provider;
 
 import java.util.Collection;
 import java.util.List;
+
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.Parameter;
+import net.descartesresearch.librede.configuration.TraceToEntityMapping;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.ResourceLocator;
@@ -23,22 +25,27 @@ import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 /**
- * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.Parameter} object.
+ * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.TraceToEntityMapping} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class ParameterItemProvider 
+public class TraceToEntityMappingItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
+		IEditingDomainItemProvider,
+		IStructuredItemContentProvider,
+		ITreeItemContentProvider,
+		IItemLabelProvider,
+		IItemPropertySource,
+		ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ParameterItemProvider(AdapterFactory adapterFactory) {
+	public TraceToEntityMappingItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -53,65 +60,65 @@ public class ParameterItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addNamePropertyDescriptor(object);
-			addValuePropertyDescriptor(object);
+			addEntityPropertyDescriptor(object);
+			addTraceColumnPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Name feature.
+	 * This adds a property descriptor for the Entity feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addNamePropertyDescriptor(Object object) {
+	protected void addEntityPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Parameter_name_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Parameter_name_feature", "_UI_Parameter_type"),
-				 ConfigurationPackage.Literals.PARAMETER__NAME,
+				 getString("_UI_TraceToEntityMapping_entity_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceToEntityMapping_entity_feature", "_UI_TraceToEntityMapping_type"),
+				 ConfigurationPackage.Literals.TRACE_TO_ENTITY_MAPPING__ENTITY,
 				 true,
 				 false,
-				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 true,
+				 null,
 				 null,
 				 null));
 	}
 
 	/**
-	 * This adds a property descriptor for the Value feature.
+	 * This adds a property descriptor for the Trace Column feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addValuePropertyDescriptor(Object object) {
+	protected void addTraceColumnPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Parameter_value_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Parameter_value_feature", "_UI_Parameter_type"),
-				 ConfigurationPackage.Literals.PARAMETER__VALUE,
+				 getString("_UI_TraceToEntityMapping_traceColumn_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceToEntityMapping_traceColumn_feature", "_UI_TraceToEntityMapping_type"),
+				 ConfigurationPackage.Literals.TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN,
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
 				 null,
 				 null));
 	}
 
 	/**
-	 * This returns Parameter.gif.
+	 * This returns TraceToEntityMapping.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/Parameter"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/TraceToEntityMapping"));
 	}
 
 	/**
@@ -122,10 +129,8 @@ public class ParameterItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((Parameter)object).getName();
-		return label == null || label.length() == 0 ?
-			getString("_UI_Parameter_type") :
-			getString("_UI_Parameter_type") + " " + label;
+		TraceToEntityMapping traceToEntityMapping = (TraceToEntityMapping)object;
+		return getString("_UI_TraceToEntityMapping_type") + " " + traceToEntityMapping.getTraceColumn();
 	}
 	
 
@@ -134,15 +139,15 @@ public class ParameterItemProvider
 	 * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Parameter.class)) {
-			case ConfigurationPackage.PARAMETER__NAME:
-			case ConfigurationPackage.PARAMETER__VALUE:
+		switch (notification.getFeatureID(TraceToEntityMapping.class)) {
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY: // IMPORTANT: also get notified of changes to entity
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}
@@ -170,6 +175,48 @@ public class ParameterItemProvider
 	@Override
 	public ResourceLocator getResourceLocator() {
 		return LibredeEditPlugin.INSTANCE;
+	}
+	
+	/**
+	 * Return the column image for a column index.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public Object getColumnImage(Object object, int columnIndex) {
+		if (columnIndex == 0) {
+			TraceToEntityMapping mapping = (TraceToEntityMapping)object;
+			if (mapping.getEntity() != null) {
+				IItemLabelProvider prov = (IItemLabelProvider)getAdapterFactory().adapt(mapping.getEntity(), IItemLabelProvider.class);
+				return prov.getImage(mapping.getEntity());
+			}
+		}
+		return super.getColumnImage(object, columnIndex);
+	}
+
+	/**
+	 * Return the column text for a column index.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		TraceToEntityMapping mapping = (TraceToEntityMapping)object;
+		switch(columnIndex) {
+		case 0:
+			if (mapping.getEntity() != null) {
+				IItemLabelProvider prov = (IItemLabelProvider)getAdapterFactory().adapt(mapping.getEntity(), IItemLabelProvider.class);
+				return prov.getText(mapping.getEntity());
+			} else {
+				// Indicate to user that he should select an entity.
+				return "Select entity...";
+			}
+		case 1:
+			return Integer.toString(mapping.getTraceColumn());
+		}
+		return super.getColumnText(object, columnIndex);
 	}
 
 }

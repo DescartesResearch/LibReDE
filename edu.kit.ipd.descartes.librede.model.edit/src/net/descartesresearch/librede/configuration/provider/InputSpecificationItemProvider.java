@@ -17,6 +17,7 @@ import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
+import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
@@ -30,7 +31,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 public class InputSpecificationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
+		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -68,7 +69,7 @@ public class InputSpecificationItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_PROVIDERS);
+			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES);
 			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS);
 		}
 		return childrenFeatures;
@@ -122,7 +123,7 @@ public class InputSpecificationItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(InputSpecification.class)) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_PROVIDERS:
+			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
@@ -143,13 +144,18 @@ public class InputSpecificationItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_PROVIDERS,
-				 ConfigurationFactory.eINSTANCE.createDataProviderConfiguration()));
+				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES,
+				 ConfigurationFactory.eINSTANCE.createDataSourceConfiguration()));
 
 		newChildDescriptors.add
 			(createChildParameter
 				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS,
 				 ConfigurationFactory.eINSTANCE.createTraceConfiguration()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS,
+				 ConfigurationFactory.eINSTANCE.createFileTraceConfiguration()));
 	}
 
 	/**

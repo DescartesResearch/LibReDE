@@ -18,6 +18,7 @@ import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
+import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
@@ -32,7 +33,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 public class TraceConfigurationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
+		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -56,9 +57,8 @@ public class TraceConfigurationItemProvider
 
 			addMetricPropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
-			addResourcesPropertyDescriptor(object);
-			addServicesPropertyDescriptor(object);
 			addIntervalPropertyDescriptor(object);
+			addProviderPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -108,50 +108,6 @@ public class TraceConfigurationItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Resources feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addResourcesPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_TraceConfiguration_resources_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_resources_feature", "_UI_TraceConfiguration_type"),
-				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__RESOURCES,
-				 true,
-				 false,
-				 true,
-				 null,
-				 null,
-				 null));
-	}
-
-	/**
-	 * This adds a property descriptor for the Services feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addServicesPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_TraceConfiguration_services_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_services_feature", "_UI_TraceConfiguration_type"),
-				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__SERVICES,
-				 true,
-				 false,
-				 true,
-				 null,
-				 null,
-				 null));
-	}
-
-	/**
 	 * This adds a property descriptor for the Interval feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -174,6 +130,28 @@ public class TraceConfigurationItemProvider
 	}
 
 	/**
+	 * This adds a property descriptor for the Provider feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addProviderPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TraceConfiguration_provider_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_provider_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__PROVIDER,
+				 true,
+				 false,
+				 true,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
 	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
 	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
 	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
@@ -185,7 +163,7 @@ public class TraceConfigurationItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.TRACE_CONFIGURATION__DATA);
+			childrenFeatures.add(ConfigurationPackage.Literals.TRACE_CONFIGURATION__MAPPINGS);
 		}
 		return childrenFeatures;
 	}
@@ -246,7 +224,7 @@ public class TraceConfigurationItemProvider
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__DATA:
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -266,8 +244,8 @@ public class TraceConfigurationItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.TRACE_CONFIGURATION__DATA,
-				 ConfigurationFactory.eINSTANCE.createDataSourceConfiguration()));
+				(ConfigurationPackage.Literals.TRACE_CONFIGURATION__MAPPINGS,
+				 ConfigurationFactory.eINSTANCE.createTraceToEntityMapping()));
 	}
 
 	/**
@@ -279,6 +257,16 @@ public class TraceConfigurationItemProvider
 	@Override
 	public ResourceLocator getResourceLocator() {
 		return LibredeEditPlugin.INSTANCE;
+	}
+	
+	@Override
+	public Object getColumnImage(Object object, int columnIndex) {
+		return getImage(object);
+	}
+	
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		return super.getText(object);
 	}
 
 }
