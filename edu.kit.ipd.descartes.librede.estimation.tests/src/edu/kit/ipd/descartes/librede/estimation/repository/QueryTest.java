@@ -28,7 +28,6 @@ package edu.kit.ipd.descartes.librede.estimation.repository;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.matrix;
 import static edu.kit.ipd.descartes.linalg.LinAlg.row;
-import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -36,33 +35,26 @@ import static org.fest.assertions.api.Assertions.offset;
 
 import java.util.Arrays;
 
-import org.fest.assertions.api.Assertions;
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.MemoryObservationRepository;
-import edu.kit.ipd.descartes.librede.estimation.repository.Query;
-import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
-import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
-import edu.kit.ipd.descartes.linalg.testutil.MatrixAssert;
 
 public class QueryTest {
 
 	private MemoryObservationRepository repository;
-	private Resource[] resources = new Resource[] { new Resource("CPU"),
-			new Resource("HardDisk1"), new Resource("HardDisk2") };
-	private Service[] services = new Service[] { new Service("AddToCard"),
-			new Service("Payment") };
+	private Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"),
+			WorkloadBuilder.newResource("HardDisk1"), WorkloadBuilder.newResource("HardDisk2") };
+	private Service[] services = new Service[] { WorkloadBuilder.newService("AddToCard"),
+			WorkloadBuilder.newService("Payment") };
 	private Matrix utilMeasurements = matrix(row(0.2, 0.3, 0.4), row(0.3, 0.4, 0.5), row(0.4, 0.5, 0.6), row(0.5, 0.6, 0.7), row(0.6, 0.7, 0.8));
 	private Matrix throughputMeasurements = matrix(row(4, 5), row(6, 7), row(8, 9), row(10, 11), row(12, 13));
 	private Matrix rtMeasurements = matrix(row(0.4, 0.5), row(0.6, 0.7), row(0.8, 0.9), row(0.10, 0.11), row(0.12, 0.13));

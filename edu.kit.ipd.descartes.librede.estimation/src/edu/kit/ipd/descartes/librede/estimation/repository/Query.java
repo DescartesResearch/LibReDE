@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
+import net.descartesresearch.librede.configuration.ModelEntity;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
@@ -46,11 +46,11 @@ public final class Query<T extends Vector> {
 	private Aggregation aggregation;
 	private Query.Type type;
 	private IMetric metric;
-	private List<IModelEntity> entities = new ArrayList<IModelEntity>();
+	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
 	protected Query(Aggregation aggregation, Type type, IMetric metric,
-			IModelEntity entity, IRepositoryCursor repositoryCursor) {
+			ModelEntity entity, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
 		this.type = type;
@@ -95,15 +95,15 @@ public final class Query<T extends Vector> {
 		}
 	}
 	
-	public int indexOf(IModelEntity entity) {
+	public int indexOf(ModelEntity entity) {
 		return entities.indexOf(entity);
 	}
 	
-	public IModelEntity getEntity(int index) {
+	public ModelEntity getEntity(int index) {
 		return entities.get(index);
 	}
 	
-	public List<? extends IModelEntity> getEntities() {
+	public List<? extends ModelEntity> getEntities() {
 		return Collections.unmodifiableList(entities);
 	}
 	

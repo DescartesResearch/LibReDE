@@ -29,6 +29,7 @@ package edu.kit.ipd.descartes.librede.ipopt.java;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import net.descartesresearch.librede.configuration.Service;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,9 +42,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinear
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.librede.ipopt.java.RecursiveOptimization;
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public class MenasceOptimizationTest {

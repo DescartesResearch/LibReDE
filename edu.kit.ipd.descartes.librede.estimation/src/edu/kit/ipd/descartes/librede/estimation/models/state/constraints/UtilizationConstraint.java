@@ -30,13 +30,13 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.ModelEntity;
+import net.descartesresearch.librede.configuration.Resource;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -89,7 +89,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
 			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
 			msg.append("entities = { ");
-			for(IModelEntity entity : throughputQuery.getEntities()) {
+			for(ModelEntity entity : throughputQuery.getEntities()) {
 				msg.append(entity.getName()).append(" ");
 			}
 			msg.append(" } ");

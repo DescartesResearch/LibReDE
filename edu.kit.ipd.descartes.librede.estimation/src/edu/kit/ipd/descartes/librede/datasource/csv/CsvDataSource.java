@@ -3,9 +3,6 @@ package edu.kit.ipd.descartes.librede.datasource.csv;
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -13,10 +10,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import edu.kit.ipd.descartes.librede.configuration.ParameterDefinition;
-import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.datasource.IDataSource;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.factory.Component;
+import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 

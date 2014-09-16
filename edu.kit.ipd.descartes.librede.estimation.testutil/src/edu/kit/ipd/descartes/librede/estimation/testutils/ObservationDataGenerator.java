@@ -26,7 +26,6 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.testutils;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.max;
 import static edu.kit.ipd.descartes.linalg.LinAlg.range;
 import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 import static edu.kit.ipd.descartes.linalg.LinAlg.sum;
@@ -35,12 +34,13 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import java.util.Arrays;
 import java.util.Random;
 
+import net.descartesresearch.librede.configuration.ConfigurationFactory;
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.librede.estimation.repository.MemoryObservationRepository;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
@@ -73,11 +73,13 @@ public class ObservationDataGenerator {
 		services = new Service[numWorkloadClasses];
 		resources = new Resource[numResources];
 		for (int i = 0; i < numWorkloadClasses; i++) {
-			services[i] = new Service("WC" + i);
+			services[i] = ConfigurationFactory.eINSTANCE.createService();
+			services[i].setName("WC" + i);
 		}
 		
 		for (int i = 0; i < numResources; i++) {
-			resources[i] = new Resource("R" + i);
+			resources[i] = ConfigurationFactory.eINSTANCE.createResource();
+			resources[i].setName("R" + i);
 		}
 		
 		model = new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services));

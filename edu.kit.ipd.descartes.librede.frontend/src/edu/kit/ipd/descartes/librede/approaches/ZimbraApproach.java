@@ -30,6 +30,8 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.ScalarObservationModel;
@@ -45,8 +47,6 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconst
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.librede.ipopt.java.RecursiveOptimization;
 import edu.kit.ipd.descartes.librede.nnls.LeastSquaresRegression;

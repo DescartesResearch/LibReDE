@@ -27,24 +27,17 @@
 package edu.kit.ipd.descartes.librede.nnls.tests;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
-import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.*;
-import static org.fest.assertions.api.Assertions.offset;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.descartes.librede.estimation.models.observation.ScalarObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ILinearOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ResponseTimeEquation;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.librede.nnls.LeastSquaresRegression;
 import edu.kit.ipd.descartes.linalg.Vector;

@@ -28,12 +28,12 @@ package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -128,7 +128,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		double R_r = R.get(avgResponseTimeQuery.indexOf(cls_r));
 		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
 		double U_i = utilizationQuery.execute().getValue();
-		int p = res_i.getNumberOfParallelServers();
+		int p = res_i.getNumberOfServers();
 		
 		return p * U_i * (R_r * X_r) / (R.dot(X));
 	}

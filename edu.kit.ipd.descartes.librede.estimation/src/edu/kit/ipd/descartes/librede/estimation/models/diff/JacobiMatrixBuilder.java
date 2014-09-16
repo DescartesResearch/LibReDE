@@ -36,7 +36,6 @@ import java.util.List;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
 import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.IStateConstraint;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;

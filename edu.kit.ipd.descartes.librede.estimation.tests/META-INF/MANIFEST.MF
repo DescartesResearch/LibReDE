@@ -5,8 +5,9 @@ Bundle-SymbolicName: edu.kit.ipd.descartes.librede.estimation.tests
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: edu.kit.ipd.descartes.librede.estimation;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: edu.kit.ipd.descartes.linalg,
+Import-Package: edu.kit.ipd.descartes.librede.estimation.testutils,
+ edu.kit.ipd.descartes.linalg,
  edu.kit.ipd.descartes.linalg.testutil,
- edu.kit.ipd.descartes.librede.estimation.testutils,
+ net.descartesresearch.librede.configuration,
  org.fest.assertions.api
 Require-Bundle: org.junit;bundle-version="4.11.0"

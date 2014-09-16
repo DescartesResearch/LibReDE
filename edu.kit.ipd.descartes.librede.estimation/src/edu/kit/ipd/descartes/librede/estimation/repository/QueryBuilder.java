@@ -26,10 +26,10 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.repository;
 
+import net.descartesresearch.librede.configuration.ModelEntity;
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query.Type;
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 
@@ -37,7 +37,7 @@ public class QueryBuilder {
 	
 	private Query.Type type;
 	private IMetric metric;
-	private IModelEntity entity;
+	private ModelEntity entity;
 	private Aggregation aggregation;
 	
 	private QueryBuilder(IMetric metric) {

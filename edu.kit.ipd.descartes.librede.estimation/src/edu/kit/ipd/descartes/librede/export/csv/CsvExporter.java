@@ -3,10 +3,10 @@ package edu.kit.ipd.descartes.librede.export.csv;
 import java.io.File;
 import java.io.PrintWriter;
 
-import edu.kit.ipd.descartes.librede.configuration.Component;
-import edu.kit.ipd.descartes.librede.configuration.ParameterDefinition;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.export.IExporter;
+import edu.kit.ipd.descartes.librede.factory.Component;
+import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 
