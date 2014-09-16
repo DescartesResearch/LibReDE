@@ -28,6 +28,7 @@ package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
 import edu.kit.ipd.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
+import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
@@ -40,6 +41,7 @@ import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 
+@Component(displayName = "Kalman Filter using Response Times and Utilization")
 public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 	
 	public static final String NAME = "ZhangKalmanFilter";
