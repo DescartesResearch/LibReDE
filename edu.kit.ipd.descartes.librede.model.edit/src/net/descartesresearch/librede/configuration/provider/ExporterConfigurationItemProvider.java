@@ -147,7 +147,7 @@ public class ExporterConfigurationItemProvider
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/ExporterConfiguration"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/ExporterConfiguration.png"));
 	}
 
 	/**
