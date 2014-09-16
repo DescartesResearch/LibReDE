@@ -27,9 +27,8 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
-import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+import net.descartesresearch.librede.configuration.Resource;
 import edu.kit.ipd.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
-import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
@@ -37,8 +36,8 @@ import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.Uti
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.factory.Component;
 
 @Component(displayName="Kalman Filter using Utilization Law")
 public class WangKalmanFilterApproach extends AbstractEstimationApproach {

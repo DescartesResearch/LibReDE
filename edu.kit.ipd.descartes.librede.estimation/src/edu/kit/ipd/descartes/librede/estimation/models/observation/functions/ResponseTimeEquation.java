@@ -33,13 +33,13 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import java.util.Arrays;
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
@@ -137,7 +137,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
 			double U_i = X.dot(D_i);
 
-			int p = res_i.getNumberOfParallelServers();
+			int p = res_i.getNumberOfServers();
 //			double P_q = calculateQueueingProbability(p, U_i);
 			
 			rt += D_ir / (p - U_i);

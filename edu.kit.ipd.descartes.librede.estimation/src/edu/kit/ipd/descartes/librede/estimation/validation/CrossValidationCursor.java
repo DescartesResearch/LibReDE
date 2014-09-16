@@ -29,13 +29,13 @@ package edu.kit.ipd.descartes.librede.estimation.validation;
 import java.util.Arrays;
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.ModelEntity;
 import cern.jet.random.sampling.RandomSampler;
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
 import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
 import edu.kit.ipd.descartes.librede.estimation.repository.IMonitoringRepository;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 
 public class CrossValidationCursor implements IRepositoryCursor {
 	
@@ -97,12 +97,12 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public TimeSeries getValues(IMetric metric, IModelEntity entity) {
+	public TimeSeries getValues(IMetric metric, ModelEntity entity) {
 		return delegate.getValues(metric, entity);
 	}
 
 	@Override
-	public double getAggregatedValue(IMetric metric, IModelEntity entity,
+	public double getAggregatedValue(IMetric metric, ModelEntity entity,
 			Aggregation func) {
 		return delegate.getAggregatedValue(metric, entity, func);
 	}
@@ -113,7 +113,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public boolean hasData(IMetric metric, List<IModelEntity> entities,
+	public boolean hasData(IMetric metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		return delegate.hasData(metric, entities, aggregation);
 	}

@@ -26,11 +26,12 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.state;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.IStateConstraint;
 import edu.kit.ipd.descartes.linalg.Matrix;

@@ -28,10 +28,10 @@ package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.ModelEntity;
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 
 public abstract class AbstractOutputFunction implements IOutputFunction {
@@ -71,7 +71,7 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
 			msg.append("metric = ").append(query.getMetric().toString()).append(" ");
 			msg.append("entities = { ");
-			for(IModelEntity entity : query.getEntities()) {
+			for(ModelEntity entity : query.getEntities()) {
 				msg.append(entity.getName()).append(" ");
 			}
 			msg.append(" } ");

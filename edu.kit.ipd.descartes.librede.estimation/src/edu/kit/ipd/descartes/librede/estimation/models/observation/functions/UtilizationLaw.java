@@ -31,11 +31,11 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import java.util.Arrays;
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.Resource;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.repository.Query;
 import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Range;
 import edu.kit.ipd.descartes.linalg.Scalar;
@@ -114,7 +114,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		return utilizationQuery.execute().getValue() * this.res_i.getNumberOfParallelServers();
+		return utilizationQuery.execute().getValue() * this.res_i.getNumberOfServers();
 	}
 
 }

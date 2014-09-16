@@ -28,7 +28,7 @@ package edu.kit.ipd.descartes.librede.estimation.repository;
 
 import java.util.UUID;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
+import net.descartesresearch.librede.configuration.ModelEntity;
 
 public interface IMetric {
 	
@@ -36,11 +36,11 @@ public interface IMetric {
 	
 	public String getDisplayName();
 	
-	public TimeSeries retrieve(IMonitoringRepository repository, IModelEntity entity, double start, double end);
+	public TimeSeries retrieve(IMonitoringRepository repository, ModelEntity entity, double start, double end);
 
-	public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func);
+	public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func);
 	
-	public boolean hasData(IMonitoringRepository repository, IModelEntity entity, double aggregationInterval);
+	public boolean hasData(IMonitoringRepository repository, ModelEntity entity, double aggregationInterval);
 	
 	public boolean isAggregationSupported(Aggregation aggregation);
 	

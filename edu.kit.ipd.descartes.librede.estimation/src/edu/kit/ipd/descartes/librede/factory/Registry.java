@@ -4,11 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
 
 public class Registry {

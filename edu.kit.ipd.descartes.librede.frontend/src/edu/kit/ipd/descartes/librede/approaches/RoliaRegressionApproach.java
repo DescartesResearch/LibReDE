@@ -27,7 +27,6 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
-import edu.kit.ipd.descartes.librede.configuration.Component;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.ScalarObservationModel;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ILinearOutputFunction;
@@ -36,6 +35,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.factory.Component;
 import edu.kit.ipd.descartes.librede.nnls.LeastSquaresRegression;
 
 @Component(displayName = "Least-squares Regression using Utilization Law")
