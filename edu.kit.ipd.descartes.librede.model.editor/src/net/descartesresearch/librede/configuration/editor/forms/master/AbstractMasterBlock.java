@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.MasterDetailsBlock;
 import org.eclipse.ui.forms.SectionPart;
@@ -65,7 +66,7 @@ public abstract class AbstractMasterBlock extends MasterDetailsBlock implements 
 	
 	@Override
 	protected void createToolBarActions(IManagedForm managedForm) {
-		managedForm.getForm().getToolBarManager().add(new RunEstimationAction());
+		managedForm.getForm().getToolBarManager().add(new RunEstimationAction(model));
 	}
 	
 	@Override
