@@ -39,12 +39,22 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Utiliza
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.librede.factory.Component;
+import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
 import edu.kit.ipd.descartes.librede.ipopt.java.RecursiveOptimization;
 
 @Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	
 	public static final String NAME = "MenasceOptimization";
+	
+	@ParameterDefinition(name = "SolutionTolerance", label = "Solution Tolerance", defaultValue = "1e-7")
+	private double solutionTolerance;
+	
+	@ParameterDefinition(name = "UpperBoundsInfValue", label = "Upper Bounds Infinity Value", defaultValue = "1e19")
+	private double upperBoundsInfValue;
+	
+	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
+	private double lowerBoundsInfValue;
 	
 	@Override
 	public void initialize(WorkloadDescription workload,
@@ -66,6 +76,8 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 		}
 
 		RecursiveOptimization estimator = new RecursiveOptimization();
+		estimator.setBoundsInfValue(lowerBoundsInfValue, upperBoundsInfValue);
+		estimator.setSolutionTolerance(solutionTolerance);
 		estimator.initialize(stateModel, observationModel, estimationWindow);
 		setEstimationAlgorithm(estimator);
 	}
