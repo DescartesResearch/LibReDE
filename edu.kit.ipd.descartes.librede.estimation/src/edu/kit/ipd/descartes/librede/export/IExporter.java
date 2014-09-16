@@ -24,34 +24,12 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.workload;
+package edu.kit.ipd.descartes.librede.export;
 
-import java.util.UUID;
+import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 
-/**
- * This represents a generic system entity in the workload description. Each
- * entity provides instrumentation points for which observation data can be
- * collected. Examples for system entities are resources or services.
- * 
- * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
- * @version 1.0
- */
-public interface IModelEntity {
-
-	/**
-	 * A unique identifier for this entity.
-	 * 
-	 * @return a UUID
-	 * @since 1.0
-	 */
-	UUID getId();
-
-	/**
-	 * A human-readable name for this entity.
-	 * 
-	 * @return a String
-	 * @since 1.0
-	 */
-	String getName();
+public interface IExporter {
+	
+	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception;
 
 }

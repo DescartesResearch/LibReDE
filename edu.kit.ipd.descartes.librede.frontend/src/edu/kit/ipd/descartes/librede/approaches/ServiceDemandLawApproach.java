@@ -27,6 +27,8 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.algorithm.SimpleApproximation;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
@@ -36,11 +38,10 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.linalg.AggregationFunction;
+import edu.kit.ipd.descartes.librede.factory.Component;
 
+@Component(displayName="Service Demand Law")
 public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 	
 	public static final String NAME = "ServiceDemandLaw";

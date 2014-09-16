@@ -27,7 +27,7 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
-import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
+import net.descartesresearch.librede.configuration.Resource;
 import edu.kit.ipd.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
 import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
@@ -36,12 +36,23 @@ import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.Uti
 import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.factory.Component;
+import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
 
+@Component(displayName="Kalman Filter using Utilization Law")
 public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 
 	public static final String NAME = "WangKalmanFilter";
+	
+	@ParameterDefinition(name = "StateNoiseCovariance", label = "State Noise Covariance", defaultValue = "1.0")
+	private double stateNoiseCovariance;
+	
+	@ParameterDefinition(name = "StateNoiseCoupling", label = "State Noise Coupling", defaultValue = "1.0")
+	private double stateNoiseCoupling;
+	
+	@ParameterDefinition(name = "ObserveNoiseCovariance", label = "Observe Noise Covariance", defaultValue = "0.0001")
+	private double observeNoiseCovariance;
 
 	@Override
 	public void initialize(WorkloadDescription workload,
@@ -60,6 +71,9 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 		}
 
 		ExtendedKalmanFilter estimator = new ExtendedKalmanFilter();
+		estimator.setStateNoiseCouplingConstant(stateNoiseCoupling);
+		estimator.setStateNoiseCovarianceConstant(stateNoiseCovariance);
+		estimator.setObserveNoiseConstant(observeNoiseCovariance);
 		estimator.initialize(stateModel, observationModel, estimationWindow);
 		setEstimationAlgorithm(estimator);
 	}

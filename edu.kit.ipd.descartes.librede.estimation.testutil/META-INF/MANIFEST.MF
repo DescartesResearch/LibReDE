@@ -9,4 +9,5 @@ Import-Package: edu.kit.ipd.descartes.librede.estimation.models.observation.func
  edu.kit.ipd.descartes.librede.estimation.repository,
  edu.kit.ipd.descartes.librede.estimation.workload,
  edu.kit.ipd.descartes.linalg,
+ net.descartesresearch.librede.configuration,
  org.junit;version="4.11.0"

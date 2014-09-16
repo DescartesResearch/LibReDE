@@ -28,7 +28,7 @@ package edu.kit.ipd.descartes.librede.estimation.repository;
 
 import java.util.List;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
+import net.descartesresearch.librede.configuration.ModelEntity;
 
 public interface IRepositoryCursor {
 
@@ -44,15 +44,15 @@ public interface IRepositoryCursor {
 
 	double getCurrentIntervalEnd();
 
-	TimeSeries getValues(IMetric metric, IModelEntity entity);
+	TimeSeries getValues(IMetric metric, ModelEntity entity);
 
 	double getAggregatedValue(IMetric metric,
-			IModelEntity entity, Aggregation func);
+			ModelEntity entity, Aggregation func);
 
 	IMonitoringRepository getRepository();
 
 	boolean hasData(IMetric metric,
-			List<IModelEntity> entities, Aggregation aggregation);
+			List<ModelEntity> entities, Aggregation aggregation);
 
 	int getAvailableIntervals();
 

@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.linalg.Range;
 
 public class State {

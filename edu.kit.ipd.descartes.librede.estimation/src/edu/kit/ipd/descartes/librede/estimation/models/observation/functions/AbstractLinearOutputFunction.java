@@ -26,13 +26,13 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.models.diff.IDifferentiableFunction;
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;

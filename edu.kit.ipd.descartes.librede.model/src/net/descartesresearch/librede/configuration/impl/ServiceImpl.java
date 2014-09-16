@@ -24,63 +24,41 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.workload;
+/**
+ */
+package net.descartesresearch.librede.configuration.impl;
 
-import java.util.UUID;
+import net.descartesresearch.librede.configuration.ConfigurationPackage;
+import net.descartesresearch.librede.configuration.Service;
+import org.eclipse.emf.ecore.EClass;
 
 /**
- * A service represents a functional endpoint of the system that processes
- * requests of a certain type. It corresponds to the concept of a workload class
- * in the queueing theory.
- * 
- * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
- * @version 1.0
+ * <!-- begin-user-doc -->
+ * An implementation of the model object '<em><b>Service</b></em>'.
+ * <!-- end-user-doc -->
+ * <p>
+ * </p>
+ *
+ * @generated
  */
-public class Service implements IModelEntity {
-
-	private final UUID id;
-	private final String name;
-
-	public Service(String name) {
+public class ServiceImpl extends ModelEntityImpl implements Service {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ServiceImpl() {
 		super();
-		this.id = UUID.randomUUID();
-		this.name = name;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
-	public UUID getId() {
-		return id;
+	protected EClass eStaticClass() {
+		return ConfigurationPackage.Literals.SERVICE;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Service other = (Service) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Service: " + name;
-	}
-
-}
+} //ServiceImpl

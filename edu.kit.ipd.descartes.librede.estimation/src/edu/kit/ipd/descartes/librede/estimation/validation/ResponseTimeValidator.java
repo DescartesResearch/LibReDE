@@ -29,14 +29,16 @@ package edu.kit.ipd.descartes.librede.estimation.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ResponseTimeEquation;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.factory.Component;
 import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;
 
+@Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements Validator {
 	
 	private List<ResponseTimeEquation> respEq;

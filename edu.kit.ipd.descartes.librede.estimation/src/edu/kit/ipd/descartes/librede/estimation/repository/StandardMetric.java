@@ -37,22 +37,22 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import net.descartesresearch.librede.configuration.ModelEntity;
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries.Interpolation;
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
 
 public enum StandardMetric implements IMetric {
 	
-	IDLE_TIME(SUM) {
+	IDLE_TIME("idle time", SUM) {
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries series = repository.getData(this, entity);
 			return series.subset(start, end);
 		}
 
 		@Override
 		public double aggregate(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end, Aggregation func) {
+				ModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
 				TimeSeries series = retrieve(repository, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
@@ -64,23 +64,23 @@ public enum StandardMetric implements IMetric {
 
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			return repository.containsData(this, entity, aggregationInterval);
 		}
 	},
 	
-	BUSY_TIME(SUM) {
+	BUSY_TIME("busy time", SUM) {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries series = repository.getData(this, entity);
 			return series.subset(start, end);
 		}
 
 		@Override
 		public double aggregate(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end, Aggregation func) {
+				ModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
 				TimeSeries series = retrieve(repository, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
@@ -92,15 +92,15 @@ public enum StandardMetric implements IMetric {
 
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			return repository.containsData(this, entity, aggregationInterval);
 		}		
 	},
 
-	UTILIZATION(AVERAGE) {	
+	UTILIZATION("utilization", AVERAGE) {	
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
 				TimeSeries series = retrieve(repository, entity, start, end);
 				series.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
@@ -112,14 +112,14 @@ public enum StandardMetric implements IMetric {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries series = repository.getData(this, entity);
 			return series.subset(start, end);
 		}
 		
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			if (repository.containsData(this, entity, aggregationInterval)) {
 				return true;
 			}
@@ -128,11 +128,11 @@ public enum StandardMetric implements IMetric {
 
 	},
 
-	ARRIVALS(NONE, SUM, MINIMUM, MAXIMUM) {
+	ARRIVALS("arrivals", NONE, SUM, MINIMUM, MAXIMUM) {
 		
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries ts = repository.getData(ARRIVALS, entity);
 			if (ts.isEmpty()) {
 				TimeSeries resp = repository.getData(RESPONSE_TIME, entity);
@@ -150,7 +150,7 @@ public enum StandardMetric implements IMetric {
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func) {
 			TimeSeries series = retrieve(repository, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
@@ -170,7 +170,7 @@ public enum StandardMetric implements IMetric {
 		
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			if (repository.containsData(this, entity, aggregationInterval)) {
 				return true;
 			}
@@ -178,11 +178,11 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	DEPARTURES(NONE, SUM, MINIMUM, MAXIMUM) {
+	DEPARTURES("departures", NONE, SUM, MINIMUM, MAXIMUM) {
 		
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries ts = repository.getData(DEPARTURES, entity);
 			if (ts.isEmpty()) {
 				TimeSeries resp = repository.getData(RESPONSE_TIME, entity);
@@ -200,7 +200,7 @@ public enum StandardMetric implements IMetric {
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func) {
 			TimeSeries series = retrieve(repository, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
@@ -220,7 +220,7 @@ public enum StandardMetric implements IMetric {
 		
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			if (repository.containsData(this, entity, aggregationInterval)) {
 				return true;
 			}
@@ -228,10 +228,10 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	ARRIVAL_RATE(AVERAGE) {
+	ARRIVAL_RATE("arrival rate", AVERAGE) {
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
 				TimeSeries ts = retrieve(repository, entity, start, end);
 				if (ts.isEmpty()) {
@@ -247,24 +247,24 @@ public enum StandardMetric implements IMetric {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries series = repository.getData(this, entity);
 			return series.subset(start, end);
 		}
 		
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			if (repository.containsData(this, entity, aggregationInterval)) {
 				return true;
 			}
 			return ARRIVALS.hasData(repository, entity, aggregationInterval);
 		}
 	},
-	THROUGHPUT(AVERAGE) {
+	THROUGHPUT("throughput", AVERAGE) {
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func) {
 			if (isAggregationSupported(func)) {
 				TimeSeries ts = retrieve(repository, entity, start, end);
 				if (ts.isEmpty()) {
@@ -280,14 +280,14 @@ public enum StandardMetric implements IMetric {
 		
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries series = repository.getData(this, entity);
 			return series.subset(start, end);
 		}
 		
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			if (repository.containsData(this, entity, aggregationInterval)) {
 				return true;
 			}
@@ -295,10 +295,10 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	RESPONSE_TIME(NONE, AVERAGE, MINIMUM, MAXIMUM) {
+	RESPONSE_TIME("reponse time", NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, IModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, ModelEntity entity, double start, double end, Aggregation func) {
 			TimeSeries series = retrieve(repository, entity, start, end);
 			switch (func) {
 			case AVERAGE: {
@@ -330,7 +330,7 @@ public enum StandardMetric implements IMetric {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			TimeSeries ts = repository.getData(this, entity);
 			if (ts.isEmpty()) {
 				TimeSeries arriv = repository.getData(ARRIVALS, entity);
@@ -345,7 +345,7 @@ public enum StandardMetric implements IMetric {
 		
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			if (repository.containsData(this, entity, aggregationInterval)) {
 				return true;
 			}
@@ -353,17 +353,17 @@ public enum StandardMetric implements IMetric {
 		}
 
 	},
-	QUEUE_LENGTH_SEEN_ON_ARRIVAL(NONE, AVERAGE, MINIMUM, MAXIMUM) {
+	QUEUE_LENGTH_SEEN_ON_ARRIVAL("queue length seen on arrival", NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
 		@Override
 		public TimeSeries retrieve(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end) {
+				ModelEntity entity, double start, double end) {
 			return repository.getData(this, entity).subset(start, end);
 		}
 
 		@Override
 		public double aggregate(IMonitoringRepository repository,
-				IModelEntity entity, double start, double end, Aggregation func) {
+				ModelEntity entity, double start, double end, Aggregation func) {
 			TimeSeries series = retrieve(repository, entity, start, end);
 			switch(func) {
 			case AVERAGE: {
@@ -393,18 +393,25 @@ public enum StandardMetric implements IMetric {
 
 		@Override
 		public boolean hasData(IMonitoringRepository repository,
-				IModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, double aggregationInterval) {
 			return repository.containsData(this, entity, aggregationInterval);
 		}
 		
 	};
 
 	private final UUID id;
+	private String displayName;
 	private final EnumSet<Aggregation> supportedAggregations;
 
-	private StandardMetric(Aggregation... aggregations) {
+	private StandardMetric(String displayName, Aggregation... aggregations) {
 		id = UUID.randomUUID();
+		this.displayName = displayName;
 		supportedAggregations = EnumSet.copyOf(Arrays.asList(aggregations));
+	}
+	
+	@Override
+	public String getDisplayName() {
+		return displayName;
 	}
 	
 	@Override

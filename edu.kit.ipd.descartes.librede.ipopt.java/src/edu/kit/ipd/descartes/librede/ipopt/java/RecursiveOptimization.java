@@ -66,10 +66,6 @@ import edu.kit.ipd.descartes.linalg.Vector;
 
 public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
 
-	private final static double OPTION_TOL_VALUE = 1e-7;
-	private final static double OPTION_LNP_LOWER_BOUND_INF_VALUE = -1e+19;
-	private final static double OPTION_LNP_UPPER_BOUND_INF_VALUE = 1e+19;
-	
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
 	
@@ -120,8 +116,32 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 	private Pointer x; /* double[stateSize] : initial and solution vector */
 	private DoubleByReference obj; /* current objective value of optimization */
 	
+	// Tolerance level for solution
+	private double solutionTolerance = 1e-7;
+	
+	// Determines when a value returned by g(x) is considered Inf
+	private double lowerBoundInfValue = 1e-19;
+	private double upperBoundInfValue = 1e+19;
+	
 	private Matrix estimationBuffer;
-			
+	
+	/**
+	 * Sets the tolerance level for an acceptable solution
+	 * @param solutionTolerance
+	 */
+	public void setSolutionTolerance(double solutionTolerance) {
+		this.solutionTolerance = solutionTolerance;
+	}
+
+	/**
+	 * Sets the interval outside which values of constraints are considered infinite.
+	 * @param lower
+	 * @param upper
+	 */
+	public void setBoundsInfValue(double lower, double upper) {
+		this.lowerBoundInfValue = lower;
+		this.upperBoundInfValue = upper;
+	}
 	
 	/* (non-Javadoc)
 	 * @see edu.kit.ipd.descartes.librede.estimation.models.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel, edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel, int)
@@ -233,9 +253,9 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 //				IpoptOptionValue.SECOND_ORDER.toNativeString());
 //		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST_PRINT_ALL.toNativeString(), 
 //				IpoptOptionValue.YES.toNativeString());
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), OPTION_TOL_VALUE);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), OPTION_LNP_LOWER_BOUND_INF_VALUE);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), OPTION_LNP_UPPER_BOUND_INF_VALUE);		
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundInfValue);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundInfValue);		
 	}
 
 	private void setOptimizationConstraints() {
@@ -259,7 +279,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 		/* set the values for the variable bounds to default value */
 		for (int i = 0; i < stateSize; i++) {
 			NativeHelper.setDoubleArray(x_L, i, 0);
-			NativeHelper.setDoubleArray(x_U, i, OPTION_LNP_UPPER_BOUND_INF_VALUE);
+			NativeHelper.setDoubleArray(x_U, i, upperBoundInfValue);
 		}
 		
 		for (StateBoundsConstraint c : boundsConstraints) {

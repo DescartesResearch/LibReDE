@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity;
+import net.descartesresearch.librede.configuration.ModelEntity;
 
 
 public class AggregationRepositoryCursor implements IRepositoryCursor {
@@ -38,9 +38,9 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	private static class SeriesCacheKey {
 		
 		public final IMetric metric;
-		public final IModelEntity entity;
+		public final ModelEntity entity;
 		
-		public SeriesCacheKey(IMetric metric, IModelEntity entity) {
+		public SeriesCacheKey(IMetric metric, ModelEntity entity) {
 			this.metric = metric;
 			this.entity = entity;
 		}
@@ -82,10 +82,10 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	private static class AggregationCacheKey {
 		
 		public final IMetric metric;
-		public final IModelEntity entity;
+		public final ModelEntity entity;
 		public final Aggregation aggregation;
 		
-		public AggregationCacheKey(IMetric metric, IModelEntity entity, Aggregation aggregation) {
+		public AggregationCacheKey(IMetric metric, ModelEntity entity, Aggregation aggregation) {
 			this.metric = metric;
 			this.entity = entity;
 			this.aggregation = aggregation;
@@ -215,7 +215,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getValues(edu.kit.ipd.descartes.librede.estimation.repository.IMetric, edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity)
 	 */
 	@Override
-	public TimeSeries getValues(IMetric metric, IModelEntity entity) {
+	public TimeSeries getValues(IMetric metric, ModelEntity entity) {
 		SeriesCacheKey key = new SeriesCacheKey(metric, entity);
 		if (!seriesCache.containsKey(key)) {
 			TimeSeries series = metric.retrieve(repository, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
@@ -229,7 +229,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#getAggregatedValue(edu.kit.ipd.descartes.librede.estimation.repository.IMetric, edu.kit.ipd.descartes.librede.estimation.workload.IModelEntity, edu.kit.ipd.descartes.librede.estimation.repository.Aggregation)
 	 */
 	@Override
-	public double getAggregatedValue(IMetric metric, IModelEntity entity, Aggregation func) {
+	public double getAggregatedValue(IMetric metric, ModelEntity entity, Aggregation func) {
 		AggregationCacheKey key = new AggregationCacheKey(metric, entity, func);
 		if (!aggregationCache.containsKey(key)) {
 			double value = metric.aggregate(repository, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
@@ -251,11 +251,11 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor#hasData(edu.kit.ipd.descartes.librede.estimation.repository.IMetric, java.util.List, edu.kit.ipd.descartes.librede.estimation.repository.Aggregation)
 	 */
 	@Override
-	public boolean hasData(IMetric metric, List<IModelEntity> entities,
+	public boolean hasData(IMetric metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		if (metric.isAggregationSupported(aggregation)) {
 			boolean data = true;
-			for (IModelEntity e : entities) {
+			for (ModelEntity e : entities) {
 				if (aggregation == Aggregation.NONE) {
 					data = data && metric.hasData(repository, e, 0.0);
 				} else {

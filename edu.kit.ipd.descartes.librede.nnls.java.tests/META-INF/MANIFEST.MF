@@ -13,6 +13,7 @@ Import-Package: edu.kit.ipd.descartes.librede.estimation.models.observation,
  edu.kit.ipd.descartes.librede.nnls,
  edu.kit.ipd.descartes.linalg,
  edu.kit.ipd.descartes.linalg.testutil,
+ net.descartesresearch.librede.configuration,
  org.apache.commons.math3.stat.regression,
  org.fest.assertions.api,
  org.fest.assertions.data

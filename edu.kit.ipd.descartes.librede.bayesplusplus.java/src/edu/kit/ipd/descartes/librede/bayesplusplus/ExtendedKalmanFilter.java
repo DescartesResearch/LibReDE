@@ -121,6 +121,38 @@ public class ExtendedKalmanFilter extends
 	private Pointer nativeStateModel = null;
 	private Pointer nativeScheme = null;
 	private Pointer stateBuffer;
+	
+	private double stateNoiseCovarianceConstant = 1.0;
+	private double stateNoiseCouplingConstant = 1.0;
+	private double observeNoiseConstant = 0.0001;
+	
+	/**
+	 * Sets a constant value used for all entries of the state noise vector.
+	 * 
+	 * @param stateNoiseCovarianceConstant
+	 */
+	public void setStateNoiseCovarianceConstant(
+			double stateNoiseCovarianceConstant) {
+		this.stateNoiseCovarianceConstant = stateNoiseCovarianceConstant;
+	}
+	
+	/**
+	 * Sets a constant value used to initialize the diagonal of the corresponding matrix.
+	 * 
+	 * @param stateNoiseCouplingConstant
+	 */
+	public void setStateNoiseCouplingConstant(double stateNoiseCouplingConstant) {
+		this.stateNoiseCouplingConstant = stateNoiseCouplingConstant;
+	}
+	
+	/**
+	 * Sets a constant value used to initialize the elements of the observe noise vector
+	 * 
+	 * @param observeNoiseConstant
+	 */
+	public void setObserveNoiseConstant(double observeNoiseConstant) {
+		this.observeNoiseConstant = observeNoiseConstant;
+	}
 
 	private void initNativeKalmanFilter() throws InitializationException {
 		nativeScheme = BayesPlusPlusLibrary.create_covariance_scheme(stateSize);
@@ -153,7 +185,7 @@ public class ExtendedKalmanFilter extends
 		stateNoiseCovariance = vector(stateSize, new VectorFunction() {			
 			@Override
 			public double cell(int row) {
-				return 1.0;
+				return stateNoiseCovarianceConstant;
 			}
 		});
 		toNative(stateBuffer, stateNoiseCovariance);
@@ -164,7 +196,7 @@ public class ExtendedKalmanFilter extends
 			@Override
 			public double cell(int row, int column) {
 				if (row == column) {
-					return 1.0;
+					return stateNoiseCouplingConstant;
 				} else {
 					return 0.0;
 				}
@@ -190,7 +222,7 @@ public class ExtendedKalmanFilter extends
 		observeNoise = vector(outputSize, new VectorFunction() {			
 			@Override
 			public double cell(int row) {
-				return 0.0001;
+				return observeNoiseConstant;
 			}
 		});
 		toNative(buffer, observeNoise);

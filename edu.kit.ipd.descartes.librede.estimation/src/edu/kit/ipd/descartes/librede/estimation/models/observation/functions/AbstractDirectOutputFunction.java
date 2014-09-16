@@ -28,8 +28,8 @@ package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
 
 import java.util.Arrays;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.Resource;
-import edu.kit.ipd.descartes.librede.estimation.workload.Service;
+import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.Vector;

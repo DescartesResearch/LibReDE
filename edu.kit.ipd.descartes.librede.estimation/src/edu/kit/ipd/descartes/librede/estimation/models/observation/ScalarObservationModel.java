@@ -26,7 +26,7 @@
  */
 package edu.kit.ipd.descartes.librede.estimation.models.observation;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.*;
+import static edu.kit.ipd.descartes.linalg.LinAlg.scalar;
 
 import java.util.ArrayList;
 import java.util.Iterator;
