@@ -5,9 +5,11 @@ package net.descartesresearch.librede.configuration.provider;
 
 import java.util.Collection;
 import java.util.List;
+
 import net.descartesresearch.librede.configuration.ConfigurationFactory;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
 import net.descartesresearch.librede.configuration.DataSourceConfiguration;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.ResourceLocator;
@@ -18,10 +20,13 @@ import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
+import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
+
+import edu.kit.ipd.descartes.librede.factory.Registry;
 
 /**
  * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.DataSourceConfiguration} object.
@@ -32,7 +37,12 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 public class DataSourceConfigurationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
+		IEditingDomainItemProvider,
+		IStructuredItemContentProvider,
+		ITreeItemContentProvider,
+		IItemLabelProvider,
+		IItemPropertySource,
+		ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -54,30 +64,30 @@ public class DataSourceConfigurationItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addDataProviderPropertyDescriptor(object);
+			addNamePropertyDescriptor(object);
 			addTypePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Data Provider feature.
+	 * This adds a property descriptor for the Name feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addDataProviderPropertyDescriptor(Object object) {
+	protected void addNamePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_DataSourceConfiguration_dataProvider_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_DataSourceConfiguration_dataProvider_feature", "_UI_DataSourceConfiguration_type"),
-				 ConfigurationPackage.Literals.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER,
+				 getString("_UI_NamedElement_name_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_NamedElement_name_feature", "_UI_NamedElement_type"),
+				 ConfigurationPackage.Literals.NAMED_ELEMENT__NAME,
 				 true,
 				 false,
-				 true,
-				 null,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
 				 null,
 				 null));
 	}
@@ -149,15 +159,18 @@ public class DataSourceConfigurationItemProvider
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String getText(Object object) {
-		Class labelValue = ((DataSourceConfiguration)object).getType();
-		String label = labelValue == null ? null : labelValue.toString();
-		return label == null || label.length() == 0 ?
-			getString("_UI_DataSourceConfiguration_type") :
-			getString("_UI_DataSourceConfiguration_type") + " " + label;
+		DataSourceConfiguration dataSource = (DataSourceConfiguration)object;
+		StringBuilder label = new StringBuilder(dataSource.getName());
+		Class<?> type = dataSource.getType();
+		String typeDisplay = Registry.INSTANCE.getDisplayName(type);
+		if (typeDisplay != null && !typeDisplay.isEmpty()) {
+			label.append(" (").append(typeDisplay).append(")");
+		}
+		return label.toString();
 	}
 	
 
@@ -173,6 +186,7 @@ public class DataSourceConfigurationItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(DataSourceConfiguration.class)) {
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__NAME:
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__TYPE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
@@ -209,6 +223,28 @@ public class DataSourceConfigurationItemProvider
 	@Override
 	public ResourceLocator getResourceLocator() {
 		return LibredeEditPlugin.INSTANCE;
+	}
+	
+	/**
+	 * Return the column image for a column index.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public Object getColumnImage(Object object, int columnIndex) {
+		return getImage(object);
+	}
+
+	/**
+	 * Return the column text for a column index.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		return getText(object);
 	}
 
 }

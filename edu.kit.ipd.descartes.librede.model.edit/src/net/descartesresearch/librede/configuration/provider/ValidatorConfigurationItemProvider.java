@@ -18,10 +18,12 @@ import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
+import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
+import edu.kit.ipd.descartes.librede.factory.Registry;
 
 /**
  * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.ValidatorConfiguration} object.
@@ -32,7 +34,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 public class ValidatorConfigurationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
+		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -126,15 +128,12 @@ public class ValidatorConfigurationItemProvider
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String getText(Object object) {
-		Class labelValue = ((ValidatorConfiguration)object).getType();
-		String label = labelValue == null ? null : labelValue.toString();
-		return label == null || label.length() == 0 ?
-			getString("_UI_ValidatorConfiguration_type") :
-			getString("_UI_ValidatorConfiguration_type") + " " + label;
+		Class type = ((ValidatorConfiguration)object).getType();
+		return Registry.INSTANCE.getDisplayName(type);
 	}
 	
 
@@ -186,6 +185,16 @@ public class ValidatorConfigurationItemProvider
 	@Override
 	public ResourceLocator getResourceLocator() {
 		return LibredeEditPlugin.INSTANCE;
+	}
+	
+	@Override
+	public Object getColumnImage(Object object, int columnIndex) {
+		return getImage(object);
+	}
+	
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		return getText(object);
 	}
 
 }

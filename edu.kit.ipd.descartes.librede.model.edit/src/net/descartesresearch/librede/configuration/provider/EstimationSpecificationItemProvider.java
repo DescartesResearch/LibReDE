@@ -12,12 +12,15 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.ResourceLocator;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
+import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
@@ -30,7 +33,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 public class EstimationSpecificationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
+		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -52,8 +55,123 @@ public class EstimationSpecificationItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
+			addRecursivePropertyDescriptor(object);
+			addWindowPropertyDescriptor(object);
+			addStepSizePropertyDescriptor(object);
+			addStartTimestampPropertyDescriptor(object);
+			addEndTimestampPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
+	}
+
+	/**
+	 * This adds a property descriptor for the Recursive feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addRecursivePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_EstimationSpecification_recursive_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationSpecification_recursive_feature", "_UI_EstimationSpecification_type"),
+				 ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__RECURSIVE,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Window feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addWindowPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_EstimationSpecification_window_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationSpecification_window_feature", "_UI_EstimationSpecification_type"),
+				 ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__WINDOW,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Step Size feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addStepSizePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_EstimationSpecification_stepSize_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationSpecification_stepSize_feature", "_UI_EstimationSpecification_type"),
+				 ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__STEP_SIZE,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Start Timestamp feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addStartTimestampPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_EstimationSpecification_startTimestamp_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationSpecification_startTimestamp_feature", "_UI_EstimationSpecification_type"),
+				 ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the End Timestamp feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addEndTimestampPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_EstimationSpecification_endTimestamp_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_EstimationSpecification_endTimestamp_feature", "_UI_EstimationSpecification_type"),
+				 ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
 	}
 
 	/**
@@ -101,10 +219,11 @@ public class EstimationSpecificationItemProvider
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String getText(Object object) {
+		EstimationSpecification estimationSpecification = (EstimationSpecification)object;
 		return getString("_UI_EstimationSpecification_type");
 	}
 	
@@ -121,6 +240,13 @@ public class EstimationSpecificationItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(EstimationSpecification.class)) {
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__RECURSIVE:
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__WINDOW:
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__STEP_SIZE:
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__START_TIMESTAMP:
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;

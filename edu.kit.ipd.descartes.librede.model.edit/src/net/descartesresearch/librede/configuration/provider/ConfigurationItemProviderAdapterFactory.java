@@ -18,6 +18,7 @@ import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.INotifyChangedListener;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
+import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 
 /**
@@ -66,6 +67,7 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		supportedTypes.add(ITreeItemContentProvider.class);
 		supportedTypes.add(IItemLabelProvider.class);
 		supportedTypes.add(IItemPropertySource.class);
+		supportedTypes.add(ITableItemLabelProvider.class);
 	}
 
 	/**
@@ -89,29 +91,6 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		}
 
 		return libredeConfigurationItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.DataProviderConfiguration} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected DataProviderConfigurationItemProvider dataProviderConfigurationItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.DataProviderConfiguration}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Adapter createDataProviderConfigurationAdapter() {
-		if (dataProviderConfigurationItemProvider == null) {
-			dataProviderConfigurationItemProvider = new DataProviderConfigurationItemProvider(this);
-		}
-
-		return dataProviderConfigurationItemProvider;
 	}
 
 	/**
@@ -414,6 +393,75 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.FileTraceConfiguration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected FileTraceConfigurationItemProvider fileTraceConfigurationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.FileTraceConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createFileTraceConfigurationAdapter() {
+		if (fileTraceConfigurationItemProvider == null) {
+			fileTraceConfigurationItemProvider = new FileTraceConfigurationItemProvider(this);
+		}
+
+		return fileTraceConfigurationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.TraceToEntityMapping} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TraceToEntityMappingItemProvider traceToEntityMappingItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.TraceToEntityMapping}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createTraceToEntityMappingAdapter() {
+		if (traceToEntityMappingItemProvider == null) {
+			traceToEntityMappingItemProvider = new TraceToEntityMappingItemProvider(this);
+		}
+
+		return traceToEntityMappingItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link net.descartesresearch.librede.configuration.ModelEntity} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ModelEntityItemProvider modelEntityItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link net.descartesresearch.librede.configuration.ModelEntity}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createModelEntityAdapter() {
+		if (modelEntityItemProvider == null) {
+			modelEntityItemProvider = new ModelEntityItemProvider(this);
+		}
+
+		return modelEntityItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -513,7 +561,7 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	 */
 	public void dispose() {
 		if (libredeConfigurationItemProvider != null) libredeConfigurationItemProvider.dispose();
-		if (dataProviderConfigurationItemProvider != null) dataProviderConfigurationItemProvider.dispose();
+		if (dataSourceConfigurationItemProvider != null) dataSourceConfigurationItemProvider.dispose();
 		if (workloadDescriptionItemProvider != null) workloadDescriptionItemProvider.dispose();
 		if (inputSpecificationItemProvider != null) inputSpecificationItemProvider.dispose();
 		if (estimationApproachConfigurationItemProvider != null) estimationApproachConfigurationItemProvider.dispose();
@@ -524,9 +572,11 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (parameterItemProvider != null) parameterItemProvider.dispose();
 		if (estimationSpecificationItemProvider != null) estimationSpecificationItemProvider.dispose();
 		if (validationSpecificationItemProvider != null) validationSpecificationItemProvider.dispose();
-		if (dataSourceConfigurationItemProvider != null) dataSourceConfigurationItemProvider.dispose();
 		if (validatorConfigurationItemProvider != null) validatorConfigurationItemProvider.dispose();
 		if (exporterConfigurationItemProvider != null) exporterConfigurationItemProvider.dispose();
+		if (fileTraceConfigurationItemProvider != null) fileTraceConfigurationItemProvider.dispose();
+		if (traceToEntityMappingItemProvider != null) traceToEntityMappingItemProvider.dispose();
+		if (modelEntityItemProvider != null) modelEntityItemProvider.dispose();
 	}
 
 }
