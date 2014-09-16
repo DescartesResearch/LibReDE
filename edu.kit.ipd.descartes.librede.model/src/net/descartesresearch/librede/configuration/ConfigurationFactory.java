@@ -31,15 +31,6 @@ public interface ConfigurationFactory extends EFactory {
 	LibredeConfiguration createLibredeConfiguration();
 
 	/**
-	 * Returns a new object of class '<em>Data Provider Configuration</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Data Provider Configuration</em>'.
-	 * @generated
-	 */
-	DataProviderConfiguration createDataProviderConfiguration();
-
-	/**
 	 * Returns a new object of class '<em>Data Source Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -155,6 +146,33 @@ public interface ConfigurationFactory extends EFactory {
 	 * @generated
 	 */
 	ExporterConfiguration createExporterConfiguration();
+
+	/**
+	 * Returns a new object of class '<em>File Trace Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>File Trace Configuration</em>'.
+	 * @generated
+	 */
+	FileTraceConfiguration createFileTraceConfiguration();
+
+	/**
+	 * Returns a new object of class '<em>Trace To Entity Mapping</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Trace To Entity Mapping</em>'.
+	 * @generated
+	 */
+	TraceToEntityMapping createTraceToEntityMapping();
+
+	/**
+	 * Returns a new object of class '<em>Model Entity</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Model Entity</em>'.
+	 * @generated
+	 */
+	ModelEntity createModelEntity();
 
 	/**
 	 * Returns the package supported by this factory.

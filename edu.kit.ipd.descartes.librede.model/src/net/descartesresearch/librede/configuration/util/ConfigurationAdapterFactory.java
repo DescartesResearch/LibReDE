@@ -72,8 +72,8 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createLibredeConfigurationAdapter();
 			}
 			@Override
-			public Adapter caseDataProviderConfiguration(DataProviderConfiguration object) {
-				return createDataProviderConfigurationAdapter();
+			public Adapter caseDataSourceConfiguration(DataSourceConfiguration object) {
+				return createDataSourceConfigurationAdapter();
 			}
 			@Override
 			public Adapter caseWorkloadDescription(WorkloadDescription object) {
@@ -116,16 +116,28 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createValidationSpecificationAdapter();
 			}
 			@Override
-			public Adapter caseDataSourceConfiguration(DataSourceConfiguration object) {
-				return createDataSourceConfigurationAdapter();
-			}
-			@Override
 			public Adapter caseValidatorConfiguration(ValidatorConfiguration object) {
 				return createValidatorConfigurationAdapter();
 			}
 			@Override
 			public Adapter caseExporterConfiguration(ExporterConfiguration object) {
 				return createExporterConfigurationAdapter();
+			}
+			@Override
+			public Adapter caseFileTraceConfiguration(FileTraceConfiguration object) {
+				return createFileTraceConfigurationAdapter();
+			}
+			@Override
+			public Adapter caseNamedElement(NamedElement object) {
+				return createNamedElementAdapter();
+			}
+			@Override
+			public Adapter caseTraceToEntityMapping(TraceToEntityMapping object) {
+				return createTraceToEntityMappingAdapter();
+			}
+			@Override
+			public Adapter caseModelEntity(ModelEntity object) {
+				return createModelEntityAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -158,20 +170,6 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createLibredeConfigurationAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.DataProviderConfiguration <em>Data Provider Configuration</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.descartesresearch.librede.configuration.DataProviderConfiguration
-	 * @generated
-	 */
-	public Adapter createDataProviderConfigurationAdapter() {
 		return null;
 	}
 
@@ -354,6 +352,62 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createExporterConfigurationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.FileTraceConfiguration <em>File Trace Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.FileTraceConfiguration
+	 * @generated
+	 */
+	public Adapter createFileTraceConfigurationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.NamedElement <em>Named Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.NamedElement
+	 * @generated
+	 */
+	public Adapter createNamedElementAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.TraceToEntityMapping <em>Trace To Entity Mapping</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.TraceToEntityMapping
+	 * @generated
+	 */
+	public Adapter createTraceToEntityMappingAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.descartesresearch.librede.configuration.ModelEntity <em>Model Entity</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.descartesresearch.librede.configuration.ModelEntity
+	 * @generated
+	 */
+	public Adapter createModelEntityAdapter() {
 		return null;
 	}
 

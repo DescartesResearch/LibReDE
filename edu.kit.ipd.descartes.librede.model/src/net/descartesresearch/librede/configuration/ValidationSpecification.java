@@ -14,6 +14,8 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.descartesresearch.librede.configuration.ValidationSpecification#getValidators <em>Validators</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.ValidationSpecification#getValidationFolds <em>Validation Folds</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.ValidationSpecification#isValidateEstimates <em>Validate Estimates</em>}</li>
  * </ul>
  * </p>
  *
@@ -38,4 +40,58 @@ public interface ValidationSpecification extends EObject {
 	 * @generated
 	 */
 	EList<ValidatorConfiguration> getValidators();
+
+	/**
+	 * Returns the value of the '<em><b>Validation Folds</b></em>' attribute.
+	 * The default value is <code>"1"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Validation Folds</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Validation Folds</em>' attribute.
+	 * @see #setValidationFolds(int)
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getValidationSpecification_ValidationFolds()
+	 * @model default="1" required="true"
+	 * @generated
+	 */
+	int getValidationFolds();
+
+	/**
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.ValidationSpecification#getValidationFolds <em>Validation Folds</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Validation Folds</em>' attribute.
+	 * @see #getValidationFolds()
+	 * @generated
+	 */
+	void setValidationFolds(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Validate Estimates</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Validate Estimates</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Validate Estimates</em>' attribute.
+	 * @see #setValidateEstimates(boolean)
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getValidationSpecification_ValidateEstimates()
+	 * @model default="false" required="true"
+	 * @generated
+	 */
+	boolean isValidateEstimates();
+
+	/**
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.ValidationSpecification#isValidateEstimates <em>Validate Estimates</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Validate Estimates</em>' attribute.
+	 * @see #isValidateEstimates()
+	 * @generated
+	 */
+	void setValidateEstimates(boolean value);
 } // ValidationSpecification

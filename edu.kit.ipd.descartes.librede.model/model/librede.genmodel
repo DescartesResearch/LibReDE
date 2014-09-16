@@ -3,7 +3,7 @@
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/edu.kit.ipd.descartes.librede.model/src" modelPluginID="edu.kit.ipd.descartes.librede.model"
     modelName="Librede" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
     importerID="org.eclipse.emf.importer.ecore" complianceLevel="7.0" copyrightFields="false"
-    operationReflection="true" importOrganizing="true">
+    tableProviders="true" operationReflection="true" importOrganizing="true">
   <foreignModel>librede.ecore</foreignModel>
   <genPackages prefix="Configuration" basePackage="net.descartesresearch.librede"
       disposableProviderFactory="true" contentTypeIdentifier="" ecorePackage="librede.ecore#/"
@@ -21,16 +21,16 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//LibredeConfiguration/output"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//LibredeConfiguration/validation"/>
     </genClasses>
-    <genClasses ecoreClass="librede.ecore#//DataProviderConfiguration">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//DataProviderConfiguration/parameters"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//DataProviderConfiguration/type"/>
+    <genClasses ecoreClass="librede.ecore#//DataSourceConfiguration">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//DataSourceConfiguration/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//DataSourceConfiguration/parameters"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//WorkloadDescription">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//WorkloadDescription/resources"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//WorkloadDescription/services"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//InputSpecification">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//InputSpecification/dataProviders"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//InputSpecification/dataSources"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//InputSpecification/observations"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//EstimationApproachConfiguration">
@@ -41,20 +41,16 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//OutputSpecification/exporters"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//Resource">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//Resource/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//Resource/numberOfServers"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//Resource/schedulingStrategy"/>
     </genClasses>
-    <genClasses ecoreClass="librede.ecore#//Service">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//Service/name"/>
-    </genClasses>
+    <genClasses ecoreClass="librede.ecore#//Service"/>
     <genClasses ecoreClass="librede.ecore#//TraceConfiguration">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/metric"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/unit"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/resources"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/services"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/interval"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/data"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/provider"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/mappings"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//Parameter">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//Parameter/name"/>
@@ -62,14 +58,16 @@
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//EstimationSpecification">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//EstimationSpecification/approaches"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/recursive"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/window"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/stepSize"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/startTimestamp"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/endTimestamp"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//ValidationSpecification">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//ValidationSpecification/validators"/>
-    </genClasses>
-    <genClasses ecoreClass="librede.ecore#//DataSourceConfiguration">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//DataSourceConfiguration/dataProvider"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//DataSourceConfiguration/type"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//DataSourceConfiguration/parameters"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//ValidationSpecification/validationFolds"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//ValidationSpecification/validateEstimates"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//ValidatorConfiguration">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//ValidatorConfiguration/type"/>
@@ -79,5 +77,16 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//ExporterConfiguration/type"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//ExporterConfiguration/parameters"/>
     </genClasses>
+    <genClasses ecoreClass="librede.ecore#//FileTraceConfiguration">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//FileTraceConfiguration/file"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="librede.ecore#//NamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//NamedElement/name"/>
+    </genClasses>
+    <genClasses ecoreClass="librede.ecore#//TraceToEntityMapping">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceToEntityMapping/entity"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceToEntityMapping/traceColumn"/>
+    </genClasses>
+    <genClasses ecoreClass="librede.ecore#//ModelEntity"/>
   </genPackages>
 </genmodel:GenModel>

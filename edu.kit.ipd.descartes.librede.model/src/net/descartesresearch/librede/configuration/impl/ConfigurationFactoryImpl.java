@@ -58,7 +58,7 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case ConfigurationPackage.LIBREDE_CONFIGURATION: return createLibredeConfiguration();
-			case ConfigurationPackage.DATA_PROVIDER_CONFIGURATION: return createDataProviderConfiguration();
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: return createDataSourceConfiguration();
 			case ConfigurationPackage.WORKLOAD_DESCRIPTION: return createWorkloadDescription();
 			case ConfigurationPackage.INPUT_SPECIFICATION: return createInputSpecification();
 			case ConfigurationPackage.ESTIMATION_APPROACH_CONFIGURATION: return createEstimationApproachConfiguration();
@@ -69,9 +69,11 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 			case ConfigurationPackage.PARAMETER: return createParameter();
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION: return createEstimationSpecification();
 			case ConfigurationPackage.VALIDATION_SPECIFICATION: return createValidationSpecification();
-			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: return createDataSourceConfiguration();
 			case ConfigurationPackage.VALIDATOR_CONFIGURATION: return createValidatorConfiguration();
 			case ConfigurationPackage.EXPORTER_CONFIGURATION: return createExporterConfiguration();
+			case ConfigurationPackage.FILE_TRACE_CONFIGURATION: return createFileTraceConfiguration();
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING: return createTraceToEntityMapping();
+			case ConfigurationPackage.MODEL_ENTITY: return createModelEntity();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -115,16 +117,6 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public LibredeConfiguration createLibredeConfiguration() {
 		LibredeConfigurationImpl libredeConfiguration = new LibredeConfigurationImpl();
 		return libredeConfiguration;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public DataProviderConfiguration createDataProviderConfiguration() {
-		DataProviderConfigurationImpl dataProviderConfiguration = new DataProviderConfigurationImpl();
-		return dataProviderConfiguration;
 	}
 
 	/**
@@ -255,6 +247,36 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public ExporterConfiguration createExporterConfiguration() {
 		ExporterConfigurationImpl exporterConfiguration = new ExporterConfigurationImpl();
 		return exporterConfiguration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public FileTraceConfiguration createFileTraceConfiguration() {
+		FileTraceConfigurationImpl fileTraceConfiguration = new FileTraceConfigurationImpl();
+		return fileTraceConfiguration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TraceToEntityMapping createTraceToEntityMapping() {
+		TraceToEntityMappingImpl traceToEntityMapping = new TraceToEntityMappingImpl();
+		return traceToEntityMapping;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ModelEntity createModelEntity() {
+		ModelEntityImpl modelEntity = new ModelEntityImpl();
+		return modelEntity;
 	}
 
 	/**

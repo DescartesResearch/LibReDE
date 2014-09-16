@@ -5,13 +5,9 @@ package net.descartesresearch.librede.configuration.impl;
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.SchedulingStrategy;
-
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 /**
  * <!-- begin-user-doc -->
@@ -20,7 +16,6 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.ResourceImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.ResourceImpl#getNumberOfServers <em>Number Of Servers</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.ResourceImpl#getSchedulingStrategy <em>Scheduling Strategy</em>}</li>
  * </ul>
@@ -28,27 +23,7 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
  *
  * @generated
  */
-public class ResourceImpl extends MinimalEObjectImpl.Container implements Resource {
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
-
+public class ResourceImpl extends ModelEntityImpl implements Resource {
 	/**
 	 * The default value of the '{@link #getNumberOfServers() <em>Number Of Servers</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -113,27 +88,6 @@ public class ResourceImpl extends MinimalEObjectImpl.Container implements Resour
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setName(String newName) {
-		String oldName = name;
-		name = newName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.RESOURCE__NAME, oldName, name));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public int getNumberOfServers() {
 		return numberOfServers;
 	}
@@ -179,8 +133,6 @@ public class ResourceImpl extends MinimalEObjectImpl.Container implements Resour
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.RESOURCE__NAME:
-				return getName();
 			case ConfigurationPackage.RESOURCE__NUMBER_OF_SERVERS:
 				return getNumberOfServers();
 			case ConfigurationPackage.RESOURCE__SCHEDULING_STRATEGY:
@@ -197,9 +149,6 @@ public class ResourceImpl extends MinimalEObjectImpl.Container implements Resour
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.RESOURCE__NAME:
-				setName((String)newValue);
-				return;
 			case ConfigurationPackage.RESOURCE__NUMBER_OF_SERVERS:
 				setNumberOfServers((Integer)newValue);
 				return;
@@ -218,9 +167,6 @@ public class ResourceImpl extends MinimalEObjectImpl.Container implements Resour
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.RESOURCE__NAME:
-				setName(NAME_EDEFAULT);
-				return;
 			case ConfigurationPackage.RESOURCE__NUMBER_OF_SERVERS:
 				setNumberOfServers(NUMBER_OF_SERVERS_EDEFAULT);
 				return;
@@ -239,8 +185,6 @@ public class ResourceImpl extends MinimalEObjectImpl.Container implements Resour
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.RESOURCE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case ConfigurationPackage.RESOURCE__NUMBER_OF_SERVERS:
 				return numberOfServers != NUMBER_OF_SERVERS_EDEFAULT;
 			case ConfigurationPackage.RESOURCE__SCHEDULING_STRATEGY:
@@ -259,9 +203,7 @@ public class ResourceImpl extends MinimalEObjectImpl.Container implements Resour
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
-		result.append(name);
-		result.append(", numberOfServers: ");
+		result.append(" (numberOfServers: ");
 		result.append(numberOfServers);
 		result.append(", schedulingStrategy: ");
 		result.append(schedulingStrategy);
