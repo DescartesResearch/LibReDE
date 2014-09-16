@@ -1,9 +1,13 @@
 package net.descartesresearch.librede.configuration.editor.forms.master;
 
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
+import net.descartesresearch.librede.configuration.actions.RunEstimationAction;
 import net.descartesresearch.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
+import net.descartesresearch.librede.configuration.presentation.LibredeEditorPlugin;
 
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
@@ -57,6 +61,11 @@ public abstract class AbstractMasterBlock extends MasterDetailsBlock implements 
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.horizontalSpan = 2;
 		sashForm.setLayoutData(data);
+	}
+	
+	@Override
+	protected void createToolBarActions(IManagedForm managedForm) {
+		managedForm.getForm().getToolBarManager().add(new RunEstimationAction());
 	}
 	
 	@Override

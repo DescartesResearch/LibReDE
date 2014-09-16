@@ -54,15 +54,6 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		part.setPageProvider(this);
 	}
 
-	/**
-	 * Create the toolbar actions.
-	 * @param managedForm
-	 */
-	@Override
-	protected void createToolBarActions(IManagedForm managedForm) {
-		// Create the toolbar actions
-	}
-
 	@Override
 	protected String getMasterSectionTitle() {
 		return "All Data Sources";

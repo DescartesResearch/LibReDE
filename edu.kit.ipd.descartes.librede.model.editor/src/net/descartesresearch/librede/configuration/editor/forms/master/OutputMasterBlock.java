@@ -106,11 +106,6 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 	}
 
 	@Override
-	protected void createToolBarActions(IManagedForm managedForm) {
-		// TODO Auto-generated method stub		
-	}
-
-	@Override
 	public Object getPageKey(Object object) {
 		if (object instanceof ExporterConfiguration) {
 			return ((ExporterConfiguration)object).getType();

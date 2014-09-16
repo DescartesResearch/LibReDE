@@ -104,10 +104,6 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 	}
 
 	@Override
-	protected void createToolBarActions(IManagedForm managedForm) {
-	}
-
-	@Override
 	public Object getPageKey(Object object) {
 		if (object instanceof ValidatorConfiguration) {
 			return ((ValidatorConfiguration)object).getType();

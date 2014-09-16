@@ -6,6 +6,7 @@ import net.descartesresearch.librede.configuration.LibredeConfiguration;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
 import net.descartesresearch.librede.configuration.WorkloadDescription;
+import net.descartesresearch.librede.configuration.actions.RunEstimationAction;
 import net.descartesresearch.librede.configuration.presentation.ConfigurationEditor;
 import net.descartesresearch.librede.configuration.presentation.LibredeEditorPlugin;
 
@@ -101,6 +102,10 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		Composite body = form.getBody();
 		toolkit.decorateFormHeading(form.getForm());
 		toolkit.paintBordersFor(body);
+		
+		// Add run estimation toolbar button
+		form.getToolBarManager().add(new RunEstimationAction());
+		form.getToolBarManager().update(true);
 		
 		TableWrapLayout tableWrapLayout = new TableWrapLayout();
 		tableWrapLayout.numColumns = 2;

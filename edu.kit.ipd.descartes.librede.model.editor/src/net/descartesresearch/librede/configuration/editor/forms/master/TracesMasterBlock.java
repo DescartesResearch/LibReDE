@@ -56,15 +56,6 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		part.registerPage(FileTraceConfigurationImpl.class, details);
 	}
 
-	/**
-	 * Create the toolbar actions.
-	 * @param managedForm
-	 */
-	@Override
-	protected void createToolBarActions(IManagedForm managedForm) {
-		// Create the toolbar actions
-	}
-	
 	private void addMeasurementTraces(Object[] results) {
 		for (Object r : results) {
 			TraceConfiguration series = ConfigurationFactory.eINSTANCE.createFileTraceConfiguration();
