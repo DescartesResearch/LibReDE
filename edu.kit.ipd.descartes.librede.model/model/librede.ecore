@@ -14,14 +14,14 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="validation" lowerBound="1"
         eType="#//ValidationSpecification" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="DataProviderConfiguration">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
-        eType="#//Parameter" containment="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DataSourceConfiguration" eSuperTypes="#//NamedElement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1">
       <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaClass">
         <eTypeArguments/>
       </eGenericType>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
+        eType="#//Parameter" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="WorkloadDescription">
     <eStructuralFeatures xsi:type="ecore:EReference" name="resources" upperBound="-1"
@@ -30,8 +30,8 @@
         eType="#//Service" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InputSpecification">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="dataProviders" lowerBound="1"
-        upperBound="-1" eType="#//DataProviderConfiguration" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dataSources" lowerBound="1"
+        upperBound="-1" eType="#//DataSourceConfiguration" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="observations" upperBound="-1"
         eType="#//TraceConfiguration" containment="true"/>
   </eClassifiers>
@@ -48,34 +48,29 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="exporters" upperBound="-1"
         eType="#//ExporterConfiguration" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Resource">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//ModelEntity">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="numberOfServers" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
         defaultValueLiteral="1"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="schedulingStrategy" eType="#//SchedulingStrategy"
-        defaultValueLiteral="UNKOWN"/>
+        defaultValueLiteral="Unkown"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Service">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Service" eSuperTypes="#//ModelEntity"/>
   <eClassifiers xsi:type="ecore:EEnum" name="SchedulingStrategy">
     <eLiterals name="FCFS"/>
     <eLiterals name="PS"/>
     <eLiterals name="IS"/>
-    <eLiterals name="UNKOWN"/>
+    <eLiterals name="UNKOWN" literal="Unkown"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TraceConfiguration">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="metric" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="resources" upperBound="-1"
-        eType="#//Resource"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="services" upperBound="-1"
-        eType="#//Service"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="interval" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong"
-        defaultValueLiteral="0"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="data" lowerBound="1" eType="#//DataSourceConfiguration"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="interval" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="provider" lowerBound="1"
+        eType="#//DataSourceConfiguration"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mappings" lowerBound="1"
+        upperBound="-1" eType="#//TraceToEntityMapping" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Parameter">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -84,21 +79,24 @@
   <eClassifiers xsi:type="ecore:EClass" name="EstimationSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="approaches" upperBound="-1"
         eType="#//EstimationApproachConfiguration" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="recursive" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="window" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="stepSize" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="1000"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startTimestamp" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endTimestamp" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ValidationSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="validators" upperBound="-1"
         eType="#//ValidatorConfiguration" containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="DataSourceConfiguration">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="dataProvider" lowerBound="1"
-        eType="#//DataProviderConfiguration"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1">
-      <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaClass">
-        <eTypeArguments/>
-      </eGenericType>
-    </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
-        eType="#//Parameter" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="validationFolds" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="1"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="validateEstimates" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ValidatorConfiguration">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1">
@@ -109,7 +107,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
         eType="#//Parameter" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="ExporterConfiguration">
+  <eClassifiers xsi:type="ecore:EClass" name="ExporterConfiguration" eSuperTypes="#//NamedElement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1">
       <eGenericType eClassifier="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaClass">
         <eTypeArguments/>
@@ -118,4 +116,17 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
         eType="#//Parameter" containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FileTraceConfiguration" eSuperTypes="#//TraceConfiguration">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="file" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TraceToEntityMapping">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entity" lowerBound="1"
+        eType="#//ModelEntity"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="traceColumn" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ModelEntity" eSuperTypes="#//NamedElement"/>
 </ecore:EPackage>

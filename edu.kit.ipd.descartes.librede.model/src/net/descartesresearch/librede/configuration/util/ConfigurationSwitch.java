@@ -72,9 +72,10 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ConfigurationPackage.DATA_PROVIDER_CONFIGURATION: {
-				DataProviderConfiguration dataProviderConfiguration = (DataProviderConfiguration)theEObject;
-				T result = caseDataProviderConfiguration(dataProviderConfiguration);
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: {
+				DataSourceConfiguration dataSourceConfiguration = (DataSourceConfiguration)theEObject;
+				T result = caseDataSourceConfiguration(dataSourceConfiguration);
+				if (result == null) result = caseNamedElement(dataSourceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -105,12 +106,16 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 			case ConfigurationPackage.RESOURCE: {
 				Resource resource = (Resource)theEObject;
 				T result = caseResource(resource);
+				if (result == null) result = caseModelEntity(resource);
+				if (result == null) result = caseNamedElement(resource);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.SERVICE: {
 				Service service = (Service)theEObject;
 				T result = caseService(service);
+				if (result == null) result = caseModelEntity(service);
+				if (result == null) result = caseNamedElement(service);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -138,12 +143,6 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: {
-				DataSourceConfiguration dataSourceConfiguration = (DataSourceConfiguration)theEObject;
-				T result = caseDataSourceConfiguration(dataSourceConfiguration);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case ConfigurationPackage.VALIDATOR_CONFIGURATION: {
 				ValidatorConfiguration validatorConfiguration = (ValidatorConfiguration)theEObject;
 				T result = caseValidatorConfiguration(validatorConfiguration);
@@ -153,6 +152,33 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 			case ConfigurationPackage.EXPORTER_CONFIGURATION: {
 				ExporterConfiguration exporterConfiguration = (ExporterConfiguration)theEObject;
 				T result = caseExporterConfiguration(exporterConfiguration);
+				if (result == null) result = caseNamedElement(exporterConfiguration);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.FILE_TRACE_CONFIGURATION: {
+				FileTraceConfiguration fileTraceConfiguration = (FileTraceConfiguration)theEObject;
+				T result = caseFileTraceConfiguration(fileTraceConfiguration);
+				if (result == null) result = caseTraceConfiguration(fileTraceConfiguration);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.NAMED_ELEMENT: {
+				NamedElement namedElement = (NamedElement)theEObject;
+				T result = caseNamedElement(namedElement);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING: {
+				TraceToEntityMapping traceToEntityMapping = (TraceToEntityMapping)theEObject;
+				T result = caseTraceToEntityMapping(traceToEntityMapping);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.MODEL_ENTITY: {
+				ModelEntity modelEntity = (ModelEntity)theEObject;
+				T result = caseModelEntity(modelEntity);
+				if (result == null) result = caseNamedElement(modelEntity);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -172,21 +198,6 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseLibredeConfiguration(LibredeConfiguration object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Data Provider Configuration</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Data Provider Configuration</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseDataProviderConfiguration(DataProviderConfiguration object) {
 		return null;
 	}
 
@@ -382,6 +393,66 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseExporterConfiguration(ExporterConfiguration object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>File Trace Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>File Trace Configuration</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseFileTraceConfiguration(FileTraceConfiguration object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Named Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Named Element</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseNamedElement(NamedElement object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Trace To Entity Mapping</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Trace To Entity Mapping</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTraceToEntityMapping(TraceToEntityMapping object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Model Entity</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Model Entity</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseModelEntity(ModelEntity object) {
 		return null;
 	}
 

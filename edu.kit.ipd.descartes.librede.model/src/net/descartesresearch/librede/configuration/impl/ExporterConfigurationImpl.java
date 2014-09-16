@@ -29,6 +29,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl#getType <em>Type</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.ExporterConfigurationImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
@@ -37,6 +38,26 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container implements ExporterConfiguration {
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
+
 	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -74,6 +95,27 @@ public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container impl
 	@Override
 	protected EClass eStaticClass() {
 		return ConfigurationPackage.Literals.EXPORTER_CONFIGURATION;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.EXPORTER_CONFIGURATION__NAME, oldName, name));
 	}
 
 	/**
@@ -131,6 +173,8 @@ public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container impl
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case ConfigurationPackage.EXPORTER_CONFIGURATION__NAME:
+				return getName();
 			case ConfigurationPackage.EXPORTER_CONFIGURATION__TYPE:
 				return getType();
 			case ConfigurationPackage.EXPORTER_CONFIGURATION__PARAMETERS:
@@ -148,6 +192,9 @@ public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container impl
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case ConfigurationPackage.EXPORTER_CONFIGURATION__NAME:
+				setName((String)newValue);
+				return;
 			case ConfigurationPackage.EXPORTER_CONFIGURATION__TYPE:
 				setType((Class<?>)newValue);
 				return;
@@ -167,6 +214,9 @@ public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container impl
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case ConfigurationPackage.EXPORTER_CONFIGURATION__NAME:
+				setName(NAME_EDEFAULT);
+				return;
 			case ConfigurationPackage.EXPORTER_CONFIGURATION__TYPE:
 				setType((Class<?>)null);
 				return;
@@ -185,6 +235,8 @@ public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container impl
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case ConfigurationPackage.EXPORTER_CONFIGURATION__NAME:
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case ConfigurationPackage.EXPORTER_CONFIGURATION__TYPE:
 				return type != null;
 			case ConfigurationPackage.EXPORTER_CONFIGURATION__PARAMETERS:
@@ -203,7 +255,9 @@ public class ExporterConfigurationImpl extends MinimalEObjectImpl.Container impl
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (type: ");
+		result.append(" (name: ");
+		result.append(name);
+		result.append(", type: ");
 		result.append(type);
 		result.append(')');
 		return result.toString();

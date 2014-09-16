@@ -16,10 +16,9 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getResources <em>Resources</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getServices <em>Services</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
- *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getData <em>Data</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getProvider <em>Provider</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  * </ul>
  * </p>
  *
@@ -81,38 +80,6 @@ public interface TraceConfiguration extends EObject {
 	void setUnit(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Resources</b></em>' reference list.
-	 * The list contents are of type {@link net.descartesresearch.librede.configuration.Resource}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Resources</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Resources</em>' reference list.
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Resources()
-	 * @model
-	 * @generated
-	 */
-	EList<Resource> getResources();
-
-	/**
-	 * Returns the value of the '<em><b>Services</b></em>' reference list.
-	 * The list contents are of type {@link net.descartesresearch.librede.configuration.Service}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Services</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Services</em>' reference list.
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Services()
-	 * @model
-	 * @generated
-	 */
-	EList<Service> getServices();
-
-	/**
 	 * Returns the value of the '<em><b>Interval</b></em>' attribute.
 	 * The default value is <code>"0"</code>.
 	 * <!-- begin-user-doc -->
@@ -124,7 +91,7 @@ public interface TraceConfiguration extends EObject {
 	 * @return the value of the '<em>Interval</em>' attribute.
 	 * @see #setInterval(long)
 	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Interval()
-	 * @model default="0"
+	 * @model default="0" required="true"
 	 * @generated
 	 */
 	long getInterval();
@@ -140,29 +107,45 @@ public interface TraceConfiguration extends EObject {
 	void setInterval(long value);
 
 	/**
-	 * Returns the value of the '<em><b>Data</b></em>' containment reference.
+	 * Returns the value of the '<em><b>Provider</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Data</em>' reference isn't clear,
+	 * If the meaning of the '<em>Provider</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Data</em>' containment reference.
-	 * @see #setData(DataSourceConfiguration)
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Data()
+	 * @return the value of the '<em>Provider</em>' reference.
+	 * @see #setProvider(DataSourceConfiguration)
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Provider()
+	 * @model required="true"
+	 * @generated
+	 */
+	DataSourceConfiguration getProvider();
+
+	/**
+	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getProvider <em>Provider</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Provider</em>' reference.
+	 * @see #getProvider()
+	 * @generated
+	 */
+	void setProvider(DataSourceConfiguration value);
+
+	/**
+	 * Returns the value of the '<em><b>Mappings</b></em>' containment reference list.
+	 * The list contents are of type {@link net.descartesresearch.librede.configuration.TraceToEntityMapping}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Mappings</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Mappings</em>' containment reference list.
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getTraceConfiguration_Mappings()
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	DataSourceConfiguration getData();
-
-	/**
-	 * Sets the value of the '{@link net.descartesresearch.librede.configuration.TraceConfiguration#getData <em>Data</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Data</em>' containment reference.
-	 * @see #getData()
-	 * @generated
-	 */
-	void setData(DataSourceConfiguration value);
+	EList<TraceToEntityMapping> getMappings();
 
 } // TraceConfiguration

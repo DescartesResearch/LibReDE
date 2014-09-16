@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.EObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.InputSpecification#getDataProviders <em>Data Providers</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.InputSpecification#getDataSources <em>Data Sources</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.InputSpecification#getObservations <em>Observations</em>}</li>
  * </ul>
  * </p>
@@ -25,20 +25,20 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface InputSpecification extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Data Providers</b></em>' containment reference list.
-	 * The list contents are of type {@link net.descartesresearch.librede.configuration.DataProviderConfiguration}.
+	 * Returns the value of the '<em><b>Data Sources</b></em>' containment reference list.
+	 * The list contents are of type {@link net.descartesresearch.librede.configuration.DataSourceConfiguration}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Data Providers</em>' containment reference list isn't clear,
+	 * If the meaning of the '<em>Data Sources</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Data Providers</em>' containment reference list.
-	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getInputSpecification_DataProviders()
+	 * @return the value of the '<em>Data Sources</em>' containment reference list.
+	 * @see net.descartesresearch.librede.configuration.ConfigurationPackage#getInputSpecification_DataSources()
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	EList<DataProviderConfiguration> getDataProviders();
+	EList<DataSourceConfiguration> getDataSources();
 
 	/**
 	 * Returns the value of the '<em><b>Observations</b></em>' containment reference list.

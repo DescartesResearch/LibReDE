@@ -56,7 +56,7 @@ public enum SchedulingStrategy implements Enumerator {
 	 * @generated
 	 * @ordered
 	 */
-	UNKOWN(0, "UNKOWN", "UNKOWN");
+	UNKOWN(0, "UNKOWN", "Unkown");
 
 	/**
 	 * The '<em><b>FCFS</b></em>' literal value.
@@ -112,7 +112,7 @@ public enum SchedulingStrategy implements Enumerator {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @see #UNKOWN
-	 * @model
+	 * @model literal="Unkown"
 	 * @generated
 	 * @ordered
 	 */

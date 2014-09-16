@@ -13,3 +13,5 @@ Export-Package: net.descartesresearch.librede.configuration,
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport
 Bundle-ActivationPolicy: lazy
+Import-Package: edu.kit.ipd.descartes.librede.configuration,
+ edu.kit.ipd.descartes.librede.factory

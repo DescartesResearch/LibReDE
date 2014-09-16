@@ -5,7 +5,6 @@ package net.descartesresearch.librede.configuration.impl;
 import java.util.Collection;
 
 import net.descartesresearch.librede.configuration.ConfigurationPackage;
-import net.descartesresearch.librede.configuration.DataProviderConfiguration;
 import net.descartesresearch.librede.configuration.DataSourceConfiguration;
 import net.descartesresearch.librede.configuration.Parameter;
 
@@ -30,7 +29,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl#getDataProvider <em>Data Provider</em>}</li>
+ *   <li>{@link net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl#getType <em>Type</em>}</li>
  *   <li>{@link net.descartesresearch.librede.configuration.impl.DataSourceConfigurationImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
@@ -40,14 +39,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container implements DataSourceConfiguration {
 	/**
-	 * The cached value of the '{@link #getDataProvider() <em>Data Provider</em>}' reference.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getDataProvider()
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected DataProviderConfiguration dataProvider;
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
@@ -93,16 +102,8 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DataProviderConfiguration getDataProvider() {
-		if (dataProvider != null && dataProvider.eIsProxy()) {
-			InternalEObject oldDataProvider = (InternalEObject)dataProvider;
-			dataProvider = (DataProviderConfiguration)eResolveProxy(oldDataProvider);
-			if (dataProvider != oldDataProvider) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER, oldDataProvider, dataProvider));
-			}
-		}
-		return dataProvider;
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -110,32 +111,11 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DataProviderConfiguration basicGetDataProvider() {
-		return dataProvider;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setDataProvider(DataProviderConfiguration newDataProvider) {
-		DataProviderConfiguration oldDataProvider = dataProvider;
-		dataProvider = newDataProvider;
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER, oldDataProvider, dataProvider));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Parameter> getParameters() {
-		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Parameter>(Parameter.class, this, ConfigurationPackage.DATA_SOURCE_CONFIGURATION__PARAMETERS);
-		}
-		return parameters;
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.DATA_SOURCE_CONFIGURATION__NAME, oldName, name));
 	}
 
 	/**
@@ -164,6 +144,18 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Parameter> getParameters() {
+		if (parameters == null) {
+			parameters = new EObjectContainmentEList<Parameter>(Parameter.class, this, ConfigurationPackage.DATA_SOURCE_CONFIGURATION__PARAMETERS);
+		}
+		return parameters;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -181,9 +173,8 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER:
-				if (resolve) return getDataProvider();
-				return basicGetDataProvider();
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__NAME:
+				return getName();
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__TYPE:
 				return getType();
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__PARAMETERS:
@@ -201,8 +192,8 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER:
-				setDataProvider((DataProviderConfiguration)newValue);
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__NAME:
+				setName((String)newValue);
 				return;
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__TYPE:
 				setType((Class<?>)newValue);
@@ -223,8 +214,8 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER:
-				setDataProvider((DataProviderConfiguration)null);
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__NAME:
+				setName(NAME_EDEFAULT);
 				return;
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__TYPE:
 				setType((Class<?>)null);
@@ -244,8 +235,8 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__DATA_PROVIDER:
-				return dataProvider != null;
+			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__NAME:
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__TYPE:
 				return type != null;
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION__PARAMETERS:
@@ -264,7 +255,9 @@ public class DataSourceConfigurationImpl extends MinimalEObjectImpl.Container im
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (type: ");
+		result.append(" (name: ");
+		result.append(name);
+		result.append(", type: ");
 		result.append(type);
 		result.append(')');
 		return result.toString();
