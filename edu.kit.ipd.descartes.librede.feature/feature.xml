@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="edu.kit.ipd.descartes.librede.feature"
-      label="Feature"
+      label="Librede Feature"
       version="1.0.0.qualifier">
 
    <description url="http://www.example.com/description">
@@ -88,6 +88,27 @@
 
    <plugin
          id="edu.kit.ipd.descartes.librede.frontend"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="edu.kit.ipd.descartes.librede.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="edu.kit.ipd.descartes.librede.model.edit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="edu.kit.ipd.descartes.librede.model.editor"
          download-size="0"
          install-size="0"
          version="0.0.0"
