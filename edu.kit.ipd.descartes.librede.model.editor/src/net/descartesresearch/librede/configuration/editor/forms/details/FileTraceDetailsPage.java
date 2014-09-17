@@ -212,12 +212,12 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		spnIntervalValue = TimeUnitSpinnerBuilder.createSpinnerControl(toolkit, intervalEditorComposite);
 		comboIntervalUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, intervalEditorComposite, spnIntervalValue);
 
-		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.NONE);
-
-		comboUnitViewer = new ComboViewer(composite, SWT.NONE);
-		comboUnit = comboUnitViewer.getCombo();
-		comboUnit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(comboUnit);
+//		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.NONE);
+//
+//		comboUnitViewer = new ComboViewer(composite, SWT.NONE);
+//		comboUnit = comboUnitViewer.getCombo();
+//		comboUnit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		toolkit.paintBordersFor(comboUnit);
 
 		Label lblMapping = toolkit.createLabel(composite, "Mapping:",
 				SWT.NONE);

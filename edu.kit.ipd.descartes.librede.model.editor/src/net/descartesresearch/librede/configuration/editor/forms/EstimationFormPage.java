@@ -108,6 +108,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		
 		toolkit.createLabel(client, "In Unix Time:");
 		Text txtStartTimestamp = toolkit.createText(client, "");
+		txtStartTimestamp.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL));
 		
 		Label lblEndDate = toolkit.createLabel(client, "End Date:");
 		GridData gd_lblEndDate = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -118,6 +119,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		
 		toolkit.createLabel(client, "In Unix Time:");
 		Text txtEndTimestamp = toolkit.createText(client, "");
+		txtEndTimestamp.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL));
 		
 		bindingContext.bindValue(WidgetProperties.selection().observe(spnStepValue), 
 				EMFEditProperties.value(getEditingDomain(), 
