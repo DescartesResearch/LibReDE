@@ -54,13 +54,13 @@ public class IpoptActivator implements BundleActivator {
 			// Workaround: On windows the plugin contains all dependent libraries.
 			// However, java cannot find them automatically. Therefore we have to load
 			// them manually.
-			System.loadLibrary("libstdc++-6");
 			System.loadLibrary("libwinpthread-1");
 			if (Platform.getOSArch().equals(Platform.ARCH_X86)) {
 				System.loadLibrary("libgcc_s_dw2-1");
 			} else {
 				System.loadLibrary("libgcc_s_seh-1");
 			}
+			System.loadLibrary("libstdc++-6");
 			System.loadLibrary("libquadmath-0");
 			System.loadLibrary("libgfortran-3");
 		}
