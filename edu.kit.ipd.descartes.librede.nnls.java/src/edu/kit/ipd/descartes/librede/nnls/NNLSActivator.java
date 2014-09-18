@@ -29,6 +29,7 @@ package edu.kit.ipd.descartes.librede.nnls;
 import java.io.File;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -50,6 +51,19 @@ public class NNLSActivator implements BundleActivator {
 	public void start(BundleContext bundleContext) throws Exception {
 		NNLSActivator.context = bundleContext;
 		
+		if (Platform.getOS().equals(Platform.OS_WIN32)) {
+			// Workaround: On windows the plugin contains all dependent libraries.
+			// However, java cannot find them automatically. Therefore we have to load
+			// them manually.
+			System.loadLibrary("libwinpthread-1");
+			if (Platform.getOSArch().equals(Platform.ARCH_X86)) {
+				System.loadLibrary("libgcc_s_dw2-1");
+			} else {
+				System.loadLibrary("libgcc_s_seh-1");
+			}
+			System.loadLibrary("libquadmath-0");
+			System.loadLibrary("libgfortran-3");
+		}
 		// Check that native library part is available
 		System.loadLibrary("NNLS");
 		
