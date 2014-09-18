@@ -39,7 +39,7 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconst
 import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.librede.factory.Component;
+import edu.kit.ipd.descartes.librede.registry.Component;
 
 @Component(displayName="Service Demand Law")
 public class ServiceDemandLawApproach extends AbstractEstimationApproach {

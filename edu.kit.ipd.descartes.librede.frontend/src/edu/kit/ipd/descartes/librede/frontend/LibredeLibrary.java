@@ -41,7 +41,7 @@ import edu.kit.ipd.descartes.librede.estimation.validation.UtilizationValidator;
 import edu.kit.ipd.descartes.librede.estimation.validation.Validator;
 import edu.kit.ipd.descartes.librede.export.IExporter;
 import edu.kit.ipd.descartes.librede.export.csv.CsvExporter;
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 
 public class LibredeLibrary {
 	

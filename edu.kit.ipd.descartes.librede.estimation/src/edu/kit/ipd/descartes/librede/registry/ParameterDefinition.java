@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.factory;
+package edu.kit.ipd.descartes.librede.registry;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -34,7 +34,11 @@ import java.lang.annotation.Target;
 
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.TYPE})
-public @interface Component {
-	String displayName();
+@Target(value = {ElementType.FIELD})
+public @interface ParameterDefinition {
+	String name();
+	String label();
+	String defaultValue() default "";
+	boolean required() default true;
+	String subType() default "";
 }

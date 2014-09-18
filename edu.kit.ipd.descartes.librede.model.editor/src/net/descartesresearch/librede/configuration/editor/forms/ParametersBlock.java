@@ -62,8 +62,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.kit.ipd.descartes.librede.factory.Component;
-import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
+import edu.kit.ipd.descartes.librede.registry.Component;
+import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
 
 public class ParametersBlock {
 	

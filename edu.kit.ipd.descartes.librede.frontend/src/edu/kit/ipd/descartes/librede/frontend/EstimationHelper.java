@@ -60,8 +60,8 @@ import edu.kit.ipd.descartes.librede.estimation.validation.ResponseTimeValidator
 import edu.kit.ipd.descartes.librede.estimation.validation.UtilizationValidator;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.librede.export.IExporter;
-import edu.kit.ipd.descartes.librede.factory.Instantiator;
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Instantiator;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;

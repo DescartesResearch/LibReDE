@@ -18,7 +18,7 @@ Export-Package: edu.kit.ipd.descartes.librede.datasource,
  edu.kit.ipd.descartes.librede.estimation.workload,
  edu.kit.ipd.descartes.librede.export,
  edu.kit.ipd.descartes.librede.export.csv,
- edu.kit.ipd.descartes.librede.factory
+ edu.kit.ipd.descartes.librede.registry
 Import-Package: cern.jet.random.sampling;version="1.2.0",
  edu.kit.ipd.descartes.linalg,
  net.descartesresearch.librede.configuration,

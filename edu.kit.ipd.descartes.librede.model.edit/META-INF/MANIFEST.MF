@@ -14,4 +14,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.edit;visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Import-Package: edu.kit.ipd.descartes.librede.estimation.repository,
- edu.kit.ipd.descartes.librede.factory
+ edu.kit.ipd.descartes.librede.registry

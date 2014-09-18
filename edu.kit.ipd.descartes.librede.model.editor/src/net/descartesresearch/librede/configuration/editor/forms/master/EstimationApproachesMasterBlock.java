@@ -59,7 +59,7 @@ import org.eclipse.ui.forms.IManagedForm;
 
 import edu.kit.ipd.descartes.librede.approaches.IEstimationApproach;
 import edu.kit.ipd.descartes.librede.estimation.validation.Validator;
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 
 public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 		implements ISelectionChangedListener, IDetailsPageProvider {

@@ -38,9 +38,9 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinear
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.librede.factory.Component;
-import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
 import edu.kit.ipd.descartes.librede.ipopt.java.RecursiveOptimization;
+import edu.kit.ipd.descartes.librede.registry.Component;
+import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
 
 @Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {
