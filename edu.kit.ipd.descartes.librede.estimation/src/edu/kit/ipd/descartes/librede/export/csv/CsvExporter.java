@@ -31,8 +31,8 @@ import java.io.PrintWriter;
 
 import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.export.IExporter;
-import edu.kit.ipd.descartes.librede.factory.Component;
-import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
+import edu.kit.ipd.descartes.librede.registry.Component;
+import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 
@@ -42,7 +42,7 @@ public class CsvExporter implements IExporter {
 	@ParameterDefinition(name = "OutputDirectory", label = "Output Directory", required = true)
 	private File outputPath;
 	
-	@ParameterDefinition(name = "FileName", label = "File Name", required = true)
+	@ParameterDefinition(name = "FileName", label = "File Name Prefix", required = true)
 	private String fileName;
 	
 	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception {

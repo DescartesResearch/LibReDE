@@ -55,7 +55,7 @@ import org.eclipse.ui.forms.IDetailsPageProvider;
 import org.eclipse.ui.forms.IManagedForm;
 
 import edu.kit.ipd.descartes.librede.export.IExporter;
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 
 public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements IDetailsPageProvider {
 	

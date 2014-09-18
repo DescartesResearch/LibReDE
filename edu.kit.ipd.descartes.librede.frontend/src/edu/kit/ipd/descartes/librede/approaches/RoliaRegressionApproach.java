@@ -35,8 +35,8 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.librede.factory.Component;
 import edu.kit.ipd.descartes.librede.nnls.LeastSquaresRegression;
+import edu.kit.ipd.descartes.librede.registry.Component;
 
 @Component(displayName = "Least-squares Regression using Utilization Law")
 public class RoliaRegressionApproach extends AbstractEstimationApproach {

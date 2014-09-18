@@ -52,7 +52,7 @@ import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 
 /**
  * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.ExporterConfiguration} object.

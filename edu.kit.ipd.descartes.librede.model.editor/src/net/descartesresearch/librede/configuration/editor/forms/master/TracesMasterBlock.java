@@ -58,7 +58,7 @@ import org.eclipse.ui.forms.IManagedForm;
 
 import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
 import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 
 public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 

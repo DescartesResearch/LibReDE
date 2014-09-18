@@ -57,7 +57,7 @@ import org.eclipse.ui.forms.IDetailsPageProvider;
 import org.eclipse.ui.forms.IManagedForm;
 
 import edu.kit.ipd.descartes.librede.datasource.IDataSource;
-import edu.kit.ipd.descartes.librede.factory.Registry;
+import edu.kit.ipd.descartes.librede.registry.Registry;
 
 public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons implements ISelectionChangedListener, IDetailsPageProvider {
 	

@@ -39,8 +39,8 @@ import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
 import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
-import edu.kit.ipd.descartes.librede.factory.Component;
-import edu.kit.ipd.descartes.librede.factory.ParameterDefinition;
+import edu.kit.ipd.descartes.librede.registry.Component;
+import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
 
 @Component(displayName = "Kalman Filter using Response Times and Utilization")
 public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
