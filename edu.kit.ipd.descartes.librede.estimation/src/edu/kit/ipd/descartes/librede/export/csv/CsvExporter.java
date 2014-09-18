@@ -42,7 +42,7 @@ public class CsvExporter implements IExporter {
 	@ParameterDefinition(name = "OutputDirectory", label = "Output Directory", required = true)
 	private File outputPath;
 	
-	@ParameterDefinition(name = "FileName", label = "File Name", required = true)
+	@ParameterDefinition(name = "FileName", label = "File Name Prefix", required = true)
 	private String fileName;
 	
 	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception {

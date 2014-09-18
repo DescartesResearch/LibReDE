@@ -56,6 +56,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -195,7 +197,12 @@ public class ParametersBlock {
 	private class FileParameterEditor extends ParameterEditor implements ModifyListener {
 		private Text path;
 		private Button browse;
-		private FileDialog dialog;
+		private Dialog dialog;
+		private String subtype;
+		
+		public FileParameterEditor(String subtype) {
+			this.subtype = subtype;
+		}
 
 		@Override
 		Control createControl(FormToolkit toolkit, Composite parent) {
@@ -211,11 +218,22 @@ public class ParametersBlock {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (dialog == null) {
-						dialog = new FileDialog(shell, SWT.OPEN);
-						String file = dialog.open();
-						if (file != null) {
-							path.setText(file);
+						if (subtype.isEmpty()) {
+							dialog = new DirectoryDialog(shell, SWT.NONE);
+						} else {
+							FileDialog newDialog = new FileDialog(shell, SWT.OPEN);
+							newDialog.setFilterExtensions(subtype.split("|"));
+							dialog = newDialog;
 						}
+					}
+					String selPath;
+					if (subtype.isEmpty()) {
+						selPath = ((DirectoryDialog)dialog).open();
+					} else {
+						selPath = ((FileDialog)dialog).open();
+					}
+					if (selPath != null) {
+						path.setText(selPath);
 					}
 				}
 			});
@@ -274,7 +292,7 @@ public class ParametersBlock {
 			for (Field curField : parameterizedType.getDeclaredFields()) {
 				ParameterDefinition param = curField.getAnnotation(ParameterDefinition.class);
 				if (param != null) {
-					ParameterEditor editor = createEditor(curField.getType());
+					ParameterEditor editor = createEditor(curField.getType(), param.subType());
 					editor.label = param.label();
 					editor.name = param.name();
 					editor.required = param.required();
@@ -302,11 +320,11 @@ public class ParametersBlock {
 		}
 	}
 	
-	private ParameterEditor createEditor(Class<?> type) {
+	private ParameterEditor createEditor(Class<?> type, String subType) {
 		if (type.equals(Boolean.TYPE)) {
 			return new CheckboxParameterEditor();
 		} else if (type.equals(File.class)) {
-			return new FileParameterEditor();
+			return new FileParameterEditor(subType);
 		}
 		return new TextParameterEditor();
 	}
