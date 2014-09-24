@@ -29,10 +29,10 @@ package edu.kit.ipd.descartes.librede.export.csv;
 import java.io.File;
 import java.io.PrintWriter;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.export.IExporter;
 import edu.kit.ipd.descartes.librede.registry.Component;
 import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 

@@ -35,13 +35,13 @@ import edu.kit.ipd.descartes.librede.approaches.WangKalmanFilterApproach;
 import edu.kit.ipd.descartes.librede.approaches.ZhangKalmanFilterApproach;
 import edu.kit.ipd.descartes.librede.datasource.IDataSource;
 import edu.kit.ipd.descartes.librede.datasource.csv.CsvDataSource;
-import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.validation.ResponseTimeValidator;
-import edu.kit.ipd.descartes.librede.estimation.validation.UtilizationValidator;
-import edu.kit.ipd.descartes.librede.estimation.validation.Validator;
 import edu.kit.ipd.descartes.librede.export.IExporter;
 import edu.kit.ipd.descartes.librede.export.csv.CsvExporter;
 import edu.kit.ipd.descartes.librede.registry.Registry;
+import edu.kit.ipd.descartes.librede.repository.StandardMetric;
+import edu.kit.ipd.descartes.librede.validation.ResponseTimeValidator;
+import edu.kit.ipd.descartes.librede.validation.UtilizationValidator;
+import edu.kit.ipd.descartes.librede.validation.Validator;
 
 public class LibredeLibrary {
 	

@@ -29,17 +29,17 @@ package edu.kit.ipd.descartes.librede.approaches;
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
-import edu.kit.ipd.descartes.librede.estimation.algorithm.SimpleApproximation;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IDirectOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ServiceDemandLaw;
-import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.librede.estimation.repository.Aggregation;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.algorithm.SimpleApproximation;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.models.observation.VectorObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.IDirectOutputFunction;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ServiceDemandLaw;
+import edu.kit.ipd.descartes.librede.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.registry.Component;
+import edu.kit.ipd.descartes.librede.repository.Aggregation;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName="Service Demand Law")
 public class ServiceDemandLawApproach extends AbstractEstimationApproach {

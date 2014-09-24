@@ -17,4 +17,7 @@ Export-Package: edu.kit.ipd.descartes.librede.approaches,
  edu.kit.ipd.descartes.librede.frontend
 Import-Package: net.descartesresearch.librede.configuration,
  org.eclipse.emf.common.util,
- org.eclipse.emf.ecore
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.ecore.resource,
+ org.eclipse.emf.ecore.resource.impl,
+ org.eclipse.emf.ecore.xmi.impl

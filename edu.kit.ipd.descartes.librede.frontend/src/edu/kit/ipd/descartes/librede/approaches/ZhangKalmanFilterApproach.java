@@ -30,17 +30,17 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.ones;
 import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
 import edu.kit.ipd.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ResponseTimeEquation;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
-import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.models.observation.VectorObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.IOutputFunction;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import edu.kit.ipd.descartes.librede.models.observation.functions.UtilizationLaw;
+import edu.kit.ipd.descartes.librede.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.registry.Component;
 import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Kalman Filter using Response Times and Utilization")
 public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {

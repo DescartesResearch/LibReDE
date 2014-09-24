@@ -31,15 +31,15 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.models.observation.ScalarObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ILinearOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
-import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.models.observation.ScalarObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ILinearOutputFunction;
+import edu.kit.ipd.descartes.librede.models.observation.functions.UtilizationLaw;
+import edu.kit.ipd.descartes.librede.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.nnls.LeastSquaresRegression;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.testutils.ObservationDataGenerator;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public class LeastSquaresRegressionTest {

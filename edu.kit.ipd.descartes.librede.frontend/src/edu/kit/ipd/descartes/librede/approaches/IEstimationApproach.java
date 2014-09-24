@@ -28,11 +28,11 @@ package edu.kit.ipd.descartes.librede.approaches;
 
 import java.util.List;
 
-import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.exceptions.EstimationException;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 
 public interface IEstimationApproach {
 	

@@ -3,14 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: edu.kit.ipd.descartes.librede.nnls.java.tests
 Bundle-Version: 1.0.0.qualifier
-Import-Package: edu.kit.ipd.descartes.librede.estimation.models.observation,
- edu.kit.ipd.descartes.librede.estimation.models.observation.functions,
- edu.kit.ipd.descartes.librede.estimation.models.state,
- edu.kit.ipd.descartes.librede.estimation.models.state.constraints,
- edu.kit.ipd.descartes.librede.estimation.repository,
- edu.kit.ipd.descartes.librede.estimation.testutils,
- edu.kit.ipd.descartes.librede.estimation.workload,
+Import-Package: edu.kit.ipd.descartes.librede.models.observation,
+ edu.kit.ipd.descartes.librede.models.observation.functions,
+ edu.kit.ipd.descartes.librede.models.state,
+ edu.kit.ipd.descartes.librede.models.state.constraints,
  edu.kit.ipd.descartes.librede.nnls,
+ edu.kit.ipd.descartes.librede.repository,
+ edu.kit.ipd.descartes.librede.testutils,
+ edu.kit.ipd.descartes.librede.workload,
  edu.kit.ipd.descartes.linalg,
  edu.kit.ipd.descartes.linalg.testutil,
  net.descartesresearch.librede.configuration,

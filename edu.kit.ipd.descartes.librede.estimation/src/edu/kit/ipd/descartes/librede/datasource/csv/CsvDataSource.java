@@ -37,9 +37,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.kit.ipd.descartes.librede.datasource.IDataSource;
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
 import edu.kit.ipd.descartes.librede.registry.Component;
 import edu.kit.ipd.descartes.librede.registry.ParameterDefinition;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
 import edu.kit.ipd.descartes.linalg.Vector;
 import edu.kit.ipd.descartes.linalg.VectorFunction;
 
