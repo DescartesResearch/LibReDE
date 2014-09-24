@@ -55,8 +55,8 @@ import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IDetailsPageProvider;
 import org.eclipse.ui.forms.IManagedForm;
 
-import edu.kit.ipd.descartes.librede.estimation.validation.Validator;
 import edu.kit.ipd.descartes.librede.registry.Registry;
+import edu.kit.ipd.descartes.librede.validation.Validator;
 
 public class ValidationMasterBlock extends AbstractMasterBlock implements IDetailsPageProvider {
 	

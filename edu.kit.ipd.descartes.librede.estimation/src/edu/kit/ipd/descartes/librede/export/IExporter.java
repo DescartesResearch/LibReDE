@@ -26,7 +26,7 @@
  */
 package edu.kit.ipd.descartes.librede.export;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
 
 public interface IExporter {
 	

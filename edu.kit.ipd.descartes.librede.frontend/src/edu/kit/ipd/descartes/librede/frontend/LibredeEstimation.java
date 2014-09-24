@@ -30,9 +30,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.IMonitoringRepository;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.librede.frontend.EstimationHelper.EstimationResult;
+import edu.kit.ipd.descartes.librede.repository.IMonitoringRepository;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import net.descartesresearch.librede.configuration.LibredeConfiguration;
 
 public class LibredeEstimation {

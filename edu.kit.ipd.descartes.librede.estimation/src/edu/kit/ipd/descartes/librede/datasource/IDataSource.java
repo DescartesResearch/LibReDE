@@ -28,7 +28,7 @@ package edu.kit.ipd.descartes.librede.datasource;
 
 import java.io.InputStream;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
 
 public interface IDataSource {
 	

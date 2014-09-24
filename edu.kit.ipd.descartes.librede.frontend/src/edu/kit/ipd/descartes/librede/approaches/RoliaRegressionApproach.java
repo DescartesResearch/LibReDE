@@ -27,16 +27,16 @@
 package edu.kit.ipd.descartes.librede.approaches;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.ScalarObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ILinearOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.UtilizationLaw;
-import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.models.observation.ScalarObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ILinearOutputFunction;
+import edu.kit.ipd.descartes.librede.models.observation.functions.UtilizationLaw;
+import edu.kit.ipd.descartes.librede.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.nnls.LeastSquaresRegression;
 import edu.kit.ipd.descartes.librede.registry.Component;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Least-squares Regression using Utilization Law")
 public class RoliaRegressionApproach extends AbstractEstimationApproach {

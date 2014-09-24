@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
+import edu.kit.ipd.descartes.librede.repository.IMetric;
 
 public class Registry {
 	

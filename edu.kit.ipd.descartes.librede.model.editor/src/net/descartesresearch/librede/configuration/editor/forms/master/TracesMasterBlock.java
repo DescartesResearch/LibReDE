@@ -56,9 +56,9 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IManagedForm;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
-import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.registry.Registry;
+import edu.kit.ipd.descartes.librede.repository.IMetric;
+import edu.kit.ipd.descartes.librede.repository.StandardMetric;
 
 public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 

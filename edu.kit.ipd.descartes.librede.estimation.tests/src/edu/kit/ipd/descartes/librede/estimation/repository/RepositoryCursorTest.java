@@ -37,7 +37,12 @@ import net.descartesresearch.librede.configuration.Service;
 
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.repository.IMonitoringRepository;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.repository.MemoryObservationRepository;
+import edu.kit.ipd.descartes.librede.repository.StandardMetric;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 
 public class RepositoryCursorTest {
 	

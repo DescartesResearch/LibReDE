@@ -34,17 +34,17 @@ import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 
 import com.sun.jna.Pointer;
 
+import edu.kit.ipd.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import edu.kit.ipd.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import edu.kit.ipd.descartes.librede.bayesplusplus.backend.FCallback;
 import edu.kit.ipd.descartes.librede.bayesplusplus.backend.HCallback;
-import edu.kit.ipd.descartes.librede.estimation.algorithm.AbstractEstimationAlgorithm;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.models.diff.JacobiMatrixBuilder;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.Unconstrained;
+import edu.kit.ipd.descartes.librede.exceptions.EstimationException;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.models.diff.JacobiMatrixBuilder;
+import edu.kit.ipd.descartes.librede.models.observation.IObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.IOutputFunction;
+import edu.kit.ipd.descartes.librede.models.state.IStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.Unconstrained;
 import edu.kit.ipd.descartes.librede.nativehelper.NativeHelper;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.MatrixFunction;
@@ -286,7 +286,7 @@ public class ExtendedKalmanFilter extends
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel, edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel, int)
+	 * @see edu.kit.ipd.descartes.librede.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.librede.models.state.IStateModel, edu.kit.ipd.descartes.librede.models.observation.IObservationModel, int)
 	 */
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
@@ -309,7 +309,7 @@ public class ExtendedKalmanFilter extends
 	}
 	
 	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm#update()
+	 * @see edu.kit.ipd.descartes.librede.algorithm.IEstimationAlgorithm#update()
 	 */
 	@Override
 	public void update() throws EstimationException {
@@ -327,7 +327,7 @@ public class ExtendedKalmanFilter extends
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * edu.kit.ipd.descartes.librede.estimation.models.algorithm.IEstimationAlgorithm
+	 * edu.kit.ipd.descartes.librede.models.algorithm.IEstimationAlgorithm
 	 * #estimate()
 	 */
 	@Override
@@ -339,7 +339,7 @@ public class ExtendedKalmanFilter extends
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * edu.kit.ipd.descartes.librede.estimation.models.algorithm.IEstimationAlgorithm
+	 * edu.kit.ipd.descartes.librede.models.algorithm.IEstimationAlgorithm
 	 * #destroy()
 	 */
 	@Override

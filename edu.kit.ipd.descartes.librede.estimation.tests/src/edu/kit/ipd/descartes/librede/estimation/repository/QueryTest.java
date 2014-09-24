@@ -44,7 +44,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.repository.MemoryObservationRepository;
+import edu.kit.ipd.descartes.librede.repository.Query;
+import edu.kit.ipd.descartes.librede.repository.QueryBuilder;
+import edu.kit.ipd.descartes.librede.repository.StandardMetric;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 

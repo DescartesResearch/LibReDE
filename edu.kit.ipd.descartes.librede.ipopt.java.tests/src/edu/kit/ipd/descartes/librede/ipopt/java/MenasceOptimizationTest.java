@@ -34,15 +34,15 @@ import net.descartesresearch.librede.configuration.Service;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.models.observation.VectorObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.ResponseTimeEquation;
-import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.UtilizationConstraint;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.models.observation.VectorObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.IOutputFunction;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import edu.kit.ipd.descartes.librede.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.ILinearStateConstraint;
+import edu.kit.ipd.descartes.librede.models.state.constraints.UtilizationConstraint;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.testutils.ObservationDataGenerator;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Vector;
 
 public class MenasceOptimizationTest {

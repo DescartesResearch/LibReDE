@@ -39,8 +39,8 @@ import static org.fest.assertions.api.Assertions.offset;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries.Interpolation;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries.Interpolation;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 

@@ -36,12 +36,13 @@ import net.descartesresearch.librede.configuration.Service;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.repository.QueryBuilder;
-import edu.kit.ipd.descartes.librede.estimation.repository.StandardMetric;
-import edu.kit.ipd.descartes.librede.estimation.testutils.Differentiation;
-import edu.kit.ipd.descartes.librede.estimation.testutils.ObservationDataGenerator;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ServiceDemandLaw;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.repository.QueryBuilder;
+import edu.kit.ipd.descartes.librede.repository.StandardMetric;
+import edu.kit.ipd.descartes.librede.testutils.Differentiation;
+import edu.kit.ipd.descartes.librede.testutils.ObservationDataGenerator;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
 

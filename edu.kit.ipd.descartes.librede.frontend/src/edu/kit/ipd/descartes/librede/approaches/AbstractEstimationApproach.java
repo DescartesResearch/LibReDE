@@ -28,16 +28,16 @@ package edu.kit.ipd.descartes.librede.approaches;
 
 import java.util.List;
 
-import edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.IStateConstraint;
-import edu.kit.ipd.descartes.librede.estimation.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.estimation.repository.TimeSeries;
-import edu.kit.ipd.descartes.librede.estimation.workload.WorkloadDescription;
+import edu.kit.ipd.descartes.librede.algorithm.IEstimationAlgorithm;
+import edu.kit.ipd.descartes.librede.exceptions.EstimationException;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
+import edu.kit.ipd.descartes.librede.models.observation.IObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.IOutputFunction;
+import edu.kit.ipd.descartes.librede.models.state.IStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.IStateConstraint;
+import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.repository.TimeSeries;
+import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;
 

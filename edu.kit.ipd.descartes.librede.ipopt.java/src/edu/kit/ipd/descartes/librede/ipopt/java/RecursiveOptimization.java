@@ -41,17 +41,9 @@ import java.util.List;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
 
-import edu.kit.ipd.descartes.librede.estimation.algorithm.AbstractEstimationAlgorithm;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.EstimationException;
-import edu.kit.ipd.descartes.librede.estimation.exceptions.InitializationException;
-import edu.kit.ipd.descartes.librede.estimation.models.diff.HessianMatrixBuilder;
-import edu.kit.ipd.descartes.librede.estimation.models.diff.JacobiMatrixBuilder;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel;
-import edu.kit.ipd.descartes.librede.estimation.models.observation.functions.IOutputFunction;
-import edu.kit.ipd.descartes.librede.estimation.models.state.ConstantStateModel;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.ILinearStateConstraint;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.IStateConstraint;
-import edu.kit.ipd.descartes.librede.estimation.models.state.constraints.StateBoundsConstraint;
+import edu.kit.ipd.descartes.librede.algorithm.AbstractEstimationAlgorithm;
+import edu.kit.ipd.descartes.librede.exceptions.EstimationException;
+import edu.kit.ipd.descartes.librede.exceptions.InitializationException;
 import edu.kit.ipd.descartes.librede.ipopt.java.backend.Eval_F_CB;
 import edu.kit.ipd.descartes.librede.ipopt.java.backend.Eval_G_CB;
 import edu.kit.ipd.descartes.librede.ipopt.java.backend.Eval_Grad_F_CB;
@@ -60,6 +52,14 @@ import edu.kit.ipd.descartes.librede.ipopt.java.backend.Eval_Jac_G_CB;
 import edu.kit.ipd.descartes.librede.ipopt.java.backend.IpoptLibrary;
 import edu.kit.ipd.descartes.librede.ipopt.java.backend.IpoptOptionKeyword;
 import edu.kit.ipd.descartes.librede.ipopt.java.backend.IpoptOptionValue;
+import edu.kit.ipd.descartes.librede.models.diff.HessianMatrixBuilder;
+import edu.kit.ipd.descartes.librede.models.diff.JacobiMatrixBuilder;
+import edu.kit.ipd.descartes.librede.models.observation.IObservationModel;
+import edu.kit.ipd.descartes.librede.models.observation.functions.IOutputFunction;
+import edu.kit.ipd.descartes.librede.models.state.ConstantStateModel;
+import edu.kit.ipd.descartes.librede.models.state.constraints.ILinearStateConstraint;
+import edu.kit.ipd.descartes.librede.models.state.constraints.IStateConstraint;
+import edu.kit.ipd.descartes.librede.models.state.constraints.StateBoundsConstraint;
 import edu.kit.ipd.descartes.librede.nativehelper.NativeHelper;
 import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Vector;
@@ -144,7 +144,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 	}
 	
 	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.librede.estimation.models.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.librede.estimation.models.state.IStateModel, edu.kit.ipd.descartes.librede.estimation.models.observation.IObservationModel, int)
+	 * @see edu.kit.ipd.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(edu.kit.ipd.descartes.librede.models.state.IStateModel, edu.kit.ipd.descartes.librede.models.observation.IObservationModel, int)
 	 */
 	@Override
 	public void initialize(ConstantStateModel<? extends IStateConstraint> stateModel,
@@ -177,7 +177,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 	
 
 	/* (non-Javadoc)
-	 * @see edu.kit.ipd.descartes.librede.estimation.algorithm.IEstimationAlgorithm#update()
+	 * @see edu.kit.ipd.descartes.librede.algorithm.IEstimationAlgorithm#update()
 	 */
 	@Override
 	public void update() {

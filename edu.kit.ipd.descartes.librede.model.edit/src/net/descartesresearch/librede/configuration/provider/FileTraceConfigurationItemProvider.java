@@ -43,8 +43,8 @@ import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
 import edu.kit.ipd.descartes.librede.registry.Registry;
+import edu.kit.ipd.descartes.librede.repository.IMetric;
 
 /**
  * This is the item provider adapter for a {@link net.descartesresearch.librede.configuration.FileTraceConfiguration} object.

@@ -90,8 +90,8 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.kit.ipd.descartes.librede.estimation.repository.IMetric;
 import edu.kit.ipd.descartes.librede.registry.Registry;
+import edu.kit.ipd.descartes.librede.repository.IMetric;
 
 public class FileTraceDetailsPage extends AbstractDetailsPage {
 
