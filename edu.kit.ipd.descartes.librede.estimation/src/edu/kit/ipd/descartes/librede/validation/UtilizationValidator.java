@@ -38,8 +38,8 @@ import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-@Component(displayName = "Utilization Law Validator")
-public class UtilizationValidator implements Validator {
+@Component(displayName = "Utilization Law IValidator")
+public class UtilizationValidator implements IValidator {
 	
 	private List<UtilizationLaw> utilLaw;
 	private MatrixBuilder allErrors;

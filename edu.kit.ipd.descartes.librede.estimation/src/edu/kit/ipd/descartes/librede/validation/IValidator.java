@@ -28,7 +28,7 @@ package edu.kit.ipd.descartes.librede.validation;
 
 import edu.kit.ipd.descartes.linalg.Vector;
 
-public interface Validator {
+public interface IValidator {
 
 	public abstract Vector getPredictionError();
 
