@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.repository;
+package edu.kit.ipd.descartes.librede.repository;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.vector;
 import static org.fest.assertions.api.Assertions.assertThat;

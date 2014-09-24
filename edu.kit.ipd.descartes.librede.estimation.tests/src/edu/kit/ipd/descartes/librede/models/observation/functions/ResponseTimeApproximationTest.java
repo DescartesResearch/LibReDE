@@ -24,18 +24,21 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
+package edu.kit.ipd.descartes.librede.models.observation.functions;
 
+import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import net.descartesresearch.librede.configuration.Resource;
 import net.descartesresearch.librede.configuration.Service;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ResponseTimeApproximation;
+import edu.kit.ipd.descartes.librede.repository.Aggregation;
 import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
 import edu.kit.ipd.descartes.librede.repository.Query;
 import edu.kit.ipd.descartes.librede.repository.QueryBuilder;
@@ -47,15 +50,19 @@ import edu.kit.ipd.descartes.linalg.Matrix;
 import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-public class ResponseTimeEquationTest {
+public class ResponseTimeApproximationTest {
 	
 	private final static int SERVICE_IDX = 2;
+	private final static int RESOURCE_IDX = 1;
 	
 	private ObservationDataGenerator generator;
-	private ResponseTimeEquation law;
-	private IRepositoryCursor cursor;
-	private Service service;
+	private ResponseTimeApproximation law;
 	private Vector state;
+	
+	private Resource resource;
+	private Service service;
+	private int stateIdx;
+	private IRepositoryCursor cursor;
 
 	@Before
 	public void setUp() throws Exception {
@@ -65,13 +72,20 @@ public class ResponseTimeEquationTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
 		
+		resource = workload.getResources().get(RESOURCE_IDX);
 		service = workload.getServices().get(SERVICE_IDX);
+		stateIdx = workload.getState().getIndex(resource, service);
 		
-		law = new ResponseTimeEquation(workload, cursor, service, workload.getResources());
+		law = new ResponseTimeApproximation(workload, cursor, resource, service, Aggregation.AVERAGE);
 		state = generator.getDemands();
 		
 		generator.nextObservation();
 		cursor.next();
+	}
+
+	@Test
+	public void testGetFactor() {
+		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
 	}
 
 	@Test
@@ -81,9 +95,13 @@ public class ResponseTimeEquationTest {
 	}
 
 	@Test
+	public void testGetIndependentVariables() {
+		assertThat(law.getIndependentVariables()).isEqualTo(zeros(state.rows()).set(stateIdx, 1.0), offset(1e-9));
+	}
+
+	@Test
 	public void testGetCalculatedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(state.get(stateIdx), offset(1e-9));
 	}
 
 	@Test

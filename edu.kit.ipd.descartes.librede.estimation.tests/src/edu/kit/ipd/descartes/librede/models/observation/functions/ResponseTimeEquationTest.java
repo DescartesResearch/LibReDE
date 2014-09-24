@@ -24,73 +24,66 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
+package edu.kit.ipd.descartes.librede.models.observation.functions;
 
-import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
 import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import net.descartesresearch.librede.configuration.Resource;
+import net.descartesresearch.librede.configuration.Service;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.models.observation.functions.UtilizationLaw;
+import edu.kit.ipd.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
+import edu.kit.ipd.descartes.librede.repository.Query;
 import edu.kit.ipd.descartes.librede.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.testutils.Differentiation;
 import edu.kit.ipd.descartes.librede.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
+import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-public class UtilizationLawTest {
-		
-	private final static int RESOURCE_IDX = 2;
+public class ResponseTimeEquationTest {
+	
+	private final static int SERVICE_IDX = 2;
 	
 	private ObservationDataGenerator generator;
-	private UtilizationLaw law;
+	private ResponseTimeEquation law;
 	private IRepositoryCursor cursor;
+	private Service service;
 	private Vector state;
-	private Resource resource;
 
 	@Before
-	public void setUp() throws Exception {		
+	public void setUp() throws Exception {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		resource = workload.getResources().get(RESOURCE_IDX);
-		law = new UtilizationLaw(workload, cursor, resource);
-		state = generator.getDemands();		
+		service = workload.getServices().get(SERVICE_IDX);
+		
+		law = new ResponseTimeEquation(workload, cursor, service, workload.getResources());
+		state = generator.getDemands();
 		
 		generator.nextObservation();
 		cursor.next();
 	}
 
 	@Test
-	public void testGetIndependentVariables() {
-		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
-		Vector varVector = law.getIndependentVariables();		
-		Vector expectedVarVector = zeros(state.rows()).set(generator.getWorkloadDescription().getState().getRange(resource), x);
-		
-		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
-	}
-
-	@Test
 	public void testGetObservedOutput() {
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
+		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
+		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
+		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
@@ -102,7 +95,7 @@ public class UtilizationLawTest {
 	@Test
 	public void testGetSecondDerivatives() {
 		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e-4));
+		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
 	}
 
 }

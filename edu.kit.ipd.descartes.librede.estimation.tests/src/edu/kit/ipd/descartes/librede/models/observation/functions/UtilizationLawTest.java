@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package edu.kit.ipd.descartes.librede.estimation.models.observation.functions;
+package edu.kit.ipd.descartes.librede.models.observation.functions;
 
 import static edu.kit.ipd.descartes.linalg.LinAlg.zeros;
 import static edu.kit.ipd.descartes.linalg.testutil.MatrixAssert.assertThat;
@@ -32,40 +32,32 @@ import static edu.kit.ipd.descartes.linalg.testutil.VectorAssert.assertThat;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import net.descartesresearch.librede.configuration.Resource;
-import net.descartesresearch.librede.configuration.Service;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.kit.ipd.descartes.librede.models.observation.functions.ResponseTimeApproximation;
-import edu.kit.ipd.descartes.librede.repository.Aggregation;
+import edu.kit.ipd.descartes.librede.models.observation.functions.UtilizationLaw;
 import edu.kit.ipd.descartes.librede.repository.IRepositoryCursor;
-import edu.kit.ipd.descartes.librede.repository.Query;
 import edu.kit.ipd.descartes.librede.repository.QueryBuilder;
 import edu.kit.ipd.descartes.librede.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.testutils.Differentiation;
 import edu.kit.ipd.descartes.librede.testutils.ObservationDataGenerator;
 import edu.kit.ipd.descartes.librede.workload.WorkloadDescription;
 import edu.kit.ipd.descartes.linalg.Matrix;
-import edu.kit.ipd.descartes.linalg.Scalar;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-public class ResponseTimeApproximationTest {
-	
-	private final static int SERVICE_IDX = 2;
-	private final static int RESOURCE_IDX = 1;
+public class UtilizationLawTest {
+		
+	private final static int RESOURCE_IDX = 2;
 	
 	private ObservationDataGenerator generator;
-	private ResponseTimeApproximation law;
-	private Vector state;
-	
-	private Resource resource;
-	private Service service;
-	private int stateIdx;
+	private UtilizationLaw law;
 	private IRepositoryCursor cursor;
+	private Vector state;
+	private Resource resource;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() throws Exception {		
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
@@ -73,35 +65,32 @@ public class ResponseTimeApproximationTest {
 		cursor = generator.getRepository().getCursor(0, 1);
 		
 		resource = workload.getResources().get(RESOURCE_IDX);
-		service = workload.getServices().get(SERVICE_IDX);
-		stateIdx = workload.getState().getIndex(resource, service);
-		
-		law = new ResponseTimeApproximation(workload, cursor, resource, service, Aggregation.AVERAGE);
-		state = generator.getDemands();
+		law = new UtilizationLaw(workload, cursor, resource);
+		state = generator.getDemands();		
 		
 		generator.nextObservation();
 		cursor.next();
 	}
 
 	@Test
-	public void testGetFactor() {
-		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
+	public void testGetIndependentVariables() {
+		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector varVector = law.getIndependentVariables();		
+		Vector expectedVarVector = zeros(state.rows()).set(generator.getWorkloadDescription().getState().getRange(resource), x);
+		
+		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
-		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
-	}
-
-	@Test
-	public void testGetIndependentVariables() {
-		assertThat(law.getIndependentVariables()).isEqualTo(zeros(state.rows()).set(stateIdx, 1.0), offset(1e-9));
+		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(state.get(stateIdx), offset(1e-9));
+		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
@@ -113,7 +102,7 @@ public class ResponseTimeApproximationTest {
 	@Test
 	public void testGetSecondDerivatives() {
 		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
+		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e-4));
 	}
 
 }
