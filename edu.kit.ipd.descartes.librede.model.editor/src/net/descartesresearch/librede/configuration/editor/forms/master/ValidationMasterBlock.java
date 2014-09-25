@@ -56,7 +56,7 @@ import org.eclipse.ui.forms.IDetailsPageProvider;
 import org.eclipse.ui.forms.IManagedForm;
 
 import edu.kit.ipd.descartes.librede.registry.Registry;
-import edu.kit.ipd.descartes.librede.validation.Validator;
+import edu.kit.ipd.descartes.librede.validation.IValidator;
 
 public class ValidationMasterBlock extends AbstractMasterBlock implements IDetailsPageProvider {
 	
@@ -97,7 +97,7 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 			existingValidators.add(v.getType());
 		}
 		for (Class<?> cl : Registry.INSTANCE
-				.getImplementationClasses(Validator.class)) {
+				.getImplementationClasses(IValidator.class)) {
 			if (!existingValidators.contains(cl)) {
 				ValidatorConfiguration a = ConfigurationFactory.eINSTANCE
 						.createValidatorConfiguration();
@@ -142,7 +142,7 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 	public IDetailsPage getPage(Object key) {
 		return new ParametersDetailsPage(page, 
 				domain, 
-				"Validator Configuration", 
+				"IValidator Configuration", 
 				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION,
 				(Class<?>)key, 
 				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__PARAMETERS);
