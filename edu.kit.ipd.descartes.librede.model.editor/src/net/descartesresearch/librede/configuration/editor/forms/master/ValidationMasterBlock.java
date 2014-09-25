@@ -142,7 +142,7 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 	public IDetailsPage getPage(Object key) {
 		return new ParametersDetailsPage(page, 
 				domain, 
-				"IValidator Configuration", 
+				"Validator Configuration", 
 				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION,
 				(Class<?>)key, 
 				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__PARAMETERS);
