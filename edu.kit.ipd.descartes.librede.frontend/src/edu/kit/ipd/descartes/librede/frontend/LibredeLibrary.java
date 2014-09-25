@@ -41,7 +41,7 @@ import edu.kit.ipd.descartes.librede.registry.Registry;
 import edu.kit.ipd.descartes.librede.repository.StandardMetric;
 import edu.kit.ipd.descartes.librede.validation.ResponseTimeValidator;
 import edu.kit.ipd.descartes.librede.validation.UtilizationValidator;
-import edu.kit.ipd.descartes.librede.validation.Validator;
+import edu.kit.ipd.descartes.librede.validation.IValidator;
 
 public class LibredeLibrary {
 	
@@ -60,8 +60,8 @@ public class LibredeLibrary {
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
 		
-		Registry.INSTANCE.registerImplementationType(Validator.class, ResponseTimeValidator.class);
-		Registry.INSTANCE.registerImplementationType(Validator.class, UtilizationValidator.class);
+		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
+		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
 		
 		Registry.INSTANCE.registerImplementationType(IExporter.class, CsvExporter.class);
 	}
