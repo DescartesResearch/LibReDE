@@ -46,7 +46,12 @@ public class CsvExporter implements IExporter {
 	private String fileName;
 	
 	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception {
-		File outputFile = new File(outputPath, fileName + "_" + approach + "_" + "fold_" + fold + ".csv");
+		File outputFile;
+		if (fileName != null && !fileName.isEmpty()) {
+			outputFile = new File(outputPath, fileName + "_" + approach + "_" + "fold_" + fold + ".csv");
+		} else {
+			outputFile = new File(outputPath, approach + "_" + "fold_" + fold + ".csv");
+		}
 		
 		Vector time = estimates.getTime();
 		Matrix demands = estimates.getData();
