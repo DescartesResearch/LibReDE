@@ -38,7 +38,7 @@ import edu.kit.ipd.descartes.linalg.LinAlg;
 import edu.kit.ipd.descartes.linalg.MatrixBuilder;
 import edu.kit.ipd.descartes.linalg.Vector;
 
-@Component(displayName = "Response Time IValidator")
+@Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
 	
 	private List<ResponseTimeEquation> respEq;
