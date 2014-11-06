@@ -26,11 +26,11 @@
  */
 package tools.descartes.librede.frontend;
 
-import tools.descartes.librede.approaches.IEstimationApproach;
+import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.approach.ResponseTimeApproximationApproach;
+import tools.descartes.librede.approach.ServiceDemandLawApproach;
 import tools.descartes.librede.approaches.MenasceOptimizationApproach;
-import tools.descartes.librede.approaches.ResponseTimeApproximationApproach;
 import tools.descartes.librede.approaches.RoliaRegressionApproach;
-import tools.descartes.librede.approaches.ServiceDemandLawApproach;
 import tools.descartes.librede.approaches.WangKalmanFilterApproach;
 import tools.descartes.librede.approaches.ZhangKalmanFilterApproach;
 import tools.descartes.librede.datasource.IDataSource;

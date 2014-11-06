@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.approaches;
+package tools.descartes.librede.approach;
 
 import java.util.List;
 

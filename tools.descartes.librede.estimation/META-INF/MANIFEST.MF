@@ -5,6 +5,7 @@ Bundle-SymbolicName: tools.descartes.librede.estimation
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: tools.descartes.librede.algorithm,
+ tools.descartes.librede.approach,
  tools.descartes.librede.datasource,
  tools.descartes.librede.datasource.csv,
  tools.descartes.librede.exceptions,

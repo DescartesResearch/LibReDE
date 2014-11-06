@@ -30,6 +30,7 @@ import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import java.util.List;
 
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.exceptions.EstimationException;

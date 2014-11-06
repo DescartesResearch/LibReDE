@@ -27,6 +27,7 @@
 package tools.descartes.librede.approaches;
 
 import static tools.descartes.librede.linalg.LinAlg.zeros;
+import tools.descartes.librede.approach.AbstractEstimationApproach;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.exceptions.InitializationException;

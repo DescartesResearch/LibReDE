@@ -27,6 +27,7 @@
 package tools.descartes.librede.approaches;
 
 import static tools.descartes.librede.linalg.LinAlg.zeros;
+import tools.descartes.librede.approach.AbstractEstimationApproach;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;

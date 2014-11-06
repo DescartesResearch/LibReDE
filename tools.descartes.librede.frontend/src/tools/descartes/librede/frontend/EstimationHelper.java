@@ -37,7 +37,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import tools.descartes.librede.approaches.IEstimationApproach;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.ExporterConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;

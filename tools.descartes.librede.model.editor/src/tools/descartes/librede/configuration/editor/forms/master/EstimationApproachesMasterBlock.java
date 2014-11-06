@@ -50,7 +50,7 @@ import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IDetailsPageProvider;
 import org.eclipse.ui.forms.IManagedForm;
 
-import tools.descartes.librede.approaches.IEstimationApproach;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;

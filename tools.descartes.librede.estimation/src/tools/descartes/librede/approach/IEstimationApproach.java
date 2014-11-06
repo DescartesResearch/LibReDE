@@ -24,34 +24,22 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.approaches;
+package tools.descartes.librede.approach;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-public class EstimationApproachFactory {
+import tools.descartes.librede.exceptions.EstimationException;
+import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.workload.WorkloadDescription;
+
+public interface IEstimationApproach {
 	
-	private static Map<String, Class<?>> approaches = new HashMap<String, Class<?>>();
+	void initialize(WorkloadDescription workload, IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException;
 	
-	static {
-		approaches.put(ResponseTimeApproximationApproach.NAME, ResponseTimeApproximationApproach.class);
-		approaches.put(ServiceDemandLawApproach.NAME, ServiceDemandLawApproach.class);
-		approaches.put(RoliaRegressionApproach.NAME, RoliaRegressionApproach.class);
-		approaches.put(ZhangKalmanFilterApproach.NAME, ZhangKalmanFilterApproach.class);
-		approaches.put(WangKalmanFilterApproach.NAME, WangKalmanFilterApproach.class);
-		approaches.put(MenasceOptimizationApproach.NAME, MenasceOptimizationApproach.class);
-	}
+	boolean checkPreconditions(List<String> messages);
 	
-	public static String[] getEstimationApproaches() {
-		return approaches.keySet().toArray(new String[approaches.size()]);
-	}
-	
-	public static IEstimationApproach newEstimationApproach(String name) throws InstantiationException, IllegalAccessException {
-		Class<?> cls = approaches.get(name);
-		if (cls != null) {
-			return (IEstimationApproach)cls.newInstance();
-		}
-		return null;
-	}
+	TimeSeries execute() throws EstimationException;
 
 }
