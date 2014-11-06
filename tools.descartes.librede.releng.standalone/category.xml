@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/tools.descartes.librede.feature_1.0.0.qualifier.jar" id="tools.descartes.librede.feature" version="1.0.0.qualifier">
+      <category name="librede.standalone"/>
+   </feature>
+   <bundle id="tools.descartes.librede.doc" version="1.0.0.qualifier">
+      <category name="librede.standalone"/>
+   </bundle>
+   <category-def name="librede.standalone" label="Standalone Distribution"/>
+</site>

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: tools.descartes.librede.bayesplusplus.java.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: tools.descartes.librede.bayesplusplus.java
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.junit;bundle-version="4.11.0"
+Import-Package: tools.descartes.librede.repository,
+ tools.descartes.librede.testutils,
+ tools.descartes.librede.workload,
+ tools.descartes.librede.configuration

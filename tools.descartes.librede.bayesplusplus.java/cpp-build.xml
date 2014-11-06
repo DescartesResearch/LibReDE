@@ -1,0 +1,23 @@
+<project name="tools.descartes.redeem.backend.kalman" default="build" basedir=".">
+	
+	<condition property="os.family" value="unix">  
+		<os family="unix"/>  
+	</condition>  
+	<condition property="os.family" value="windows">  
+		<os family="windows"/>  
+	</condition>  
+	
+	<property file="native/${os.family}/gcc.properties" />
+			
+	<target name="build">
+		<exec executable="${make.executable}" dir="native">
+			<env key="BOOST_ROOT" value="${boost.root}" />
+			<env key="BAYES_PLUS_PLUS_INCLUDES" value="${bayesplusplus.include.dir}" />
+			<env key="BAYES_PLUS_PLUS_LIB" value="${bayesplusplus.lib.dir}" />
+			<env key="BUILD_DIR" value="../build" />
+			<env key="LIB_PREFIX" value="${lib.prefix}" />
+			<env key="LIB_EXTENSION" value="${lib.extension}" />
+		</exec>
+		<copy file="build/${lib.prefix}BayesPlusPlus.${lib.extension}" todir="${basedir}"></copy>
+	</target>
+</project>

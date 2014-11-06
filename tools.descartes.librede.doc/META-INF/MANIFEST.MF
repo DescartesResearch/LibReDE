@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LibReDE documentation
+Bundle-SymbolicName: tools.descartes.librede.doc
+Bundle-Version: 1.0.0.qualifier

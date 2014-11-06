@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Testutil
+Bundle-SymbolicName: tools.descartes.librede.estimation.testutil
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: tools.descartes.librede.testutils
+Import-Package: org.junit;version="4.11.0",
+ tools.descartes.librede.configuration,
+ tools.descartes.librede.linalg,
+ tools.descartes.librede.models.observation.functions,
+ tools.descartes.librede.repository,
+ tools.descartes.librede.workload

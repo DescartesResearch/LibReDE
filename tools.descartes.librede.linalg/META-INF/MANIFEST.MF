@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Linalg
+Bundle-SymbolicName: tools.descartes.librede.linalg
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: tools.descartes.librede.linalg,
+ tools.descartes.librede.linalg.backend,
+ tools.descartes.librede.linalg.backend.colt
+Import-Package: cern.colt;version="1.2.0",
+ cern.colt.function;version="1.2.0",
+ cern.colt.matrix,
+ cern.colt.matrix.doublealgo;version="1.2.0",
+ cern.colt.matrix.impl,
+ cern.colt.matrix.linalg,
+ cern.jet.math

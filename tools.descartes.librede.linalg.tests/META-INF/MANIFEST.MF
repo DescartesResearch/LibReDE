@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: tools.descartes.librede.linalg.tests
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: tools.descartes.librede.linalg
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: tools.descartes.librede.linalg.testutil,
+ org.fest.assertions.api,
+ org.mockito,
+ org.mockito.invocation,
+ org.mockito.stubbing
+Require-Bundle: org.junit;bundle-version="4.11.0"
