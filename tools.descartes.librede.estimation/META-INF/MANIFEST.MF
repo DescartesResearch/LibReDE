@@ -4,7 +4,8 @@ Bundle-Name: Estimation
 Bundle-SymbolicName: tools.descartes.librede.estimation
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: tools.descartes.librede.algorithm,
+Export-Package: tools.descartes.librede,
+ tools.descartes.librede.algorithm,
  tools.descartes.librede.approach,
  tools.descartes.librede.datasource,
  tools.descartes.librede.datasource.csv,
@@ -24,5 +25,6 @@ Import-Package: cern.jet.random.sampling;version="1.2.0",
  org.apache.commons.math3.optim;version="3.2.0",
  org.apache.commons.math3.optim.linear;version="3.2.0",
  org.apache.log4j;version="1.2.15",
+ org.osgi.framework;version="1.8.0",
  tools.descartes.librede.configuration,
  tools.descartes.librede.linalg

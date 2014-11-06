@@ -39,7 +39,7 @@ public class Registry {
 	
 	public static final Registry INSTANCE = new Registry();
 	
-	private Map<String, IMetric> metrics = new HashMap<String, IMetric>();	
+	private Map<String, IMetric> metrics = new HashMap<String, IMetric>();
 	
 	private Map< Class<?>, Set<Class<?>> > implementations = new HashMap< Class<?>, Set<Class<?>> >();
 	

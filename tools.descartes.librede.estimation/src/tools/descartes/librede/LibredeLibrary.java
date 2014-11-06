@@ -24,15 +24,11 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.frontend;
+package tools.descartes.librede;
 
 import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.approach.ResponseTimeApproximationApproach;
 import tools.descartes.librede.approach.ServiceDemandLawApproach;
-import tools.descartes.librede.approaches.MenasceOptimizationApproach;
-import tools.descartes.librede.approaches.RoliaRegressionApproach;
-import tools.descartes.librede.approaches.WangKalmanFilterApproach;
-import tools.descartes.librede.approaches.ZhangKalmanFilterApproach;
 import tools.descartes.librede.datasource.IDataSource;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.export.IExporter;
@@ -51,14 +47,17 @@ public class LibredeLibrary {
 			Registry.INSTANCE.registerMetric(metric.toString(), metric);
 		}
 		
-		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);		
+		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ResponseTimeApproximationApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ServiceDemandLawApproach.class);
-		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, RoliaRegressionApproach.class);
-		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, MenasceOptimizationApproach.class);
-		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
-		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
+		
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ResponseTimeApproximationApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ServiceDemandLawApproach.class);
+//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, RoliaRegressionApproach.class);
+//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, MenasceOptimizationApproach.class);
+//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
+//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
 		
 		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
