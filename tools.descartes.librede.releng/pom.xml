@@ -17,11 +17,11 @@
 	</organization>
 
 	<properties>
-		<tycho-version>0.20.0</tycho-version>
+		<tycho-version>0.21.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    	<sonar.jacoco.reportPath>../tools.descartes.librede.releng/jacoco.exec</sonar.jacoco.reportPath>
+    	<sonar.jacoco.reportPath>../tools.descartes.librede.releng/target/jacoco.exec</sonar.jacoco.reportPath>
 	</properties>
 	<distributionManagement>
 		<repository>
