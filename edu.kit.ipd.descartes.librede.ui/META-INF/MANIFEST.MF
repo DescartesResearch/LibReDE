@@ -4,7 +4,7 @@ Bundle-Name: Librede UI
 Bundle-SymbolicName: edu.kit.ipd.descartes.librede.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: edu.kit.ipd.descartes.librede.estimation.repository,
+Import-Package: edu.kit.ipd.descartes.librede.repository,
  org.eclipse.core.commands,
  org.eclipse.core.commands.common,
  org.eclipse.core.resources,
