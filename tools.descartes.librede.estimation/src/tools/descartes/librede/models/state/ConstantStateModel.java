@@ -32,12 +32,42 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.state.constraints.Unconstrained;
 
-public class ConstantStateModel<C extends IStateConstraint> implements IStateModel<C> {	
+public class ConstantStateModel<C extends IStateConstraint> implements IStateModel<C> {
+	
+	public static class Builder<C extends IStateConstraint> {
+		private List<Resource> resources = new ArrayList<>();
+		private List<Service> services = new ArrayList<>();
+		private List<C> constraints = new ArrayList<C>();
+		private Vector initialState;
+		
+		public void addVariable(Resource resource, Service service) {
+			resources.add(resource);
+			services.add(service);
+		}
+		
+		public void setInitialState(Vector initialState) {
+			this.initialState = initialState;
+		}
+		
+		public void addConstraint(C constraint) {
+			if (constraint == null) {
+				throw new IllegalArgumentException("Constraint must not be null.");
+			}
+			constraints.add(constraint);
+		}
+		
+		public ConstantStateModel<C> build() {
+			return new ConstantStateModel<C>(resources, services, constraints, initialState);
+		}
+	}
 	
 	private class ConstantFunction implements IDifferentiableFunction {
 		
@@ -61,28 +91,38 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		
 	}
 	
-	private int stateSize;
-	private List<C> constraints = new ArrayList<C>();
-	private Vector initialState;
-	private List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
+	private final int stateSize;
+	private final List<Resource> resources;
+	private final List<Service> services;
+	private final List<C> constraints;
+	private final Vector initialState;
+	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
 	
-	public ConstantStateModel(int stateSize, Vector initialState) {
-		if (stateSize <= 0) {
-			throw new IllegalArgumentException("State size must be greater than 0.");
-		}
+	private ConstantStateModel(List<Resource> resources, List<Service> services, List<C> constraints, Vector initialState) {
+		this.stateSize = resources.size();
+		this.resources = Collections.unmodifiableList(resources);
+		this.services = Collections.unmodifiableList(services);
+		this.constraints = Collections.unmodifiableList(constraints);
+		
 		if (initialState == null) {
 			throw new IllegalArgumentException("Initial state must not be null.");
 		}
 		if (initialState.rows() != stateSize) {
 			throw new IllegalArgumentException("Size of initial state vector must be equal to the state size.");
-		}
-		
-		this.stateSize = stateSize;
+		}		
 		this.initialState = initialState;
-		
+	
 		for (int i = 0; i < stateSize; i++) {
 			derivatives.add(new ConstantFunction(stateSize, i));
 		}
+	}
+	
+	public static Builder<Unconstrained> unconstrainedModelBuilder() {
+		return new Builder<Unconstrained>();
+	}
+	
+	public static Builder<IStateConstraint> constrainedModelBuilder() {
+		return new Builder<IStateConstraint>();
 	}
 
 	@Override
@@ -93,15 +133,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	@Override
 	public Vector getNextState(Vector state) {
 		return state;
-	}
-
-	@Override
-	public void addConstraint(C constraint) {
-		if (constraint == null) {
-			throw new IllegalArgumentException("Constraint must not be null.");
-		}
-		
-		constraints.add(constraint);
 	}
 
 	@Override
@@ -117,6 +148,16 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	@Override
 	public Vector getInitialState() {
 		return initialState;
+	}
+
+	@Override
+	public Resource getResource(int stateIdx) {
+		return resources.get(stateIdx);
+	}
+
+	@Override
+	public Service getService(int stateIdx) {
+		return services.get(stateIdx);
 	}
 
 }

@@ -28,6 +28,8 @@ package tools.descartes.librede.models.state;
 
 import java.util.List;
 
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -36,9 +38,11 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	int getStateSize();
 	
-	Vector getNextState(Vector state);
+	Resource getResource(int stateIdx);
 	
-	void addConstraint(C constraint);
+	Service getService(int stateIdx);
+	
+	Vector getNextState(Vector state);
 	
 	List<C> getConstraints();
 	
