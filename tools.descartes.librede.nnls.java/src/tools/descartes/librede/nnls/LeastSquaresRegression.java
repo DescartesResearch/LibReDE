@@ -28,7 +28,7 @@ package tools.descartes.librede.nnls;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.vector;
-import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
+import tools.descartes.librede.algorithm.ILeastSquaresRegressionAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.LinAlg;
@@ -37,7 +37,7 @@ import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
 import cern.colt.matrix.DoubleFactory2D;
@@ -55,9 +55,11 @@ import com.sun.jna.ptr.IntByReference;
  * 
  */
 public class LeastSquaresRegression
-		extends AbstractEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<ILinearOutputFunction, Scalar>> {
+		implements ILeastSquaresRegressionAlgorithm {
 
 	private ILinearOutputFunction outputFunction;
+	private ConstantStateModel<Unconstrained> stateModel;
+	private IObservationModel<ILinearOutputFunction, Scalar> observationModel;
 
 	// contains current measurements
 	private Matrix independentVariables;
@@ -69,13 +71,21 @@ public class LeastSquaresRegression
 	private final int MIN_SIZE_OF_ESTIMATION = 2;
 	private static final DoubleFactory2D FACTORY2D = DoubleFactory2D.dense;
 
-	public LeastSquaresRegression() {
+	@Override
+	public ConstantStateModel<Unconstrained> getStateModel() {
+		return stateModel;
 	}
 
 	@Override
-	public void initialize(IStateModel<Unconstrained> stateModel,
+	public IObservationModel<ILinearOutputFunction, Scalar> getObservationModel() {
+		return observationModel;
+	}
+
+	@Override
+	public void initialize(ConstantStateModel<Unconstrained> stateModel,
 			IObservationModel<ILinearOutputFunction, Scalar> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+		this.stateModel = stateModel;
+		this.observationModel = observationModel;
 		
 		independentVariables = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
 		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);
@@ -190,7 +200,6 @@ public class LeastSquaresRegression
 
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
-
+		// Do nothing
 	}
 }

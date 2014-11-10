@@ -16,6 +16,7 @@ Import-Package: com.sun.jna,
  tools.descartes.librede.models.observation.functions,
  tools.descartes.librede.models.state,
  tools.descartes.librede.models.state.constraints,
- tools.descartes.librede.nativehelper
+ tools.descartes.librede.nativehelper,
+ tools.descartes.librede.registry
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.9.0"
 Export-Package: tools.descartes.librede.ipopt.java

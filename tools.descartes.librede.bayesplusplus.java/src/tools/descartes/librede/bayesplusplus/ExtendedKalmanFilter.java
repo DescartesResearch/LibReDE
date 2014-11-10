@@ -32,6 +32,7 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
+import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import tools.descartes.librede.bayesplusplus.backend.FCallback;
 import tools.descartes.librede.bayesplusplus.backend.HCallback;
@@ -50,8 +51,7 @@ import tools.descartes.librede.nativehelper.NativeHelper;
 
 import com.sun.jna.Pointer;
 
-public class ExtendedKalmanFilter extends
-		AbstractEstimationAlgorithm<IStateModel<Unconstrained>, IObservationModel<IOutputFunction, Vector>> {
+public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {	
 
 	// Callback function from native library for the observation model
 	private class HFunction implements HCallback {
@@ -124,6 +124,16 @@ public class ExtendedKalmanFilter extends
 	private double stateNoiseCovarianceConstant = 1.0;
 	private double stateNoiseCouplingConstant = 1.0;
 	private double observeNoiseConstant = 0.0001;
+	
+	@Override
+	public IStateModel<Unconstrained> getStateModel() {
+		return stateModel;
+	}
+
+	@Override
+	public IObservationModel<IOutputFunction, Vector> getObservationModel() {
+		return observationModel;
+	}
 	
 	/**
 	 * Sets a constant value used for all entries of the state noise vector.
@@ -290,7 +300,8 @@ public class ExtendedKalmanFilter extends
 	@Override
 	public void initialize(IStateModel<Unconstrained> stateModel,
 			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+		this.stateModel = stateModel;
+		this.observationModel = observationModel;
 		
 		this.stateSize = stateModel.getStateSize();
 		this.outputSize = observationModel.getOutputSize();
@@ -333,7 +344,7 @@ public class ExtendedKalmanFilter extends
 	public Vector estimate() throws EstimationException {
 		return mean(estimates, 0);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -352,5 +363,4 @@ public class ExtendedKalmanFilter extends
 			nativeStateModel = null;
 		}
 	}
-
 }

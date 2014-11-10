@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
+import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.ipopt.java.backend.Eval_F_CB;
@@ -64,7 +65,7 @@ import tools.descartes.librede.nativehelper.NativeHelper;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
 
-public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>> {	
+public class RecursiveOptimization implements IConstrainedNonLinearOptimizationAlgorithm {	
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
@@ -125,6 +126,9 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 	
 	private Matrix estimationBuffer;
 	
+	private ConstantStateModel<? extends IStateConstraint> stateModel;
+	private IObservationModel<IOutputFunction, Vector> observationModel;
+	
 	/**
 	 * Sets the tolerance level for an acceptable solution
 	 * @param solutionTolerance
@@ -144,13 +148,29 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 	}
 	
 	/* (non-Javadoc)
+	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#getStateModel()
+	 */
+	@Override
+	public ConstantStateModel<? extends IStateConstraint> getStateModel() {
+		return stateModel;
+	}
+
+	/* (non-Javadoc)
+	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#getObservationModel()
+	 */
+	@Override
+	public IObservationModel<IOutputFunction, Vector> getObservationModel() {
+		return observationModel;
+	}
+	
+	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
 	 */
 	@Override
 	public void initialize(ConstantStateModel<? extends IStateConstraint> stateModel,
 			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
-		
+		this.stateModel = stateModel;
+		this.observationModel = observationModel;		
 		
 		initStateConstraints(stateModel.getConstraints());
 		
@@ -568,6 +588,5 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm<ConstantS
 	@Override
 	public void destroy() {
 		
-	}
-	
+	}	
 }

@@ -17,5 +17,6 @@ Import-Package: cern.colt.matrix,
  tools.descartes.librede.models.observation,
  tools.descartes.librede.models.observation.functions,
  tools.descartes.librede.models.state,
- tools.descartes.librede.models.state.constraints
+ tools.descartes.librede.models.state.constraints,
+ tools.descartes.librede.registry
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.9.0"
