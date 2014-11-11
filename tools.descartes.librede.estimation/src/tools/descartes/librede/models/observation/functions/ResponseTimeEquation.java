@@ -41,6 +41,8 @@ import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -77,7 +79,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	/**
 	 * Creates a new instance.
 	 * 
-	 * @param system - the model of the system
+	 * @param stateModel - the description of the state
 	 * @param repository - a view of the repository with current measurement data
 	 * @param service - the service for which the response time is calculated
 	 * @param selectedResources - the list of resources which are involved during the processing of the service
@@ -85,10 +87,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @throws NullPointerException if any parameter is null
 	 * @throws IllegalArgumentException if the list of services or resources is empty
 	 */
-	public ResponseTimeEquation(WorkloadDescription system, IRepositoryCursor repository,
+	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Service service, List<Resource> selectedResources
 			) {
-		super(system, selectedResources, Arrays.asList(service));
+		super(stateModel, selectedResources, Arrays.asList(service));
 		
 		cls_r = service;
 		
@@ -125,14 +127,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public double getCalculatedOutput(final Vector state) {
+	public double getCalculatedOutput() {
 		double rt = 0.0;
 		Vector X = throughputQuery.execute();
 		double X_total = sum(X);
 		
 		for (Resource res_i : getSelectedResources()) {
-			Vector D_i = state.slice(getSystem().getState().getRange(res_i));
-			double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
+			Vector D_i = getStateModel().getCurrentState().slice(getStateModel().getStateVariableIndexRange(res_i));
+			double D_ir = getStateModel().getCurrentState().get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			double U_i = X.dot(D_i);
 
 			int p = res_i.getNumberOfServers();
@@ -158,12 +160,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				 * i - index of the resource corresponding to x_{row}
 				 * s - index of the service corresponding to x_{row}
 				 */
-				Resource res_i = getSystem().getState().getResource(row);
-				Service cls_s = getSystem().getState().getService(row);
+				Resource res_i = getStateModel().getResource(row);
+				Service cls_s = getStateModel().getService(row);
 				
 				// get resource demands
-				Vector D_i = state.slice(getSystem().getState().getRange(res_i));
-				double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
+				Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
+				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 				
 				// get current throughput data
 				Vector X = throughputQuery.execute();
@@ -210,16 +212,16 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				 * j - index of the resource corresponding to x_{column}
 				 * t - index of the service corresponding to x_{column}
 				 */
-				Resource res_i = getSystem().getState().getResource(row);
-				Service cls_s = getSystem().getState().getService(row);
-				Resource res_j = getSystem().getState().getResource(column);
-				Service cls_t = getSystem().getState().getService(column);
+				Resource res_i = getStateModel().getResource(row);
+				Service cls_s = getStateModel().getService(row);
+				Resource res_j = getStateModel().getResource(column);
+				Service cls_t = getStateModel().getService(column);
 				
 				// if resources of x_{row} and x_{column} do not match the second derivative is zero
 				if (res_i.equals(res_j)) {
 					// get resource demands
-					Vector D_i = state.slice(getSystem().getState().getRange(res_i));
-					double D_ir = state.get(getSystem().getState().getIndex(res_i, cls_r));
+					Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
+					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 					
 					// get current throughput data
 					Vector X = throughputQuery.execute();

@@ -35,7 +35,7 @@ public interface IObservationModel<E extends IOutputFunction, O extends Vector> 
 	
 	O getObservedOutput();
 	
-	O getCalculatedOutput(Vector state);
+	O getCalculatedOutput();
 	
 	E getOutputFunction(int output);
 	

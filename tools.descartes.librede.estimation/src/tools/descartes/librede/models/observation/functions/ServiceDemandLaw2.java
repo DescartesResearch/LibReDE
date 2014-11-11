@@ -31,11 +31,12 @@ import java.util.List;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 /**
  * This output function describes the relationship between the per-service utilization and the resource demands. 
@@ -78,17 +79,17 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	/**
 	 * Creates a new instance.
 	 * 
-	 * @param system - the model of the system
+	 * @param stateModel - the description of the state
 	 * @param repository - the view of the repository with current measurement data
 	 * @param service - the service for which the utilization is calculated
 	 * @param resource - the resource for which the utilization is calculated
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public ServiceDemandLaw2(WorkloadDescription system, IRepositoryCursor repository,
+	public ServiceDemandLaw2(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource,
 			Service service) {
-		super(system, resource, service);
+		super(stateModel, resource, service);
 		
 		res_i = resource;
 		cls_r = service;

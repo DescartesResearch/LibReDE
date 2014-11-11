@@ -31,31 +31,32 @@ import java.util.List;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public abstract class AbstractOutputFunction implements IOutputFunction {
 	
-	private WorkloadDescription system;
-	private List<Resource> selectedResources;
-	private List<Service> selectedClasses;
+	private final IStateModel<? extends IStateConstraint> stateModel;
+	private final List<Resource> selectedResources;
+	private final List<Service> selectedClasses;
 
-	protected AbstractOutputFunction(WorkloadDescription system, List<Resource> selectedResources,
+	protected AbstractOutputFunction(IStateModel<? extends IStateConstraint> stateModel, List<Resource> selectedResources,
 			List<Service> selectedClasses) {		
-		if (system == null || selectedResources == null || selectedClasses == null) {
+		if (stateModel == null || selectedResources == null || selectedClasses == null) {
 			throw new NullPointerException();
 		}
 		if (selectedResources.size() < 1 || selectedClasses.size() < 1) {
 			throw new IllegalArgumentException();
 		}
 		
-		this.system = system;
+		this.stateModel = stateModel;
 		this.selectedResources = selectedResources;
 		this.selectedClasses = selectedClasses;
 	}
 
-	public WorkloadDescription getSystem() {
-		return system;
+	public IStateModel<? extends IStateConstraint> getStateModel() {
+		return stateModel;
 	}
 
 	public List<Resource> getSelectedResources() {

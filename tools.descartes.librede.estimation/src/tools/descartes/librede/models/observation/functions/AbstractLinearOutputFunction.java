@@ -35,19 +35,20 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
-import tools.descartes.librede.workload.WorkloadDescription;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction {
 	
-	protected AbstractLinearOutputFunction(WorkloadDescription system,
+	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel,
 			List<Resource> selectedResources,
 			List<Service> selectedClasses) {
-		super(system, selectedResources, selectedClasses);
+		super(stateModel, selectedResources, selectedClasses);
 	}
 	
 	@Override
-	public double getCalculatedOutput(Vector state) {
-		return getIndependentVariables().dot(state);
+	public double getCalculatedOutput() {
+		return getIndependentVariables().dot(getStateModel().getCurrentState());
 	}
 
 	@Override

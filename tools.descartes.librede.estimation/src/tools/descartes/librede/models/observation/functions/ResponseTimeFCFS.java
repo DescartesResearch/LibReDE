@@ -31,20 +31,21 @@ import java.util.List;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	
 	private Query<Scalar> responseTimeQuery;
 	private Query<Scalar> queueLengthQuery;
 
-	public  ResponseTimeFCFS(WorkloadDescription system, IRepositoryCursor repository,
+	public  ResponseTimeFCFS(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource, Service service) {
-		super(system, resource, service);
+		super(stateModel, resource, service);
 		
 		responseTimeQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(repository);
 		queueLengthQuery = QueryBuilder.select(StandardMetric.QUEUE_LENGTH_SEEN_ON_ARRIVAL).forResource(resource).average().using(repository);

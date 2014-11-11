@@ -32,7 +32,8 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.workload.WorkloadDescription;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public abstract class AbstractDirectOutputFunction extends
 		AbstractLinearOutputFunction implements IDirectOutputFunction {
@@ -40,13 +41,13 @@ public abstract class AbstractDirectOutputFunction extends
 	private Vector zeros;
 	private int idx;
 
-	protected AbstractDirectOutputFunction(WorkloadDescription system,
+	protected AbstractDirectOutputFunction(IStateModel<? extends IStateConstraint> stateModel,
 			Resource resource,
 			Service service) {
-		super(system, Arrays.asList(resource), Arrays.asList(service));
+		super(stateModel, Arrays.asList(resource), Arrays.asList(service));
 		
-		zeros = LinAlg.zeros(getSystem().getState().getStateSize());
-		idx = getSystem().getState().getIndex(resource, service);
+		zeros = LinAlg.zeros(stateModel.getStateSize());
+		idx = stateModel.getStateVariableIndex(resource, service);
 	}
 
 	@Override
