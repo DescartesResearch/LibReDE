@@ -55,7 +55,7 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		return stateModel.getCurrentState(res_i, cls_r);
+		return stateModel.getCurrentState().get(stateModel.getStateVariableIndex(res_i, cls_r));
 	}
 
 	@Override

@@ -30,25 +30,34 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.linalg.Range;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public interface IStateModel<C extends IStateConstraint> {
 	
+	// Information about the structure of the state model
+	
 	int getStateSize();
+	
+	List<Resource> getResources();
+	
+	List<Service> getServices();
+
+	Range getStateVariableIndexRange(Resource res);
+	
+	int getStateVariableIndex(Resource res, Service service);	
+	
+	List<C> getConstraints();
+	
+	// Access methods to current state of state model.
 	
 	void setCurrentState(Vector state);	
 	
 	Vector getCurrentState();
 	
-	Vector getCurrentState(Resource res);
-	
-	double getCurrentState(Resource res, Service service);
-	
 	Vector getNextState();
-	
-	List<C> getConstraints();
 	
 	List<IDifferentiableFunction> getStateDerivatives();
 	

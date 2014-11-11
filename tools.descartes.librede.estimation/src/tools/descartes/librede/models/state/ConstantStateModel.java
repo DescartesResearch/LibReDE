@@ -70,20 +70,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 		
 		public ConstantStateModel<C> build() {
-			Map<Resource, Integer> resourceIndexes = new HashMap<Resource, Integer>(resources.size());
-			int i = 0;
-			for (Resource r : resources) {
-				resourceIndexes.put(r, i);
-				i++;
-			}
-			Map<Service, Integer> serviceIndexes = new HashMap<Service, Integer>(services.size());
-			i = 0;
-			for (Service s : services) {
-				serviceIndexes.put(s, i);
-				i++;
-			}
-			
-			return new ConstantStateModel<C>(resourceIndexes, serviceIndexes, constraints, initialState);
+			return new ConstantStateModel<C>(resources, services, constraints, initialState);
 		}
 	}
 	
@@ -111,20 +98,37 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	
 	private final int resourceStride;
 	private final int stateSize;
-	private final Map<Resource, Integer> resources;
-	private final Map<Service, Integer> services;
+	private final List<Resource> resources;
+	private final List<Service> services;
+	private final Map<Resource, Integer> resourcesToIndex;
+	private final Map<Service, Integer> servicesToIndex;
 	private final List<C> constraints;
 	private final Vector initialState;
 	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
 	private Vector currentState;
 	
-	private ConstantStateModel(Map<Resource, Integer> resources, Map<Service, Integer> services, List<C> constraints, Vector initialState) {
+	private ConstantStateModel(List<Resource> resources, List<Service> services, List<C> constraints, Vector initialState) {
 		this.stateSize = resources.size() * services.size();
-		this.resourceStride = services.size();
-		this.resources = Collections.unmodifiableMap(resources);
-		this.services = Collections.unmodifiableMap(services);
+		this.resourceStride = services.size();		
+		this.resources = Collections.unmodifiableList(resources);
+		this.services = Collections.unmodifiableList(services);
 		this.constraints = Collections.unmodifiableList(constraints);
 		
+		// Create mapping between model entities and state variables index
+		this.resourcesToIndex = new HashMap<Resource, Integer>(resources.size());
+		int i = 0;
+		for (Resource r : resources) {
+			this.resourcesToIndex.put(r, i);
+			i++;
+		}
+		this.servicesToIndex = new HashMap<Service, Integer>(services.size());
+		i = 0;
+		for (Service s : services) {
+			this.servicesToIndex.put(s, i);
+			i++;
+		}
+
+		// initialize state of model		
 		if (initialState == null) {
 			throw new IllegalArgumentException("Initial state must not be null.");
 		}
@@ -134,8 +138,8 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		this.initialState = initialState;
 		this.currentState = initialState;
 	
-		for (int i = 0; i < stateSize; i++) {
-			derivatives.add(new ConstantFunction(stateSize, i));
+		for (int a = 0; a < stateSize; a++) {
+			derivatives.add(new ConstantFunction(stateSize, a));
 		}
 	}
 	
@@ -163,22 +167,22 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 	
 	@Override
-	public Vector getCurrentState(Resource res) {
-		Integer resIdx = resources.get(res);
+	public Range getStateVariableIndexRange(Resource res) {
+		Integer resIdx = resourcesToIndex.get(res);
 		if (resIdx == null) {
 			throw new NoSuchElementException("Resource is not contained in state model.");
 		}
-		return currentState.slice(LinAlg.range(resIdx * resourceStride, (resIdx + 1) * resourceStride - 1));
+		return LinAlg.range(resIdx * resourceStride, (resIdx + 1) * resourceStride - 1);
 	}
 	
 	@Override
-	public double getCurrentState(Resource res, Service service) {
-		Integer resIdx = resources.get(res);
-		Integer serviceIdx = services.get(service);
+	public int getStateVariableIndex(Resource res, Service service) {
+		Integer resIdx = resourcesToIndex.get(res);
+		Integer serviceIdx = servicesToIndex.get(service);
 		if (resIdx == null || serviceIdx == null) {
 			throw new NoSuchElementException("Service or resource is not contained in state model.");
 		}
-		return currentState.get(resIdx * resourceStride + serviceIdx);
+		return resIdx * resourceStride + serviceIdx;
 	}	
 
 	@Override
@@ -199,6 +203,16 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	@Override
 	public Vector getInitialState() {
 		return initialState;
+	}
+
+	@Override
+	public List<Resource> getResources() {
+		return resources;
+	}
+
+	@Override
+	public List<Service> getServices() {
+		return services;
 	}
 
 
