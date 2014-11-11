@@ -38,11 +38,15 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	int getStateSize();
 	
-	Resource getResource(int stateIdx);
+	void setCurrentState(Vector state);	
 	
-	Service getService(int stateIdx);
+	Vector getCurrentState();
 	
-	Vector getNextState(Vector state);
+	Vector getCurrentState(Resource res);
+	
+	double getCurrentState(Resource res, Service service);
+	
+	Vector getNextState();
 	
 	List<C> getConstraints();
 	

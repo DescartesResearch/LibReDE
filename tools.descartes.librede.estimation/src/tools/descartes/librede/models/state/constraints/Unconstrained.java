@@ -28,7 +28,7 @@ package tools.descartes.librede.models.state.constraints;
 
 import java.util.List;
 
-import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.state.IStateModel;
 
 public final class Unconstrained implements IStateConstraint {
 	
@@ -47,13 +47,18 @@ public final class Unconstrained implements IStateConstraint {
 	}
 
 	@Override
-	public double getValue(Vector state) {
+	public double getValue() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public boolean isApplicable(List<String> messages) {
 		return true;
+	}
+
+	@Override
+	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
+		// Do nothing
 	}
 
 }

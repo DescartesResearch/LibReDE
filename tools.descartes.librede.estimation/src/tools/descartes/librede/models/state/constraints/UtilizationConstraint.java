@@ -35,22 +35,21 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
 	private Resource res_i;
 	
-	private WorkloadDescription system;
+	private IStateModel<? extends IStateConstraint> stateModel;
 	
 	private Query<Vector> throughputQuery;
 	
-	public UtilizationConstraint(WorkloadDescription system, IRepositoryCursor repository, Resource resource) {
-		this.system = system;
+	public UtilizationConstraint(Resource resource, IRepositoryCursor repository) {
 		this.res_i = resource;
 		
 		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
@@ -67,8 +66,11 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public double getValue(Vector state) {
-		Vector D_i = state.slice(system.getState().getRange(res_i));
+	public double getValue() {
+		if (stateModel == null) {
+			throw new IllegalStateException();
+		}
+		Vector D_i = stateModel.getCurrentState(res_i);
 		Vector X = throughputQuery.execute();
 		return X.dot(D_i);
 	}
@@ -97,6 +99,11 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
+		this.stateModel = model;
 	}
 
 }

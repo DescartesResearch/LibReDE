@@ -28,29 +28,34 @@ package tools.descartes.librede.models.state.constraints;
 
 import java.util.List;
 
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.state.IStateModel;
 
 public class StateBoundsConstraint implements ILinearStateConstraint, IDifferentiableFunction {
+
+	private final Resource res_i;
+	private final Service cls_r;
+	private final double lower;
+	private final double upper;
+	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	private double lower;
-	private double upper;
-	private int stateVar;
-	
-	public StateBoundsConstraint(int stateVar, double lowerBound, double upperBound) {
+	public StateBoundsConstraint(Resource resource, Service service, double lowerBound, double upperBound) {
+		this.res_i = resource;
+		this.cls_r = service;
 		this.lower = lowerBound;
 		this.upper = upperBound;
-		this.stateVar = stateVar;
 	}
-	
-	public int getStateVariable() {
-		return stateVar;
-	}
-	
+
 	@Override
-	public double getValue(Vector state) {
-		return state.get(stateVar);
+	public double getValue() {
+		if (stateModel == null) {
+			throw new IllegalStateException();
+		}
+		return stateModel.getCurrentState(res_i, cls_r);
 	}
 
 	@Override
@@ -64,8 +69,7 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public Vector getFirstDerivatives(Vector x) {
-		
+	public Vector getFirstDerivatives(Vector x) {		
 		return null;
 	}
 
@@ -77,6 +81,11 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public boolean isApplicable(List<String> messages) {
 		return true;
+	}
+
+	@Override
+	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
+		this.stateModel = model;
 	}
 
 }
