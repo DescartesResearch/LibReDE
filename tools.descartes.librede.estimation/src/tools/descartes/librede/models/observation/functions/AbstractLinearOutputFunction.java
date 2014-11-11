@@ -27,11 +27,6 @@
 package tools.descartes.librede.models.observation.functions;
 
 import static tools.descartes.librede.linalg.LinAlg.zeros;
-
-import java.util.List;
-
-import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
@@ -40,10 +35,8 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction {
 	
-	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel,
-			List<Resource> selectedResources,
-			List<Service> selectedClasses) {
-		super(stateModel, selectedResources, selectedClasses);
+	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel) {
+		super(stateModel);
 	}
 	
 	@Override

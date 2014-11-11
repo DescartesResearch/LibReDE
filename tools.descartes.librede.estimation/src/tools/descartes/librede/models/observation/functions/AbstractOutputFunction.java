@@ -38,35 +38,19 @@ import tools.descartes.librede.repository.Query;
 public abstract class AbstractOutputFunction implements IOutputFunction {
 	
 	private final IStateModel<? extends IStateConstraint> stateModel;
-	private final List<Resource> selectedResources;
-	private final List<Service> selectedClasses;
 
-	protected AbstractOutputFunction(IStateModel<? extends IStateConstraint> stateModel, List<Resource> selectedResources,
-			List<Service> selectedClasses) {		
-		if (stateModel == null || selectedResources == null || selectedClasses == null) {
+	protected AbstractOutputFunction(IStateModel<? extends IStateConstraint> stateModel) {		
+		if (stateModel == null) {
 			throw new NullPointerException();
-		}
-		if (selectedResources.size() < 1 || selectedClasses.size() < 1) {
-			throw new IllegalArgumentException();
 		}
 		
 		this.stateModel = stateModel;
-		this.selectedResources = selectedResources;
-		this.selectedClasses = selectedClasses;
 	}
 
 	public IStateModel<? extends IStateConstraint> getStateModel() {
 		return stateModel;
 	}
 
-	public List<Resource> getSelectedResources() {
-		return selectedResources;
-	}
-
-	public List<Service> getSelectedWorkloadClasses() {
-		return selectedClasses;
-	}	
-	
 	protected boolean checkQueryPrecondition(Query<?> query, List<String> messages) {
 		if (!query.hasData()) {
 			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");

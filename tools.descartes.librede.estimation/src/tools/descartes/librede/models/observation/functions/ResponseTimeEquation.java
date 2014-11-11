@@ -90,7 +90,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Service service, List<Resource> selectedResources
 			) {
-		super(stateModel, selectedResources, Arrays.asList(service));
+		super(stateModel);
 		
 		cls_r = service;
 		
@@ -132,7 +132,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		Vector X = throughputQuery.execute();
 		double X_total = sum(X);
 		
-		for (Resource res_i : getSelectedResources()) {
+		for (Resource res_i : getStateModel().getResources()) {
 			Vector D_i = getStateModel().getCurrentState().slice(getStateModel().getStateVariableIndexRange(res_i));
 			double D_ir = getStateModel().getCurrentState().get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			double U_i = X.dot(D_i);

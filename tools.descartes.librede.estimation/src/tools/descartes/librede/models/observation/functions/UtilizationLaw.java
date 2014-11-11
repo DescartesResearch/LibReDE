@@ -79,7 +79,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	public UtilizationLaw(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource) {
-		super(stateModel, Arrays.asList(resource), stateModel.getServices());
+		super(stateModel);
 		
 		this.res_i = resource;
 		

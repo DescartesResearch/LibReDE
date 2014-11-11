@@ -41,10 +41,8 @@ public abstract class AbstractDirectOutputFunction extends
 	private Vector zeros;
 	private int idx;
 
-	protected AbstractDirectOutputFunction(IStateModel<? extends IStateConstraint> stateModel,
-			Resource resource,
-			Service service) {
-		super(stateModel, Arrays.asList(resource), Arrays.asList(service));
+	protected AbstractDirectOutputFunction(IStateModel<? extends IStateConstraint> stateModel, Resource resource, Service service) {
+		super(stateModel);
 		
 		zeros = LinAlg.zeros(stateModel.getStateSize());
 		idx = stateModel.getStateVariableIndex(resource, service);
