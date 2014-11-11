@@ -215,5 +215,15 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		return services;
 	}
 
+	@Override
+	public Resource getResource(int stateVariableIdx) {
+		return resources.get(stateVariableIdx / resourceStride);
+	}
+
+	@Override
+	public Service getService(int stateVariableIdx) {
+		return services.get(stateVariableIdx % resourceStride);
+	}
+
 
 }
