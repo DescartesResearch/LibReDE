@@ -172,7 +172,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		if (resIdx == null) {
 			throw new NoSuchElementException("Resource is not contained in state model.");
 		}
-		return LinAlg.range(resIdx * resourceStride, (resIdx + 1) * resourceStride - 1);
+		return LinAlg.range(resIdx * resourceStride, (resIdx + 1) * resourceStride);
 	}
 	
 	@Override
