@@ -19,12 +19,12 @@ public class EstimationAlgorithmFactory {
 		this.configuration = configuration;
 	}
 	
-	public IEstimationAlgorithm<?,?> createInstances(Class<?> componentClass) {
+	public IEstimationAlgorithm createInstance(Class<?> componentClass) {
 		Set<Class<?>> candidates = Registry.INSTANCE.getImplementationClasses(componentClass);
 
 		for (Class<?> cl : candidates) {
 			try {
-				return (IEstimationAlgorithm<?,?>) Instantiator.newInstance(cl, Collections.emptyList());
+				return (IEstimationAlgorithm) Instantiator.newInstance(cl, Collections.emptyList());
 			} catch(Exception ex) {
 				log.error("Error instantiating estimation algorithm " + cl.toString() + ". Skip it...", ex);
 			}

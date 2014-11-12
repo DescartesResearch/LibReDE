@@ -6,6 +6,6 @@ import tools.descartes.librede.models.observation.functions.ILinearOutputFunctio
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 
-public interface ILeastSquaresRegressionAlgorithm extends IEstimationAlgorithm<ConstantStateModel<Unconstrained>, IObservationModel<ILinearOutputFunction, Scalar>> {
+public interface ILeastSquaresRegressionAlgorithm extends IEstimationAlgorithm {
 
 }

@@ -30,25 +30,25 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 
-public abstract class AbstractEstimationAlgorithm<S extends IStateModel<?>, O extends IObservationModel<?, ?>> implements IEstimationAlgorithm<S, O> {
+public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm {
 	
-	private S stateModel;
-	private O observationModel;
+	private IStateModel<?> stateModel;
+	private IObservationModel<?, ?> observationModel;
 	
 	@Override
-	public void initialize(S stateModel, O observationModel,
+	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
 			int estimationWindow) throws InitializationException {
 		this.stateModel = stateModel;
 		this.observationModel = observationModel;
 	}
 
 	@Override
-	public S getStateModel() {
+	public IStateModel<?> getStateModel() {
 		return stateModel;
 	}
 
 	@Override
-	public O getObservationModel() {
+	public IObservationModel<?, ?> getObservationModel() {
 		return observationModel;
 	}
 

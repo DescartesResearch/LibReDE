@@ -6,6 +6,6 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
-public interface IConstrainedNonLinearOptimizationAlgorithm extends IEstimationAlgorithm<ConstantStateModel<? extends IStateConstraint>, IObservationModel<IOutputFunction, Vector>>  {
+public interface IConstrainedNonLinearOptimizationAlgorithm extends IEstimationAlgorithm  {
 
 }

@@ -34,11 +34,11 @@ import tools.descartes.librede.models.observation.functions.ILinearOutputFunctio
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 
-public class LinearOptimizationAlgorithm extends AbstractEstimationAlgorithm<IStateModel<ILinearStateConstraint>, IObservationModel<ILinearOutputFunction, Vector>> {
+public class LinearOptimizationAlgorithm extends AbstractEstimationAlgorithm {
 
 	@Override
-	public void initialize(IStateModel<ILinearStateConstraint> stateModel,
-			IObservationModel<ILinearOutputFunction, Vector> observationModel,
+	public void initialize(IStateModel<?> stateModel,
+			IObservationModel<?, ?> observationModel,
 			int estimationWindow) throws InitializationException {
 		//SimplexSolver solver = new SimplexSolver();
 		

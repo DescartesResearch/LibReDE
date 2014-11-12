@@ -41,10 +41,11 @@ import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.Aggregation;
 
-public class SimpleApproximation extends AbstractEstimationAlgorithm<ConstantStateModel<Unconstrained>, IObservationModel<IDirectOutputFunction, Vector>> {
+public class SimpleApproximation extends AbstractEstimationAlgorithm {
 	
 	private Aggregation aggregation;
 	private Matrix buffer;
@@ -54,8 +55,8 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm<ConstantSta
 	}
 
 	@Override
-	public void initialize(ConstantStateModel<Unconstrained> stateModel,
-			IObservationModel<IDirectOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
+	public void initialize(IStateModel<?> stateModel,
+			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
 		super.initialize(stateModel, observationModel, estimationWindow);
 		this.buffer = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
 	}
@@ -67,7 +68,7 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm<ConstantSta
 		Vector currentEstimate = vector(output.rows(), new VectorFunction() {			
 			@Override
 			public double cell(int row) {
-				return output.get(row) / getObservationModel().getOutputFunction(row).getFactor();
+				return output.get(row) / getCastedObservationModel().getOutputFunction(row).getFactor();
 			}
 		});
 		buffer = buffer.circshift(1).setRow(0, currentEstimate);		
@@ -92,5 +93,10 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm<ConstantSta
 
 	@Override
 	public void destroy() {
+	}
+	
+	@SuppressWarnings("unchecked")
+	private IObservationModel<IDirectOutputFunction, Vector> getCastedObservationModel() {
+		return (IObservationModel<IDirectOutputFunction, Vector>) getObservationModel();
 	}
 }

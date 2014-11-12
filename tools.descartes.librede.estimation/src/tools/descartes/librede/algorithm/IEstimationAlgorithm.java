@@ -32,9 +32,9 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 
-public interface IEstimationAlgorithm<S extends IStateModel<?>, O extends IObservationModel<?, ?>> {
+public interface IEstimationAlgorithm {
 	
-	void initialize(S stateModel, O observationModel, int estimationWindow) throws InitializationException;
+	void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException;
 	
 	void update() throws EstimationException;
 	
@@ -42,8 +42,8 @@ public interface IEstimationAlgorithm<S extends IStateModel<?>, O extends IObser
 	
 	void destroy();
 	
-	S getStateModel();
+	IStateModel<?> getStateModel();
 	
-	O getObservationModel();
+	IObservationModel<?, ?> getObservationModel();
 
 }
