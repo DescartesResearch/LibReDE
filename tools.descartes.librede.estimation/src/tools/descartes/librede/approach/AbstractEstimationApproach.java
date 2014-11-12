@@ -26,79 +26,128 @@
  */
 package tools.descartes.librede.approach;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
-import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.workload.WorkloadDescription;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
-	
+
 	private boolean iterative;
+	private int estimationWindow;
+	private EstimationAlgorithmFactory algorithmFactory;
 	private WorkloadDescription workload;
-	private IEstimationAlgorithm<?, ?> estimator;
+	private List<IEstimationAlgorithm> algorithms;
 	private IRepositoryCursor cursor;
-	
+
+	protected abstract List<IStateModel<?>> deriveStateModels(
+			WorkloadDescription workload, IRepositoryCursor cursor);
+
+	protected abstract IObservationModel<?, ?> deriveObservationModel(
+			IStateModel<?> stateModel, IRepositoryCursor cursor);
+
+	protected abstract IEstimationAlgorithm getEstimationAlgorithm(
+			EstimationAlgorithmFactory factory);
+
 	@Override
 	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor, int estimationWindow, boolean iterative)
-			throws InitializationException {
+			IRepositoryCursor cursor,
+			EstimationAlgorithmFactory algorithmFactory, int estimationWindow,
+			boolean iterative) {
 		this.workload = workload;
 		this.cursor = cursor;
 		this.iterative = iterative;
+		this.estimationWindow = estimationWindow;
 	}
-	
-	protected void setEstimationAlgorithm(IEstimationAlgorithm<?, ?> estimator) {
-		this.estimator = estimator;
-	}
-	
-	@Override
-	public boolean checkPreconditions(List<String> messages) {
-		boolean result = true;
-		IObservationModel<?, ?> observationModel  = this.estimator.getObservationModel();
-		for (IOutputFunction func : observationModel) {
-			result = result && func.isApplicable(messages);
-		}
-		IStateModel<?> stateModel = this.estimator.getStateModel();
-		for (IStateConstraint constr : stateModel.getConstraints()) {
-			result = result && constr.isApplicable(messages);
-		}
-		return result;
-	}
-	
-	@Override
-	public TimeSeries execute() throws EstimationException {
-		try {
-			MatrixBuilder estimateBuilder = new MatrixBuilder(workload.getState().getStateSize());
-			MatrixBuilder timestampBuilder = new MatrixBuilder(1);
-			if (iterative) {
-				while(cursor.next()) {
-					estimator.update();
 
-					timestampBuilder.addRow(cursor.getCurrentIntervalEnd());
-					estimateBuilder.addRow(estimator.estimate());
+	public void constructEstimationDefinitions() throws InitializationException{
+		if (workload == null || cursor == null) {
+			throw new IllegalStateException();
+		}
+		List<IStateModel<?>> stateModels = deriveStateModels(workload, cursor);
+		algorithms = new ArrayList<IEstimationAlgorithm>(
+				stateModels.size());		
+		
+		for (IStateModel<?> sm : stateModels) {
+			IObservationModel<?, ?> om = deriveObservationModel(sm, cursor);
+			IEstimationAlgorithm algo = getEstimationAlgorithm(algorithmFactory);
+			algo.initialize(sm, om, estimationWindow);
+			algorithms.add(algo);
+		}
+	}
+	
+	@Override
+	public void pruneEstimationDefinitions() {
+		List<IEstimationAlgorithm> temp = new ArrayList<IEstimationAlgorithm>(algorithms);
+		for (IEstimationAlgorithm a : temp) {
+			boolean isApplicable = true;
+			for (IStateConstraint constr : a.getStateModel().getConstraints()) {
+				isApplicable = isApplicable && constr.isApplicable(new ArrayList<String>());
+			}
+			for (IOutputFunction func : a.getObservationModel()) {
+				isApplicable = isApplicable && func.isApplicable(new ArrayList<String>());
+			}
+			if (!isApplicable) {
+				algorithms.remove(a);
+			}
+		}
+		
+	}
+
+	@Override
+	public EstimationResult executeEstimation() throws EstimationException {
+		if (algorithms == null) {
+			throw new IllegalStateException();
+		}
+
+		try {
+			EstimationResult.Builder builder = EstimationResult.builder(
+					this.getClass(), workload);
+
+			if (iterative) {
+				while (cursor.next()) {					
+					builder.next(cursor.getCurrentIntervalEnd());
+					
+					for (IEstimationAlgorithm a : algorithms) {
+						a.update();
+						Vector curEstimates = a.estimate();
+						for (int i = 0; i < curEstimates.rows(); i++) {
+							builder.set(a.getStateModel().getResource(i), a.getStateModel().getService(i), curEstimates.get(i));
+						}
+					}
+					
+					builder.save();
 				}
 			} else {
 				while(cursor.next()) {
-					estimator.update();
+					for (IEstimationAlgorithm a : algorithms) {
+						a.update();
+					}
 				}
-
-				timestampBuilder.addRow(cursor.getCurrentIntervalEnd());
-				estimateBuilder.addRow(estimator.estimate());
+				
+				builder.next(cursor.getCurrentIntervalEnd());
+				for (IEstimationAlgorithm a : algorithms) {
+					Vector curEstimates = a.estimate();
+					for (int i = 0; i < curEstimates.rows(); i++) {
+						builder.set(a.getStateModel().getResource(i), a.getStateModel().getService(i), curEstimates.get(i));
+					}
+				}
+				builder.save();
 			}
-			return new TimeSeries((Vector)timestampBuilder.toMatrix(), estimateBuilder.toMatrix());
+			return builder.build();
 		} finally {
-			if (estimator != null) {
-				estimator.destroy();
+			for (IEstimationAlgorithm a: algorithms) {
+				a.destroy();
 			}
 		}
 	}

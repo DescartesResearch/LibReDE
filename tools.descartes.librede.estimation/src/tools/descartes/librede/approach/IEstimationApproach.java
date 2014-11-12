@@ -26,20 +26,20 @@
  */
 package tools.descartes.librede.approach;
 
-import java.util.List;
-
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.workload.WorkloadDescription;
 
 public interface IEstimationApproach {
 	
-	void initialize(WorkloadDescription workload, IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException;
+	void initialize(WorkloadDescription workload, IRepositoryCursor cursor, EstimationAlgorithmFactory algorithmFactory, int estimationWindow, boolean iterative);
 	
-	boolean checkPreconditions(List<String> messages);
+	void constructEstimationDefinitions() throws InitializationException;
 	
-	TimeSeries execute() throws EstimationException;
+	void pruneEstimationDefinitions();
+	
+	EstimationResult executeEstimation() throws EstimationException;
 
 }

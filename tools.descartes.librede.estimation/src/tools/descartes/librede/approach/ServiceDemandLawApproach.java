@@ -26,15 +26,21 @@
  */
 package tools.descartes.librede.approach;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
+import java.util.ArrayList;
+import java.util.List;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.observation.functions.ServiceDemandLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.Aggregation;
@@ -47,24 +53,37 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 	public static final String NAME = "ServiceDemandLaw";
 	
 	@Override
-	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException {
-		super.initialize(workload, cursor, estimationWindow, iterative);
+	protected List<IStateModel<?>> deriveStateModels(
+			WorkloadDescription workload, IRepositoryCursor cursor) {
+		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		
-		int stateSize = workload.getServices().size();
-		
-		ConstantStateModel<Unconstrained> stateModel = new ConstantStateModel<Unconstrained>(stateSize, zeros(stateSize));
-		
-		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
 		for (Resource res : workload.getResources()) {
+			Builder<Unconstrained> stateModelBuilder = ConstantStateModel.unconstrainedModelBuilder();
 			for (Service service : workload.getServices()) {
-				ServiceDemandLaw func = new ServiceDemandLaw(workload, cursor, res, service);
+				stateModelBuilder.addVariable(res, service);
+			}
+			stateModels.add(stateModelBuilder.build());
+		}
+		
+		return stateModels;
+	}
+	
+	@Override
+	protected IObservationModel<?,?> deriveObservationModel(
+			IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
+		for (Resource resource : stateModel.getResources()) {
+			for (Service service : stateModel.getServices()) {
+				ServiceDemandLaw func = new ServiceDemandLaw(stateModel, cursor, resource, service);
 				observationModel.addOutputFunction(func);
 			}
 		}
+		return observationModel;
+	}
 
-		SimpleApproximation estimator = new SimpleApproximation(Aggregation.AVERAGE);
-		estimator.initialize(stateModel, observationModel, estimationWindow);
-		setEstimationAlgorithm(estimator);
+	@Override
+	protected IEstimationAlgorithm getEstimationAlgorithm(
+			EstimationAlgorithmFactory factory) {
+		return new SimpleApproximation(Aggregation.AVERAGE);
 	}
 }

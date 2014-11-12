@@ -24,63 +24,54 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.approaches;
+package tools.descartes.librede.approach;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-import tools.descartes.librede.approach.AbstractEstimationApproach;
+import java.util.Arrays;
+import java.util.List;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.exceptions.InitializationException;
-import tools.descartes.librede.ipopt.java.RecursiveOptimization;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	
-	public static final String NAME = "MenasceOptimization";
-	
-	@ParameterDefinition(name = "SolutionTolerance", label = "Solution Tolerance", defaultValue = "1e-7")
-	private double solutionTolerance;
-	
-	@ParameterDefinition(name = "UpperBoundsInfValue", label = "Upper Bounds Infinity Value", defaultValue = "1e19")
-	private double upperBoundsInfValue;
-	
-	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
-	private double lowerBoundsInfValue;
-	
-	@Override
-	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor, int estimationWindow, boolean iterative)
-			throws InitializationException {
-		super.initialize(workload, cursor, estimationWindow, iterative);
-		
-		int stateSize = workload.getState().getStateSize();
-		
-		ConstantStateModel<ILinearStateConstraint> stateModel = new ConstantStateModel<ILinearStateConstraint>(stateSize, zeros(stateSize));
+	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
+		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			stateModel.addConstraint(new UtilizationConstraint(workload, cursor, res));
+			builder.addConstraint(new UtilizationConstraint(res, cursor));
+			for (Service service : workload.getServices()) {
+				builder.addVariable(res, service);
+			}
 		}
-		
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
-		for (Service service : workload.getServices()) {
-			ResponseTimeEquation func = new ResponseTimeEquation(workload, cursor, service, workload.getResources());
-			observationModel.addOutputFunction(func);
-		}
-
-		RecursiveOptimization estimator = new RecursiveOptimization();
-		estimator.setBoundsInfValue(lowerBoundsInfValue, upperBoundsInfValue);
-		estimator.setSolutionTolerance(solutionTolerance);
-		estimator.initialize(stateModel, observationModel, estimationWindow);
-		setEstimationAlgorithm(estimator);
+		return Arrays.asList(builder.build());
 	}
 	
+	protected IObservationModel<IOutputFunction,Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+		for (Service service : stateModel.getServices()) {
+			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, stateModel.getResources());
+			observationModel.addOutputFunction(func);
+		}
+		return observationModel;
+	}
+	
+	protected IEstimationAlgorithm getEstimationAlgorithm(EstimationAlgorithmFactory factory) {
+		return factory.createInstance(IConstrainedNonLinearOptimizationAlgorithm.class);
+	}
 }

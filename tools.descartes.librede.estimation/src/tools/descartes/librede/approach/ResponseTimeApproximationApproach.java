@@ -26,14 +26,21 @@
  */
 package tools.descartes.librede.approach;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
+import java.util.ArrayList;
+import java.util.List;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.Aggregation;
@@ -46,26 +53,34 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 	public static final String NAME = "ResponseTimeApproximation";
 	
 	@Override
-	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException {
-		super.initialize(workload, cursor, estimationWindow, iterative);
-		
-		int stateSize = workload.getServices().size();
-		
-		if (workload.getResources().size() != 1) {
-			throw new InitializationException("The response time approximation approach is only applicable on workload models with one resource.");
-		}
-		
-		Resource res = workload.getResources().get(0);
-		ConstantStateModel<Unconstrained> stateModel = new ConstantStateModel<Unconstrained>(stateSize, zeros(stateSize));
-		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
-		for (int i = 0; i < stateSize; i++) {
-			ResponseTimeApproximation func = new ResponseTimeApproximation(workload, cursor, res, workload.getServices().get(i), Aggregation.AVERAGE);
-			observationModel.addOutputFunction(func);
+	protected List<IStateModel<?>> deriveStateModels(
+			WorkloadDescription workload, IRepositoryCursor cursor) {
+		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
+		for (Resource res : workload.getResources()) {
+			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+			for (Service service : workload.getServices()) {
+				builder.addVariable(res, service);
+			}
+			stateModels.add(builder.build());
 		}		
-		
-		SimpleApproximation estimator = new SimpleApproximation(Aggregation.MINIMUM);
-		estimator.initialize(stateModel, observationModel, estimationWindow);
-		setEstimationAlgorithm(estimator);
+		return stateModels;
+	}
+	
+	@Override
+	protected IObservationModel<?, ?> deriveObservationModel(
+			IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		Resource resource = stateModel.getResources().get(0);
+		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
+		for (Service service : stateModel.getServices()) {
+			ResponseTimeApproximation func = new ResponseTimeApproximation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
+			observationModel.addOutputFunction(func);
+		}
+		return observationModel;
+	}
+
+	@Override
+	protected IEstimationAlgorithm getEstimationAlgorithm(
+			EstimationAlgorithmFactory factory) {
+		return new SimpleApproximation(Aggregation.AVERAGE);
 	}
 }
