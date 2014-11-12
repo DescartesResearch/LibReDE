@@ -24,17 +24,24 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.approaches;
+package tools.descartes.librede.approach;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-import tools.descartes.librede.approach.AbstractEstimationApproach;
-import tools.descartes.librede.exceptions.InitializationException;
+import java.util.ArrayList;
+import java.util.List;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.algorithm.ILeastSquaresRegressionAlgorithm;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
-import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.workload.WorkloadDescription;
@@ -42,28 +49,33 @@ import tools.descartes.librede.workload.WorkloadDescription;
 @Component(displayName = "Least-squares Regression using Utilization Law")
 public class RoliaRegressionApproach extends AbstractEstimationApproach {
 	
-	public static final String NAME = "RoliaRegression";
+	@Override
+	protected List<IStateModel<?>> deriveStateModels(
+			WorkloadDescription workload, IRepositoryCursor cursor) {
+		// For each resource we create a separate state model as
+		// linear regression only supports one output variable (Utilization)
+		// at a time.
+		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
+		for (Resource res : workload.getResources()) {
+			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+			for (Service serv : workload.getServices()) {
+				builder.addVariable(res, serv);
+			}
+			stateModels.add(builder.build());
+		}
+		return stateModels;
+	}
 
 	@Override
-	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor, int estimationWindow, boolean iterative) throws InitializationException {
-		super.initialize(workload, cursor, estimationWindow, iterative);
+	protected IObservationModel<?, ?> deriveObservationModel(
+			IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		UtilizationLaw func = new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0));	
+		return new ScalarObservationModel<ILinearOutputFunction>(func);
+	}
 
-		int stateSize = workload.getServices().size();
-		
-		if (workload.getResources().size() != 1) {
-			throw new InitializationException("The rolia regression approach is only applicable on workload models with one resource.");
-		}
-
-		ConstantStateModel<Unconstrained> stateModel = new ConstantStateModel<Unconstrained>(
-				stateSize, zeros(stateSize));
-
-		
-		UtilizationLaw func = new UtilizationLaw(workload, cursor, workload.getResources().get(0));		
-		ScalarObservationModel<ILinearOutputFunction> observationModel = new ScalarObservationModel<ILinearOutputFunction>(func);
-	
-		LeastSquaresRegression lsq = new LeastSquaresRegression();
-		lsq.initialize(stateModel, observationModel, estimationWindow);
-		setEstimationAlgorithm(lsq);
+	@Override
+	protected IEstimationAlgorithm getEstimationAlgorithm(
+			EstimationAlgorithmFactory factory) {
+		return factory.createInstance(ILeastSquaresRegressionAlgorithm.class);
 	}
 }
