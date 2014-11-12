@@ -24,17 +24,23 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.approaches;
+package tools.descartes.librede.approach;
 
-import static tools.descartes.librede.linalg.LinAlg.ones;
-import tools.descartes.librede.approach.AbstractEstimationApproach;
-import tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
+import java.util.Arrays;
+import java.util.List;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
@@ -43,8 +49,6 @@ import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName="Kalman Filter using Utilization Law")
 public class WangKalmanFilterApproach extends AbstractEstimationApproach {
-
-	public static final String NAME = "WangKalmanFilter";
 	
 	@ParameterDefinition(name = "StateNoiseCovariance", label = "State Noise Covariance", defaultValue = "1.0")
 	private double stateNoiseCovariance;
@@ -56,26 +60,31 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 	private double observeNoiseCovariance;
 
 	@Override
-	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor, int estimationWindow, boolean iterative)
-			throws InitializationException {
-		super.initialize(workload, cursor, estimationWindow, iterative);
-		
-		int stateSize = workload.getServices().size();
-		
-		ConstantStateModel<Unconstrained> stateModel = new ConstantStateModel<Unconstrained>(stateSize, ones(stateSize).times(0.01));
-		
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+	protected List<IStateModel<?>> deriveStateModels(
+			WorkloadDescription workload, IRepositoryCursor cursor) {
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			UtilizationLaw func = new UtilizationLaw(workload, cursor, res);
+			for (Service serv : workload.getServices()) {
+				builder.addVariable(res, serv);
+			}
+		}
+		return Arrays.asList(builder.build());
+	}
+
+	@Override
+	protected IObservationModel<?, ?> deriveObservationModel(
+			IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+		for (Resource res : stateModel.getResources()) {
+			UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
 			observationModel.addOutputFunction(func);
 		}
+		return observationModel;
+	}
 
-		ExtendedKalmanFilter estimator = new ExtendedKalmanFilter();
-		estimator.setStateNoiseCouplingConstant(stateNoiseCoupling);
-		estimator.setStateNoiseCovarianceConstant(stateNoiseCovariance);
-		estimator.setObserveNoiseConstant(observeNoiseCovariance);
-		estimator.initialize(stateModel, observationModel, estimationWindow);
-		setEstimationAlgorithm(estimator);
+	@Override
+	protected IEstimationAlgorithm getEstimationAlgorithm(
+			EstimationAlgorithmFactory factory) {
+		return factory.createInstance(IKalmanFilterAlgorithm.class);
 	}
 }
