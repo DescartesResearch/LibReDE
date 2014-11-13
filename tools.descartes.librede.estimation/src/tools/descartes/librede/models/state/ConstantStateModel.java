@@ -29,11 +29,14 @@ package tools.descartes.librede.models.state;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
@@ -48,14 +51,13 @@ import tools.descartes.librede.models.state.constraints.Unconstrained;
 public class ConstantStateModel<C extends IStateConstraint> implements IStateModel<C> {
 	
 	public static class Builder<C extends IStateConstraint> {
-		private List<Resource> resources = new ArrayList<>();
-		private List<Service> services = new ArrayList<>();
+		// The set is automatically sorted by resource names and service names
+		private Set<StateVariable> stateVariables = new TreeSet<StateVariable>();
 		private List<C> constraints = new ArrayList<C>();
 		private Vector initialState;
 		
 		public void addVariable(Resource resource, Service service) {
-			resources.add(resource);
-			services.add(service);
+			stateVariables.add(new StateVariable(resource, service));
 		}
 		
 		public void setInitialState(Vector initialState) {
@@ -70,7 +72,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 		
 		public ConstantStateModel<C> build() {
-			return new ConstantStateModel<C>(resources, services, constraints, initialState);
+			return new ConstantStateModel<C>(new ArrayList<StateVariable>(stateVariables), constraints, initialState);
 		}
 	}
 	
@@ -96,36 +98,67 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		
 	}
 	
-	private final int resourceStride;
 	private final int stateSize;
-	private final List<Resource> resources;
 	private final List<Service> services;
-	private final Map<Resource, Integer> resourcesToIndex;
-	private final Map<Service, Integer> servicesToIndex;
+	private final List<Resource> resources;
+	private final Map<Resource, Integer> resourcesToIdx;
+	private final Map<Service, Integer> servicesToIdx;
+	private final List<StateVariable> variables;
+	private final int[][] stateVarIdx;
+	private final List<Range> resourceRanges;
 	private final List<C> constraints;
 	private final Vector initialState;
 	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
 	private Vector currentState;
 	
-	private ConstantStateModel(List<Resource> resources, List<Service> services, List<C> constraints, Vector initialState) {
-		this.stateSize = resources.size() * services.size();
-		this.resourceStride = services.size();		
-		this.resources = Collections.unmodifiableList(resources);
-		this.services = Collections.unmodifiableList(services);
+	private ConstantStateModel(List<StateVariable> variables, List<C> constraints, Vector initialState) {
+		this.stateSize = variables.size();	
 		this.constraints = Collections.unmodifiableList(constraints);
+		this.variables = Collections.unmodifiableList(variables);
 		
-		// Create mapping between model entities and state variables index
-		this.resourcesToIndex = new HashMap<Resource, Integer>(resources.size());
-		int i = 0;
-		for (Resource r : resources) {
-			this.resourcesToIndex.put(r, i);
-			i++;
+		// Determine all resources and services contained in this state model
+		resources = new ArrayList<Resource>();
+		services = new ArrayList<Service>();
+		resourcesToIdx = new HashMap<Resource, Integer>();
+		servicesToIdx = new HashMap<Service, Integer>();
+		for (StateVariable v : variables) {
+			if (!resourcesToIdx.containsKey(v.getResource())) {
+				resources.add(v.getResource());
+				resourcesToIdx.put(v.getResource(), resources.size() - 1);
+			}
+			if (!servicesToIdx.containsKey(v.getService())) {
+				services.add(v.getService());
+				servicesToIdx.put(v.getService(), services.size() - 1);
+			}
 		}
-		this.servicesToIndex = new HashMap<Service, Integer>(services.size());
-		i = 0;
-		for (Service s : services) {
-			this.servicesToIndex.put(s, i);
-			i++;
+		
+		// Determine a mapping between the 2-dimensional state vector and the resources and services
+		stateVarIdx = new int[resourcesToIdx.size()][servicesToIdx.size()];
+		// -1 means that this resource / service combination is not a state variable 
+		// (e.g. if a service does not visit all resources)
+		for (int i = 0; i < stateVarIdx.length; i++) {
+			Arrays.fill(stateVarIdx[i], -1);
+		}		
+		int varIdx = 0;
+		for (StateVariable var : variables) {
+			int r = resourcesToIdx.get(var.getResource());
+			int s = servicesToIdx.get(var.getService());
+			stateVarIdx[r][s] = varIdx;
+			varIdx++;
+		}
+		
+		// determine the start and end indexes of all resources
+		resourceRanges = new ArrayList<Range>(resourcesToIdx.size());
+		int offset = 0;
+		for (int r = 0; r < stateVarIdx.length; r++) {
+			int newOffset = offset;
+			for (int s = 0; s < stateVarIdx[r].length; s++) {
+				if (stateVarIdx[r][s] >= 0) {
+					newOffset++;
+				}
+			}
+			resourceRanges.add(LinAlg.range(offset, newOffset));
+			offset = newOffset;
 		}
 
 		// initialize state of model		
@@ -168,21 +201,25 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	
 	@Override
 	public Range getStateVariableIndexRange(Resource res) {
-		Integer resIdx = resourcesToIndex.get(res);
+		Integer resIdx = resourcesToIdx.get(res);
 		if (resIdx == null) {
 			throw new NoSuchElementException("Resource is not contained in state model.");
 		}
-		return LinAlg.range(resIdx * resourceStride, (resIdx + 1) * resourceStride);
+		return resourceRanges.get(resIdx);
 	}
 	
 	@Override
 	public int getStateVariableIndex(Resource res, Service service) {
-		Integer resIdx = resourcesToIndex.get(res);
-		Integer serviceIdx = servicesToIndex.get(service);
+		Integer resIdx = resourcesToIdx.get(res);
+		Integer serviceIdx = servicesToIdx.get(service);
 		if (resIdx == null || serviceIdx == null) {
-			throw new NoSuchElementException("Service or resource is not contained in state model.");
+			throw new NoSuchElementException("There is no defined state variable for this resource/service combination.");
 		}
-		return resIdx * resourceStride + serviceIdx;
+		int idx = stateVarIdx[resIdx][serviceIdx];
+		if (idx < 0) {
+			throw new NoSuchElementException("There is no defined state variable for this resource/service combination.");
+		}
+		return idx;
 	}	
 
 	@Override
@@ -217,12 +254,12 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 
 	@Override
 	public Resource getResource(int stateVariableIdx) {
-		return resources.get(stateVariableIdx / resourceStride);
+		return variables.get(stateVariableIdx).getResource();
 	}
 
 	@Override
 	public Service getService(int stateVariableIdx) {
-		return services.get(stateVariableIdx % resourceStride);
+		return variables.get(stateVariableIdx).getService();
 	}
 
 
