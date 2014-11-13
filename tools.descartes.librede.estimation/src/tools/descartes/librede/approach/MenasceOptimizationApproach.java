@@ -65,7 +65,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	protected IObservationModel<IOutputFunction,Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
 		for (Service service : stateModel.getServices()) {
-			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, stateModel.getResources());
+			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service);
 			observationModel.addOutputFunction(func);
 		}
 		return observationModel;

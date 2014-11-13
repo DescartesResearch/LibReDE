@@ -69,7 +69,7 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 	@Override
 	protected IObservationModel<?, ?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		Resource resource = stateModel.getResources().get(0);
+		Resource resource = stateModel.getResources().toArray(new Resource[1])[0];
 		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
 		for (Service service : stateModel.getServices()) {
 			ResponseTimeApproximation func = new ResponseTimeApproximation(stateModel, cursor, resource, service, Aggregation.AVERAGE);

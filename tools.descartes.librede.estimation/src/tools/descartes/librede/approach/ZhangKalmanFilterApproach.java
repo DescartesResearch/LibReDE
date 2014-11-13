@@ -70,7 +70,7 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
 		for (Service serv : stateModel.getServices()) {
-			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, serv, stateModel.getResources());
+			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, serv);
 			observationModel.addOutputFunction(func);
 		}	
 		

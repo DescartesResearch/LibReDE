@@ -69,7 +69,7 @@ public class RoliaRegressionApproach extends AbstractEstimationApproach {
 	@Override
 	protected IObservationModel<?, ?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		UtilizationLaw func = new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0));	
+		UtilizationLaw func = new UtilizationLaw(stateModel, cursor, stateModel.getResources().toArray(new Resource[1])[0]);	
 		return new ScalarObservationModel<ILinearOutputFunction>(func);
 	}
 
