@@ -30,7 +30,6 @@ import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
-import java.util.Arrays;
 import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
@@ -47,7 +46,6 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 /**
  * This output function describes the relationship between the mean response time and the resource demands. 
@@ -88,8 +86,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @throws IllegalArgumentException if the list of services or resources is empty
 	 */
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
-			Service service, List<Resource> selectedResources
-			) {
+			Service service) {
 		super(stateModel);
 		
 		cls_r = service;
