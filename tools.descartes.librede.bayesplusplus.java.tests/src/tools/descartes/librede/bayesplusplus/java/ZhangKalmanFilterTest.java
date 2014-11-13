@@ -33,12 +33,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
@@ -71,12 +73,14 @@ public class ZhangKalmanFilterTest {
 		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
-		Vector initialEstimate = vector(0.1);
-		stateModel = new ConstantStateModel<>(1, initialEstimate);
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
+		builder.setInitialState(vector(0.1));
+		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();		
-		observationModel.addOutputFunction(new ResponseTimeEquation(workload, cursor, workload.getServices().get(0), workload.getResources()));
-		observationModel.addOutputFunction(new UtilizationLaw(workload, cursor, workload.getResources().get(0)));
+		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0)));
+		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(stateModel, observationModel, 1);
@@ -109,13 +113,18 @@ public class ZhangKalmanFilterTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
-		stateModel = new ConstantStateModel<>(5, initialEstimate);
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		for (Service service : workload.getServices()) {
+			builder.addVariable(workload.getResources().get(0), service);
+		}
+		builder.setInitialState(vector(0.01, 0.01, 0.01, 0.01, 0.01));
+		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
 		for (int i = 0; i < 5; i++) {
-			observationModel.addOutputFunction(new ResponseTimeEquation(workload, cursor, workload.getServices().get(i), workload.getResources()));
+			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(i)));
 		}
-		observationModel.addOutputFunction(new UtilizationLaw(workload, cursor, workload.getResources().get(0)));
+		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(stateModel, observationModel, 1);

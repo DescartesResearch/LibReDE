@@ -51,7 +51,7 @@ import tools.descartes.librede.nativehelper.NativeHelper;
 
 import com.sun.jna.Pointer;
 
-public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {	
+public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {	
 
 	// Callback function from native library for the observation model
 	private class HFunction implements HCallback {
@@ -63,9 +63,9 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 		public Pointer execute(Pointer x) {
 			Vector currentState = nativeVector(stateSize, x);
 
-			Vector nextObservation = observationModel.getCalculatedOutput(currentState);
+			Vector nextObservation = getObservationModel().getCalculatedOutput();
 
-			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(observationModel, currentState);
+			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(getObservationModel(), currentState);
 			toNative(jacobiBuffer, jacobi);
 			BayesPlusPlusLibrary.set_Hx(nativeObservationModel, jacobiBuffer, stateSize, outputSize);
 
@@ -84,9 +84,10 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 		@Override
 		public Pointer execute(Pointer x) {
 			Vector currentState = nativeVector(stateSize, x);
+			getStateModel().setCurrentState(currentState);
 
-			Vector nextState = stateModel.getNextState(currentState);
-			Matrix jacobi = JacobiMatrixBuilder.calculateOfState(stateModel, currentState);
+			Vector nextState = getStateModel().getNextState();
+			Matrix jacobi = JacobiMatrixBuilder.calculateOfState(getStateModel(), currentState);
 			toNative(jacobiBuffer, jacobi);
 			BayesPlusPlusLibrary.set_Fx(nativeStateModel, jacobiBuffer, stateSize);
 
@@ -94,9 +95,6 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 			return stateBuffer;
 		}
 	}
-
-	private IStateModel<Unconstrained> stateModel;
-	private IObservationModel<IOutputFunction, Vector> observationModel;
 
 	private int stateSize;
 	private int outputSize;
@@ -124,16 +122,6 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 	private double stateNoiseCovarianceConstant = 1.0;
 	private double stateNoiseCouplingConstant = 1.0;
 	private double observeNoiseConstant = 0.0001;
-	
-	@Override
-	public IStateModel<Unconstrained> getStateModel() {
-		return stateModel;
-	}
-
-	@Override
-	public IObservationModel<IOutputFunction, Vector> getObservationModel() {
-		return observationModel;
-	}
 	
 	/**
 	 * Sets a constant value used for all entries of the state noise vector.
@@ -170,7 +158,7 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 
-		Vector initialState = stateModel.getInitialState();
+		Vector initialState = getStateModel().getInitialState();
 		toNative(stateBuffer, initialState);
 
 		Pointer covBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
@@ -298,16 +286,12 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 	 * @see tools.descartes.librede.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
 	 */
 	@Override
-	public void initialize(IStateModel<Unconstrained> stateModel,
-			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
-		this.stateModel = stateModel;
-		this.observationModel = observationModel;
+	public void initialize(IStateModel<?> stateModel,
+			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, estimationWindow);
 		
 		this.stateSize = stateModel.getStateSize();
 		this.outputSize = observationModel.getOutputSize();
-
-		this.observationModel = observationModel;
-		this.stateModel = stateModel;
 		
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
 		
@@ -325,7 +309,7 @@ public class ExtendedKalmanFilter implements IKalmanFilterAlgorithm {
 	public void update() throws EstimationException {
 		predict();
 
-		observe(observationModel.getObservedOutput());
+		observe(getObservationModel().getObservedOutput());
 
 		updateState();
 		
