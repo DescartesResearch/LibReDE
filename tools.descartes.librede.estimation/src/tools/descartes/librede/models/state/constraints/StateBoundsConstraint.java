@@ -34,20 +34,24 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.StateVariable;
 
 public class StateBoundsConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
-	private final Resource res_i;
-	private final Service cls_r;
+	// the state variable to which the bounds apply to
+	private final StateVariable variable;
 	private final double lower;
 	private final double upper;
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
 	public StateBoundsConstraint(Resource resource, Service service, double lowerBound, double upperBound) {
-		this.res_i = resource;
-		this.cls_r = service;
+		this.variable = new StateVariable(resource, service);
 		this.lower = lowerBound;
 		this.upper = upperBound;
+	}
+	
+	public StateVariable getStateVariable() {
+		return this.variable;
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		return state.get(stateModel.getStateVariableIndex(res_i, cls_r));
+		return state.get(stateModel.getStateVariableIndex(variable.getResource(), variable.getService()));
 	}
 
 	@Override
