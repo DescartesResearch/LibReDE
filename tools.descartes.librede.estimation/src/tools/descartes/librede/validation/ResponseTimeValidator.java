@@ -34,9 +34,9 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
@@ -44,12 +44,12 @@ public class ResponseTimeValidator implements IValidator {
 	private List<ResponseTimeEquation> respEq;
 	private MatrixBuilder allErrors;
 	
-	public ResponseTimeValidator(WorkloadDescription workload, IRepositoryCursor cursor) {
+	public ResponseTimeValidator(IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		this.respEq = new ArrayList<ResponseTimeEquation>();
-		for (Service srv : workload.getServices()) {
-			respEq.add(new ResponseTimeEquation(workload, cursor, srv, workload.getResources()));
+		for (Service srv : stateModel.getServices()) {
+			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv));
 		}
-		allErrors = new MatrixBuilder(workload.getServices().size());
+		allErrors = new MatrixBuilder(stateModel.getServices().size());
 	}
 	
 	public void predict(Vector state) {

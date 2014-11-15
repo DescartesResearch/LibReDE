@@ -34,9 +34,9 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Utilization Law Validator")
 public class UtilizationValidator implements IValidator {
@@ -44,12 +44,12 @@ public class UtilizationValidator implements IValidator {
 	private List<UtilizationLaw> utilLaw;
 	private MatrixBuilder allErrors;
 	
-	public UtilizationValidator(WorkloadDescription workload, IRepositoryCursor cursor) {
+	public UtilizationValidator(IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		this.utilLaw = new ArrayList<UtilizationLaw>();
-		for (Resource res : workload.getResources()) {
-			utilLaw.add(new UtilizationLaw(workload, cursor, res));
+		for (Resource res : stateModel.getResources()) {
+			utilLaw.add(new UtilizationLaw(stateModel, cursor, res));
 		}
-		allErrors = new MatrixBuilder(workload.getResources().size());
+		allErrors = new MatrixBuilder(stateModel.getResources().size());
 	}
 	
 	@Override
