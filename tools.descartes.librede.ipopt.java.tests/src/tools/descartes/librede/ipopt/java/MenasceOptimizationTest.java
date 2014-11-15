@@ -40,7 +40,9 @@ import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
@@ -51,7 +53,7 @@ public class MenasceOptimizationTest {
 	private static final int ITERATIONS = 100;
 
 	private VectorObservationModel<IOutputFunction> observationModel;
-	private ConstantStateModel<ILinearStateConstraint> stateModel;
+	private ConstantStateModel<IStateConstraint> stateModel;
 
 	@Before
 	public void setUp() throws Exception {
@@ -69,12 +71,14 @@ public class MenasceOptimizationTest {
 		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
 		Vector initialEstimate = vector(0.01);
-		stateModel = new ConstantStateModel<>(1, initialEstimate);
+		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
+		builder.setInitialState(initialEstimate);
+		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
+		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
-		observationModel.addOutputFunction(new ResponseTimeEquation(workload, cursor, workload.getServices().get(0), workload.getResources()));
-		
-		stateModel.addConstraint(new UtilizationConstraint(workload, cursor, workload.getResources().get(0)));
+		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0)));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
 		optim.initialize(stateModel, observationModel, 10);
@@ -113,15 +117,19 @@ public class MenasceOptimizationTest {
 		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
-		stateModel = new ConstantStateModel<>(5, initialEstimate);
+		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+		for (Service service : workload.getServices()) {
+			builder.addVariable(workload.getResources().get(0), service);
+		}
+		builder.setInitialState(initialEstimate);
+		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
+		stateModel = builder.build();
+		
 
 		observationModel = new VectorObservationModel<>();
 		for (Service service : workload.getServices()) {		
-			observationModel.addOutputFunction(new ResponseTimeEquation(workload, cursor, service,
-					workload.getResources()));
+			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, service));
 		}
-		
-		stateModel.addConstraint(new UtilizationConstraint(workload, cursor, workload.getResources().get(0)));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
 		optim.initialize(stateModel, observationModel, 10);

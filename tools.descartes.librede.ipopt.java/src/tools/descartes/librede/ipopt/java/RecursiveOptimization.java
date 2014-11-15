@@ -38,6 +38,8 @@ import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.views.AbstractView;
+
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
@@ -57,6 +59,8 @@ import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.StateBoundsConstraint;
@@ -65,7 +69,7 @@ import tools.descartes.librede.nativehelper.NativeHelper;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
 
-public class RecursiveOptimization implements IConstrainedNonLinearOptimizationAlgorithm {	
+public class RecursiveOptimization extends AbstractEstimationAlgorithm{	
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
@@ -167,10 +171,9 @@ public class RecursiveOptimization implements IConstrainedNonLinearOptimizationA
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
 	 */
 	@Override
-	public void initialize(ConstantStateModel<? extends IStateConstraint> stateModel,
-			IObservationModel<IOutputFunction, Vector> observationModel, int estimationWindow) throws InitializationException {
-		this.stateModel = stateModel;
-		this.observationModel = observationModel;		
+	public void initialize(IStateModel<?> stateModel,
+			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, estimationWindow);
 		
 		initStateConstraints(stateModel.getConstraints());
 		
@@ -235,7 +238,7 @@ public class RecursiveOptimization implements IConstrainedNonLinearOptimizationA
 		return mean(estimationBuffer, 0);
 	}
 	
-	private void initOptimizationState(IObservationModel<IOutputFunction, Vector> observationModel) {
+	private void initOptimizationState(IObservationModel<?, ?> observationModel) {
 		sharedState.observationModel = observationModel;
 		sharedState.nonlinearConstraints = nonlinearConstraints;
 		sharedState.linearConstraints = linearConstraints;
@@ -303,8 +306,9 @@ public class RecursiveOptimization implements IConstrainedNonLinearOptimizationA
 		}
 		
 		for (StateBoundsConstraint c : boundsConstraints) {
-			NativeHelper.setDoubleArray(x_L, c.getStateVariable(), c.getLowerBound());
-			NativeHelper.setDoubleArray(x_U, c.getStateVariable(), c.getUpperBound());
+			StateVariable var = c.getStateVariable();
+			NativeHelper.setDoubleArray(x_L, stateModel.getStateVariableIndex(var.getResource(), var.getService()), c.getLowerBound());
+			NativeHelper.setDoubleArray(x_U, stateModel.getStateVariableIndex(var.getResource(), var.getService()), c.getUpperBound());
 		}
 	}
 	
@@ -550,7 +554,7 @@ public class RecursiveOptimization implements IConstrainedNonLinearOptimizationA
 		
 		public int stateSize;
 		
-		public IObservationModel<IOutputFunction, Vector> observationModel;
+		public IObservationModel<?, ?> observationModel;
 		
 		public List<IStateConstraint> nonlinearConstraints;
 		public List<ILinearStateConstraint> linearConstraints;
