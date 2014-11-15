@@ -38,10 +38,7 @@ import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.views.AbstractView;
-
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
-import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.ipopt.java.backend.Eval_F_CB;
@@ -65,11 +62,23 @@ import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.StateBoundsConstraint;
 import tools.descartes.librede.nativehelper.NativeHelper;
+import tools.descartes.librede.registry.Component;
+import tools.descartes.librede.registry.ParameterDefinition;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
 
-public class RecursiveOptimization extends AbstractEstimationAlgorithm{	
+@Component(displayName="Non-linear Constrained Optimization")
+public class RecursiveOptimization extends AbstractEstimationAlgorithm {
+	
+	@ParameterDefinition(name = "SolutionTolerance", label = "Solution Tolerance", defaultValue = "1e-7")
+	private double solutionTolerance;
+	
+	@ParameterDefinition(name = "UpperBoundsInfValue", label = "Upper Bounds Infinity Value", defaultValue = "1e19")
+	private double upperBoundsInfValue;
+	
+	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
+	private double lowerBoundsInfValue;
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
@@ -121,35 +130,10 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm{
 	private Pointer x; /* double[stateSize] : initial and solution vector */
 	private DoubleByReference obj; /* current objective value of optimization */
 	
-	// Tolerance level for solution
-	private double solutionTolerance = 1e-7;
-	
-	// Determines when a value returned by g(x) is considered Inf
-	private double lowerBoundInfValue = 1e-19;
-	private double upperBoundInfValue = 1e+19;
-	
 	private Matrix estimationBuffer;
 	
 	private ConstantStateModel<? extends IStateConstraint> stateModel;
 	private IObservationModel<IOutputFunction, Vector> observationModel;
-	
-	/**
-	 * Sets the tolerance level for an acceptable solution
-	 * @param solutionTolerance
-	 */
-	public void setSolutionTolerance(double solutionTolerance) {
-		this.solutionTolerance = solutionTolerance;
-	}
-
-	/**
-	 * Sets the interval outside which values of constraints are considered infinite.
-	 * @param lower
-	 * @param upper
-	 */
-	public void setBoundsInfValue(double lower, double upper) {
-		this.lowerBoundInfValue = lower;
-		this.upperBoundInfValue = upper;
-	}
 	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#getStateModel()
@@ -277,8 +261,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm{
 //		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST_PRINT_ALL.toNativeString(), 
 //				IpoptOptionValue.YES.toNativeString());
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundInfValue);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundInfValue);		
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundsInfValue);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);		
 	}
 
 	private void setOptimizationConstraints() {
@@ -302,7 +286,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm{
 		/* set the values for the variable bounds to default value */
 		for (int i = 0; i < stateSize; i++) {
 			NativeHelper.setDoubleArray(x_L, i, 0);
-			NativeHelper.setDoubleArray(x_U, i, upperBoundInfValue);
+			NativeHelper.setDoubleArray(x_U, i, upperBoundsInfValue);
 		}
 		
 		for (StateBoundsConstraint c : boundsConstraints) {
