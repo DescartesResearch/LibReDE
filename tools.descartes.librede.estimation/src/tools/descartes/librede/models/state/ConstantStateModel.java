@@ -72,6 +72,9 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 		
 		public ConstantStateModel<C> build() {
+			if (initialState == null) {
+				initialState = zeros(stateVariables.size());
+			}
 			ConstantStateModel<C> model = new ConstantStateModel<C>(new ArrayList<StateVariable>(stateVariables), constraints, initialState);
 			for (IStateConstraint c : model.getConstraints()) {
 				c.setStateModel(model);
