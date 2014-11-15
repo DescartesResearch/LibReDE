@@ -38,6 +38,7 @@ import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
+import tools.descartes.librede.registry.Component;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
@@ -52,6 +53,7 @@ import com.sun.jna.ptr.IntByReference;
  * @author Mehran Saliminia
  * 
  */
+@Component(displayName="Non-negative Least-Squares Regression")
 public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 
 	private ILinearOutputFunction outputFunction;
