@@ -40,8 +40,8 @@ public abstract class AbstractLinearOutputFunction extends AbstractOutputFunctio
 	}
 	
 	@Override
-	public double getCalculatedOutput() {
-		return getIndependentVariables().dot(getStateModel().getCurrentState());
+	public double getCalculatedOutput(Vector state) {
+		return getIndependentVariables().dot(state);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ package tools.descartes.librede.models.state.constraints;
 
 import java.util.List;
 
+import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.IStateModel;
 
 public interface IStateConstraint {
@@ -36,10 +37,10 @@ public interface IStateConstraint {
 	
 	double getUpperBound();
 	
-	double getValue();
-	
-	void setStateModel(IStateModel<? extends IStateConstraint> model);
+	double getValue(Vector state);
 	
 	boolean isApplicable(List<String> messages);
+
+	void setStateModel(IStateModel<? extends IStateConstraint> model);
 	
 }

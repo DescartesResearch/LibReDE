@@ -51,11 +51,11 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public double getValue() {
+	public double getValue(Vector state) {
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		return stateModel.getCurrentState().get(stateModel.getStateVariableIndex(res_i, cls_r));
+		return state.get(stateModel.getStateVariableIndex(res_i, cls_r));
 	}
 
 	@Override

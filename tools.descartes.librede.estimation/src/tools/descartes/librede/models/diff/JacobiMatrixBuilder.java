@@ -42,7 +42,7 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public final class JacobiMatrixBuilder {
 	
-	public static Matrix calculateOfObservationModel(IObservationModel<IOutputFunction, Vector> observationModel, Vector x) {
+	public static Matrix calculateOfObservationModel(IObservationModel<?, ?> observationModel, Vector x) {
 		List<Vector> dev = new ArrayList<Vector>();
 		for (IOutputFunction f : observationModel) {
 			if (f instanceof IDifferentiableFunction) {

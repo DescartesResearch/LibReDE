@@ -28,12 +28,14 @@ package tools.descartes.librede.models.observation.functions;
 
 import java.util.List;
 
+import tools.descartes.librede.linalg.Vector;
+
 public interface IOutputFunction {
 	
 	boolean isApplicable(List<String> messages);
 	
 	double getObservedOutput();
 	
-	double getCalculatedOutput();
+	double getCalculatedOutput(Vector state);
 	
 }

@@ -66,11 +66,11 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public double getValue() {
+	public double getValue(Vector state) {
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		Vector D_i = stateModel.getCurrentState().slice(stateModel.getStateVariableIndexRange(res_i));
+		Vector D_i = state.slice(stateModel.getStateVariableIndexRange(res_i));
 		Vector X = throughputQuery.execute();
 		return X.dot(D_i);
 	}

@@ -124,14 +124,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public double getCalculatedOutput() {
+	public double getCalculatedOutput(Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.execute();
 		double X_total = sum(X);
 		
 		for (Resource res_i : getStateModel().getResources()) {
-			Vector D_i = getStateModel().getCurrentState().slice(getStateModel().getStateVariableIndexRange(res_i));
-			double D_ir = getStateModel().getCurrentState().get(getStateModel().getStateVariableIndex(res_i, cls_r));
+			Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
+			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			double U_i = X.dot(D_i);
 
 			int p = res_i.getNumberOfServers();

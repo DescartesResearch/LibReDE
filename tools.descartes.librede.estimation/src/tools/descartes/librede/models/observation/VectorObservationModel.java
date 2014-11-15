@@ -65,10 +65,10 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
-	public Vector getCalculatedOutput() {
+	public Vector getCalculatedOutput(Vector state) {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = outputFunctions.get(i).getCalculatedOutput();
+			temp[i] = outputFunctions.get(i).getCalculatedOutput(state);
 		}
 		return vector(temp);
 	}

@@ -54,8 +54,8 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
-	public Scalar getCalculatedOutput() {
-		return scalar(outputFunction.getCalculatedOutput());
+	public Scalar getCalculatedOutput(Vector state) {
+		return scalar(outputFunction.getCalculatedOutput(state));
 	}
 	
 	@Override

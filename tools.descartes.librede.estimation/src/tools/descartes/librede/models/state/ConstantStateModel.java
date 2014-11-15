@@ -109,7 +109,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	private final List<C> constraints;
 	private final Vector initialState;
 	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
-	private Vector currentState;
 	
 	private ConstantStateModel(List<StateVariable> variables, List<C> constraints, Vector initialState) {
 		this.stateSize = variables.size();	
@@ -169,7 +168,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			throw new IllegalArgumentException("Size of initial state vector must be equal to the state size.");
 		}		
 		this.initialState = initialState;
-		this.currentState = initialState;
 	
 		for (int a = 0; a < stateSize; a++) {
 			derivatives.add(new ConstantFunction(stateSize, a));
@@ -190,13 +188,8 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public Vector getNextState() {
-		return currentState;
-	}
-	
-	@Override
-	public Vector getCurrentState() {
-		return currentState;
+	public Vector getNextState(Vector state) {
+		return state;
 	}
 	
 	@Override
@@ -221,11 +214,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 		return idx;
 	}	
-
-	@Override
-	public void setCurrentState(Vector state) {
-		this.currentState = state;
-	}
 
 	@Override
 	public List<C> getConstraints() {

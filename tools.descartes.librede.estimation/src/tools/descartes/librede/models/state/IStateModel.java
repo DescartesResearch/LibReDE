@@ -55,13 +55,7 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	List<C> getConstraints();
 	
-	// Access methods to current state of state model.
-	
-	void setCurrentState(Vector state);	
-	
-	Vector getCurrentState();
-	
-	Vector getNextState();
+	Vector getNextState(Vector currentState);
 	
 	List<IDifferentiableFunction> getStateDerivatives();
 	
