@@ -32,7 +32,6 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
-import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import tools.descartes.librede.bayesplusplus.backend.FCallback;
 import tools.descartes.librede.bayesplusplus.backend.HCallback;
@@ -44,14 +43,15 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nativehelper.NativeHelper;
+import tools.descartes.librede.registry.Component;
+import tools.descartes.librede.registry.ParameterDefinition;
 
 import com.sun.jna.Pointer;
 
-public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {	
+@Component(displayName="Extended Kalman Filter")
+public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 
 	// Callback function from native library for the observation model
 	private class HFunction implements HCallback {
@@ -94,6 +94,15 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 			return stateBuffer;
 		}
 	}
+	
+	@ParameterDefinition(name = "StateNoiseCovariance", label = "State Noise Covariance", defaultValue = "1.0")
+	private double stateNoiseCovarianceConstant;
+	
+	@ParameterDefinition(name = "StateNoiseCoupling", label = "State Noise Coupling", defaultValue = "1.0")
+	private double stateNoiseCouplingConstant;
+	
+	@ParameterDefinition(name = "ObserveNoiseCovariance", label = "Observe Noise Covariance", defaultValue = "0.0001")
+	private double observeNoiseCovarianceConstant;
 
 	private int stateSize;
 	private int outputSize;
@@ -118,38 +127,6 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Pointer nativeScheme = null;
 	private Pointer stateBuffer;
 	
-	private double stateNoiseCovarianceConstant = 1.0;
-	private double stateNoiseCouplingConstant = 1.0;
-	private double observeNoiseConstant = 0.0001;
-	
-	/**
-	 * Sets a constant value used for all entries of the state noise vector.
-	 * 
-	 * @param stateNoiseCovarianceConstant
-	 */
-	public void setStateNoiseCovarianceConstant(
-			double stateNoiseCovarianceConstant) {
-		this.stateNoiseCovarianceConstant = stateNoiseCovarianceConstant;
-	}
-	
-	/**
-	 * Sets a constant value used to initialize the diagonal of the corresponding matrix.
-	 * 
-	 * @param stateNoiseCouplingConstant
-	 */
-	public void setStateNoiseCouplingConstant(double stateNoiseCouplingConstant) {
-		this.stateNoiseCouplingConstant = stateNoiseCouplingConstant;
-	}
-	
-	/**
-	 * Sets a constant value used to initialize the elements of the observe noise vector
-	 * 
-	 * @param observeNoiseConstant
-	 */
-	public void setObserveNoiseConstant(double observeNoiseConstant) {
-		this.observeNoiseConstant = observeNoiseConstant;
-	}
-
 	private void initNativeKalmanFilter() throws InitializationException {
 		nativeScheme = BayesPlusPlusLibrary.create_covariance_scheme(stateSize);
 		if (nativeScheme == null) {
@@ -218,7 +195,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		observeNoise = vector(outputSize, new VectorFunction() {			
 			@Override
 			public double cell(int row) {
-				return observeNoiseConstant;
+				return observeNoiseCovarianceConstant;
 			}
 		});
 		toNative(buffer, observeNoise);
