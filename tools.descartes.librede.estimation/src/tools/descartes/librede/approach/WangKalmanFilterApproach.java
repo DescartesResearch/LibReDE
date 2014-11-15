@@ -44,20 +44,10 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName="Kalman Filter using Utilization Law")
 public class WangKalmanFilterApproach extends AbstractEstimationApproach {
-	
-	@ParameterDefinition(name = "StateNoiseCovariance", label = "State Noise Covariance", defaultValue = "1.0")
-	private double stateNoiseCovariance;
-	
-	@ParameterDefinition(name = "StateNoiseCoupling", label = "State Noise Coupling", defaultValue = "1.0")
-	private double stateNoiseCoupling;
-	
-	@ParameterDefinition(name = "ObserveNoiseCovariance", label = "Observe Noise Covariance", defaultValue = "0.0001")
-	private double observeNoiseCovariance;
 
 	@Override
 	protected List<IStateModel<?>> deriveStateModels(

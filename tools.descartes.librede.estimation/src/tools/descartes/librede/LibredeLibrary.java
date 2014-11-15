@@ -26,9 +26,15 @@
  */
 package tools.descartes.librede;
 
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.approach.MenasceOptimizationApproach;
 import tools.descartes.librede.approach.ResponseTimeApproximationApproach;
+import tools.descartes.librede.approach.RoliaRegressionApproach;
 import tools.descartes.librede.approach.ServiceDemandLawApproach;
+import tools.descartes.librede.approach.WangKalmanFilterApproach;
+import tools.descartes.librede.approach.ZhangKalmanFilterApproach;
 import tools.descartes.librede.datasource.IDataSource;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.export.IExporter;
@@ -49,15 +55,14 @@ public class LibredeLibrary {
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		
-		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ResponseTimeApproximationApproach.class);
-		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ServiceDemandLawApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationAlgorithm.class, SimpleApproximation.class);
 		
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ResponseTimeApproximationApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ServiceDemandLawApproach.class);
-//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, RoliaRegressionApproach.class);
-//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, MenasceOptimizationApproach.class);
-//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
-//		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, RoliaRegressionApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, MenasceOptimizationApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
 		
 		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);

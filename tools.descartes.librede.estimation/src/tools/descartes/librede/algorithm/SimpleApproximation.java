@@ -40,11 +40,11 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
-import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.Aggregation;
 
+@Component(displayName="Simple Approximation")
 public class SimpleApproximation extends AbstractEstimationAlgorithm {
 	
 	private Aggregation aggregation;
