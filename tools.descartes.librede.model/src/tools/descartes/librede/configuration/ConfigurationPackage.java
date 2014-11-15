@@ -776,7 +776,7 @@ public interface ConfigurationPackage extends EPackage {
 	int ESTIMATION_SPECIFICATION__END_TIMESTAMP = 5;
 
 	/**
-	 * The feature id for the '<em><b>Algorithms</b></em>' containment reference.
+	 * The feature id for the '<em><b>Algorithms</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1533,10 +1533,10 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getEstimationSpecification_EndTimestamp();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}'.
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Algorithms</em>'.
+	 * @return the meta object for the containment reference list '<em>Algorithms</em>'.
 	 * @see tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms()
 	 * @see #getEstimationSpecification()
 	 * @generated
@@ -2142,7 +2142,7 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute ESTIMATION_SPECIFICATION__END_TIMESTAMP = eINSTANCE.getEstimationSpecification_EndTimestamp();
 
 		/**
-		 * The meta object literal for the '<em><b>Algorithms</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Algorithms</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

@@ -167,14 +167,14 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	protected long endTimestamp = END_TIMESTAMP_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getAlgorithms() <em>Algorithms</em>}' containment reference.
+	 * The cached value of the '{@link #getAlgorithms() <em>Algorithms</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getAlgorithms()
 	 * @generated
 	 * @ordered
 	 */
-	protected EstimationAlgorithmConfiguration algorithms;
+	protected EList<EstimationAlgorithmConfiguration> algorithms;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -317,42 +317,11 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EstimationAlgorithmConfiguration getAlgorithms() {
+	public EList<EstimationAlgorithmConfiguration> getAlgorithms() {
+		if (algorithms == null) {
+			algorithms = new EObjectContainmentEList<EstimationAlgorithmConfiguration>(EstimationAlgorithmConfiguration.class, this, ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS);
+		}
 		return algorithms;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetAlgorithms(EstimationAlgorithmConfiguration newAlgorithms, NotificationChain msgs) {
-		EstimationAlgorithmConfiguration oldAlgorithms = algorithms;
-		algorithms = newAlgorithms;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, oldAlgorithms, newAlgorithms);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setAlgorithms(EstimationAlgorithmConfiguration newAlgorithms) {
-		if (newAlgorithms != algorithms) {
-			NotificationChain msgs = null;
-			if (algorithms != null)
-				msgs = ((InternalEObject)algorithms).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, null, msgs);
-			if (newAlgorithms != null)
-				msgs = ((InternalEObject)newAlgorithms).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, null, msgs);
-			msgs = basicSetAlgorithms(newAlgorithms, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, newAlgorithms, newAlgorithms));
 	}
 
 	/**
@@ -366,7 +335,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES:
 				return ((InternalEList<?>)getApproaches()).basicRemove(otherEnd, msgs);
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
-				return basicSetAlgorithms(null, msgs);
+				return ((InternalEList<?>)getAlgorithms()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -426,7 +395,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				setEndTimestamp((Long)newValue);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
-				setAlgorithms((EstimationAlgorithmConfiguration)newValue);
+				getAlgorithms().clear();
+				getAlgorithms().addAll((Collection<? extends EstimationAlgorithmConfiguration>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -459,7 +429,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				setEndTimestamp(END_TIMESTAMP_EDEFAULT);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
-				setAlgorithms((EstimationAlgorithmConfiguration)null);
+				getAlgorithms().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -486,7 +456,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				return endTimestamp != END_TIMESTAMP_EDEFAULT;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
-				return algorithms != null;
+				return algorithms != null && !algorithms.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

@@ -206,29 +206,19 @@ public interface EstimationSpecification extends EObject {
 	void setEndTimestamp(long value);
 
 	/**
-	 * Returns the value of the '<em><b>Algorithms</b></em>' containment reference.
+	 * Returns the value of the '<em><b>Algorithms</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Algorithms</em>' containment reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Algorithms</em>' containment reference.
-	 * @see #setAlgorithms(EstimationAlgorithmConfiguration)
+	 * @return the value of the '<em>Algorithms</em>' containment reference list.
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationSpecification_Algorithms()
 	 * @model containment="true"
 	 * @generated
 	 */
-	EstimationAlgorithmConfiguration getAlgorithms();
-
-	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Algorithms</em>' containment reference.
-	 * @see #getAlgorithms()
-	 * @generated
-	 */
-	void setAlgorithms(EstimationAlgorithmConfiguration value);
+	EList<EstimationAlgorithmConfiguration> getAlgorithms();
 
 } // EstimationSpecification

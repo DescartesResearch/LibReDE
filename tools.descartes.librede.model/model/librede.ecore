@@ -89,8 +89,8 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="endTimestamp" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="algorithms" eType="#//EstimationAlgorithmConfiguration"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="algorithms" upperBound="-1"
+        eType="#//EstimationAlgorithmConfiguration" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ValidationSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="validators" upperBound="-1"
