@@ -39,6 +39,10 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ServiceDemandLaw;
+import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
@@ -67,10 +71,18 @@ public class ServiceDemandLawTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		resource = workload.getResources().get(RESOURCE_IDX);
-		service = workload.getServices().get(SERVICE_IDX);
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		for (Resource res : workload.getResources()) {
+			for (Service serv : workload.getServices()) {
+				builder.addVariable(res, serv);
+			}
+		}
+		IStateModel<Unconstrained> stateModel = builder.build();
 		
-		law = new ServiceDemandLaw(workload, cursor, resource, service);
+		resource = stateModel.getResources().get(RESOURCE_IDX);
+		service = stateModel.getServices().get(SERVICE_IDX);
+		
+		law = new ServiceDemandLaw(stateModel, cursor, resource, service);
 		state = generator.getDemands();	
 		
 		generator.nextObservation();

@@ -36,9 +36,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
@@ -64,8 +69,16 @@ public class UtilizationLawTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		resource = workload.getResources().get(RESOURCE_IDX);
-		law = new UtilizationLaw(workload, cursor, resource);
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		for (Resource res : workload.getResources()) {
+			for (Service serv : workload.getServices()) {
+				builder.addVariable(res, serv);
+			}
+		}
+		IStateModel<Unconstrained> stateModel = builder.build();
+		
+		resource = stateModel.getResources().get(RESOURCE_IDX);
+		law = new UtilizationLaw(stateModel, cursor, resource);
 		state = generator.getDemands();		
 		
 		generator.nextObservation();

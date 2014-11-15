@@ -41,6 +41,10 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
+import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.Aggregation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
@@ -72,11 +76,19 @@ public class ResponseTimeApproximationTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		resource = workload.getResources().get(RESOURCE_IDX);
-		service = workload.getServices().get(SERVICE_IDX);
-		stateIdx = workload.getState().getIndex(resource, service);
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		for (Resource res : workload.getResources()) {
+			for (Service serv : workload.getServices()) {
+				builder.addVariable(res, serv);
+			}
+		}
+		IStateModel<Unconstrained> stateModel = builder.build();
 		
-		law = new ResponseTimeApproximation(workload, cursor, resource, service, Aggregation.AVERAGE);
+		resource = stateModel.getResources().get(RESOURCE_IDX);
+		service = stateModel.getServices().get(SERVICE_IDX);
+		stateIdx = stateModel.getStateVariableIndex(resource, service);
+		
+		law = new ResponseTimeApproximation(builder.build(), cursor, resource, service, Aggregation.AVERAGE);
 		state = generator.getDemands();
 		
 		generator.nextObservation();
