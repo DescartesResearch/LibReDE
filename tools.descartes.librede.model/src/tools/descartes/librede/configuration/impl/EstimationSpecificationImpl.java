@@ -41,6 +41,7 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.EstimationSpecification;
 
@@ -57,6 +58,7 @@ import tools.descartes.librede.configuration.EstimationSpecification;
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getStepSize <em>Step Size</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getStartTimestamp <em>Start Timestamp</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getEndTimestamp <em>End Timestamp</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getAlgorithms <em>Algorithms</em>}</li>
  * </ul>
  * </p>
  *
@@ -163,6 +165,16 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * @ordered
 	 */
 	protected long endTimestamp = END_TIMESTAMP_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getAlgorithms() <em>Algorithms</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getAlgorithms()
+	 * @generated
+	 * @ordered
+	 */
+	protected EstimationAlgorithmConfiguration algorithms;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -305,11 +317,56 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EstimationAlgorithmConfiguration getAlgorithms() {
+		return algorithms;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetAlgorithms(EstimationAlgorithmConfiguration newAlgorithms, NotificationChain msgs) {
+		EstimationAlgorithmConfiguration oldAlgorithms = algorithms;
+		algorithms = newAlgorithms;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, oldAlgorithms, newAlgorithms);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setAlgorithms(EstimationAlgorithmConfiguration newAlgorithms) {
+		if (newAlgorithms != algorithms) {
+			NotificationChain msgs = null;
+			if (algorithms != null)
+				msgs = ((InternalEObject)algorithms).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, null, msgs);
+			if (newAlgorithms != null)
+				msgs = ((InternalEObject)newAlgorithms).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, null, msgs);
+			msgs = basicSetAlgorithms(newAlgorithms, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS, newAlgorithms, newAlgorithms));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES:
 				return ((InternalEList<?>)getApproaches()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
+				return basicSetAlgorithms(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -334,6 +391,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				return getStartTimestamp();
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				return getEndTimestamp();
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
+				return getAlgorithms();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -366,6 +425,9 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				setEndTimestamp((Long)newValue);
 				return;
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
+				setAlgorithms((EstimationAlgorithmConfiguration)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -396,6 +458,9 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				setEndTimestamp(END_TIMESTAMP_EDEFAULT);
 				return;
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
+				setAlgorithms((EstimationAlgorithmConfiguration)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -420,6 +485,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				return startTimestamp != START_TIMESTAMP_EDEFAULT;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				return endTimestamp != END_TIMESTAMP_EDEFAULT;
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
+				return algorithms != null;
 		}
 		return super.eIsSet(featureID);
 	}

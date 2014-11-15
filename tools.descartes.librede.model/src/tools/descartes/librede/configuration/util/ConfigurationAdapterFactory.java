@@ -164,6 +164,10 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createModelEntityAdapter();
 			}
 			@Override
+			public Adapter caseEstimationAlgorithmConfiguration(EstimationAlgorithmConfiguration object) {
+				return createEstimationAlgorithmConfigurationAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -432,6 +436,20 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createModelEntityAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration <em>Estimation Algorithm Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.EstimationAlgorithmConfiguration
+	 * @generated
+	 */
+	public Adapter createEstimationAlgorithmConfigurationAdapter() {
 		return null;
 	}
 

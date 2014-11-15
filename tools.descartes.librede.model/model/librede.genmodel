@@ -62,6 +62,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/stepSize"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/startTimestamp"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationSpecification/endTimestamp"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//EstimationSpecification/algorithms"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//ValidationSpecification">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//ValidationSpecification/validators"/>
@@ -87,5 +88,9 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceToEntityMapping/traceColumn"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//ModelEntity"/>
+    <genClasses ecoreClass="librede.ecore#//EstimationAlgorithmConfiguration">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationAlgorithmConfiguration/type"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//EstimationAlgorithmConfiguration/parameters"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

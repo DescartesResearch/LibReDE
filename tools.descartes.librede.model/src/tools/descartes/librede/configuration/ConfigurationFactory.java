@@ -201,6 +201,15 @@ public interface ConfigurationFactory extends EFactory {
 	ModelEntity createModelEntity();
 
 	/**
+	 * Returns a new object of class '<em>Estimation Algorithm Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Estimation Algorithm Configuration</em>'.
+	 * @generated
+	 */
+	EstimationAlgorithmConfiguration createEstimationAlgorithmConfiguration();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

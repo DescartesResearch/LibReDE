@@ -46,6 +46,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getStepSize <em>Step Size</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getStartTimestamp <em>Start Timestamp</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp <em>End Timestamp</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}</li>
  * </ul>
  * </p>
  *
@@ -203,5 +204,31 @@ public interface EstimationSpecification extends EObject {
 	 * @generated
 	 */
 	void setEndTimestamp(long value);
+
+	/**
+	 * Returns the value of the '<em><b>Algorithms</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Algorithms</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Algorithms</em>' containment reference.
+	 * @see #setAlgorithms(EstimationAlgorithmConfiguration)
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationSpecification_Algorithms()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EstimationAlgorithmConfiguration getAlgorithms();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Algorithms</em>' containment reference.
+	 * @see #getAlgorithms()
+	 * @generated
+	 */
+	void setAlgorithms(EstimationAlgorithmConfiguration value);
 
 } // EstimationSpecification

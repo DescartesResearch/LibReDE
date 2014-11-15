@@ -490,6 +490,29 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected EstimationAlgorithmConfigurationItemProvider estimationAlgorithmConfigurationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createEstimationAlgorithmConfigurationAdapter() {
+		if (estimationAlgorithmConfigurationItemProvider == null) {
+			estimationAlgorithmConfigurationItemProvider = new EstimationAlgorithmConfigurationItemProvider(this);
+		}
+
+		return estimationAlgorithmConfigurationItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -605,6 +628,7 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (fileTraceConfigurationItemProvider != null) fileTraceConfigurationItemProvider.dispose();
 		if (traceToEntityMappingItemProvider != null) traceToEntityMappingItemProvider.dispose();
 		if (modelEntityItemProvider != null) modelEntityItemProvider.dispose();
+		if (estimationAlgorithmConfigurationItemProvider != null) estimationAlgorithmConfigurationItemProvider.dispose();
 	}
 
 }

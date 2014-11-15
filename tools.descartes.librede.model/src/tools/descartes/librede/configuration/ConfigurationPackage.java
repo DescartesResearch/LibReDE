@@ -776,13 +776,22 @@ public interface ConfigurationPackage extends EPackage {
 	int ESTIMATION_SPECIFICATION__END_TIMESTAMP = 5;
 
 	/**
+	 * The feature id for the '<em><b>Algorithms</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_SPECIFICATION__ALGORITHMS = 6;
+
+	/**
 	 * The number of structural features of the '<em>Estimation Specification</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_SPECIFICATION_FEATURE_COUNT = 6;
+	int ESTIMATION_SPECIFICATION_FEATURE_COUNT = 7;
 
 	/**
 	 * The number of operations of the '<em>Estimation Specification</em>' class.
@@ -1038,6 +1047,52 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_TO_ENTITY_MAPPING_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.EstimationAlgorithmConfigurationImpl <em>Estimation Algorithm Configuration</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.EstimationAlgorithmConfigurationImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getEstimationAlgorithmConfiguration()
+	 * @generated
+	 */
+	int ESTIMATION_ALGORITHM_CONFIGURATION = 18;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_ALGORITHM_CONFIGURATION__TYPE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS = 1;
+
+	/**
+	 * The number of structural features of the '<em>Estimation Algorithm Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_ALGORITHM_CONFIGURATION_FEATURE_COUNT = 2;
+
+	/**
+	 * The number of operations of the '<em>Estimation Algorithm Configuration</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_ALGORITHM_CONFIGURATION_OPERATION_COUNT = 0;
+
+	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1045,7 +1100,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getSchedulingStrategy()
 	 * @generated
 	 */
-	int SCHEDULING_STRATEGY = 18;
+	int SCHEDULING_STRATEGY = 19;
 
 
 	/**
@@ -1478,6 +1533,17 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getEstimationSpecification_EndTimestamp();
 
 	/**
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Algorithms</em>'.
+	 * @see tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms()
+	 * @see #getEstimationSpecification()
+	 * @generated
+	 */
+	EReference getEstimationSpecification_Algorithms();
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ValidationSpecification <em>Validation Specification</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1667,6 +1733,38 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getModelEntity();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration <em>Estimation Algorithm Configuration</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Estimation Algorithm Configuration</em>'.
+	 * @see tools.descartes.librede.configuration.EstimationAlgorithmConfiguration
+	 * @generated
+	 */
+	EClass getEstimationAlgorithmConfiguration();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration#getType <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Type</em>'.
+	 * @see tools.descartes.librede.configuration.EstimationAlgorithmConfiguration#getType()
+	 * @see #getEstimationAlgorithmConfiguration()
+	 * @generated
+	 */
+	EAttribute getEstimationAlgorithmConfiguration_Type();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see tools.descartes.librede.configuration.EstimationAlgorithmConfiguration#getParameters()
+	 * @see #getEstimationAlgorithmConfiguration()
+	 * @generated
+	 */
+	EReference getEstimationAlgorithmConfiguration_Parameters();
 
 	/**
 	 * Returns the meta object for enum '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
@@ -2044,6 +2142,14 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute ESTIMATION_SPECIFICATION__END_TIMESTAMP = eINSTANCE.getEstimationSpecification_EndTimestamp();
 
 		/**
+		 * The meta object literal for the '<em><b>Algorithms</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ESTIMATION_SPECIFICATION__ALGORITHMS = eINSTANCE.getEstimationSpecification_Algorithms();
+
+		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ValidationSpecificationImpl <em>Validation Specification</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2200,6 +2306,32 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EClass MODEL_ENTITY = eINSTANCE.getModelEntity();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.EstimationAlgorithmConfigurationImpl <em>Estimation Algorithm Configuration</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.EstimationAlgorithmConfigurationImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getEstimationAlgorithmConfiguration()
+		 * @generated
+		 */
+		EClass ESTIMATION_ALGORITHM_CONFIGURATION = eINSTANCE.getEstimationAlgorithmConfiguration();
+
+		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ESTIMATION_ALGORITHM_CONFIGURATION__TYPE = eINSTANCE.getEstimationAlgorithmConfiguration_Type();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS = eINSTANCE.getEstimationAlgorithmConfiguration_Parameters();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

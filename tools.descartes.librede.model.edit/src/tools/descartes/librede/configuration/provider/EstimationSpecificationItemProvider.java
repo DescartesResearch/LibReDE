@@ -215,6 +215,7 @@ public class EstimationSpecificationItemProvider
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__APPROACHES);
+			childrenFeatures.add(ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__ALGORITHMS);
 		}
 		return childrenFeatures;
 	}
@@ -276,6 +277,7 @@ public class EstimationSpecificationItemProvider
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__APPROACHES:
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -297,6 +299,11 @@ public class EstimationSpecificationItemProvider
 			(createChildParameter
 				(ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__APPROACHES,
 				 ConfigurationFactory.eINSTANCE.createEstimationApproachConfiguration()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__ALGORITHMS,
+				 ConfigurationFactory.eINSTANCE.createEstimationAlgorithmConfiguration()));
 	}
 
 	/**

@@ -39,6 +39,7 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.EstimationSpecification;
 import tools.descartes.librede.configuration.ExporterConfiguration;
@@ -190,6 +191,13 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	private EClass modelEntityEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass estimationAlgorithmConfigurationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -624,6 +632,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getEstimationSpecification_Algorithms() {
+		return (EReference)estimationSpecificationEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getValidationSpecification() {
 		return validationSpecificationEClass;
 	}
@@ -786,6 +803,33 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getEstimationAlgorithmConfiguration() {
+		return estimationAlgorithmConfigurationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEstimationAlgorithmConfiguration_Type() {
+		return (EAttribute)estimationAlgorithmConfigurationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getEstimationAlgorithmConfiguration_Parameters() {
+		return (EReference)estimationAlgorithmConfigurationEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EEnum getSchedulingStrategy() {
 		return schedulingStrategyEEnum;
 	}
@@ -868,6 +912,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEAttribute(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__STEP_SIZE);
 		createEAttribute(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__START_TIMESTAMP);
 		createEAttribute(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__END_TIMESTAMP);
+		createEReference(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__ALGORITHMS);
 
 		validationSpecificationEClass = createEClass(VALIDATION_SPECIFICATION);
 		createEReference(validationSpecificationEClass, VALIDATION_SPECIFICATION__VALIDATORS);
@@ -893,6 +938,10 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEAttribute(traceToEntityMappingEClass, TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN);
 
 		modelEntityEClass = createEClass(MODEL_ENTITY);
+
+		estimationAlgorithmConfigurationEClass = createEClass(ESTIMATION_ALGORITHM_CONFIGURATION);
+		createEAttribute(estimationAlgorithmConfigurationEClass, ESTIMATION_ALGORITHM_CONFIGURATION__TYPE);
+		createEReference(estimationAlgorithmConfigurationEClass, ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS);
 
 		// Create enums
 		schedulingStrategyEEnum = createEEnum(SCHEDULING_STRATEGY);
@@ -990,6 +1039,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEAttribute(getEstimationSpecification_StepSize(), ecorePackage.getELong(), "stepSize", "1000", 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEstimationSpecification_StartTimestamp(), ecorePackage.getELong(), "startTimestamp", "0", 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEstimationSpecification_EndTimestamp(), ecorePackage.getELong(), "endTimestamp", "0", 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEstimationSpecification_Algorithms(), this.getEstimationAlgorithmConfiguration(), null, "algorithms", null, 0, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(validationSpecificationEClass, ValidationSpecification.class, "ValidationSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getValidationSpecification_Validators(), this.getValidatorConfiguration(), null, "validators", null, 0, -1, ValidationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1021,6 +1071,13 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEAttribute(getTraceToEntityMapping_TraceColumn(), ecorePackage.getEInt(), "traceColumn", "1", 0, 1, TraceToEntityMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(modelEntityEClass, ModelEntity.class, "ModelEntity", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(estimationAlgorithmConfigurationEClass, EstimationAlgorithmConfiguration.class, "EstimationAlgorithmConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		g1 = createEGenericType(ecorePackage.getEJavaClass());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEAttribute(getEstimationAlgorithmConfiguration_Type(), g1, "type", null, 1, 1, EstimationAlgorithmConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getEstimationAlgorithmConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, EstimationAlgorithmConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(schedulingStrategyEEnum, SchedulingStrategy.class, "SchedulingStrategy");

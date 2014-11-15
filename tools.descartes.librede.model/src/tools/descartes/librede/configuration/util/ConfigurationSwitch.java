@@ -207,6 +207,12 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION: {
+				EstimationAlgorithmConfiguration estimationAlgorithmConfiguration = (EstimationAlgorithmConfiguration)theEObject;
+				T result = caseEstimationAlgorithmConfiguration(estimationAlgorithmConfiguration);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -478,6 +484,21 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseModelEntity(ModelEntity object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Estimation Algorithm Configuration</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Estimation Algorithm Configuration</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEstimationAlgorithmConfiguration(EstimationAlgorithmConfiguration object) {
 		return null;
 	}
 

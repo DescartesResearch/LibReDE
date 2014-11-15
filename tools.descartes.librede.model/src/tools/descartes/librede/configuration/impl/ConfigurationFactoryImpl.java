@@ -98,6 +98,7 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 			case ConfigurationPackage.FILE_TRACE_CONFIGURATION: return createFileTraceConfiguration();
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING: return createTraceToEntityMapping();
 			case ConfigurationPackage.MODEL_ENTITY: return createModelEntity();
+			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION: return createEstimationAlgorithmConfiguration();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -301,6 +302,16 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public ModelEntity createModelEntity() {
 		ModelEntityImpl modelEntity = new ModelEntityImpl();
 		return modelEntity;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EstimationAlgorithmConfiguration createEstimationAlgorithmConfiguration() {
+		EstimationAlgorithmConfigurationImpl estimationAlgorithmConfiguration = new EstimationAlgorithmConfigurationImpl();
+		return estimationAlgorithmConfiguration;
 	}
 
 	/**
