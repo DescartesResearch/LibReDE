@@ -29,27 +29,20 @@ package tools.descartes.librede.models.observation.functions;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
-import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.ConstantStateModel.Builder;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class UtilizationLawTest {
 		
@@ -65,20 +58,11 @@ public class UtilizationLawTest {
 	public void setUp() throws Exception {		
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
-		
-		WorkloadDescription workload = generator.getWorkloadDescription();
+
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
-				builder.addVariable(res, serv);
-			}
-		}
-		IStateModel<Unconstrained> stateModel = builder.build();
-		
-		resource = stateModel.getResources().get(RESOURCE_IDX);
-		law = new UtilizationLaw(stateModel, cursor, resource);
+		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
+		law = new UtilizationLaw(generator.getStateModel(), cursor, resource);
 		state = generator.getDemands();		
 		
 		generator.nextObservation();
@@ -89,7 +73,7 @@ public class UtilizationLawTest {
 	public void testGetIndependentVariables() {
 		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();		
-		Vector expectedVarVector = zeros(state.rows()).set(generator.getWorkloadDescription().getState().getRange(resource), x);
+		Vector expectedVarVector = zeros(state.rows()).set(generator.getStateModel().getStateVariableIndexRange(resource), x);
 		
 		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}

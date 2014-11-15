@@ -28,8 +28,8 @@ package tools.descartes.librede.models.observation.functions;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,17 +38,11 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.observation.functions.ServiceDemandLaw;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.ConstantStateModel.Builder;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class ServiceDemandLawTest {
 	
@@ -68,21 +62,12 @@ public class ServiceDemandLawTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		WorkloadDescription workload = generator.getWorkloadDescription();
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
-				builder.addVariable(res, serv);
-			}
-		}
-		IStateModel<Unconstrained> stateModel = builder.build();
+		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
+		service = generator.getStateModel().getServices().get(SERVICE_IDX);
 		
-		resource = stateModel.getResources().get(RESOURCE_IDX);
-		service = stateModel.getServices().get(SERVICE_IDX);
-		
-		law = new ServiceDemandLaw(stateModel, cursor, resource, service);
+		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
 		
 		generator.nextObservation();
@@ -101,7 +86,7 @@ public class ServiceDemandLawTest {
 	@Test
 	public void testGetCalculatedOutput() {
 		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
-		double expected = x * state.get(generator.getWorkloadDescription().getState().getIndex(resource, service));
+		double expected = x * state.get(generator.getStateModel().getStateVariableIndex(resource, service));
 		
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
 	}

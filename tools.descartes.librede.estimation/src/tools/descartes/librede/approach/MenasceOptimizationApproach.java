@@ -34,6 +34,7 @@ import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgori
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
@@ -46,7 +47,6 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {

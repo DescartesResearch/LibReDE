@@ -29,8 +29,8 @@ package tools.descartes.librede.models.observation.functions;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
-import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,11 +40,6 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.ConstantStateModel.Builder;
-import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.Aggregation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
@@ -52,7 +47,6 @@ import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class ResponseTimeApproximationTest {
 	
@@ -72,23 +66,14 @@ public class ResponseTimeApproximationTest {
 	public void setUp() throws Exception {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
-		
-		WorkloadDescription workload = generator.getWorkloadDescription();
+
 		cursor = generator.getRepository().getCursor(0, 1);
 		
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
-				builder.addVariable(res, serv);
-			}
-		}
-		IStateModel<Unconstrained> stateModel = builder.build();
+		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
+		service = generator.getStateModel().getServices().get(SERVICE_IDX);
+		stateIdx = generator.getStateModel().getStateVariableIndex(resource, service);
 		
-		resource = stateModel.getResources().get(RESOURCE_IDX);
-		service = stateModel.getServices().get(SERVICE_IDX);
-		stateIdx = stateModel.getStateVariableIndex(resource, service);
-		
-		law = new ResponseTimeApproximation(builder.build(), cursor, resource, service, Aggregation.AVERAGE);
+		law = new ResponseTimeApproximation(generator.getStateModel(), cursor, resource, service, Aggregation.AVERAGE);
 		state = generator.getDemands();
 		
 		generator.nextObservation();

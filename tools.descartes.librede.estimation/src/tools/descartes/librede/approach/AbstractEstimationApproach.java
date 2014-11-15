@@ -31,6 +31,7 @@ import java.util.List;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
@@ -39,7 +40,6 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
 

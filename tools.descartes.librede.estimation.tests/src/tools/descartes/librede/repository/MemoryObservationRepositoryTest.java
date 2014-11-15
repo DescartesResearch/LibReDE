@@ -34,12 +34,13 @@ import java.util.Collections;
 
 import org.junit.Test;
 
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class MemoryObservationRepositoryTest {
 	
@@ -50,14 +51,29 @@ public class MemoryObservationRepositoryTest {
 	TimeSeries ts2 = new TimeSeries(vector(4, 5, 6, 9, 12), vector(1, 1, 1, 1, 1));
 	TimeSeries ts3 = new TimeSeries(vector(10, 12, 13, 14, 15), vector(1, 1, 1, 1, 1));
 	
-	MemoryObservationRepository repo = new MemoryObservationRepository(new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services)));
+	MemoryObservationRepository repo;
+
+	public MemoryObservationRepositoryTest() {
+		WorkloadDescription workload = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload.getResources().addAll(Arrays.asList(resources));
+		workload.getServices().addAll(Arrays.asList(services));
+		repo = new MemoryObservationRepository(workload);
+	}
 	
 	@Test
-	public void testListResourcesAndServices() {		
-		MemoryObservationRepository repository1 = new MemoryObservationRepository(new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services)));
-		MemoryObservationRepository repository2 = new MemoryObservationRepository(new WorkloadDescription(Collections.<Resource>emptyList(), Arrays.asList(services)));
-		MemoryObservationRepository repository3 = new MemoryObservationRepository(new WorkloadDescription(Arrays.asList(resources), Collections.<Service>emptyList()));
-		MemoryObservationRepository repository4 = new MemoryObservationRepository(new WorkloadDescription(Collections.<Resource>emptyList(), Collections.<Service>emptyList()));
+	public void testListResourcesAndServices() {
+		WorkloadDescription workload1 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload1.getResources().addAll(Arrays.asList(resources));
+		workload1.getServices().addAll(Arrays.asList(services));
+		MemoryObservationRepository repository1 = new MemoryObservationRepository(workload1);
+		WorkloadDescription workload2 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload2.getServices().addAll(Arrays.asList(services));
+		MemoryObservationRepository repository2 = new MemoryObservationRepository(workload2);
+		WorkloadDescription workload3 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload3.getResources().addAll(Arrays.asList(resources));
+		MemoryObservationRepository repository3 = new MemoryObservationRepository(workload3);
+		WorkloadDescription workload4 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		MemoryObservationRepository repository4 = new MemoryObservationRepository(workload4);
 		
 		assertThat(repository1.listResources()).isEqualTo(Arrays.asList(resources));		
 		assertThat(repository1.listServices()).isEqualTo(Arrays.asList(services));

@@ -41,17 +41,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class QueryTest {
 
@@ -100,8 +95,10 @@ public class QueryTest {
 				rtMeasurements.column(1));
 		payServRtTable.setStartTime(0);
 
-		repository = new MemoryObservationRepository(new WorkloadDescription(
-				Arrays.asList(resources), Arrays.asList(services)));
+		WorkloadDescription workload = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload.getResources().addAll(Arrays.asList(resources));
+		workload.getServices().addAll(Arrays.asList(services));
+		repository = new MemoryObservationRepository(workload);
 		repository.setData(StandardMetric.UTILIZATION, resources[0], cpuUtilTable);
 		repository.setData(StandardMetric.UTILIZATION, resources[1], hd1UtilTable);
 		repository.setData(StandardMetric.UTILIZATION, resources[2], hd2UtilTable);

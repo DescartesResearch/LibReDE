@@ -34,6 +34,7 @@ import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.ILeastSquaresRegressionAlgorithm;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
@@ -44,7 +45,6 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Least-squares Regression using Utilization Law")
 public class RoliaRegressionApproach extends AbstractEstimationApproach {

@@ -4,6 +4,7 @@ Bundle-Name: Tests
 Bundle-SymbolicName: tools.descartes.librede.nnls.java.tests
 Bundle-Version: 1.0.0.qualifier
 Import-Package: org.apache.commons.math3.stat.regression,
+ org.eclipse.emf.common.util,
  org.fest.assertions.api,
  org.fest.assertions.data,
  tools.descartes.librede.configuration,
@@ -15,7 +16,6 @@ Import-Package: org.apache.commons.math3.stat.regression,
  tools.descartes.librede.models.state.constraints,
  tools.descartes.librede.nnls,
  tools.descartes.librede.repository,
- tools.descartes.librede.testutils,
- tools.descartes.librede.workload
+ tools.descartes.librede.testutils
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.11.0"

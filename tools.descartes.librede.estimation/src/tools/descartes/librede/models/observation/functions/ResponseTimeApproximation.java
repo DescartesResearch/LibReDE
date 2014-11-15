@@ -38,7 +38,6 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 /**
  * This output function approximates the resource demands with the observed response times (min, max, or mean) of a service.

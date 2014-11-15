@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
@@ -42,7 +43,6 @@ import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class LeastSquaresRegressionTest {
 

@@ -6,11 +6,11 @@ import java.util.Map;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class EstimationResult {
 	

@@ -34,14 +34,10 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.repository.IMonitoringRepository;
-import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.workload.WorkloadDescription;
+import tools.descartes.librede.configuration.WorkloadDescription;
 
 public class RepositoryCursorTest {
 	
@@ -51,7 +47,14 @@ public class RepositoryCursorTest {
 	TimeSeries ts1 = new TimeSeries(vector(2, 3, 4, 6, 8), vector(1, 1, 1, 1, 1));
 	TimeSeries ts2 = new TimeSeries(vector(2.2, 3.2, 4.2, 6.2, 8.2), vector(1, 1, 1, 1, 1));
 	
-	IMonitoringRepository repository = new MemoryObservationRepository(new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services)));
+	IMonitoringRepository repository;
+	
+	public RepositoryCursorTest() {
+		WorkloadDescription workload = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload.getResources().addAll(Arrays.asList(resources));
+		workload.getServices().addAll(Arrays.asList(services));
+		repository = new MemoryObservationRepository(workload);
+	}
 	
 	@Test
 	public void test1StepCursor() {

@@ -31,7 +31,7 @@ import java.util.List;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.workload.WorkloadDescription;
+import tools.descartes.librede.configuration.WorkloadDescription;
 
 
 public interface IMonitoringRepository {

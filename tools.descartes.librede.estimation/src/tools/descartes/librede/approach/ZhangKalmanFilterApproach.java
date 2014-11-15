@@ -36,6 +36,7 @@ import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
@@ -47,7 +48,6 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 @Component(displayName = "Kalman Filter using Response Times and Utilization")
 public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
@@ -86,7 +86,4 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 			EstimationAlgorithmFactory factory) {
 		return factory.createInstance(IKalmanFilterAlgorithm.class);
 	}
-
-
-
 }

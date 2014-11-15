@@ -27,10 +27,10 @@
 package tools.descartes.librede.approach;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public interface IEstimationApproach {
 	
