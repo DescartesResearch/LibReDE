@@ -48,7 +48,9 @@ public class ResponseTimeValidator implements IValidator {
 	private List<ResponseTimeEquation> respEq;
 	private MatrixBuilder allErrors;
 	
-	public ResponseTimeValidator(WorkloadDescription workload, IRepositoryCursor cursor) {
+	@Override
+	public void initialize(WorkloadDescription workload,
+			IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
 			for (Service serv : workload.getServices()) {
@@ -61,7 +63,7 @@ public class ResponseTimeValidator implements IValidator {
 		for (Service srv : stateModel.getServices()) {
 			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv));
 		}
-		allErrors = new MatrixBuilder(stateModel.getServices().size());
+		allErrors = new MatrixBuilder(stateModel.getServices().size());		
 	}
 	
 	public void predict(Vector state) {
@@ -79,5 +81,4 @@ public class ResponseTimeValidator implements IValidator {
 	public Vector getPredictionError() {
 		return LinAlg.mean(allErrors.toMatrix(), 0);
 	}
-
 }

@@ -37,7 +37,6 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
@@ -49,7 +48,8 @@ public class UtilizationValidator implements IValidator {
 	private List<UtilizationLaw> utilLaw;
 	private MatrixBuilder allErrors;
 	
-	public UtilizationValidator(WorkloadDescription workload, IRepositoryCursor cursor) {
+	@Override
+	public void initialize(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
 			for (Service serv : workload.getServices()) {

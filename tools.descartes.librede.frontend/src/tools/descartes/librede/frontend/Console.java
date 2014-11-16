@@ -41,6 +41,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import tools.descartes.librede.LibredeLibrary;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 
@@ -69,7 +70,7 @@ public class Console {
 			
 			LibredeConfiguration config = loadConfiguration(configurationFile);
 			
-			LibredeEstimation.execute(config);
+			LibredeLibrary.execute(config);
 		} catch (CmdLineException ex) {
 			System.err.println(ex.getMessage());
 			parser.printUsage(System.err);

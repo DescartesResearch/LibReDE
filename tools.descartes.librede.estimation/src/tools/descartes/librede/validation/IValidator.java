@@ -26,12 +26,16 @@
  */
 package tools.descartes.librede.validation;
 
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 public interface IValidator {
+	
+	void initialize(WorkloadDescription workload, IRepositoryCursor cursor);
 
-	public abstract Vector getPredictionError();
+	Vector getPredictionError();
 
-	public abstract void predict(Vector state);
+	void predict(Vector state);
 
 }

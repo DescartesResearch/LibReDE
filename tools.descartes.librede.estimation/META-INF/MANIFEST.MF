@@ -54,6 +54,7 @@ Import-Package: cern.jet.random.sampling;version="1.2.0",
  org.apache.commons.math3.optim.linear;version="3.2.0",
  org.apache.log4j;version="1.2.15",
  org.eclipse.emf.common.util,
+ org.eclipse.emf.ecore,
  org.osgi.framework;version="1.8.0",
  tools.descartes.librede.configuration,
  tools.descartes.librede.linalg

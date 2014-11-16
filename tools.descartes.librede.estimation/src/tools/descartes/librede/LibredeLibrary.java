@@ -26,6 +26,19 @@
  */
 package tools.descartes.librede;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.approach.IEstimationApproach;
@@ -35,17 +48,43 @@ import tools.descartes.librede.approach.RoliaRegressionApproach;
 import tools.descartes.librede.approach.ServiceDemandLawApproach;
 import tools.descartes.librede.approach.WangKalmanFilterApproach;
 import tools.descartes.librede.approach.ZhangKalmanFilterApproach;
+import tools.descartes.librede.configuration.EstimationApproachConfiguration;
+import tools.descartes.librede.configuration.ExporterConfiguration;
+import tools.descartes.librede.configuration.FileTraceConfiguration;
+import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.configuration.ValidatorConfiguration;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.datasource.IDataSource;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
+import tools.descartes.librede.exceptions.EstimationException;
+import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.export.IExporter;
 import tools.descartes.librede.export.csv.CsvExporter;
+import tools.descartes.librede.linalg.LinAlg;
+import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixBuilder;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.state.StateVariable;
+import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
+import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.repository.IMonitoringRepository;
+import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.validation.CrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
 
 public class LibredeLibrary {
+	
+	private static final Logger log = Logger.getLogger(LibredeLibrary.class);	
 	
 	public static void init() {
 		
@@ -68,6 +107,311 @@ public class LibredeLibrary {
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
 		
 		Registry.INSTANCE.registerImplementationType(IExporter.class, CsvExporter.class);
+	}
+	
+	public static void execute(LibredeConfiguration conf) {
+		IMonitoringRepository repo = createRepository(
+				conf.getWorkloadDescription(), conf.getEstimation().getEndTimestamp());
+
+		loadRepository(conf, repo);
+		
+		if (!conf.getValidation().isValidateEstimates()) {
+			
+			try {
+				List<ResultTable[]> results = runEstimation(conf, repo);
+				printSummary(results);
+				exportResults(conf, results);
+			} catch (Exception e) {
+				log.error("Error running estimation.", e);
+			}			
+		} else {
+			try {
+				List<ResultTable[]> results = runEstimationWithCrossValidation(conf, repo);
+				printSummary(results);
+				exportResults(conf, results);
+			} catch (Exception e) {
+				log.error("Error running estimation.", e);
+			}			
+		}
+	}
+	
+	public static IMonitoringRepository createRepository(WorkloadDescription workload, double endTime) {
+		IMonitoringRepository repo = new MemoryObservationRepository(workload);
+		repo.setCurrentTime(endTime / 1000.0);
+		return repo;
+	}
+	
+	public static void loadRepository(LibredeConfiguration conf, IMonitoringRepository repo) {
+		Map<Class<?>, IDataSource> dataSources = new HashMap<Class<?>, IDataSource>();
+		
+		for (TraceConfiguration trace : conf.getInput().getObservations()) {
+			if (trace instanceof FileTraceConfiguration) {
+				FileTraceConfiguration fileTrace = (FileTraceConfiguration)trace;
+				File file = new File(fileTrace.getFile());
+				if (!file.exists()) {
+					log.error("Measurement trace " + fileTrace.getFile() + " does not exist.");
+					continue;
+				}
+				
+				Class<?> dataSourceType = fileTrace.getProvider().getType();
+				if (!dataSources.containsKey(dataSourceType)) {
+					try {
+						IDataSource newSource = (IDataSource) Instantiator.newInstance(dataSourceType, fileTrace.getProvider().getParameters());
+						dataSources.put(dataSourceType, newSource);
+					} catch (Exception e) {
+						log.error("Could not instantiate data source " + fileTrace.getProvider().getName(), e);
+						continue;
+					}
+				}
+				IDataSource source = dataSources.get(dataSourceType);
+				
+				IMetric metric = Registry.INSTANCE.getMetric(fileTrace.getMetric());
+				if (metric == null) {
+					log.error("Unknown metric type: " + fileTrace.getMetric());
+					continue;
+				}
+				
+				for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
+					try {
+						FileInputStream in = null;
+						try {						
+							in = new FileInputStream(file);
+							TimeSeries data = source.load(in, mapping.getTraceColumn());
+							data.setStartTime(conf.getEstimation().getStartTimestamp() / 1000.0);
+							data.setEndTime(conf.getEstimation().getEndTimestamp() / 1000.0);
+							
+							if (fileTrace.getInterval() > 0) {
+								repo.setAggregatedData(metric, mapping.getEntity(), data, fileTrace.getInterval() / 1000.0);
+							} else {
+								repo.setData(metric, mapping.getEntity(), data);
+							}
+						} finally {
+							if (in != null) in.close();
+						}
+					} catch (Exception e) {
+						log.error("Error reading measurement trace " + fileTrace.getFile() + ".", e);
+					}					
+				}
+			}		
+		}
+	}
+	
+	public static List<ResultTable[]> runEstimation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {
+		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory(conf);
+		
+		List<ResultTable[]> results = new ArrayList<ResultTable[]>();
+		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
+			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp() / 1000.0, 
+					conf.getEstimation().getStepSize() / 1000.0);
+			
+			IEstimationApproach currentApproach;
+			try {
+				currentApproach = (IEstimationApproach) Instantiator.newInstance(currentConf.getType(), currentConf.getParameters());
+			} catch(Exception ex) {
+				log.error("Error instantiating estimation approach: " + currentConf.getType().getSimpleName(), ex);
+				continue;
+			}
+			
+			ResultTable estimates = initAndExecuteEstimation(currentApproach, 
+					repository.getWorkload(), 
+					conf.getEstimation().getWindow(), 
+					conf.getEstimation().isRecursive(),
+					cursor, algoFactory);
+			results.add(new ResultTable[] {estimates});
+		}
+		return results;
+	}
+	
+	public static List<ResultTable[]> runEstimationWithCrossValidation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {
+		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory(conf);
+		
+		List<ResultTable[]> results = new ArrayList<ResultTable[]>();
+		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
+			ResultTable[] folds = new ResultTable[conf.getValidation().getValidationFolds()];
+			CrossValidationCursor cursor = new CrossValidationCursor(repository.getCursor(
+					conf.getEstimation().getStartTimestamp() / 1000.0, 
+					conf.getEstimation().getStepSize() / 1000.0), 
+					conf.getValidation().getValidationFolds());
+			cursor.initPartitions();
+			
+			IEstimationApproach currentApproach;
+			try {
+				currentApproach = (IEstimationApproach) Instantiator.newInstance(currentConf.getType(), currentConf.getParameters());
+			} catch(Exception ex) {
+				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
+				continue;
+			}
+			
+			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
+			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
+				validators.add((IValidator) Instantiator.newInstance(validator.getType(), validator.getParameters()));
+			}
+			
+			for (int i = 0; i < conf.getValidation().getValidationFolds(); i++) {
+				log.info("Running repetition " + (i + 1) + " of estimation approach " + currentConf.getType().getSimpleName());
+				cursor.startTrainingPhase(i);			
+				
+				ResultTable estimates = initAndExecuteEstimation(currentApproach, 
+						repository.getWorkload(), 
+						conf.getEstimation().getWindow(), 
+						conf.getEstimation().isRecursive(), 
+						cursor, algoFactory);
+				if (estimates.getEstimates().isEmpty()) {
+					break;
+				}
+				Vector state = estimates.getLastEstimates();
+				
+				cursor.startValidationPhase(i);
+				
+				while(cursor.next()) {
+					for (IValidator validator : validators) {
+						validator.predict(state);
+					}
+				}
+				
+				for (IValidator validator : validators) {
+					estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
+				}
+				
+				folds[i] = estimates;
+			}
+			results.add(folds);
+		}
+		return results;
+	}
+	
+	private static ResultTable initAndExecuteEstimation(IEstimationApproach approach,
+			WorkloadDescription workload, int window, boolean iterative,
+			IRepositoryCursor cursor, EstimationAlgorithmFactory algoFactory) throws InstantiationException,
+			IllegalAccessException, InitializationException,
+			EstimationException {
+		
+		if (approach != null) {
+			
+			approach.initialize(workload, cursor, algoFactory, window, iterative);
+			approach.constructEstimationDefinitions();			
+			approach.pruneEstimationDefinitions();
+			return approach.executeEstimation();
+		} else {
+			log.error("Unkown estimation approach: " + approach);
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	public static void printSummary(List<ResultTable[]> results) {
+		// Aggregate results
+		StateVariable[] variables = null;
+		List<String> approaches = new ArrayList<String>(results.size());
+		Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
+		for (ResultTable[] folds : results) {
+			for (ResultTable curFold : folds) {
+				if (variables == null) {
+					variables = curFold.getStateVariables();
+					approaches.add(Registry.INSTANCE.getDisplayName(curFold.getApproach()));
+				} else {
+					if(!Arrays.equals(variables, curFold.getStateVariables())) {
+						throw new IllegalStateException();
+					}
+				}
+				validators.addAll(curFold.getValidators());
+			}
+		}
+
+		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
+		for (Class<? extends IValidator> validator : validators) {
+			meanErrors.put(validator, new MatrixBuilder(variables.length));
+		}	
+	
+		MatrixBuilder meanEstimates = new MatrixBuilder(variables.length);
+		for (ResultTable[] folds : results) {
+			MatrixBuilder lastEstimates = new MatrixBuilder(variables.length);
+			for (ResultTable curFold : folds) {
+				lastEstimates.addRow(curFold.getLastEstimates());
+			}
+			meanEstimates.addRow(LinAlg.mean(lastEstimates.toMatrix(), 0));
+
+			for (Class<? extends IValidator> validator : validators) {
+				MatrixBuilder errors = new MatrixBuilder(variables.length);
+				for (ResultTable curFold : folds) {
+					errors.addRow(curFold.getValidationErrors(validator));
+				}
+				meanErrors.get(validator).addRow(LinAlg.mean(errors.toMatrix(), 0));
+			}
+			
+		}
+		
+		// Estimates
+		System.out.println("Estimates");
+		printTable(variables, approaches, meanEstimates.toMatrix());
+		System.out.println();
+		
+		if (validators.size() > 0) {
+			// Cross-Validation Results
+			System.out.println("Cross-Validation Results:");
+			
+			for (Class<? extends IValidator> validator : validators) {
+				String name = Registry.INSTANCE.getDisplayName(validator);
+				System.out.println(name + ":");
+				
+				printTable(variables, approaches, meanErrors.get(validator).toMatrix());
+			}
+		}
+	}
+	
+	private static void printTable(StateVariable[] variables, List<String> approaches, Matrix values) {
+		System.out.printf("%-20.20s | ", "Approach");
+		Resource last = null;
+		for (StateVariable var : variables) {
+			if (var.getResource().equals(last)) {
+				System.out.printf("%-8.8s", "");
+			} else {
+				System.out.printf("%-8.8s", var.getResource().getName());
+			}
+		}
+		System.out.println();
+
+		System.out.printf("%20.20s | ", "");
+		for (StateVariable var : variables) {
+			System.out.printf("%-8.8s", var.getService().getName());
+		}
+		System.out.println("|");
+
+		for (int i = 0; i < (24 + variables.length * 8); i++) {
+			System.out.print("-");
+		}
+		System.out.println();
+
+		for (int r = 0; r < values.rows(); r++) {
+			System.out.printf("%-20.20s |", approaches.get(r));
+			Vector row = values.row(r);
+			for (int i = 0; i < row.rows(); i++) {
+				System.out.printf(" %.5f", row.get(i));
+			}
+			System.out.println(" |");
+		}
+	}
+	
+	public static void exportResults(LibredeConfiguration conf, List<ResultTable[]> results) {
+		for (ExporterConfiguration exportConf :conf.getOutput().getExporters()) {
+			IExporter exporter;
+			try {
+				exporter = (IExporter) Instantiator.newInstance(exportConf.getType(), exportConf.getParameters());
+			} catch (Exception e) {
+				log.error("Could not instantiate exporter: " + exportConf.getName());
+				continue;
+			}
+			for (ResultTable[] folds : results) {
+				int i = 0;
+				for (ResultTable curFold : folds) {
+					try {
+						exporter.writeResults(curFold.getApproach().getSimpleName(), i, curFold.getEstimates());
+					} catch (Exception e) {
+						log.error("Could not export results.", e);
+					}
+					i++;
+				}
+			}
+		}
 	}
 
 }

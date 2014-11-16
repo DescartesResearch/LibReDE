@@ -1,8 +1,11 @@
 package tools.descartes.librede;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.Resource;
@@ -12,6 +15,7 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.validation.IValidator;
 
 public class ResultTable {
 	
@@ -66,11 +70,13 @@ public class ResultTable {
 	private final Class<? extends IEstimationApproach> approach;
 	private final StateVariable[] columnToEntry;
 	private final TimeSeries estimates;
+	private Map<Class <? extends IValidator>, Vector> validationResults;
 	
 	private ResultTable(Class<? extends IEstimationApproach> approach, StateVariable[] columnToEntry, TimeSeries estimates) {
 		this.approach = approach;
 		this.columnToEntry = columnToEntry;
 		this.estimates = estimates;
+		this.validationResults = new HashMap<Class <? extends IValidator>, Vector>();
 	}
 	
 	public static Builder builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
@@ -92,5 +98,24 @@ public class ResultTable {
 	public Class<? extends IEstimationApproach> getApproach() {
 		return approach;
 	}
+	
+	public void addValidationResults(Class <? extends IValidator> validator, Vector errors) {
+		validationResults.put(validator, errors);
+	}
+	
+	public Vector getLastEstimates() {
+		return estimates.getData().row(estimates.samples() - 1);
+	}
+	
+	public StateVariable[] getStateVariables() {
+		return columnToEntry;
+	}
+	
+	public Set<Class <? extends IValidator>> getValidators() {
+		return validationResults.keySet();
+	}
 
+	public Vector getValidationErrors(Class<? extends IValidator> validator) {
+		return validationResults.get(validator);
+	}
 }

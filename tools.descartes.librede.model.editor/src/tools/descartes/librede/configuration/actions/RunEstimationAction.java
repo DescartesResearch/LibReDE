@@ -47,10 +47,9 @@ import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import tools.descartes.librede.LibredeLibrary;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.presentation.LibredeEditorPlugin;
-import tools.descartes.librede.frontend.EstimationHelper;
-import tools.descartes.librede.frontend.LibredeEstimation;
 
 public class RunEstimationAction extends Action {
 
@@ -95,7 +94,7 @@ public class RunEstimationAction extends Action {
 
 		BasicConfigurator.configure();
 		
-		LibredeEstimation.execute(conf);
+		LibredeLibrary.execute(conf);
 
 		System.setOut(oldOut);
 		System.setErr(oldErr);
