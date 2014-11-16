@@ -27,15 +27,23 @@
 package tools.descartes.librede.configuration.editor.forms;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.databinding.conversion.Converter;
+import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.DateAndTimeObservableValue;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
+import org.eclipse.jface.databinding.viewers.ViewerProperties;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -45,15 +53,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.master.AbstractMasterBlock;
 import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
 import tools.descartes.librede.configuration.presentation.ConfigurationEditor;
+import tools.descartes.librede.registry.Registry;
 
 public class EstimationFormPage extends MasterDetailsFormPage {
 	
@@ -76,15 +89,15 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 			Composite parent) {
 		super.createFormContentBeginning(toolkit, parent);
 		
-		createIntervalSection(toolkit, parent);
-		
 		createEstimationSection(toolkit, parent);
+		
+		createIntervalSection(toolkit, parent);
 	}
 	
 	private void createIntervalSection(FormToolkit toolkit, Composite body) {
 		Section sctnIntervals = toolkit.createSection(body, Section.TWISTIE | Section.TITLE_BAR);
 		sctnIntervals.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		sctnIntervals.setText("Estimation Interval Settings");
+		sctnIntervals.setText("Interval Settings");
 		sctnIntervals.setExpanded(true);
 		
 		Composite client = toolkit.createComposite(sctnIntervals, SWT.NONE);
@@ -120,6 +133,17 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		toolkit.createLabel(client, "In Unix Time:");
 		Text txtEndTimestamp = toolkit.createText(client, "");
 		txtEndTimestamp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
+		
+		btnRecursive = toolkit.createButton(client, "Recursive Execution", SWT.CHECK);
+		GridData gd_btnRecursive = new GridData();
+		gd_btnRecursive.horizontalSpan = 3;
+		btnRecursive.setLayoutData(gd_btnRecursive);
+		
+		toolkit.createLabel(client, "Window Size:");
+		spnWindow = new Spinner(client, SWT.BORDER);
+		spnWindow.setMinimum(1);
+		spnWindow.setMaximum(Integer.MAX_VALUE);
+		toolkit.paintBordersFor(spnWindow);
 		
 		bindingContext.bindValue(WidgetProperties.selection().observe(spnStepValue), 
 				EMFEditProperties.value(getEditingDomain(), 
@@ -161,31 +185,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 						FeaturePath.fromList(
 								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
 								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP
-						)).observe(getModel()));
-	}
-	
-	private void createEstimationSection(FormToolkit toolkit, Composite body) {
-		Section sctnEstimation = toolkit.createSection(body, Section.TWISTIE | Section.TITLE_BAR);
-		sctnEstimation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING));
-		sctnEstimation.setText("Recursive Execution Settings");
-		sctnEstimation.setExpanded(true);
-		
-		Composite client = toolkit.createComposite(sctnEstimation, SWT.NONE);
-		sctnEstimation.setClient(client);
-		toolkit.paintBordersFor(client);
-		client.setLayout(new GridLayout(2, false));
-		
-		btnRecursive = toolkit.createButton(client, "Recursive Execution", SWT.CHECK);
-		GridData gd_btnRecursive = new GridData();
-		gd_btnRecursive.horizontalSpan = 2;
-		btnRecursive.setLayoutData(gd_btnRecursive);
-		
-		toolkit.createLabel(client, "Window Size:");
-		spnWindow = new Spinner(client, SWT.BORDER);
-		spnWindow.setMinimum(1);
-		spnWindow.setMaximum(Integer.MAX_VALUE);
-		toolkit.paintBordersFor(spnWindow);
-		
+						)).observe(getModel()));		
 		bindingContext.bindValue(WidgetProperties.selection().observe(btnRecursive), 
 				EMFEditProperties.value(getEditingDomain(), 
 						FeaturePath.fromList(
@@ -198,6 +198,60 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
 								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__WINDOW
 								)).observe(getModel()));
+	}
+	
+	private void createEstimationSection(FormToolkit toolkit, Composite body) {
+		Section sctnEstimation = toolkit.createSection(body, Section.TWISTIE | Section.TITLE_BAR);
+		sctnEstimation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING));
+		sctnEstimation.setText("Activated Estimation Approaches");
+		sctnEstimation.setExpanded(true);
+		
+		Composite client = toolkit.createComposite(sctnEstimation, SWT.NONE);
+		sctnEstimation.setClient(client);
+		toolkit.paintBordersFor(client);
+		client.setLayout(new GridLayout(2, false));
+		
+		CheckboxTableViewer tableApproachesViewer = CheckboxTableViewer.newCheckList(client, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
+		Table tableApproaches = tableApproachesViewer.getTable();
+		tableApproaches.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		tableApproachesViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
+		tableApproachesViewer
+				.setContentProvider(new ObservableListContentProvider());
+
+		// We need to add the existing validators in the configuration first, so that the test for
+		// equality in the checked table binding works correctly. EMF always does an equality check on
+		// the object instance.
+		IObservableList approaches = new WritableList();
+		Set<Class<?>> existingApproaches = new HashSet<Class<?>>();
+		for (EstimationApproachConfiguration v : getModel().getEstimation().getApproaches()) {
+			approaches.add(v);
+			existingApproaches.add(v.getType());
+		}
+		for (Class<?> cl : Registry.INSTANCE
+				.getImplementationClasses(IEstimationApproach.class)) {
+			if (!existingApproaches.contains(cl)) {
+				EstimationApproachConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationApproachConfiguration();
+				a.setType(cl);
+				approaches.add(a);
+			}
+		}
+		tableApproachesViewer.setInput(approaches);
+		
+		// Binding: All checked approaches are added to the model instance
+		bindingContext
+				.bindSet(
+						ViewerProperties.checkedElements(
+								EstimationApproachConfiguration.class).observe(
+								tableApproachesViewer),
+						EMFEditProperties
+								.set(getEditingDomain(),
+										FeaturePath
+												.fromList(
+														ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+														ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__APPROACHES))
+								.observe(getModel()));
+		
 	}
 	
 	private EMFUpdateValueStrategy createDateConverterTargetToModel() {
