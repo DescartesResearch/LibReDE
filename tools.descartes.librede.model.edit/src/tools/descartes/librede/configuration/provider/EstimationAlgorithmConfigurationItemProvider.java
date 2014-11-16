@@ -8,11 +8,8 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.ResourceLocator;
-
 import org.eclipse.emf.ecore.EStructuralFeature;
-
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
@@ -28,6 +25,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.registry.Registry;
 
 /**
  * This is the item provider adapter for a {@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration} object.
@@ -142,10 +140,11 @@ public class EstimationAlgorithmConfigurationItemProvider
 	@Override
 	public String getText(Object object) {
 		Class labelValue = ((EstimationAlgorithmConfiguration)object).getType();
-		String label = labelValue == null ? null : labelValue.toString();
-		return label == null || label.length() == 0 ?
-			getString("_UI_EstimationAlgorithmConfiguration_type") :
-			getString("_UI_EstimationAlgorithmConfiguration_type") + " " + label;
+		if (labelValue != null) {
+			return Registry.INSTANCE.getDisplayName(labelValue);
+		} else {
+			return "Unkown type";
+		}
 	}
 	
 
@@ -197,6 +196,16 @@ public class EstimationAlgorithmConfigurationItemProvider
 	@Override
 	public ResourceLocator getResourceLocator() {
 		return LibredeEditPlugin.INSTANCE;
+	}
+	
+	@Override
+	public Object getColumnImage(Object object, int columnIndex) {
+		return getImage(object);
+	}
+	
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		return getText(object);
 	}
 
 }

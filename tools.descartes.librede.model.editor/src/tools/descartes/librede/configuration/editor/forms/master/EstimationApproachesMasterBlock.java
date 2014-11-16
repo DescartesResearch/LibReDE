@@ -31,15 +31,15 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
-import org.eclipse.emf.databinding.EMFDataBindingContext;
-import org.eclipse.emf.databinding.FeaturePath;
-import org.eclipse.emf.databinding.edit.EMFEditProperties;
+import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
-import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -48,25 +48,21 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IDetailsPageProvider;
-import org.eclipse.ui.forms.IManagedForm;
 
-import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.EstimationApproachConfiguration;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
-import tools.descartes.librede.configuration.ValidatorConfiguration;
+import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.ParametersDetailsPage;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.validation.IValidator;
 
 public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 		implements ISelectionChangedListener, IDetailsPageProvider {
 
-	private Table tableApproaches;
-	private CheckboxTableViewer tableApproachesViewer;
-
-	private EMFDataBindingContext masterBindingContext = new EMFDataBindingContext();
+	private Table tableAlgorithms;
+	private TableViewer tableAlgorithmsViewer;
 
 	/**
 	 * Create the master details block.
@@ -88,63 +84,46 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 
 	@Override
 	protected String getMasterSectionTitle() {
-		return "All Estimation Approaches";
+		return "All Estimation Algorithms";
 	}
 
 	@Override
 	protected Control createItemsList(Composite composite) {
-		tableApproachesViewer = CheckboxTableViewer.newCheckList(composite,
-				SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
-		tableApproaches = tableApproachesViewer.getTable();
-		tableApproaches.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-				false, 1, 1));
-		toolkit.paintBordersFor(tableApproaches);
+		tableAlgorithmsViewer = new TableViewer(composite,
+				SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		tableAlgorithms = tableAlgorithmsViewer.getTable();
 
-		tableApproachesViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
-		tableApproachesViewer
-				.setContentProvider(new ObservableListContentProvider());
+		tableAlgorithmsViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
+		tableAlgorithmsViewer
+				.setContentProvider(new AdapterFactoryContentProvider(page.getAdapterFactory()));
 
 		// We need to add the existing validators in the configuration first, so that the test for
 		// equality in the checked table binding works correctly. EMF always does an equality check on
 		// the object instance.
-		IObservableList approaches = new WritableList();
-		Set<Class<?>> existingApproaches = new HashSet<Class<?>>();
-		for (EstimationApproachConfiguration v : model.getEstimation().getApproaches()) {
-			approaches.add(v);
-			existingApproaches.add(v.getType());
+		Set<Class<?>> existingAlgorithms = new HashSet<Class<?>>();
+		for (EstimationAlgorithmConfiguration v : model.getEstimation().getAlgorithms()) {
+			existingAlgorithms.add(v.getType());
 		}
 		for (Class<?> cl : Registry.INSTANCE
-				.getImplementationClasses(IEstimationApproach.class)) {
-			if (!existingApproaches.contains(cl)) {
-				EstimationApproachConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationApproachConfiguration();
+				.getImplementationClasses(IEstimationAlgorithm.class)) {
+			if (!existingAlgorithms.contains(cl)) {
+				EstimationAlgorithmConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationAlgorithmConfiguration();
 				a.setType(cl);
-				approaches.add(a);
+				Command cmd = AddCommand.create(domain, model.getEstimation(), ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__ALGORITHMS, a);
+				domain.getCommandStack().execute(cmd);
 			}
 		}
-		tableApproachesViewer.setInput(approaches);
-		tableApproachesViewer.addSelectionChangedListener(this);
+		tableAlgorithmsViewer.setInput(model.getEstimation());
+		tableAlgorithmsViewer.addFilter(new ClassesViewerFilter(EstimationAlgorithmConfiguration.class));
+		tableAlgorithmsViewer.addSelectionChangedListener(this);
 		
-		// Binding: All checked approaches are added to the model instance
-		masterBindingContext
-				.bindSet(
-						ViewerProperties.checkedElements(
-								EstimationApproachConfiguration.class).observe(
-								tableApproachesViewer),
-						EMFEditProperties
-								.set(domain,
-										FeaturePath
-												.fromList(
-														ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-														ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__APPROACHES))
-								.observe(model));
-
-		return tableApproaches;
+		return tableAlgorithms;
 	}
 
 	@Override
 	public Object getPageKey(Object object) {
-		if (object instanceof EstimationApproachConfiguration) {
-			return ((EstimationApproachConfiguration)object).getType();
+		if (object instanceof EstimationAlgorithmConfiguration) {
+			return ((EstimationAlgorithmConfiguration)object).getType();
 		}
 		return null;
 	}
@@ -154,10 +133,10 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 		if (key instanceof Class<?>) {
 			return new ParametersDetailsPage(page, 
 					domain, 
-					"Estimation Approach Configuration", 
-					ConfigurationPackage.Literals.ESTIMATION_APPROACH_CONFIGURATION,
+					"Estimation Algorithm Configuration", 
+					ConfigurationPackage.Literals.ESTIMATION_ALGORITHM_CONFIGURATION,
 					(Class<?>) key, 
-					ConfigurationPackage.Literals.ESTIMATION_APPROACH_CONFIGURATION__PARAMETERS);
+					ConfigurationPackage.Literals.ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS);
 		}
 		return null;
 	}

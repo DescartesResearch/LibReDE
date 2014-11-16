@@ -161,7 +161,11 @@ public class EstimationApproachConfigurationItemProvider
 	@Override
 	public String getText(Object object) {
 		Class type = ((EstimationApproachConfiguration)object).getType();
-		return Registry.INSTANCE.getDisplayName(type);
+		if (type != null) {
+			return Registry.INSTANCE.getDisplayName(type);
+		} else {
+			return "Unkown type";
+		}
 	}
 	
 
