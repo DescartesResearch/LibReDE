@@ -71,8 +71,6 @@ public class IpoptActivator implements BundleActivator {
 		// of JNA so that it can find the library
 		String pluginBasePath = new File(FileLocator.toFileURL(context.getBundle().getEntry("/os/" + Platform.getOS() + "/" + Platform.getOSArch())).getFile()).getAbsolutePath();
 		NativeLibrary.addSearchPath("IpOpt", pluginBasePath);
-		
-		IpoptLibrary.init();
 	}
 
 	/*
