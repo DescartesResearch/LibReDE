@@ -88,6 +88,7 @@ public abstract class AbstractMasterBlock extends MasterDetailsBlock implements 
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.horizontalSpan = 2;
 		sashForm.setLayoutData(data);
+		sashForm.setSashWidth(20);
 	}
 	
 	@Override
