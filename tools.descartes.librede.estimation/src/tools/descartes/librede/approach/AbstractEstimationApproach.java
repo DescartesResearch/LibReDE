@@ -29,7 +29,7 @@ package tools.descartes.librede.approach;
 import java.util.ArrayList;
 import java.util.List;
 
-import tools.descartes.librede.EstimationResult;
+import tools.descartes.librede.ResultTable;
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.WorkloadDescription;
@@ -106,13 +106,13 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 	}
 
 	@Override
-	public EstimationResult executeEstimation() throws EstimationException {
+	public ResultTable executeEstimation() throws EstimationException {
 		if (algorithms == null) {
 			throw new IllegalStateException();
 		}
 
 		try {
-			EstimationResult.Builder builder = EstimationResult.builder(
+			ResultTable.Builder builder = ResultTable.builder(
 					this.getClass(), workload);
 
 			if (iterative) {

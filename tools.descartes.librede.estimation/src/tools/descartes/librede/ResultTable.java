@@ -13,7 +13,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.TimeSeries;
 
-public class EstimationResult {
+public class ResultTable {
 	
 	public static class Builder {
 		private final Class<? extends IEstimationApproach> approach;
@@ -52,14 +52,14 @@ public class EstimationResult {
 			estimateBuilder.addRow(buffer);
 		}
 		
-		public EstimationResult build() {
+		public ResultTable build() {
 			StateVariable[] columnToEntry = new StateVariable[entryToColumn.size()];
 			for (Map.Entry<StateVariable, Integer> e : entryToColumn.entrySet()) {
 				columnToEntry[e.getValue()] = e.getKey();
 			}
 			TimeSeries estimates = new TimeSeries((Vector)timestampBuilder.toMatrix(), estimateBuilder.toMatrix());
 			
-			return new EstimationResult(approach, columnToEntry, estimates);
+			return new ResultTable(approach, columnToEntry, estimates);
 		}
 	}
 	
@@ -67,7 +67,7 @@ public class EstimationResult {
 	private final StateVariable[] columnToEntry;
 	private final TimeSeries estimates;
 	
-	private EstimationResult(Class<? extends IEstimationApproach> approach, StateVariable[] columnToEntry, TimeSeries estimates) {
+	private ResultTable(Class<? extends IEstimationApproach> approach, StateVariable[] columnToEntry, TimeSeries estimates) {
 		this.approach = approach;
 		this.columnToEntry = columnToEntry;
 		this.estimates = estimates;

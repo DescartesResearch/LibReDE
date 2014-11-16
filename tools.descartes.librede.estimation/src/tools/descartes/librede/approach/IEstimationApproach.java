@@ -26,7 +26,7 @@
  */
 package tools.descartes.librede.approach;
 
-import tools.descartes.librede.EstimationResult;
+import tools.descartes.librede.ResultTable;
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.exceptions.EstimationException;
@@ -41,6 +41,6 @@ public interface IEstimationApproach {
 	
 	void pruneEstimationDefinitions();
 	
-	EstimationResult executeEstimation() throws EstimationException;
+	ResultTable executeEstimation() throws EstimationException;
 
 }
