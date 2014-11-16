@@ -82,9 +82,9 @@ import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
 
-public class LibredeLibrary {
+public class Librede {
 	
-	private static final Logger log = Logger.getLogger(LibredeLibrary.class);	
+	private static final Logger log = Logger.getLogger(Librede.class);	
 	
 	public static void init() {
 		
