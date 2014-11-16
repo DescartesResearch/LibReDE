@@ -129,7 +129,7 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.PropertySheet;
 import org.eclipse.ui.views.properties.PropertySheetPage;
 
-import tools.descartes.librede.LibredeLibrary;
+import tools.descartes.librede.Librede;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.EstimationFormPage;
 import tools.descartes.librede.configuration.editor.forms.MasterDetailsFormPage;
@@ -618,7 +618,7 @@ public class ConfigurationEditor
 	 */
 	public ConfigurationEditor() {
 		super();
-		LibredeLibrary.init();
+		Librede.init();
 		initializeEditingDomain();
 	}
 

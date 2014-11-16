@@ -33,7 +33,7 @@ import org.eclipse.emf.common.ui.EclipseUIPlugin;
 import org.eclipse.emf.common.util.ResourceLocator;
 import org.osgi.framework.BundleContext;
 
-import tools.descartes.librede.LibredeLibrary;
+import tools.descartes.librede.Librede;
 import tools.descartes.librede.bayesplusplus.BayesLibrary;
 import tools.descartes.librede.ipopt.java.IpoptLibrary;
 import tools.descartes.librede.nnls.NNLSLibrary;
@@ -120,7 +120,7 @@ public final class LibredeEditorPlugin extends EMFPlugin {
 		@Override
 		public void start(BundleContext context) throws Exception {
 			super.start(context);
-			LibredeLibrary.init();
+			Librede.init();
 			NNLSLibrary.init();
 			IpoptLibrary.init();
 			BayesLibrary.init();
