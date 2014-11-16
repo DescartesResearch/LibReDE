@@ -37,13 +37,17 @@ import java.util.Random;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.workload.WorkloadDescription;
 
 public class ObservationDataGenerator {
 	
@@ -61,6 +65,8 @@ public class ObservationDataGenerator {
 	private double time = 1.0;
 	
 	private WorkloadDescription model;
+	
+	private IStateModel<Unconstrained> stateModel;
 	
 	private MemoryObservationRepository repository;
 	
@@ -82,7 +88,18 @@ public class ObservationDataGenerator {
 			resources[i].setName("R" + i);
 		}
 		
-		model = new WorkloadDescription(Arrays.asList(resources), Arrays.asList(services));
+		model = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		model.getResources().addAll(Arrays.asList(resources));
+		model.getServices().addAll(Arrays.asList(services));
+		
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		for (Resource res : resources) {
+			for (Service serv : services) {
+				builder.addVariable(res, serv);
+			}
+		}
+		stateModel = builder.build();
+		
 		repository = new MemoryObservationRepository(model);
 	}
 	
@@ -177,7 +194,7 @@ public class ObservationDataGenerator {
 			@Override
 			public double cell(int row) {
 				if (row != bottleneckResource) {
-					return throughput.dot(demands.slice(model.getState().getRange(resources[row])));
+					return throughput.dot(demands.slice(stateModel.getStateVariableIndexRange(resources[row])));
 				} else {
 					return maxUtil;
 				}
@@ -235,5 +252,9 @@ public class ObservationDataGenerator {
 	
 	public IMonitoringRepository getRepository() {
 		return repository;
+	}
+	
+	public IStateModel<Unconstrained> getStateModel() {
+		return stateModel;
 	}
 }
