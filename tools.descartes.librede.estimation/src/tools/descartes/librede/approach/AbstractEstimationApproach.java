@@ -29,6 +29,7 @@ package tools.descartes.librede.approach;
 import java.util.ArrayList;
 import java.util.List;
 
+import tools.descartes.librede.EstimationResult;
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.WorkloadDescription;

@@ -1,9 +1,10 @@
-package tools.descartes.librede.approach;
+package tools.descartes.librede;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
