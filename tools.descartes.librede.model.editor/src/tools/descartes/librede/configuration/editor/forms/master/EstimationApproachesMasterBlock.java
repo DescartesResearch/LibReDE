@@ -100,15 +100,16 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 		// We need to add the existing validators in the configuration first, so that the test for
 		// equality in the checked table binding works correctly. EMF always does an equality check on
 		// the object instance.
-		Set<Class<?>> existingAlgorithms = new HashSet<Class<?>>();
+		Set<String> existingAlgorithms = new HashSet<String>();
 		for (EstimationAlgorithmConfiguration v : model.getEstimation().getAlgorithms()) {
 			existingAlgorithms.add(v.getType());
 		}
 		for (Class<?> cl : Registry.INSTANCE
 				.getImplementationClasses(IEstimationAlgorithm.class)) {
-			if (!existingAlgorithms.contains(cl)) {
+			String id = Registry.INSTANCE.toStringIdentifier(cl);
+			if (!existingAlgorithms.contains(id)) {
 				EstimationAlgorithmConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationAlgorithmConfiguration();
-				a.setType(cl);
+				a.setType(id);
 				Command cmd = AddCommand.create(domain, model.getEstimation(), ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__ALGORITHMS, a);
 				domain.getCommandStack().execute(cmd);
 			}

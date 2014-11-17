@@ -650,13 +650,13 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_CONFIGURATION__INTERVAL = 2;
 
 	/**
-	 * The feature id for the '<em><b>Provider</b></em>' reference.
+	 * The feature id for the '<em><b>Data Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__PROVIDER = 3;
+	int TRACE_CONFIGURATION__DATA_SOURCE = 3;
 
 	/**
 	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
@@ -956,13 +956,13 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION__INTERVAL = TRACE_CONFIGURATION__INTERVAL;
 
 	/**
-	 * The feature id for the '<em><b>Provider</b></em>' reference.
+	 * The feature id for the '<em><b>Data Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int FILE_TRACE_CONFIGURATION__PROVIDER = TRACE_CONFIGURATION__PROVIDER;
+	int FILE_TRACE_CONFIGURATION__DATA_SOURCE = TRACE_CONFIGURATION__DATA_SOURCE;
 
 	/**
 	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
@@ -1403,15 +1403,15 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getTraceConfiguration_Interval();
 
 	/**
-	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getProvider <em>Provider</em>}'.
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Provider</em>'.
-	 * @see tools.descartes.librede.configuration.TraceConfiguration#getProvider()
+	 * @return the meta object for the reference '<em>Data Source</em>'.
+	 * @see tools.descartes.librede.configuration.TraceConfiguration#getDataSource()
 	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EReference getTraceConfiguration_Provider();
+	EReference getTraceConfiguration_DataSource();
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}'.
@@ -2042,12 +2042,12 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute TRACE_CONFIGURATION__INTERVAL = eINSTANCE.getTraceConfiguration_Interval();
 
 		/**
-		 * The meta object literal for the '<em><b>Provider</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Data Source</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TRACE_CONFIGURATION__PROVIDER = eINSTANCE.getTraceConfiguration_Provider();
+		EReference TRACE_CONFIGURATION__DATA_SOURCE = eINSTANCE.getTraceConfiguration_DataSource();
 
 		/**
 		 * The meta object literal for the '<em><b>Mappings</b></em>' containment reference list feature.

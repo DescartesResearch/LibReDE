@@ -333,7 +333,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 						EMFEditProperties
 								.value(domain,
 										FeaturePath
-												.fromList(ConfigurationPackage.Literals.TRACE_CONFIGURATION__PROVIDER))
+												.fromList(ConfigurationPackage.Literals.TRACE_CONFIGURATION__DATA_SOURCE))
 								.observe(input));
 
 	}

@@ -136,7 +136,7 @@ public class Librede {
 	}
 	
 	public static void loadRepository(LibredeConfiguration conf, IMonitoringRepository repo) {
-		Map<Class<?>, IDataSource> dataSources = new HashMap<Class<?>, IDataSource>();
+		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
 		for (TraceConfiguration trace : conf.getInput().getObservations()) {
 			if (trace instanceof FileTraceConfiguration) {
@@ -147,13 +147,14 @@ public class Librede {
 					continue;
 				}
 				
-				Class<?> dataSourceType = fileTrace.getProvider().getType();
+				String dataSourceType = fileTrace.getDataSource().getType();
 				if (!dataSources.containsKey(dataSourceType)) {
+					Class<?> cl = Registry.INSTANCE.fromStringIdentifier(dataSourceType);
 					try {
-						IDataSource newSource = (IDataSource) Instantiator.newInstance(dataSourceType, fileTrace.getProvider().getParameters());
+						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, fileTrace.getDataSource().getParameters());
 						dataSources.put(dataSourceType, newSource);
 					} catch (Exception e) {
-						log.error("Could not instantiate data source " + fileTrace.getProvider().getName(), e);
+						log.error("Could not instantiate data source " + fileTrace.getDataSource().getName(), e);
 						continue;
 					}
 				}
@@ -200,9 +201,10 @@ public class Librede {
 			
 			IEstimationApproach currentApproach;
 			try {
-				currentApproach = (IEstimationApproach) Instantiator.newInstance(currentConf.getType(), currentConf.getParameters());
+				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(currentConf.getType());
+				currentApproach = (IEstimationApproach) Instantiator.newInstance(cl, currentConf.getParameters());
 			} catch(Exception ex) {
-				log.error("Error instantiating estimation approach: " + currentConf.getType().getSimpleName(), ex);
+				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
 				continue;
 			}
 			
@@ -230,7 +232,8 @@ public class Librede {
 			
 			IEstimationApproach currentApproach;
 			try {
-				currentApproach = (IEstimationApproach) Instantiator.newInstance(currentConf.getType(), currentConf.getParameters());
+				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(currentConf.getType());
+				currentApproach = (IEstimationApproach) Instantiator.newInstance(cl, currentConf.getParameters());
 			} catch(Exception ex) {
 				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
 				continue;
@@ -238,11 +241,12 @@ public class Librede {
 			
 			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
 			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
-				validators.add((IValidator) Instantiator.newInstance(validator.getType(), validator.getParameters()));
+				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(validator.getType());
+				validators.add((IValidator) Instantiator.newInstance(cl, validator.getParameters()));
 			}
 			
 			for (int i = 0; i < conf.getValidation().getValidationFolds(); i++) {
-				log.info("Running repetition " + (i + 1) + " of estimation approach " + currentConf.getType().getSimpleName());
+				log.info("Running repetition " + (i + 1) + " of estimation approach " + currentConf.getType());
 				cursor.startTrainingPhase(i);			
 				
 				ResultTable estimates = initAndExecuteEstimation(currentApproach, 
@@ -389,7 +393,8 @@ public class Librede {
 		for (ExporterConfiguration exportConf :conf.getOutput().getExporters()) {
 			IExporter exporter;
 			try {
-				exporter = (IExporter) Instantiator.newInstance(exportConf.getType(), exportConf.getParameters());
+				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(exportConf.getType());
+				exporter = (IExporter) Instantiator.newInstance(cl, exportConf.getParameters());
 			} catch (Exception e) {
 				log.error("Could not instantiate exporter: " + exportConf.getName());
 				continue;

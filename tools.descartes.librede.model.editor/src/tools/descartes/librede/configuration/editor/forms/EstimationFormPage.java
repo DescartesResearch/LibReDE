@@ -259,16 +259,17 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		// equality in the checked table binding works correctly. EMF always does an equality check on
 		// the object instance.
 		IObservableList approaches = new WritableList();
-		Set<Class<?>> existingApproaches = new HashSet<Class<?>>();
+		Set<String> existingApproaches = new HashSet<String>();
 		for (EstimationApproachConfiguration v : getModel().getEstimation().getApproaches()) {
 			approaches.add(v);
 			existingApproaches.add(v.getType());
 		}
 		for (Class<?> cl : Registry.INSTANCE
 				.getImplementationClasses(IEstimationApproach.class)) {
-			if (!existingApproaches.contains(cl)) {
+			String id = Registry.INSTANCE.toStringIdentifier(cl);
+			if (!existingApproaches.contains(id)) {
 				EstimationApproachConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationApproachConfiguration();
-				a.setType(cl);
+				a.setType(id);
 				approaches.add(a);
 			}
 		}
@@ -313,7 +314,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 	}
 	
 	private void handleReadFromTrace() {
-		Map<Class<?>, IDataSource> dataSources = new HashMap<Class<?>, IDataSource>();
+		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
 		double maxStart = Double.MIN_VALUE;
 		double minEnd = Double.MAX_VALUE;
@@ -323,12 +324,13 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 				FileTraceConfiguration fileTrace = (FileTraceConfiguration)trace;
 				File inputFile = new File(fileTrace.getFile());
 				if (inputFile.exists()) {
-					DataSourceConfiguration dataSourceConf = fileTrace.getProvider();
+					DataSourceConfiguration dataSourceConf = fileTrace.getDataSource();
 					if (dataSourceConf != null) {
 						IDataSource ds = dataSources.get(dataSourceConf.getType());
 						if (ds == null) {
 							try {
-								ds = (IDataSource)Instantiator.newInstance(dataSourceConf.getType(), dataSourceConf.getParameters());
+								Class<?> cl = Registry.INSTANCE.fromStringIdentifier(dataSourceConf.getType());
+								ds = (IDataSource)Instantiator.newInstance(cl, dataSourceConf.getParameters());
 								dataSources.put(dataSourceConf.getType(), ds);
 							} catch (Exception e) {
 								ErrorDialog.openError(getEditor().getEditorSite().getShell(), null, null, 

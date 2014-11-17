@@ -88,7 +88,7 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 		for (Object r : results) {
 			ExporterConfiguration source = ConfigurationFactory.eINSTANCE.createExporterConfiguration();
 			source.setName("New Exporter");
-			source.setType((Class<?>)r);
+			source.setType(Registry.INSTANCE.toStringIdentifier((Class<?>)r));
 			
 			Command cmd = AddCommand.create(domain, model.getOutput(), ConfigurationPackage.Literals.OUTPUT_SPECIFICATION__EXPORTERS, source);
 			domain.getCommandStack().execute(cmd);

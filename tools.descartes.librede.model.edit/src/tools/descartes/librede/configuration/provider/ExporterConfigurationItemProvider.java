@@ -185,10 +185,12 @@ public class ExporterConfigurationItemProvider
 	public String getText(Object object) {
 		ExporterConfiguration exporter = (ExporterConfiguration)object;
 		StringBuilder label = new StringBuilder(exporter.getName());
-		Class<?> type = exporter.getType();
-		String typeDisplay = Registry.INSTANCE.getDisplayName(type);
-		if (typeDisplay != null && !typeDisplay.isEmpty()) {
-			label.append(" (").append(typeDisplay).append(")");
+		Class<?> type = Registry.INSTANCE.fromStringIdentifier(exporter.getType());
+		if (type != null) {
+			String typeDisplay = Registry.INSTANCE.getDisplayName(type);
+			if (typeDisplay != null && !typeDisplay.isEmpty()) {
+				label.append(" (").append(typeDisplay).append(")");
+			}
 		}
 		return label.toString();
 	}

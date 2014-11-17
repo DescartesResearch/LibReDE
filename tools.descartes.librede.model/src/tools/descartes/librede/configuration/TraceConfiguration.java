@@ -43,7 +43,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getProvider <em>Provider</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  * </ul>
  * </p>
@@ -133,30 +133,30 @@ public interface TraceConfiguration extends EObject {
 	void setInterval(long value);
 
 	/**
-	 * Returns the value of the '<em><b>Provider</b></em>' reference.
+	 * Returns the value of the '<em><b>Data Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Provider</em>' reference isn't clear,
+	 * If the meaning of the '<em>Data Source</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Provider</em>' reference.
-	 * @see #setProvider(DataSourceConfiguration)
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Provider()
+	 * @return the value of the '<em>Data Source</em>' reference.
+	 * @see #setDataSource(DataSourceConfiguration)
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_DataSource()
 	 * @model required="true"
 	 * @generated
 	 */
-	DataSourceConfiguration getProvider();
+	DataSourceConfiguration getDataSource();
 
 	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getProvider <em>Provider</em>}' reference.
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Provider</em>' reference.
-	 * @see #getProvider()
+	 * @param value the new value of the '<em>Data Source</em>' reference.
+	 * @see #getDataSource()
 	 * @generated
 	 */
-	void setProvider(DataSourceConfiguration value);
+	void setDataSource(DataSourceConfiguration value);
 
 	/**
 	 * Returns the value of the '<em><b>Mappings</b></em>' containment reference list.

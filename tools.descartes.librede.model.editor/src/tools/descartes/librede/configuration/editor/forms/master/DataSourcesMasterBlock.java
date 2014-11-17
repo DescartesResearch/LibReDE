@@ -122,7 +122,7 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		for (Object r : results) {
 			DataSourceConfiguration source = ConfigurationFactory.eINSTANCE.createDataSourceConfiguration();
 			source.setName("New Data Source");
-			source.setType((Class<?>)r);
+			source.setType(Registry.INSTANCE.toStringIdentifier((Class<?>)r));
 			
 			Command cmd = AddCommand.create(domain, model.getInput(), ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES, source);
 			domain.getCommandStack().execute(cmd);

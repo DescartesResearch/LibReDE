@@ -38,6 +38,16 @@ import tools.descartes.librede.configuration.Parameter;
  */
 public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Container implements EstimationAlgorithmConfiguration {
 	/**
+	 * The default value of the '{@link #getType() <em>Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getType()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String TYPE_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -45,7 +55,7 @@ public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Con
 	 * @generated
 	 * @ordered
 	 */
-	protected Class<?> type;
+	protected String type = TYPE_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
@@ -81,7 +91,7 @@ public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Con
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Class<?> getType() {
+	public String getType() {
 		return type;
 	}
 
@@ -90,8 +100,8 @@ public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Con
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setType(Class<?> newType) {
-		Class<?> oldType = type;
+	public void setType(String newType) {
+		String oldType = type;
 		type = newType;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__TYPE, oldType, type));
@@ -149,7 +159,7 @@ public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Con
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__TYPE:
-				setType((Class<?>)newValue);
+				setType((String)newValue);
 				return;
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS:
 				getParameters().clear();
@@ -168,7 +178,7 @@ public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Con
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__TYPE:
-				setType((Class<?>)null);
+				setType(TYPE_EDEFAULT);
 				return;
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS:
 				getParameters().clear();
@@ -186,7 +196,7 @@ public class EstimationAlgorithmConfigurationImpl extends MinimalEObjectImpl.Con
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__TYPE:
-				return type != null;
+				return TYPE_EDEFAULT == null ? type != null : !TYPE_EDEFAULT.equals(type);
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS:
 				return parameters != null && !parameters.isEmpty();
 		}

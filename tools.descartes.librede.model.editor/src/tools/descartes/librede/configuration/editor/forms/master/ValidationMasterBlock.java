@@ -90,17 +90,18 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 		// equality in the checked table binding works correctly. EMF always does an equality check on
 		// the object instance.
 		IObservableList validators = new WritableList();
-		Set<Class<?>> existingValidators = new HashSet<Class<?>>();
+		Set<String> existingValidators = new HashSet<String>();
 		for (ValidatorConfiguration v : model.getValidation().getValidators()) {
 			validators.add(v);
 			existingValidators.add(v.getType());
 		}
 		for (Class<?> cl : Registry.INSTANCE
 				.getImplementationClasses(IValidator.class)) {
-			if (!existingValidators.contains(cl)) {
+			String id = Registry.INSTANCE.toStringIdentifier(cl);
+			if (!existingValidators.contains(id)) {
 				ValidatorConfiguration a = ConfigurationFactory.eINSTANCE
 						.createValidatorConfiguration();
-				a.setType(cl);
+				a.setType(id);
 				validators.add(a);
 			}
 		}

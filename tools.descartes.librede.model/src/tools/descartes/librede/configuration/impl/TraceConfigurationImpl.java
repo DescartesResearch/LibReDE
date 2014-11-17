@@ -55,7 +55,7 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMetric <em>Metric</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getProvider <em>Provider</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
  * </ul>
  * </p>
@@ -124,14 +124,14 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	protected long interval = INTERVAL_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getProvider() <em>Provider</em>}' reference.
+	 * The cached value of the '{@link #getDataSource() <em>Data Source</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getProvider()
+	 * @see #getDataSource()
 	 * @generated
 	 * @ordered
 	 */
-	protected DataSourceConfiguration provider;
+	protected DataSourceConfiguration dataSource;
 
 	/**
 	 * The cached value of the '{@link #getMappings() <em>Mappings</em>}' containment reference list.
@@ -230,16 +230,16 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DataSourceConfiguration getProvider() {
-		if (provider != null && provider.eIsProxy()) {
-			InternalEObject oldProvider = (InternalEObject)provider;
-			provider = (DataSourceConfiguration)eResolveProxy(oldProvider);
-			if (provider != oldProvider) {
+	public DataSourceConfiguration getDataSource() {
+		if (dataSource != null && dataSource.eIsProxy()) {
+			InternalEObject oldDataSource = (InternalEObject)dataSource;
+			dataSource = (DataSourceConfiguration)eResolveProxy(oldDataSource);
+			if (dataSource != oldDataSource) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__PROVIDER, oldProvider, provider));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE, oldDataSource, dataSource));
 			}
 		}
-		return provider;
+		return dataSource;
 	}
 
 	/**
@@ -247,8 +247,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public DataSourceConfiguration basicGetProvider() {
-		return provider;
+	public DataSourceConfiguration basicGetDataSource() {
+		return dataSource;
 	}
 
 	/**
@@ -256,11 +256,11 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setProvider(DataSourceConfiguration newProvider) {
-		DataSourceConfiguration oldProvider = provider;
-		provider = newProvider;
+	public void setDataSource(DataSourceConfiguration newDataSource) {
+		DataSourceConfiguration oldDataSource = dataSource;
+		dataSource = newDataSource;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__PROVIDER, oldProvider, provider));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE, oldDataSource, dataSource));
 	}
 
 	/**
@@ -303,9 +303,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return getUnit();
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return getInterval();
-			case ConfigurationPackage.TRACE_CONFIGURATION__PROVIDER:
-				if (resolve) return getProvider();
-				return basicGetProvider();
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
+				if (resolve) return getDataSource();
+				return basicGetDataSource();
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return getMappings();
 		}
@@ -330,8 +330,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval((Long)newValue);
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__PROVIDER:
-				setProvider((DataSourceConfiguration)newValue);
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
+				setDataSource((DataSourceConfiguration)newValue);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				getMappings().clear();
@@ -358,8 +358,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval(INTERVAL_EDEFAULT);
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__PROVIDER:
-				setProvider((DataSourceConfiguration)null);
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
+				setDataSource((DataSourceConfiguration)null);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				getMappings().clear();
@@ -382,8 +382,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return UNIT_EDEFAULT == null ? unit != null : !UNIT_EDEFAULT.equals(unit);
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return interval != INTERVAL_EDEFAULT;
-			case ConfigurationPackage.TRACE_CONFIGURATION__PROVIDER:
-				return provider != null;
+			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
+				return dataSource != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return mappings != null && !mappings.isEmpty();
 		}

@@ -139,7 +139,7 @@ public class EstimationAlgorithmConfigurationItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		Class labelValue = ((EstimationAlgorithmConfiguration)object).getType();
+		Class<?> labelValue = Registry.INSTANCE.fromStringIdentifier(((EstimationAlgorithmConfiguration)object).getType());
 		if (labelValue != null) {
 			return Registry.INSTANCE.getDisplayName(labelValue);
 		} else {

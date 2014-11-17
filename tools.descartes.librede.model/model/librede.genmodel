@@ -48,7 +48,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/metric"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/unit"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/interval"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/provider"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/dataSource"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/mappings"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//Parameter">

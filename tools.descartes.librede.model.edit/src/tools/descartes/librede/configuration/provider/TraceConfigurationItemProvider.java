@@ -86,7 +86,7 @@ public class TraceConfigurationItemProvider
 			addMetricPropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
 			addIntervalPropertyDescriptor(object);
-			addProviderPropertyDescriptor(object);
+			addDataSourcePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -158,19 +158,19 @@ public class TraceConfigurationItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Provider feature.
+	 * This adds a property descriptor for the Data Source feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addProviderPropertyDescriptor(Object object) {
+	protected void addDataSourcePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_TraceConfiguration_provider_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_provider_feature", "_UI_TraceConfiguration_type"),
-				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__PROVIDER,
+				 getString("_UI_TraceConfiguration_dataSource_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_dataSource_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__DATA_SOURCE,
 				 true,
 				 false,
 				 true,

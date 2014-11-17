@@ -85,7 +85,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		for (Object r : results) {
 			TraceConfiguration series = ConfigurationFactory.eINSTANCE.createFileTraceConfiguration();
 			if (model.getInput().getDataSources().size() > 0) {
-				series.setProvider(model.getInput().getDataSources().get(0));
+				series.setDataSource(model.getInput().getDataSources().get(0));
 			}
 			series.setMetric(r.toString());
 			ModelEntity entity = null;

@@ -33,12 +33,12 @@ public interface EstimationAlgorithmConfiguration extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Type</em>' attribute.
-	 * @see #setType(Class)
+	 * @see #setType(String)
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationAlgorithmConfiguration_Type()
 	 * @model required="true"
 	 * @generated
 	 */
-	Class<?> getType();
+	String getType();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationAlgorithmConfiguration#getType <em>Type</em>}' attribute.
@@ -48,7 +48,7 @@ public interface EstimationAlgorithmConfiguration extends EObject {
 	 * @see #getType()
 	 * @generated
 	 */
-	void setType(Class<?> value);
+	void setType(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Parameters</b></em>' containment reference list.
