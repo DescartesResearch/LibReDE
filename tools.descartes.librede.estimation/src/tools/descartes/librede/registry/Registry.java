@@ -41,6 +41,8 @@ public class Registry {
 	
 	private Map<String, IMetric> metrics = new HashMap<String, IMetric>();
 	
+	private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();	
+	
 	private Map< Class<?>, Set<Class<?>> > implementations = new HashMap< Class<?>, Set<Class<?>> >();
 	
 	private Registry() {}
@@ -61,6 +63,14 @@ public class Registry {
 	}
 	
 	public void registerImplementationType(Class<?> componentClass, Class<?> implementationClass) {
+		Component comp = implementationClass.getAnnotation(Component.class);
+		if (comp == null) {
+			throw new IllegalArgumentException("The implementation class must have a component annotation.");
+		}
+		if (!comp.alias().isEmpty()) {
+			aliases.put(comp.alias(), implementationClass);
+		}
+		
 		Set<Class<?>> impl = implementations.get(componentClass);
 		if (impl == null) {
 			impl = new HashSet<Class<?>>();
@@ -80,10 +90,26 @@ public class Registry {
 	
 	public String getDisplayName(Class<?> implementationClass) {
 		Component comp = implementationClass.getAnnotation(Component.class);
-		if (comp != null) {
-			return comp.displayName();
+		return comp.displayName();
+	}
+
+	public String toStringIdentifier(Class<?> implementationClass) {
+		Component comp = implementationClass.getAnnotation(Component.class);
+		if (comp.alias().isEmpty()) {
+			return implementationClass.getName();
 		} else {
-			return implementationClass.toString();
+			return comp.alias();
+		}
+	}
+	
+	public Class<?> fromStringIdentifier(String id) {
+		if (aliases.containsKey(id)) {
+			return aliases.get(id);
+		}
+		try {
+			return Class.forName(id);
+		} catch (ClassNotFoundException e) {
+			return null;
 		}
 	}
 }
