@@ -45,6 +45,9 @@ import tools.descartes.librede.nnls.NNLSLibrary;
  * @generated
  */
 public final class LibredeEditorPlugin extends EMFPlugin {
+	
+	public static final String ID = "tools.descartes.librede.model.editor";
+	
 	/**
 	 * Keep track of the singleton.
 	 * <!-- begin-user-doc -->

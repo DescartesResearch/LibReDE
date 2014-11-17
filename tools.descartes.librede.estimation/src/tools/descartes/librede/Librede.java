@@ -110,8 +110,8 @@ public class Librede {
 	}
 	
 	public static void execute(LibredeConfiguration conf) {
-		IMonitoringRepository repo = createRepository(
-				conf.getWorkloadDescription(), conf.getEstimation().getEndTimestamp());
+		IMonitoringRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
+		repo.setCurrentTime(conf.getEstimation().getEndTimestamp() / 1000);
 
 		loadRepository(conf, repo);
 		
@@ -133,12 +133,6 @@ public class Librede {
 				log.error("Error running estimation.", e);
 			}			
 		}
-	}
-	
-	public static IMonitoringRepository createRepository(WorkloadDescription workload, double endTime) {
-		IMonitoringRepository repo = new MemoryObservationRepository(workload);
-		repo.setCurrentTime(endTime / 1000.0);
-		return repo;
 	}
 	
 	public static void loadRepository(LibredeConfiguration conf, IMonitoringRepository repo) {
