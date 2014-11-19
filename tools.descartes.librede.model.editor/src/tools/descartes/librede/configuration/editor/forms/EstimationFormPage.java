@@ -40,6 +40,7 @@ import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.DateAndTimeObservableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 import org.eclipse.emf.databinding.FeaturePath;
@@ -361,16 +362,18 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 			return;
 		}
 		if (maxStart != Double.MIN_VALUE) {
-			SetCommand.create(getEditingDomain(), 
+			Command cmd = SetCommand.create(getEditingDomain(), 
 					getModel().getEstimation(), 
 					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP, 
-					maxStart);
+					(long)maxStart * 1000);
+			getEditingDomain().getCommandStack().execute(cmd);
 		}
 		if (minEnd != Double.MAX_VALUE) {
-			SetCommand.create(getEditingDomain(), 
+			Command cmd = SetCommand.create(getEditingDomain(), 
 					getModel().getEstimation(), 
 					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP, 
-					minEnd);
+					(long)minEnd * 1000);
+			getEditingDomain().getCommandStack().execute(cmd);
 		}
 		
 	}
