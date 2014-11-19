@@ -242,7 +242,9 @@ public class Librede {
 			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
 			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
 				Class<?> cl = Registry.INSTANCE.getInstanceClass(validator.getType());
-				validators.add((IValidator) Instantiator.newInstance(cl, validator.getParameters()));
+				IValidator val = (IValidator) Instantiator.newInstance(cl, validator.getParameters());
+				val.initialize(conf.getWorkloadDescription(), cursor);
+				validators.add(val);
 			}
 			
 			for (int i = 0; i < conf.getValidation().getValidationFolds(); i++) {
@@ -302,10 +304,14 @@ public class Librede {
 		List<String> approaches = new ArrayList<String>(results.size());
 		Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
 		for (ResultTable[] folds : results) {
+			boolean first = true;
 			for (ResultTable curFold : folds) {
+				if (first) {
+					approaches.add(Registry.INSTANCE.getDisplayName(curFold.getApproach()));
+					first = false;
+				}
 				if (variables == null) {
 					variables = curFold.getStateVariables();
-					approaches.add(Registry.INSTANCE.getDisplayName(curFold.getApproach()));
 				} else {
 					if(!Arrays.equals(variables, curFold.getStateVariables())) {
 						throw new IllegalStateException();

@@ -132,25 +132,6 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	private Matrix estimationBuffer;
 	
-	private ConstantStateModel<? extends IStateConstraint> stateModel;
-	private IObservationModel<IOutputFunction, Vector> observationModel;
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#getStateModel()
-	 */
-	@Override
-	public ConstantStateModel<? extends IStateConstraint> getStateModel() {
-		return stateModel;
-	}
-
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#getObservationModel()
-	 */
-	@Override
-	public IObservationModel<IOutputFunction, Vector> getObservationModel() {
-		return observationModel;
-	}
-	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
 	 */
@@ -291,8 +272,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		
 		for (StateBoundsConstraint c : boundsConstraints) {
 			StateVariable var = c.getStateVariable();
-			NativeHelper.setDoubleArray(x_L, stateModel.getStateVariableIndex(var.getResource(), var.getService()), c.getLowerBound());
-			NativeHelper.setDoubleArray(x_U, stateModel.getStateVariableIndex(var.getResource(), var.getService()), c.getUpperBound());
+			NativeHelper.setDoubleArray(x_L, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getLowerBound());
+			NativeHelper.setDoubleArray(x_U, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getUpperBound());
 		}
 	}
 	

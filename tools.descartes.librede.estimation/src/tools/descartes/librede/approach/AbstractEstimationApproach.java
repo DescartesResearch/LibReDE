@@ -67,6 +67,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 			boolean iterative) {
 		this.workload = workload;
 		this.cursor = cursor;
+		this.algorithmFactory = algorithmFactory;
 		this.iterative = iterative;
 		this.estimationWindow = estimationWindow;
 	}
