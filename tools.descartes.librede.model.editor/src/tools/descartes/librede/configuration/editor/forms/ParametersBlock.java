@@ -65,6 +65,7 @@ import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
+import tools.descartes.librede.registry.Registry;
 
 public class ParametersBlock {
 	
@@ -286,9 +287,10 @@ public class ParametersBlock {
 		this.parametersFeature = parametersFeature;
 	}
 	
-	public void setObjectType(Class<?> parameterizedType) {
-		if (parameterizedType.isAnnotationPresent(Component.class)) {
-			for (Field curField : parameterizedType.getDeclaredFields()) {
+	public void setObjectType(String type) {
+		Class<?> cl = Registry.INSTANCE.getInstanceClass(type);
+		if (cl.isAnnotationPresent(Component.class)) {
+			for (Field curField : cl.getDeclaredFields()) {
 				ParameterDefinition param = curField.getAnnotation(ParameterDefinition.class);
 				if (param != null) {
 					ParameterEditor editor = createEditor(curField.getType(), param.subType());

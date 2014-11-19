@@ -104,10 +104,10 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(page.getSite().getShell(), new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Registry.INSTANCE.getDisplayName((Class<?>)element);
+				return Registry.INSTANCE.getDisplayName(Registry.INSTANCE.getInstanceClass((String)element));
 			}
 		});
-		dialog.setElements(Registry.INSTANCE.getImplementationClasses(IDataSource.class).toArray());
+		dialog.setElements(Registry.INSTANCE.getInstances(IDataSource.class).toArray());
 		dialog.setAllowDuplicates(false);
 		dialog.setMultipleSelection(false);
 		dialog.setTitle("Data Source Types");
@@ -122,7 +122,7 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		for (Object r : results) {
 			DataSourceConfiguration source = ConfigurationFactory.eINSTANCE.createDataSourceConfiguration();
 			source.setName("New Data Source");
-			source.setType(Registry.INSTANCE.toStringIdentifier((Class<?>)r));
+			source.setType((String)r);
 			
 			Command cmd = AddCommand.create(domain, model.getInput(), ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES, source);
 			domain.getCommandStack().execute(cmd);
@@ -151,12 +151,12 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 
 	@Override
 	public IDetailsPage getPage(Object key) {
-		if (key instanceof Class<?>) {
+		if (key instanceof String) {
 			return new ParametersDetailsPage(page, 
 					domain, 
 					"Data Source Configuration", 
 					ConfigurationPackage.Literals.DATA_SOURCE_CONFIGURATION,
-					((Class<?>)key), 
+					(String)key, 
 					ConfigurationPackage.Literals.DATA_SOURCE_CONFIGURATION__PARAMETERS);
 		}
 		return null;

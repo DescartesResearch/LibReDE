@@ -57,7 +57,7 @@ public class ParametersDetailsPage extends AbstractDetailsPage {
 	private ParametersBlock parameters;
 	private String sectionTitle;
 	private EClass inputType;
-	private Class<?> componentType;
+	private String componentType;
 	private EStructuralFeature parametersFeature;
 	private Text txtName = null;
 	
@@ -65,7 +65,7 @@ public class ParametersDetailsPage extends AbstractDetailsPage {
 
 	public ParametersDetailsPage(
 			AbstractEstimationConfigurationFormPage page, AdapterFactoryEditingDomain domain,
-			String sectionTitle, EClass inputType, Class<?> componentType, EStructuralFeature parametersFeature) {
+			String sectionTitle, EClass inputType, String componentType, EStructuralFeature parametersFeature) {
 		super(page, domain);
 		this.sectionTitle = sectionTitle;
 		this.inputType = inputType;

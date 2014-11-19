@@ -264,12 +264,11 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 			approaches.add(v);
 			existingApproaches.add(v.getType());
 		}
-		for (Class<?> cl : Registry.INSTANCE
-				.getImplementationClasses(IEstimationApproach.class)) {
-			String id = Registry.INSTANCE.toStringIdentifier(cl);
-			if (!existingApproaches.contains(id)) {
+		for (String instance : Registry.INSTANCE
+				.getInstances(IEstimationApproach.class)) {
+			if (!existingApproaches.contains(instance)) {
 				EstimationApproachConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationApproachConfiguration();
-				a.setType(id);
+				a.setType(instance);
 				approaches.add(a);
 			}
 		}
@@ -329,7 +328,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 						IDataSource ds = dataSources.get(dataSourceConf.getType());
 						if (ds == null) {
 							try {
-								Class<?> cl = Registry.INSTANCE.fromStringIdentifier(dataSourceConf.getType());
+								Class<?> cl = Registry.INSTANCE.getInstanceClass(dataSourceConf.getType());
 								ds = (IDataSource)Instantiator.newInstance(cl, dataSourceConf.getParameters());
 								dataSources.put(dataSourceConf.getType(), ds);
 							} catch (Exception e) {

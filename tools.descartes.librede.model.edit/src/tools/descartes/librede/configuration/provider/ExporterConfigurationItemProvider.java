@@ -185,7 +185,7 @@ public class ExporterConfigurationItemProvider
 	public String getText(Object object) {
 		ExporterConfiguration exporter = (ExporterConfiguration)object;
 		StringBuilder label = new StringBuilder(exporter.getName());
-		Class<?> type = Registry.INSTANCE.fromStringIdentifier(exporter.getType());
+		Class<?> type = Registry.INSTANCE.getInstanceClass(exporter.getType());
 		if (type != null) {
 			String typeDisplay = Registry.INSTANCE.getDisplayName(type);
 			if (typeDisplay != null && !typeDisplay.isEmpty()) {

@@ -95,13 +95,12 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 			validators.add(v);
 			existingValidators.add(v.getType());
 		}
-		for (Class<?> cl : Registry.INSTANCE
-				.getImplementationClasses(IValidator.class)) {
-			String id = Registry.INSTANCE.toStringIdentifier(cl);
-			if (!existingValidators.contains(id)) {
+		for (String instance : Registry.INSTANCE
+				.getInstances(IValidator.class)) {
+			if (!existingValidators.contains(instance)) {
 				ValidatorConfiguration a = ConfigurationFactory.eINSTANCE
 						.createValidatorConfiguration();
-				a.setType(id);
+				a.setType(instance);
 				validators.add(a);
 			}
 		}
@@ -144,7 +143,7 @@ public class ValidationMasterBlock extends AbstractMasterBlock implements IDetai
 				domain, 
 				"Validator Configuration", 
 				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION,
-				(Class<?>)key, 
+				(String)key, 
 				ConfigurationPackage.Literals.VALIDATOR_CONFIGURATION__PARAMETERS);
 	}
 

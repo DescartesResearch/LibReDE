@@ -160,7 +160,7 @@ public class ValidatorConfigurationItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		Class<?> type = Registry.INSTANCE.fromStringIdentifier(((ValidatorConfiguration)object).getType());
+		Class<?> type = Registry.INSTANCE.getInstanceClass(((ValidatorConfiguration)object).getType());
 		if (type != null) {
 			return Registry.INSTANCE.getDisplayName(type);
 		} else {

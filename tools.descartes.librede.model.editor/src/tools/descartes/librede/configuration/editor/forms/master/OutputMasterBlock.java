@@ -70,10 +70,10 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(page.getSite().getShell(), new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Registry.INSTANCE.getDisplayName((Class<?>)element);
+				return Registry.INSTANCE.getDisplayName(Registry.INSTANCE.getInstanceClass((String)element));
 			}
 		});
-		dialog.setElements(Registry.INSTANCE.getImplementationClasses(IExporter.class).toArray());
+		dialog.setElements(Registry.INSTANCE.getInstances(IExporter.class).toArray());
 		dialog.setAllowDuplicates(false);
 		dialog.setMultipleSelection(false);
 		dialog.setTitle("Exporter Types");
@@ -88,7 +88,7 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 		for (Object r : results) {
 			ExporterConfiguration source = ConfigurationFactory.eINSTANCE.createExporterConfiguration();
 			source.setName("New Exporter");
-			source.setType(Registry.INSTANCE.toStringIdentifier((Class<?>)r));
+			source.setType((String)r);
 			
 			Command cmd = AddCommand.create(domain, model.getOutput(), ConfigurationPackage.Literals.OUTPUT_SPECIFICATION__EXPORTERS, source);
 			domain.getCommandStack().execute(cmd);
@@ -144,7 +144,7 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 				domain, 
 				"Exporter Configuration", 
 				ConfigurationPackage.Literals.EXPORTER_CONFIGURATION,
-				(Class<?>)key, 
+				(String)key, 
 				ConfigurationPackage.Literals.EXPORTER_CONFIGURATION__PARAMETERS);
 	}
 

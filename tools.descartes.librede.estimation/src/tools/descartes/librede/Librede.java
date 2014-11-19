@@ -149,7 +149,7 @@ public class Librede {
 				
 				String dataSourceType = fileTrace.getDataSource().getType();
 				if (!dataSources.containsKey(dataSourceType)) {
-					Class<?> cl = Registry.INSTANCE.fromStringIdentifier(dataSourceType);
+					Class<?> cl = Registry.INSTANCE.getInstanceClass(dataSourceType);
 					try {
 						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, fileTrace.getDataSource().getParameters());
 						dataSources.put(dataSourceType, newSource);
@@ -201,7 +201,7 @@ public class Librede {
 			
 			IEstimationApproach currentApproach;
 			try {
-				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(currentConf.getType());
+				Class<?> cl = Registry.INSTANCE.getInstanceClass(currentConf.getType());
 				currentApproach = (IEstimationApproach) Instantiator.newInstance(cl, currentConf.getParameters());
 			} catch(Exception ex) {
 				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
@@ -232,7 +232,7 @@ public class Librede {
 			
 			IEstimationApproach currentApproach;
 			try {
-				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(currentConf.getType());
+				Class<?> cl = Registry.INSTANCE.getInstanceClass(currentConf.getType());
 				currentApproach = (IEstimationApproach) Instantiator.newInstance(cl, currentConf.getParameters());
 			} catch(Exception ex) {
 				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
@@ -241,7 +241,7 @@ public class Librede {
 			
 			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
 			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
-				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(validator.getType());
+				Class<?> cl = Registry.INSTANCE.getInstanceClass(validator.getType());
 				validators.add((IValidator) Instantiator.newInstance(cl, validator.getParameters()));
 			}
 			
@@ -393,7 +393,7 @@ public class Librede {
 		for (ExporterConfiguration exportConf :conf.getOutput().getExporters()) {
 			IExporter exporter;
 			try {
-				Class<?> cl = Registry.INSTANCE.fromStringIdentifier(exportConf.getType());
+				Class<?> cl = Registry.INSTANCE.getInstanceClass(exportConf.getType());
 				exporter = (IExporter) Instantiator.newInstance(cl, exportConf.getParameters());
 			} catch (Exception e) {
 				log.error("Could not instantiate exporter: " + exportConf.getName());

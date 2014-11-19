@@ -104,12 +104,11 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 		for (EstimationAlgorithmConfiguration v : model.getEstimation().getAlgorithms()) {
 			existingAlgorithms.add(v.getType());
 		}
-		for (Class<?> cl : Registry.INSTANCE
-				.getImplementationClasses(IEstimationAlgorithm.class)) {
-			String id = Registry.INSTANCE.toStringIdentifier(cl);
-			if (!existingAlgorithms.contains(id)) {
+		for (String instance : Registry.INSTANCE
+				.getInstances(IEstimationAlgorithm.class)) {
+			if (!existingAlgorithms.contains(instance)) {
 				EstimationAlgorithmConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationAlgorithmConfiguration();
-				a.setType(id);
+				a.setType(instance);
 				Command cmd = AddCommand.create(domain, model.getEstimation(), ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__ALGORITHMS, a);
 				domain.getCommandStack().execute(cmd);
 			}
@@ -131,12 +130,12 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 
 	@Override
 	public IDetailsPage getPage(Object key) {
-		if (key instanceof Class<?>) {
+		if (key instanceof String) {
 			return new ParametersDetailsPage(page, 
 					domain, 
 					"Estimation Algorithm Configuration", 
 					ConfigurationPackage.Literals.ESTIMATION_ALGORITHM_CONFIGURATION,
-					(Class<?>) key, 
+					(String) key, 
 					ConfigurationPackage.Literals.ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS);
 		}
 		return null;

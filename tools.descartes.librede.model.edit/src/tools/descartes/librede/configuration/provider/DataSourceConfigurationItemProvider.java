@@ -190,7 +190,7 @@ public class DataSourceConfigurationItemProvider
 	public String getText(Object object) {
 		DataSourceConfiguration dataSource = (DataSourceConfiguration)object;
 		StringBuilder label = new StringBuilder(dataSource.getName());
-		Class<?> type = Registry.INSTANCE.fromStringIdentifier(dataSource.getType());
+		Class<?> type = Registry.INSTANCE.getInstanceClass(dataSource.getType());
 		if (type != null) {
 			String typeDisplay = Registry.INSTANCE.getDisplayName(type);
 			if (typeDisplay != null && !typeDisplay.isEmpty()) {

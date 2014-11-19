@@ -41,9 +41,9 @@ public class Registry {
 	
 	private Map<String, IMetric> metrics = new HashMap<String, IMetric>();
 	
-	private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();	
+	private Map<String, Class<?>> instances = new HashMap<String, Class<?>>();	
 	
-	private Map< Class<?>, Set<Class<?>> > implementations = new HashMap< Class<?>, Set<Class<?>> >();
+	private Map< Class<?>, Set<String> > components = new HashMap< Class<?>, Set<String> >();
 	
 	private Registry() {}
 	
@@ -62,25 +62,27 @@ public class Registry {
 		return metrics.get(literal);
 	}
 	
-	public void registerImplementationType(Class<?> componentClass, Class<?> implementationClass) {
-		Component comp = implementationClass.getAnnotation(Component.class);
+	public void registerImplementationType(Class<?> componentClass, Class<?> instanceClass) {
+		Component comp = instanceClass.getAnnotation(Component.class);
 		if (comp == null) {
-			throw new IllegalArgumentException("The implementation class must have a component annotation.");
+			throw new IllegalArgumentException("The instance class must have a component annotation.");
 		}
-		if (!comp.alias().isEmpty()) {
-			aliases.put(comp.alias(), implementationClass);
+		String id = comp.alias();
+		if (id.isEmpty()) {
+			id = instanceClass.getName();
 		}
 		
-		Set<Class<?>> impl = implementations.get(componentClass);
+		Set<String> impl = components.get(componentClass);
 		if (impl == null) {
-			impl = new HashSet<Class<?>>();
-			implementations.put(componentClass, impl);
+			impl = new HashSet<String>();
+			components.put(componentClass, impl);
 		}
-		impl.add(implementationClass);
+		impl.add(id);
+		instances.put(id, instanceClass);
 	}
 	
-	public Set<Class<?>> getImplementationClasses(Class<?> componentClass) {
-		Set<Class<?>> impl = implementations.get(componentClass);
+	public Set<String> getInstances(Class<?> componentClass) {
+		Set<String> impl = components.get(componentClass);
 		if (impl == null) {
 			return Collections.emptySet();
 		} else {
@@ -88,28 +90,12 @@ public class Registry {
 		}
 	}
 	
-	public String getDisplayName(Class<?> implementationClass) {
-		Component comp = implementationClass.getAnnotation(Component.class);
-		return comp.displayName();
-	}
-
-	public String toStringIdentifier(Class<?> implementationClass) {
-		Component comp = implementationClass.getAnnotation(Component.class);
-		if (comp.alias().isEmpty()) {
-			return implementationClass.getName();
-		} else {
-			return comp.alias();
-		}
+	public Class<?> getInstanceClass(String id) {
+		return instances.get(id);
 	}
 	
-	public Class<?> fromStringIdentifier(String id) {
-		if (aliases.containsKey(id)) {
-			return aliases.get(id);
-		}
-		try {
-			return Class.forName(id);
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
+	public String getDisplayName(Class<?> instanceClass) {
+		Component comp = instanceClass.getAnnotation(Component.class);
+		return comp.displayName();
 	}
 }
