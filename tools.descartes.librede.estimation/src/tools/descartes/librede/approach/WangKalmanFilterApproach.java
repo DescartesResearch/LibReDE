@@ -58,7 +58,7 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 				builder.addVariable(res, serv);
 			}
 		}
-		return Arrays.asList(builder.build());
+		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 				builder.addVariable(res, service);
 			}
 		}
-		return Arrays.asList(builder.build());
+		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 	
 	protected IObservationModel<IOutputFunction,Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {

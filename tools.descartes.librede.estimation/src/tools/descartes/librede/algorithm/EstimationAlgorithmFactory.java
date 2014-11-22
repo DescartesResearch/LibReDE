@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 
@@ -50,7 +51,7 @@ public class EstimationAlgorithmFactory {
 
 		for (String cand : candidates) {
 			try {
-				return (IEstimationAlgorithm) Instantiator.newInstance(Registry.INSTANCE.getInstanceClass(cand), Collections.emptyList());
+				return (IEstimationAlgorithm) Instantiator.newInstance(Registry.INSTANCE.getInstanceClass(cand), Collections.<Parameter>emptyList());
 			} catch(Exception ex) {
 				log.error("Error instantiating estimation algorithm " + cand + ". Skip it...", ex);
 			}

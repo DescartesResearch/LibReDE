@@ -62,7 +62,7 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 			}
 		}
 		b.setInitialState(ones(workload.getResources().size() * workload.getServices().size()).times(0.01));
-		return Arrays.asList(b.build());
+		return Arrays.<IStateModel<?>>asList(b.build());
 	}
 
 	@Override
