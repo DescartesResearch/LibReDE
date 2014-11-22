@@ -66,23 +66,26 @@ public class MemoryObservationRepositoryTest {
 		workload1.getResources().addAll(Arrays.asList(resources));
 		workload1.getServices().addAll(Arrays.asList(services));
 		MemoryObservationRepository repository1 = new MemoryObservationRepository(workload1);
-		WorkloadDescription workload2 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
-		workload2.getServices().addAll(Arrays.asList(services));
-		MemoryObservationRepository repository2 = new MemoryObservationRepository(workload2);
-		WorkloadDescription workload3 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
-		workload3.getResources().addAll(Arrays.asList(resources));
-		MemoryObservationRepository repository3 = new MemoryObservationRepository(workload3);
-		WorkloadDescription workload4 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
-		MemoryObservationRepository repository4 = new MemoryObservationRepository(workload4);
 		
 		assertThat(repository1.listResources()).isEqualTo(Arrays.asList(resources));		
 		assertThat(repository1.listServices()).isEqualTo(Arrays.asList(services));
 		
+		WorkloadDescription workload2 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload2.getServices().addAll(Arrays.asList(services));
+		MemoryObservationRepository repository2 = new MemoryObservationRepository(workload2);
+		
 		assertThat(repository2.listResources()).isEmpty();
 		assertThat(repository2.listServices()).isEqualTo(Arrays.asList(services));
 		
+		WorkloadDescription workload3 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		workload3.getResources().addAll(Arrays.asList(resources));
+		MemoryObservationRepository repository3 = new MemoryObservationRepository(workload3);
+		
 		assertThat(repository3.listResources()).isEqualTo(Arrays.asList(resources));
 		assertThat(repository3.listServices()).isEmpty();
+		
+		WorkloadDescription workload4 = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+		MemoryObservationRepository repository4 = new MemoryObservationRepository(workload4);
 		
 		assertThat(repository4.listResources()).isEmpty();
 		assertThat(repository4.listServices()).isEmpty();	

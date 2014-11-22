@@ -96,13 +96,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	}
 	
 	@ParameterDefinition(name = "StateNoiseCovariance", label = "State Noise Covariance", defaultValue = "1.0")
-	private double stateNoiseCovarianceConstant;
+	private double stateNoiseCovarianceConstant = 1.0;
 	
 	@ParameterDefinition(name = "StateNoiseCoupling", label = "State Noise Coupling", defaultValue = "1.0")
-	private double stateNoiseCouplingConstant;
+	private double stateNoiseCouplingConstant = 1.0;
 	
 	@ParameterDefinition(name = "ObserveNoiseCovariance", label = "Observe Noise Covariance", defaultValue = "0.0001")
-	private double observeNoiseCovarianceConstant;
+	private double observeNoiseCovarianceConstant = 0.0001;
 
 	private int stateSize;
 	private int outputSize;

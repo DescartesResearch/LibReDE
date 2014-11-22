@@ -72,13 +72,13 @@ import com.sun.jna.ptr.DoubleByReference;
 public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	@ParameterDefinition(name = "SolutionTolerance", label = "Solution Tolerance", defaultValue = "1e-7")
-	private double solutionTolerance;
+	private double solutionTolerance = 1e-7;
 	
 	@ParameterDefinition(name = "UpperBoundsInfValue", label = "Upper Bounds Infinity Value", defaultValue = "1e19")
-	private double upperBoundsInfValue;
+	private double upperBoundsInfValue = 1e19;
 	
 	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
-	private double lowerBoundsInfValue;
+	private double lowerBoundsInfValue = -1e19;
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
