@@ -194,6 +194,6 @@
 		<module>../tools.descartes.librede.model.edit</module>
 		<module>../tools.descartes.librede.model.editor</module>
 		<module>../tools.descartes.librede.console</module>
-		<module>../tools.descartes.librede.doc</module>
+		<module>../tools.descartes.librede.releng.doc</module>
 	</modules>
 </project>
