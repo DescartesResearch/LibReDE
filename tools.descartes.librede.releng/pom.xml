@@ -193,7 +193,7 @@
 		<module>../tools.descartes.librede.model</module>
 		<module>../tools.descartes.librede.model.edit</module>
 		<module>../tools.descartes.librede.model.editor</module>
-		<module>../tools.descartes.librede.frontend</module>
+		<module>../tools.descartes.librede.console</module>
 		<module>../tools.descartes.librede.doc</module>
 	</modules>
 </project>

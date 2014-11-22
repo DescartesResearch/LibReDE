@@ -6,7 +6,7 @@
 		<maven>3.0</maven>
 	</prerequisites>
 
-	<artifactId>tools.descartes.librede.frontend</artifactId>
+	<artifactId>tools.descartes.librede.console</artifactId>
 
 	<packaging>eclipse-plugin</packaging>
 

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Frontend
-Bundle-SymbolicName: tools.descartes.librede.frontend;singleton:=true
+Bundle-SymbolicName: tools.descartes.librede.console;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.kohsuke.args4j;bundle-version="2.0.21",
