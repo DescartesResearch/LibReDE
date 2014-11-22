@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
@@ -70,12 +71,14 @@ public class ResultTable {
 	private final Class<? extends IEstimationApproach> approach;
 	private final StateVariable[] columnToEntry;
 	private final TimeSeries estimates;
-	private Map<Class <? extends IValidator>, Vector> validationResults;
+	private Map<Class<? extends IValidator>, List<ModelEntity>> validationEntities;
+	private Map<Class<? extends IValidator>, Vector> validationResults;
 	
 	private ResultTable(Class<? extends IEstimationApproach> approach, StateVariable[] columnToEntry, TimeSeries estimates) {
 		this.approach = approach;
 		this.columnToEntry = columnToEntry;
 		this.estimates = estimates;
+		this.validationEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
 		this.validationResults = new HashMap<Class <? extends IValidator>, Vector>();
 	}
 	
@@ -113,6 +116,14 @@ public class ResultTable {
 	
 	public Set<Class <? extends IValidator>> getValidators() {
 		return validationResults.keySet();
+	}
+	
+	public void setValidatedEntities(Class<? extends IValidator> validator, List<ModelEntity> entities) {
+		validationEntities.put(validator, entities);
+	}
+	
+	public List<ModelEntity> getValidatedEntities(Class<? extends IValidator> validator) {
+		return validationEntities.get(validator);
 	}
 
 	public Vector getValidationErrors(Class<? extends IValidator> validator) {

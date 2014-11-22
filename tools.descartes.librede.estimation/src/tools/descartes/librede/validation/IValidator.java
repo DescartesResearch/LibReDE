@@ -26,6 +26,9 @@
  */
 package tools.descartes.librede.validation;
 
+import java.util.List;
+
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -35,6 +38,8 @@ public interface IValidator {
 	void initialize(WorkloadDescription workload, IRepositoryCursor cursor);
 
 	Vector getPredictionError();
+	
+	List<ModelEntity> getModelEntities();
 
 	void predict(Vector state);
 

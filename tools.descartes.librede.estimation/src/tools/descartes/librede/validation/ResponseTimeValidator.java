@@ -29,6 +29,7 @@ package tools.descartes.librede.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
@@ -45,6 +46,7 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 @Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
 	
+	private List<ModelEntity> services;
 	private List<ResponseTimeEquation> respEq;
 	private MatrixBuilder allErrors;
 	
@@ -60,8 +62,10 @@ public class ResponseTimeValidator implements IValidator {
 		ConstantStateModel<Unconstrained> stateModel = builder.build(); 
 		
 		this.respEq = new ArrayList<ResponseTimeEquation>();
+		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getServices()) {
 			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv));
+			services.add(srv);
 		}
 		allErrors = new MatrixBuilder(stateModel.getServices().size());		
 	}
@@ -80,5 +84,10 @@ public class ResponseTimeValidator implements IValidator {
 	
 	public Vector getPredictionError() {
 		return LinAlg.mean(allErrors.toMatrix(), 0);
+	}
+	
+	@Override
+	public List<ModelEntity> getModelEntities() {
+		return services;
 	}
 }

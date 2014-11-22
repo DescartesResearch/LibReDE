@@ -29,6 +29,7 @@ package tools.descartes.librede.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
@@ -45,6 +46,7 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 @Component(displayName = "Utilization Law Validator")
 public class UtilizationValidator implements IValidator {
 	
+	private List<ModelEntity> resources;
 	private List<UtilizationLaw> utilLaw;
 	private MatrixBuilder allErrors;
 	
@@ -59,8 +61,10 @@ public class UtilizationValidator implements IValidator {
 		ConstantStateModel<Unconstrained> stateModel = builder.build(); 
 		
 		this.utilLaw = new ArrayList<UtilizationLaw>();
+		this.resources = new ArrayList<ModelEntity>();
 		for (Resource res : stateModel.getResources()) {
 			utilLaw.add(new UtilizationLaw(stateModel, cursor, res));
+			resources.add(res);
 		}
 		allErrors = new MatrixBuilder(stateModel.getResources().size());
 	}
@@ -81,6 +85,11 @@ public class UtilizationValidator implements IValidator {
 	@Override
 	public Vector getPredictionError() {
 		return LinAlg.mean(allErrors.toMatrix(), 0);
+	}
+	
+	@Override
+	public List<ModelEntity> getModelEntities() {
+		return resources;
 	}
 
 }

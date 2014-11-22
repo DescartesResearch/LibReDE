@@ -52,8 +52,8 @@ import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.ExporterConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
@@ -270,6 +270,7 @@ public class Librede {
 				}
 				
 				for (IValidator validator : validators) {
+					estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
 					estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
 				}
 				
@@ -322,9 +323,7 @@ public class Librede {
 		}
 
 		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
-		for (Class<? extends IValidator> validator : validators) {
-			meanErrors.put(validator, new MatrixBuilder(variables.length));
-		}	
+		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
 	
 		MatrixBuilder meanEstimates = new MatrixBuilder(variables.length);
 		for (ResultTable[] folds : results) {
@@ -335,18 +334,28 @@ public class Librede {
 			meanEstimates.addRow(LinAlg.mean(lastEstimates.toMatrix(), 0));
 
 			for (Class<? extends IValidator> validator : validators) {
-				MatrixBuilder errors = new MatrixBuilder(variables.length);
+				MatrixBuilder errors = null; 
 				for (ResultTable curFold : folds) {
-					errors.addRow(curFold.getValidationErrors(validator));
+					Vector vec = curFold.getValidationErrors(validator);
+					if (errors == null) {
+						errors = new MatrixBuilder(vec.rows());
+						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
+					}
+					errors.addRow(vec);
 				}
-				meanErrors.get(validator).addRow(LinAlg.mean(errors.toMatrix(), 0));
+				
+				Vector mean = LinAlg.mean(errors.toMatrix(), 0);
+				if (!meanErrors.containsKey(validator)) {
+					meanErrors.put(validator, new MatrixBuilder(mean.rows()));
+				}
+				meanErrors.get(validator).addRow(mean);
 			}
 			
 		}
 		
 		// Estimates
 		System.out.println("Estimates");
-		printTable(variables, approaches, meanEstimates.toMatrix());
+		printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
 		System.out.println();
 		
 		if (validators.size() > 0) {
@@ -355,14 +364,37 @@ public class Librede {
 			
 			for (Class<? extends IValidator> validator : validators) {
 				String name = Registry.INSTANCE.getDisplayName(validator);
-				System.out.println(name + ":");
-				
-				printTable(variables, approaches, meanErrors.get(validator).toMatrix());
+				System.out.println("\n" + name + ":");				
+				printValidationResultsTable(validatedEntities.get(validator), approaches, meanErrors.get(validator).toMatrix());
 			}
 		}
 	}
 	
-	private static void printTable(StateVariable[] variables, List<String> approaches, Matrix values) {
+	private static void printValidationResultsTable(List<ModelEntity> entities, List<String> approaches, Matrix values) {
+		System.out.printf("%-20.20s | ", "Approach");
+		
+		for (ModelEntity var : entities) {
+			System.out.printf("%-8.8s", var.getName());
+		}
+		
+		System.out.println("|");
+
+		for (int i = 0; i < (24 + entities.size() * 8); i++) {
+			System.out.print("-");
+		}
+		System.out.println();
+
+		for (int r = 0; r < values.rows(); r++) {
+			System.out.printf("%-20.20s |", approaches.get(r));
+			Vector row = values.row(r);
+			for (int i = 0; i < row.rows(); i++) {
+				System.out.printf(" %.5f", row.get(i));
+			}
+			System.out.println(" |");
+		}
+	}
+	
+	private static void printEstimatesTable(StateVariable[] variables, List<String> approaches, Matrix values) {
 		System.out.printf("%-20.20s | ", "Approach");
 		Resource last = null;
 		for (StateVariable var : variables) {
