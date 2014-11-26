@@ -18,31 +18,30 @@
 			</fileset>
     	</copy>
     	
-    	<unjar dest="${librede.standalone.dir}/lib/native">
+    	<unjar dest="${librede.standalone.dir}/lib">
     		<fileset dir="${librede.plugin.jars.location}">
     			<include name="tools.descartes.librede.bayesplusplus.java_*.jar" />
     			<include name="tools.descartes.librede.ipopt.java_*.jar" />
     			<include name="tools.descartes.librede.nnls.java_*.jar" />
     		</fileset>
     		<patternset>
-    			<include name="*.dll"/>
-    			<include name="*.so"/>
+    			<include name="os/**"/>
     		</patternset>
     	</unjar>
     	
     	<unjar dest="${librede.standalone.dir}">
     		<fileset dir="${librede.plugin.jars.location}">
-    			<include name="tools.descartes.librede.frontend_*.jar" />
+    			<include name="tools.descartes.librede.console_*.jar" />
     		</fileset>
     		<patternset>
-    			<include name="matlab/**"/>
+    			<!--<include name="matlab/**"/>-->
     			<include name="console/**"/>
     		</patternset>
     	</unjar>
     	
     	<unjar dest="${librede.standalone.dir}/apidocs">
     		<fileset dir="${librede.plugin.jars.location}">
-    			<include name="tools.descartes.librede.doc_*.jar" />
+    			<include name="tools.descartes.librede.releng.doc_*.jar" />
     		</fileset>
     		<patternset>
     			<include name="reference/api/**"/>
