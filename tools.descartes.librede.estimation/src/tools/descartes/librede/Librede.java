@@ -371,7 +371,7 @@ public class Librede {
 	}
 	
 	private static void printValidationResultsTable(List<ModelEntity> entities, List<String> approaches, Matrix values) {
-		System.out.printf("%-20.20s | ", "Approach");
+		System.out.printf("%-60.60s | ", "Approach");
 		
 		for (ModelEntity var : entities) {
 			System.out.printf("%-8.8s", var.getName());
@@ -379,13 +379,13 @@ public class Librede {
 		
 		System.out.println("|");
 
-		for (int i = 0; i < (24 + entities.size() * 8); i++) {
+		for (int i = 0; i < (64 + entities.size() * 8); i++) {
 			System.out.print("-");
 		}
 		System.out.println();
 
 		for (int r = 0; r < values.rows(); r++) {
-			System.out.printf("%-20.20s |", approaches.get(r));
+			System.out.printf("%-60.60s |", approaches.get(r));
 			Vector row = values.row(r);
 			for (int i = 0; i < row.rows(); i++) {
 				System.out.printf(" %.5f", row.get(i));
@@ -395,7 +395,7 @@ public class Librede {
 	}
 	
 	private static void printEstimatesTable(StateVariable[] variables, List<String> approaches, Matrix values) {
-		System.out.printf("%-20.20s | ", "Approach");
+		System.out.printf("%-60.60s | ", "Approach");
 		Resource last = null;
 		for (StateVariable var : variables) {
 			if (var.getResource().equals(last)) {
@@ -406,19 +406,19 @@ public class Librede {
 		}
 		System.out.println();
 
-		System.out.printf("%20.20s | ", "");
+		System.out.printf("%60.60s | ", "");
 		for (StateVariable var : variables) {
 			System.out.printf("%-8.8s", var.getService().getName());
 		}
 		System.out.println("|");
 
-		for (int i = 0; i < (24 + variables.length * 8); i++) {
+		for (int i = 0; i < (64 + variables.length * 8); i++) {
 			System.out.print("-");
 		}
 		System.out.println();
 
 		for (int r = 0; r < values.rows(); r++) {
-			System.out.printf("%-20.20s |", approaches.get(r));
+			System.out.printf("%-60.60s |", approaches.get(r));
 			Vector row = values.row(r);
 			for (int i = 0; i < row.rows(); i++) {
 				System.out.printf(" %.5f", row.get(i));
