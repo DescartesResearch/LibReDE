@@ -27,11 +27,17 @@
 package tools.descartes.librede.approach;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import tools.descartes.librede.ResultTable;
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
@@ -40,9 +46,12 @@ import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
+	
+	private static final Logger log = Logger.getLogger(AbstractEstimationApproach.class);
 
 	private boolean iterative;
 	private int estimationWindow;
@@ -91,19 +100,54 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 	@Override
 	public void pruneEstimationDefinitions() {
 		List<IEstimationAlgorithm> temp = new ArrayList<IEstimationAlgorithm>(algorithms);
+		
+		Set<Resource> ignoredResources = new HashSet<Resource>();
+		Set<Service> ignoredServices = new HashSet<Service>();
+		List<String> messages = new ArrayList<String>();
 		for (IEstimationAlgorithm a : temp) {
 			boolean isApplicable = true;
+			
 			for (IStateConstraint constr : a.getStateModel().getConstraints()) {
-				isApplicable = isApplicable && constr.isApplicable(new ArrayList<String>());
+				isApplicable = isApplicable && constr.isApplicable(messages);
 			}
 			for (IOutputFunction func : a.getObservationModel()) {
-				isApplicable = isApplicable && func.isApplicable(new ArrayList<String>());
+				isApplicable = isApplicable && func.isApplicable(messages);
 			}
 			if (!isApplicable) {
+				ignoredResources.addAll(a.getStateModel().getResources());
+				ignoredServices.addAll(a.getStateModel().getServices());				
 				algorithms.remove(a);
 			}
 		}
-		
+		if (messages.size() > 0) {
+			StringBuilder warning = new StringBuilder("State model pruned\n");
+			warning.append(" -- Approach \"").append(Registry.INSTANCE.getDisplayName(this.getClass())).append("\" cannot be applied.\n");
+			warning.append(" -- Ignored resources: ");
+			boolean first = true;
+			for(Resource r : ignoredResources) {
+				if (!first) {
+					warning.append(", ");
+				}
+				warning.append(r.getName());
+				first = false;
+			}
+			warning.append(" --\n");
+			warning.append(" -- Ignored services: ");
+			first = true;
+			for (Service s : ignoredServices) {
+				if (!first) {
+					warning.append(", ");
+				}
+				warning.append(s.getName());
+				first = false;
+			}
+			warning.append(" --\n");
+			warning.append(" -- Reason:\n");
+			for (String message : messages) {
+				warning.append("    -- ").append(message).append("\n");
+			}
+			log.warn(warning);			
+		}
 	}
 
 	@Override
