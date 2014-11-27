@@ -30,7 +30,9 @@ import java.util.Iterator;
 
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -152,7 +154,8 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		while(iterator.hasNext()) {
 			Object o = iterator.next();
 			if (o instanceof TraceConfiguration) {
-				model.getInput().getObservations().remove(o);
+				Command cmd = RemoveCommand.create(domain, o);
+				domain.getCommandStack().execute(cmd);
 			}
 		}	
 	}
