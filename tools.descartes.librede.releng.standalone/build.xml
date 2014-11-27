@@ -15,8 +15,21 @@
     	<copy todir="${librede.standalone.dir}/lib/plugins">
     		<fileset dir="${librede.plugin.jars.location}">
     			<include name="*.jar"/>
+    			<exclude name="cern.colt_*.jar" />
+    			<exclude name="edu.oswego.cs.dl.util.concurrent_*.jar" />
 			</fileset>
     	</copy>
+    	
+    	<!-- workaround for nested jar files -->
+    	<unjar dest="${librede.standalone.dir}/lib/plugins">
+    		<fileset dir="${librede.plugin.jars.location}">
+    		    <include name="cern.colt_*.jar" />
+    		    <include name="edu.oswego.cs.dl.util.concurrent_*.jar" />
+    		</fileset>
+    		<patternset>
+    			<include name="*.jar"/>
+    		</patternset>
+    	</unjar>
     	
     	<unjar dest="${librede.standalone.dir}/lib">
     		<fileset dir="${librede.plugin.jars.location}">

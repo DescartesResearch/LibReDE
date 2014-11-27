@@ -36,4 +36,20 @@ cd %basepath%\..
 for /r %%a in (lib\plugins\*) do set classpath=!classpath!;%%a
 popd
 
-java -cp %classpath% -Djava.library.path=%basepath%\..\lib\native\win32 -Djna.library.path=%basepath%\..\lib\native\win32 tools.descartes.librede.frontend.Console %*
+@REM Determine whether we have 32-bit or 64-bit Java
+java -d64 -version >nul 2>&1
+if errorlevel 1 goto CHECK32
+set arch=x86_64
+goto EXEC
+:CHECK32
+where java >nul 2>&1
+if errorlevel 1 goto NOJAVA
+set arch=x86
+goto EXEC
+echo "No Java installation found. Check your PATH variable."
+goto EXIT
+
+:EXEC
+java -cp %classpath% -Djava.library.path=%basepath%\..\lib\os\win32\%arch% -Djna.library.path=%basepath%\..\lib\os\win32\%arch% tools.descartes.librede.frontend.Console %*
+
+:EXIT

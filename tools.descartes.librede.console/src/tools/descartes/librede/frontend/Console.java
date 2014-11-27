@@ -42,8 +42,11 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import tools.descartes.librede.Librede;
+import tools.descartes.librede.bayesplusplus.BayesLibrary;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.ipopt.java.IpoptLibrary;
+import tools.descartes.librede.nnls.NNLSLibrary;
 
 public class Console {
 
@@ -67,6 +70,11 @@ public class Console {
 			currentPath = Paths.get("").toAbsolutePath();
 
 			parser.parseArgument(args);
+			
+			Librede.init();
+			IpoptLibrary.init();
+			NNLSLibrary.init();
+			BayesLibrary.init();
 			
 			LibredeConfiguration config = loadConfiguration(configurationFile);
 			
