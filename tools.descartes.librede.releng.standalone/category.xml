@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/tools.descartes.librede.feature_1.0.0.qualifier.jar" id="tools.descartes.librede.feature" version="1.0.0.qualifier">
+   <feature url="features/tools.descartes.librede.feature_1.1.0.qualifier.jar" id="tools.descartes.librede.feature" version="1.1.0.qualifier">
       <category name="librede.standalone"/>
    </feature>
    <feature url="features/org.eclipse.emf_2.10.0.v20140519-0339.jar" id="org.eclipse.emf" version="2.10.0.v20140519-0339">
       <category name="librede.standalone"/>
    </feature>
-   <bundle id="tools.descartes.librede.console" version="1.0.0.qualifier">
+   <bundle id="tools.descartes.librede.console" version="1.1.0.qualifier">
       <category name="librede.standalone"/>
    </bundle>
-   <bundle id="tools.descartes.librede.releng.doc" version="1.0.0.qualifier">
+   <bundle id="tools.descartes.librede.releng.doc" version="1.1.0.qualifier">
       <category name="librede.standalone"/>
    </bundle>
    <bundle id="org.kohsuke.args4j" version="2.0.21.v201301150030">
