@@ -29,6 +29,21 @@
     	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     	<sonar.jacoco.reportPath>../tools.descartes.librede.releng/target/jacoco.exec</sonar.jacoco.reportPath>
 	</properties>
+	
+	<repositories>
+		<repository>
+			<id>se-uw-nexus</id>
+			<name>Public Repositories</name>
+			<url>https://se4.informatik.uni-wuerzburg.de/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
