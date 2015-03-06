@@ -47,7 +47,7 @@ public class RepositoryCursorTest {
 	TimeSeries ts1 = new TimeSeries(vector(2, 3, 4, 6, 8), vector(1, 1, 1, 1, 1));
 	TimeSeries ts2 = new TimeSeries(vector(2.2, 3.2, 4.2, 6.2, 8.2), vector(1, 1, 1, 1, 1));
 	
-	IMonitoringRepository repository;
+	MemoryObservationRepository repository;
 	
 	public RepositoryCursorTest() {
 		WorkloadDescription workload = ConfigurationFactory.eINSTANCE.createWorkloadDescription();

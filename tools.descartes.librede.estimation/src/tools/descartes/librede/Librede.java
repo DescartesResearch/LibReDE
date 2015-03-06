@@ -110,7 +110,7 @@ public class Librede {
 	}
 	
 	public static void execute(LibredeConfiguration conf) {
-		IMonitoringRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
+		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp() / 1000);
 
 		loadRepository(conf, repo);
@@ -135,7 +135,7 @@ public class Librede {
 		}
 	}
 	
-	public static void loadRepository(LibredeConfiguration conf, IMonitoringRepository repo) {
+	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
 		for (TraceConfiguration trace : conf.getInput().getObservations()) {

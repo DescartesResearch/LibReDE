@@ -38,9 +38,6 @@ public interface IMonitoringRepository {
 
 	public double getAggregationInterval(IMetric m, ModelEntity entity);
 	public TimeSeries getData(IMetric metric, ModelEntity entity);
-	public void setData(IMetric metric, ModelEntity entity, TimeSeries observations);
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations);
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval);
 	public boolean containsData(IMetric responseTime,
 			ModelEntity entity, double maximumAggregationInterval);
 	
