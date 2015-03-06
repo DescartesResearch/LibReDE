@@ -27,6 +27,12 @@
 package tools.descartes.librede.algorithm;
 
 
+/**
+ * Marker interface for all Kalman Filter implementations.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public interface IKalmanFilterAlgorithm extends IEstimationAlgorithm {
 
 }

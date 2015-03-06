@@ -32,18 +32,74 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 
+/**
+ * This interface must be implemented by all estimation algorithms. It provides
+ * the common interface to execute the estimation algorithm given a concrete
+ * state and observation model.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public interface IEstimationAlgorithm {
-	
-	void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException;
-	
+
+	/**
+	 * Initializes the estimation algorithm.
+	 * 
+	 * This function needs to be called before any other method in this
+	 * interface.
+	 * 
+	 * @param stateModel
+	 *            an instance of IStateModel
+	 * @param observationModel
+	 *            an instance of IObservationModel
+	 * @param estimationWindow
+	 *            the size of the sliding window to be used on the input
+	 *            measurement data. The size of the sliding window is the number
+	 *            of interval which are considered during one run of the
+	 *            estimation algorithm. (estimationWindow >= 1)
+	 * @throws InitializationException
+	 */
+	void initialize(IStateModel<?> stateModel,
+			IObservationModel<?, ?> observationModel, int estimationWindow)
+			throws InitializationException;
+
+	/**
+	 * This method is called to update the internal state of the estimator after
+	 * new measurement data points are available.
+	 * 
+	 * This method must be called before estimate in order to update the
+	 * estimated resource demands.
+	 * 
+	 * @throws EstimationException
+	 */
 	void update() throws EstimationException;
-	
+
+	/**
+	 * Returns the current estimated resource demands.
+	 * 
+	 * @return a state vector with estimated demands for all resources and
+	 *         services defined in the state model.
+	 * @throws EstimationException
+	 */
 	Vector estimate() throws EstimationException;
-	
+
+	/**
+	 * Releases any retained resources.
+	 * 
+	 * This method should be implemented if native resources are retained. The
+	 * method should be executed only once, when the estimation algorithm is not
+	 * needed any more.
+	 */
 	void destroy();
-	
+
+	/**
+	 * @return the state model associated with this instance of the estimation algorithm.
+	 */
 	IStateModel<?> getStateModel();
-	
+
+	/**
+	 * @return the observation model associated with this instance of the estimation algorithm.
+	 */
 	IObservationModel<?, ?> getObservationModel();
 
 }

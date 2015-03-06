@@ -30,8 +30,24 @@ import java.io.InputStream;
 
 import tools.descartes.librede.repository.TimeSeries;
 
+/**
+ * This interface provides common methods supported by all data source
+ * implementations.
+ * 
+ * A data source provides functionality to read measurement data from a source
+ * of a specific type and format (e.g., file, database, or interface provided by
+ * a monitoring tool). A data source is used to continuously load the newly
+ * available measurement data points into an instance of a
+ * {@link tools.descartes.librede.repository.IMonitoringRepository}.
+ * 
+ * TODO: Make this interface more general: no direct dependency on InputStream
+ * and support iterativ reading from data source (currently always the all available
+ * data is loaded)
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ */
 public interface IDataSource {
-	
+
 	public TimeSeries load(InputStream in, int column) throws Exception;
 
 }
