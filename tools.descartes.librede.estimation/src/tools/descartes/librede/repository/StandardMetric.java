@@ -39,6 +39,11 @@ import java.util.UUID;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.units.Proportion;
+import tools.descartes.librede.units.IDimension;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 public enum StandardMetric implements IMetric {
 	
@@ -67,6 +72,11 @@ public enum StandardMetric implements IMetric {
 				ModelEntity entity, double aggregationInterval) {
 			return repository.containsData(this, entity, aggregationInterval);
 		}
+		
+		@Override
+		public IDimension getDimension() {
+			return Time.INSTANCE;
+		}
 	},
 	
 	BUSY_TIME("busy time", SUM) {
@@ -94,7 +104,12 @@ public enum StandardMetric implements IMetric {
 		public boolean hasData(IMonitoringRepository repository,
 				ModelEntity entity, double aggregationInterval) {
 			return repository.containsData(this, entity, aggregationInterval);
-		}		
+		}
+		
+		@Override
+		public IDimension getDimension() {
+			return Time.INSTANCE;
+		}
 	},
 
 	UTILIZATION("utilization", AVERAGE) {	
@@ -125,7 +140,11 @@ public enum StandardMetric implements IMetric {
 			}
 			return repository.containsData(BUSY_TIME, entity, aggregationInterval) && repository.containsData(IDLE_TIME, entity, aggregationInterval);
 		}
-
+		
+		@Override
+		public IDimension getDimension() {
+			return Proportion.INSTANCE;
+		}
 	},
 
 	ARRIVALS("arrivals", NONE, SUM, MINIMUM, MAXIMUM) {
@@ -177,6 +196,10 @@ public enum StandardMetric implements IMetric {
 			return repository.containsData(RESPONSE_TIME, entity, 0.0);
 		}
 
+		@Override
+		public IDimension getDimension() {
+			return RequestCount.INSTANCE;
+		}
 	},
 	DEPARTURES("departures", NONE, SUM, MINIMUM, MAXIMUM) {
 		
@@ -227,6 +250,10 @@ public enum StandardMetric implements IMetric {
 			return repository.containsData(RESPONSE_TIME, entity, 0.0);
 		}
 
+		@Override
+		public IDimension getDimension() {
+			return RequestCount.INSTANCE;
+		}
 	},
 	ARRIVAL_RATE("arrival rate", AVERAGE) {
 
@@ -259,6 +286,11 @@ public enum StandardMetric implements IMetric {
 				return true;
 			}
 			return ARRIVALS.hasData(repository, entity, aggregationInterval);
+		}
+		
+		@Override
+		public IDimension getDimension() {
+			return RequestRate.INSTANCE;
 		}
 	},
 	THROUGHPUT("throughput", AVERAGE) {
@@ -294,6 +326,10 @@ public enum StandardMetric implements IMetric {
 			return DEPARTURES.hasData(repository, entity, aggregationInterval);
 		}
 
+		@Override
+		public IDimension getDimension() {
+			return RequestRate.INSTANCE;
+		}
 	},
 	RESPONSE_TIME("reponse time", NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
@@ -352,6 +388,10 @@ public enum StandardMetric implements IMetric {
 			return DEPARTURES.hasData(repository, entity, 0.0) && ARRIVALS.hasData(repository, entity, 0.0);
 		}
 
+		@Override
+		public IDimension getDimension() {
+			return Time.INSTANCE;
+		}
 	},
 	QUEUE_LENGTH_SEEN_ON_ARRIVAL("queue length seen on arrival", NONE, AVERAGE, MINIMUM, MAXIMUM) {
 
@@ -397,6 +437,10 @@ public enum StandardMetric implements IMetric {
 			return repository.containsData(this, entity, aggregationInterval);
 		}
 		
+		@Override
+		public IDimension getDimension() {
+			return RequestCount.INSTANCE;
+		}		
 	};
 
 	private final UUID id;
