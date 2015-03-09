@@ -46,6 +46,7 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.initial.MinResponseTimeInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
@@ -61,7 +62,7 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 				b.addVariable(res, serv);
 			}
 		}
-		b.setInitialState(ones(workload.getResources().size() * workload.getServices().size()).times(0.01));
+		b.setStateInitializer(new MinResponseTimeInitializer(cursor));
 		return Arrays.<IStateModel<?>>asList(b.build());
 	}
 
