@@ -19,7 +19,7 @@ import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
 @RunWith(Parameterized.class)
-public class MinResponseTimeInitializerTest {
+public class WeightedTargetUtilizationInitializerTest {
 	
 	@Parameters
     public static Collection<Object[]> data() {
@@ -31,7 +31,7 @@ public class MinResponseTimeInitializerTest {
     private double lowerUtil;
     private double upperUtil;
 
-	public MinResponseTimeInitializerTest(double lowerUtil, double upperUtil) {
+	public WeightedTargetUtilizationInitializerTest(double lowerUtil, double upperUtil) {
 		this.lowerUtil = lowerUtil;
 		this.upperUtil = upperUtil;
 	}
@@ -47,7 +47,7 @@ public class MinResponseTimeInitializerTest {
 		generator.nextObservation();
 		cursor.next();
 		
-		MinResponseTimeInitializer initializer = new MinResponseTimeInitializer(cursor);
+		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
 		Vector initialDemands = initializer.getInitialValue();
 		
 		Vector throughput = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
