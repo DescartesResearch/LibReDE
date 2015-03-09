@@ -8,5 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.11.0"
 Import-Package: org.eclipse.emf.common.util,
  tools.descartes.librede.configuration,
+ tools.descartes.librede.models.state.initial,
  tools.descartes.librede.repository,
  tools.descartes.librede.testutils

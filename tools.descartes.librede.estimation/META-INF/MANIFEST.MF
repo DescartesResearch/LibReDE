@@ -42,6 +42,7 @@ Export-Package: tools.descartes.librede;uses:="org.osgi.framework",
    tools.descartes.librede.configuration,
    tools.descartes.librede.linalg,
    tools.descartes.librede.models.state",
+ tools.descartes.librede.models.state.initial,
  tools.descartes.librede.registry;uses:="tools.descartes.librede.repository",
  tools.descartes.librede.repository;uses:="tools.descartes.librede.configuration,tools.descartes.librede.linalg",
  tools.descartes.librede.validation;
