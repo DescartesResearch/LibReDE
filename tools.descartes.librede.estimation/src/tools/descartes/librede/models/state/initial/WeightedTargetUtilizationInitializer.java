@@ -24,15 +24,15 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 	private final double targetUtilization;
 	private Query<Vector> respTime;
 	private Query<Vector> throughput;
-	private int resourceCount;
+	private final int resourceCount;
 
-	public WeightedTargetUtilizationInitializer(double targetUtilization, IRepositoryCursor cursor) {
+	public WeightedTargetUtilizationInitializer(int resourceCount, double targetUtilization, IRepositoryCursor cursor) {
 		this.targetUtilization = targetUtilization;
 
 		respTime = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forAllServices().average().using(cursor);
 		throughput = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor);
 
-		resourceCount = cursor.getRepository().listResources().size();
+		this.resourceCount = resourceCount;
 	}
 
 	@Override

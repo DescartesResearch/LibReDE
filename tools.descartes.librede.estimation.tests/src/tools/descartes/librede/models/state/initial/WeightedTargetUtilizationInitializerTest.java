@@ -47,7 +47,7 @@ public class WeightedTargetUtilizationInitializerTest {
 		generator.nextObservation();
 		cursor.next();
 		
-		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
+		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(4, 0.5, cursor);
 		Vector initialDemands = initializer.getInitialValue();
 		
 		Vector throughput = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();

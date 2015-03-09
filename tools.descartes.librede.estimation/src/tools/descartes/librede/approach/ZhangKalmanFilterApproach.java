@@ -66,7 +66,7 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 				b.addVariable(res, serv);
 			}
 		}
-		b.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
+		b.setStateInitializer(new WeightedTargetUtilizationInitializer(workload.getResources().size(), INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>> asList(b.build());
 	}
 
