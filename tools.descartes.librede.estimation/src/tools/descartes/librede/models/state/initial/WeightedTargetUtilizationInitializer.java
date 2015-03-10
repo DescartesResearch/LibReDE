@@ -1,6 +1,7 @@
 package tools.descartes.librede.models.state.initial;
 
 import static tools.descartes.librede.linalg.LinAlg.repmat;
+import static tools.descartes.librede.linalg.LinAlg.empty;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
@@ -38,6 +39,12 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 	@Override
 	public Vector getInitialValue() {
 		Vector initialDemands = respTime.execute();
+		for (int i = 0; i < initialDemands.rows(); i++) {
+			if (Double.isNaN(initialDemands.get(i))) {
+				// not enough observations yet to initialized the state
+				return empty();
+			}
+		}
 		if (resourceCount > 1) {
 			// If we have several resources, then distribute the demands evenly
 			// between the resources

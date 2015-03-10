@@ -14,9 +14,11 @@ public interface IStateInitializer {
 
 	/**
 	 * Called to initialized the state model with initial values of the resource
-	 * demnads.
+	 * demands.
 	 * 
-	 * @return a Vector containing the initial value for all state variables
+	 * @return a Vector containing the initial value for all state variables or
+	 *         an empty vector if the initial value could not be determined
+	 *         (e.g., due to missing observations)
 	 */
 	Vector getInitialValue();
 

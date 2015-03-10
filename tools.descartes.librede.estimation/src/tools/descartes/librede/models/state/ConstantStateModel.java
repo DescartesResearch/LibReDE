@@ -234,7 +234,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	@Override
 	public Vector getInitialState() {
 		Vector initialState = stateInitializer.getInitialValue();
-		if (initialState.rows() != stateSize) {
+		if (!initialState.isEmpty() && initialState.rows() != stateSize) {
 			throw new IllegalStateException("Size of initial state vector must be equal to the state size.");
 		}
 		return initialState;

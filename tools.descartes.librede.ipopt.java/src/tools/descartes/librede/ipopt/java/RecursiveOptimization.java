@@ -133,7 +133,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private Matrix estimationBuffer;
 	
 	// Flag indicating whether this is the first iteration.
-	private boolean firstIteration = true;
+	private boolean initialized = true;
 	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
@@ -173,35 +173,40 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 			throw new IllegalStateException("Method initialize() must be called before calling estimate().");
 		}		
 		
-		if (firstIteration) {
+		if (!initialized) {
 			// Set initial state
-			copy(getStateModel().getInitialState(), x);
-			firstIteration = false;
+			Vector initialState = getStateModel().getInitialState();
+			if (!initialState.isEmpty()) {
+				copy(initialState, x);
+				initialized = false;
+			}
 		}
 		
-		setOptimizationBounds();
-		
-		setOptimizationConstraints();
-		
-		Pointer nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
-                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
-                evaljacg, evalh);
-		
-		setOptimizationOptions(nlp);	
-		
-		/* solve the problem */
-		int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, obj, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
-		
-		Vector estimate = zeros(stateSize);		
-		if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED || status == IpoptLibrary.IP_ACCEPTABLE_LEVEL) {
-			estimate = nativeVector(stateSize, x);		
-		} else {
-			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
+		if (initialized) {
+			setOptimizationBounds();
+			
+			setOptimizationConstraints();
+			
+			Pointer nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
+	                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
+	                evaljacg, evalh);
+			
+			setOptimizationOptions(nlp);	
+			
+			/* solve the problem */
+			int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, obj, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
+			
+			Vector estimate = zeros(stateSize);		
+			if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED || status == IpoptLibrary.IP_ACCEPTABLE_LEVEL) {
+				estimate = nativeVector(stateSize, x);		
+			} else {
+				System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
+			}
+			estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);
+			  
+			/* free allocated memory */
+			IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
 		}
-		estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);
-		  
-		/* free allocated memory */
-		IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
 	}
 	
 	@Override

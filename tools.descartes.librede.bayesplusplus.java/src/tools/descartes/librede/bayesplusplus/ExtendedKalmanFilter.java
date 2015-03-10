@@ -129,14 +129,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Pointer nativeScheme = null;
 	private Pointer stateBuffer;
 	
-	private void initNativeKalmanFilter() throws EstimationException {
+	private void initNativeKalmanFilter(Vector initialState) throws EstimationException {
 		nativeScheme = BayesPlusPlusLibrary.create_covariance_scheme(stateSize);
 		if (nativeScheme == null) {
 			throw new EstimationException("Could not create kalman filter: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 
-		Vector initialState = getStateModel().getInitialState();
 		toNative(stateBuffer, initialState);
 
 		Pointer covBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
@@ -282,13 +281,16 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	@Override
 	public void update() throws EstimationException {
 		if (!initialized) {
-			// Wait with the initialization of the kalman filter until the first update
-			// since then the first observations are available that can be used to
+			// First we need to obtain some observations to be able to
 			// determine a good initial state.
-			initNativeStateModel();
-			initNativeObservationModel();
-			initNativeKalmanFilter();
-			initialized = true;
+			Vector initialState = getStateModel().getInitialState();
+			if (!initialState.isEmpty()) {
+				// initial state could be determined
+				initNativeStateModel();
+				initNativeObservationModel();
+				initNativeKalmanFilter(initialState);
+				initialized = true;
+			}
 		} else {	
 			predict();
 	
