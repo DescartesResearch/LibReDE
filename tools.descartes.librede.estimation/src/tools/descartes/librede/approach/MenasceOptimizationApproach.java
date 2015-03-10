@@ -45,11 +45,19 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
+import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {
+	
+	/**
+	 * The initial demand is scaled to this utilization level, to avoid bad
+	 * starting points (e.g., demands that would result in a utilization value
+	 * above 100%)
+	 */
+	private static final double INITIAL_UTILIZATION = 0.5;
 	
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
@@ -59,6 +67,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 				builder.addVariable(res, service);
 			}
 		}
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(workload.getResources().size(), INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 	
