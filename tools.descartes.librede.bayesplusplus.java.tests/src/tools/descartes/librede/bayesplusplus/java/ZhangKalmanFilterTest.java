@@ -43,6 +43,7 @@ import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
@@ -75,7 +76,7 @@ public class ZhangKalmanFilterTest {
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
-		builder.setInitialState(vector(0.1));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(1, 0.5, cursor));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();		
@@ -117,7 +118,7 @@ public class ZhangKalmanFilterTest {
 		for (Service service : workload.getServices()) {
 			builder.addVariable(workload.getResources().get(0), service);
 		}
-		builder.setInitialState(vector(0.01, 0.01, 0.01, 0.01, 0.01));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(1, 0.5, cursor));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();

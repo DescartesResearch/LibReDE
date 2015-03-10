@@ -113,6 +113,8 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Vector observeNoise;
 	
 	private Matrix estimates;
+	
+	private boolean initialized = false;
 
 	/*
 	 * Callback functions from native code. IMPORTANT: References to these
@@ -127,10 +129,10 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Pointer nativeScheme = null;
 	private Pointer stateBuffer;
 	
-	private void initNativeKalmanFilter() throws InitializationException {
+	private void initNativeKalmanFilter() throws EstimationException {
 		nativeScheme = BayesPlusPlusLibrary.create_covariance_scheme(stateSize);
 		if (nativeScheme == null) {
-			throw new InitializationException("Could not create kalman filter: "
+			throw new EstimationException("Could not create kalman filter: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 
@@ -142,19 +144,19 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		toNative(covBuffer, initialCovariance);
 
 		if (BayesPlusPlusLibrary.init_kalman(nativeScheme, stateBuffer, covBuffer, stateSize) == BayesPlusPlusLibrary.ERROR) {
-			throw new InitializationException("Could not initialize kalman filter: "
+			throw new EstimationException("Could not initialize kalman filter: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 	}
 
-	private void initNativeStateModel() throws InitializationException {
+	private void initNativeStateModel() throws EstimationException {
 		fcallback = new FFunction();
 
 		nativeStateModel = BayesPlusPlusLibrary.create_linrz_predict_model(stateSize, stateSize, fcallback);
 		if (nativeStateModel == Pointer.NULL) {
-			throw new InitializationException("Error creating state model: " + BayesPlusPlusLibrary.get_last_error());
+			throw new EstimationException("Error creating state model: " + BayesPlusPlusLibrary.get_last_error());
 		}
-
+		
 		stateNoiseCovariance = vector(stateSize, new VectorFunction() {			
 			@Override
 			public double cell(int row) {
@@ -180,13 +182,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		BayesPlusPlusLibrary.set_G(nativeStateModel, temp, stateSize);
 	}
 
-	private void initNativeObservationModel() throws InitializationException {
+	private void initNativeObservationModel() throws EstimationException {
 		hcallback = new HFunction();
 
 		nativeObservationModel = BayesPlusPlusLibrary.create_linrz_uncorrelated_observe_model(stateSize, outputSize,
 				hcallback);
 		if (nativeObservationModel == null) {
-			throw new InitializationException("Error creating observation model: "
+			throw new EstimationException("Error creating observation model: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 
@@ -272,10 +274,6 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
 		
 		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
-
-		initNativeStateModel();
-		initNativeObservationModel();
-		initNativeKalmanFilter();
 	}
 	
 	/* (non-Javadoc)
@@ -283,14 +281,24 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 */
 	@Override
 	public void update() throws EstimationException {
-		predict();
-
-		observe(getObservationModel().getObservedOutput());
-
-		updateState();
-		
-		Vector cur = getCurrentEstimate();
-		estimates = estimates.circshift(1).setRow(0, cur);
+		if (!initialized) {
+			// Wait with the initialization of the kalman filter until the first update
+			// since then the first observations are available that can be used to
+			// determine a good initial state.
+			initNativeStateModel();
+			initNativeObservationModel();
+			initNativeKalmanFilter();
+			initialized = true;
+		} else {	
+			predict();
+	
+			observe(getObservationModel().getObservedOutput());
+	
+			updateState();
+			
+			Vector cur = getCurrentEstimate();
+			estimates = estimates.circshift(1).setRow(0, cur);
+		}
 	}
 
 	/*
