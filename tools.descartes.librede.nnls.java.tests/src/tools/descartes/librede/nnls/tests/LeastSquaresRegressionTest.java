@@ -66,10 +66,8 @@ public class LeastSquaresRegressionTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
-		Vector initialEstimate = vector(0.01);
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
-		builder.setInitialState(initialEstimate);
 		stateModel = builder.build();
 		
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0)));
@@ -110,13 +108,10 @@ public class LeastSquaresRegressionTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
 
-		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
-
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Service serv : workload.getServices()) {
 			builder.addVariable(workload.getResources().get(0), serv);
 		}
-		builder.setInitialState(initialEstimate);
 		stateModel = builder.build();
 
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
