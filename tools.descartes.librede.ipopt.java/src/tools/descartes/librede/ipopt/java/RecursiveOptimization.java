@@ -132,6 +132,9 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	private Matrix estimationBuffer;
 	
+	// Flag indicating whether this is the first iteration.
+	private boolean firstIteration = true;
+	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
 	 */
@@ -148,9 +151,6 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		initOptimizationState(observationModel);
 		
 		allocateNativeMemory();
-		
-		// Set initial state
-		copy(stateModel.getInitialState(), x);	
 		
 		// Determine number of zeros in jacobi an hessian matrices.
 		nele_jac = stateSize * constraintCount;
@@ -172,6 +172,12 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		if (stateSize < 0) {
 			throw new IllegalStateException("Method initialize() must be called before calling estimate().");
 		}		
+		
+		if (firstIteration) {
+			// Set initial state
+			copy(getStateModel().getInitialState(), x);
+			firstIteration = false;
+		}
 		
 		setOptimizationBounds();
 		
