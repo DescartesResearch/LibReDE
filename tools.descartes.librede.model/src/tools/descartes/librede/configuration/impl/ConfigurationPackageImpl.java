@@ -31,6 +31,7 @@ package tools.descartes.librede.configuration.impl;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
@@ -56,6 +57,8 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.ValidationSpecification;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.units.impl.UnitsPackageImpl;
 
 /**
  * <!-- begin-user-doc -->
@@ -250,11 +253,16 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		isInited = true;
 
+		// Obtain or create and register interdependencies
+		UnitsPackageImpl theUnitsPackage = (UnitsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) instanceof UnitsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) : UnitsPackage.eINSTANCE);
+
 		// Create package meta-data objects
 		theConfigurationPackage.createPackageContents();
+		theUnitsPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theConfigurationPackage.initializePackageContents();
+		theUnitsPackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theConfigurationPackage.freeze();
@@ -504,8 +512,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTraceConfiguration_Unit() {
-		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(1);
+	public EReference getTraceConfiguration_Unit() {
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -514,7 +522,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	public EAttribute getTraceConfiguration_Interval() {
-		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -523,7 +531,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	public EReference getTraceConfiguration_DataSource() {
-		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(3);
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -532,7 +540,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	public EReference getTraceConfiguration_Mappings() {
-		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(4);
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -894,10 +902,10 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		traceConfigurationEClass = createEClass(TRACE_CONFIGURATION);
 		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
-		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__UNIT);
 		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__INTERVAL);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__DATA_SOURCE);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__MAPPINGS);
+		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__UNIT);
 
 		parameterEClass = createEClass(PARAMETER);
 		createEAttribute(parameterEClass, PARAMETER__NAME);
@@ -968,6 +976,9 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		setNsPrefix(eNS_PREFIX);
 		setNsURI(eNS_URI);
 
+		// Obtain other dependent packages
+		UnitsPackage theUnitsPackage = (UnitsPackage)EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI);
+
 		// Create type parameters
 
 		// Set bounds for type parameters
@@ -1015,10 +1026,13 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTraceConfiguration_Metric(), ecorePackage.getEString(), "metric", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTraceConfiguration_Unit(), ecorePackage.getEString(), "unit", null, 0, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTraceConfiguration_Interval(), ecorePackage.getELong(), "interval", "0", 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTraceConfiguration_DataSource(), this.getDataSourceConfiguration(), null, "dataSource", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTraceConfiguration_Mappings(), this.getTraceToEntityMapping(), null, "mappings", null, 1, -1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		EGenericType g1 = createEGenericType(theUnitsPackage.getUnit());
+		EGenericType g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEReference(getTraceConfiguration_Unit(), g1, null, "unit", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(parameterEClass, Parameter.class, "Parameter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getParameter_Name(), ecorePackage.getEString(), "name", null, 1, 1, Parameter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

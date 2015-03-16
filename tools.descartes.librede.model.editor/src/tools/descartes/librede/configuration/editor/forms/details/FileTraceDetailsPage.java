@@ -53,6 +53,7 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -203,6 +204,15 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 
 		lblMetricValue = toolkit.createLabel(composite, "", SWT.NONE);
 		lblMetricValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.READ_ONLY);
+		comboUnitViewer = new ComboViewer(composite, SWT.NONE);
+		comboUnit = comboUnitViewer.getCombo();
+		comboUnit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(comboUnit);
+		
+		comboUnitViewer.setContentProvider(new ArrayContentProvider());
+		comboUnitViewer.setLabelProvider(new LabelProvider());
 
 		Label lblInterval = toolkit.createLabel(composite, "Interval:",
 				SWT.NONE);
@@ -210,13 +220,6 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		Composite intervalEditorComposite = TimeUnitSpinnerBuilder.createComposite(toolkit, composite);
 		spnIntervalValue = TimeUnitSpinnerBuilder.createSpinnerControl(toolkit, intervalEditorComposite);
 		comboIntervalUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, intervalEditorComposite, spnIntervalValue);
-
-//		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.NONE);
-//
-//		comboUnitViewer = new ComboViewer(composite, SWT.NONE);
-//		comboUnit = comboUnitViewer.getCombo();
-//		comboUnit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		toolkit.paintBordersFor(comboUnit);
 
 		Label lblMapping = toolkit.createLabel(composite, "Mapping:",
 				SWT.NONE);

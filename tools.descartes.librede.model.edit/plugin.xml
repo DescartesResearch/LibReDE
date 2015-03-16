@@ -20,4 +20,18 @@
                org.eclipse.emf.edit.provider.ITableItemLabelProvider"/>
    </extension>
 
+   <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
+      <!-- @generated librede -->
+      <factory
+            uri="http://www.descartes-research.net/librede/units/1.0"
+            class="tools.descartes.librede.units.provider.UnitsItemProviderAdapterFactory"
+            supportedTypes=
+              "org.eclipse.emf.edit.provider.IEditingDomainItemProvider
+               org.eclipse.emf.edit.provider.IStructuredItemContentProvider
+               org.eclipse.emf.edit.provider.ITreeItemContentProvider
+               org.eclipse.emf.edit.provider.IItemLabelProvider
+               org.eclipse.emf.edit.provider.IItemPropertySource
+               org.eclipse.emf.edit.provider.ITableItemLabelProvider"/>
+   </extension>
+
 </plugin>

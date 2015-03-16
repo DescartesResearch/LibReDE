@@ -29,7 +29,6 @@
 package tools.descartes.librede.configuration.impl;
 
 import java.util.Collection;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -39,11 +38,11 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.units.Unit;
 
 /**
  * <!-- begin-user-doc -->
@@ -51,14 +50,14 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
@@ -82,26 +81,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected String metric = METRIC_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getUnit() <em>Unit</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getUnit()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String UNIT_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getUnit() <em>Unit</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getUnit()
-	 * @generated
-	 * @ordered
-	 */
-	protected String unit = UNIT_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getInterval() <em>Interval</em>}' attribute.
@@ -142,6 +121,16 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected EList<TraceToEntityMapping> mappings;
+
+	/**
+	 * The cached value of the '{@link #getUnit() <em>Unit</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getUnit()
+	 * @generated
+	 * @ordered
+	 */
+	protected Unit<?> unit;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -188,7 +177,15 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getUnit() {
+	public Unit<?> getUnit() {
+		if (unit != null && unit.eIsProxy()) {
+			InternalEObject oldUnit = (InternalEObject)unit;
+			unit = (Unit<?>)eResolveProxy(oldUnit);
+			if (unit != oldUnit) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
+			}
+		}
 		return unit;
 	}
 
@@ -197,8 +194,17 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setUnit(String newUnit) {
-		String oldUnit = unit;
+	public Unit<?> basicGetUnit() {
+		return unit;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setUnit(Unit<?> newUnit) {
+		Unit<?> oldUnit = unit;
 		unit = newUnit;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
@@ -299,8 +305,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				return getMetric();
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				return getUnit();
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return getInterval();
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
@@ -308,6 +312,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return basicGetDataSource();
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return getMappings();
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				if (resolve) return getUnit();
+				return basicGetUnit();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -324,9 +331,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				setMetric((String)newValue);
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				setUnit((String)newValue);
-				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval((Long)newValue);
 				return;
@@ -336,6 +340,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				getMappings().clear();
 				getMappings().addAll((Collection<? extends TraceToEntityMapping>)newValue);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				setUnit((Unit<?>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -352,9 +359,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				setMetric(METRIC_EDEFAULT);
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				setUnit(UNIT_EDEFAULT);
-				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval(INTERVAL_EDEFAULT);
 				return;
@@ -363,6 +367,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				getMappings().clear();
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				setUnit((Unit<?>)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -378,14 +385,14 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				return METRIC_EDEFAULT == null ? metric != null : !METRIC_EDEFAULT.equals(metric);
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				return UNIT_EDEFAULT == null ? unit != null : !UNIT_EDEFAULT.equals(unit);
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return interval != INTERVAL_EDEFAULT;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				return dataSource != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return mappings != null && !mappings.isEmpty();
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				return unit != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -402,8 +409,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (metric: ");
 		result.append(metric);
-		result.append(", unit: ");
-		result.append(unit);
 		result.append(", interval: ");
 		result.append(interval);
 		result.append(')');

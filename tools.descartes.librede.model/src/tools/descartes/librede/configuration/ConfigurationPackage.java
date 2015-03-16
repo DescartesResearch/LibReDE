@@ -632,22 +632,13 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_CONFIGURATION__METRIC = 0;
 
 	/**
-	 * The feature id for the '<em><b>Unit</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__UNIT = 1;
-
-	/**
 	 * The feature id for the '<em><b>Interval</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__INTERVAL = 2;
+	int TRACE_CONFIGURATION__INTERVAL = 1;
 
 	/**
 	 * The feature id for the '<em><b>Data Source</b></em>' reference.
@@ -656,7 +647,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__DATA_SOURCE = 3;
+	int TRACE_CONFIGURATION__DATA_SOURCE = 2;
 
 	/**
 	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
@@ -665,7 +656,16 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__MAPPINGS = 4;
+	int TRACE_CONFIGURATION__MAPPINGS = 3;
+
+	/**
+	 * The feature id for the '<em><b>Unit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__UNIT = 4;
 
 	/**
 	 * The number of structural features of the '<em>Trace Configuration</em>' class.
@@ -938,15 +938,6 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION__METRIC = TRACE_CONFIGURATION__METRIC;
 
 	/**
-	 * The feature id for the '<em><b>Unit</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FILE_TRACE_CONFIGURATION__UNIT = TRACE_CONFIGURATION__UNIT;
-
-	/**
 	 * The feature id for the '<em><b>Interval</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -972,6 +963,15 @@ public interface ConfigurationPackage extends EPackage {
 	 * @ordered
 	 */
 	int FILE_TRACE_CONFIGURATION__MAPPINGS = TRACE_CONFIGURATION__MAPPINGS;
+
+	/**
+	 * The feature id for the '<em><b>Unit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FILE_TRACE_CONFIGURATION__UNIT = TRACE_CONFIGURATION__UNIT;
 
 	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
@@ -1381,15 +1381,15 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getTraceConfiguration_Metric();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}'.
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Unit</em>'.
+	 * @return the meta object for the reference '<em>Unit</em>'.
 	 * @see tools.descartes.librede.configuration.TraceConfiguration#getUnit()
 	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EAttribute getTraceConfiguration_Unit();
+	EReference getTraceConfiguration_Unit();
 
 	/**
 	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}'.
@@ -2026,12 +2026,12 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute TRACE_CONFIGURATION__METRIC = eINSTANCE.getTraceConfiguration_Metric();
 
 		/**
-		 * The meta object literal for the '<em><b>Unit</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Unit</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TRACE_CONFIGURATION__UNIT = eINSTANCE.getTraceConfiguration_Unit();
+		EReference TRACE_CONFIGURATION__UNIT = eINSTANCE.getTraceConfiguration_Unit();
 
 		/**
 		 * The meta object literal for the '<em><b>Interval</b></em>' attribute feature.

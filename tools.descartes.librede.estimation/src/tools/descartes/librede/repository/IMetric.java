@@ -29,7 +29,7 @@ package tools.descartes.librede.repository;
 import java.util.UUID;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.units.IDimension;
+import tools.descartes.librede.units.Dimension;
 
 public interface IMetric {
 	
@@ -45,6 +45,6 @@ public interface IMetric {
 	
 	public boolean isAggregationSupported(Aggregation aggregation);
 	
-	public IDimension getDimension();
+	public Dimension getDimension();
 	
 }

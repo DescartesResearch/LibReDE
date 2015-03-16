@@ -84,9 +84,9 @@ public class TraceConfigurationItemProvider
 			super.getPropertyDescriptors(object);
 
 			addMetricPropertyDescriptor(object);
-			addUnitPropertyDescriptor(object);
 			addIntervalPropertyDescriptor(object);
 			addDataSourcePropertyDescriptor(object);
+			addUnitPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -130,7 +130,7 @@ public class TraceConfigurationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}
@@ -248,8 +248,8 @@ public class TraceConfigurationItemProvider
 
 		switch (notification.getFeatureID(TraceConfiguration.class)) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:

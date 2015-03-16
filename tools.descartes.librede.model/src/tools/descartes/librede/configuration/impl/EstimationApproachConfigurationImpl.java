@@ -50,11 +50,11 @@ import tools.descartes.librede.configuration.Parameter;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationApproachConfigurationImpl#getType <em>Type</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationApproachConfigurationImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

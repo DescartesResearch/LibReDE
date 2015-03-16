@@ -49,11 +49,11 @@ import tools.descartes.librede.configuration.WorkloadDescription;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.WorkloadDescriptionImpl#getResources <em>Resources</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.WorkloadDescriptionImpl#getServices <em>Services</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

@@ -39,6 +39,7 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getApproaches <em>Approaches</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#isRecursive <em>Recursive</em>}</li>
@@ -48,7 +49,6 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp <em>End Timestamp</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationSpecification()
  * @model

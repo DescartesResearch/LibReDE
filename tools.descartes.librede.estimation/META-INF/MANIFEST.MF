@@ -57,4 +57,5 @@ Import-Package: cern.jet.random.sampling;version="1.2.0",
  org.eclipse.emf.ecore,
  org.osgi.framework;version="1.8.0",
  tools.descartes.librede.configuration,
- tools.descartes.librede.linalg
+ tools.descartes.librede.linalg,
+ tools.descartes.librede.units

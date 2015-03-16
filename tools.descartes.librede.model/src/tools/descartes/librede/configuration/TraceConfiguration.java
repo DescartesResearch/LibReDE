@@ -31,6 +31,7 @@ package tools.descartes.librede.configuration;
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
+import tools.descartes.librede.units.Unit;
 
 /**
  * <!-- begin-user-doc -->
@@ -39,14 +40,14 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration()
  * @model
@@ -80,30 +81,30 @@ public interface TraceConfiguration extends EObject {
 	void setMetric(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Unit</b></em>' attribute.
+	 * Returns the value of the '<em><b>Unit</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Unit</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Unit</em>' attribute.
-	 * @see #setUnit(String)
+	 * @return the value of the '<em>Unit</em>' reference.
+	 * @see #setUnit(Unit)
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Unit()
-	 * @model
+	 * @model required="true"
 	 * @generated
 	 */
-	String getUnit();
+	Unit<?> getUnit();
 
 	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}' attribute.
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Unit</em>' attribute.
+	 * @param value the new value of the '<em>Unit</em>' reference.
 	 * @see #getUnit()
 	 * @generated
 	 */
-	void setUnit(String value);
+	void setUnit(Unit<?> value);
 
 	/**
 	 * Returns the value of the '<em><b>Interval</b></em>' attribute.

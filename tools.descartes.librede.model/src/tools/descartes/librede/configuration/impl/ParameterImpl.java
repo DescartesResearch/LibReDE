@@ -42,11 +42,11 @@ import tools.descartes.librede.configuration.Parameter;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ParameterImpl#getName <em>Name</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ParameterImpl#getValue <em>Value</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

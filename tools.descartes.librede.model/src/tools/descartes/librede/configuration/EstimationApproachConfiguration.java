@@ -39,11 +39,11 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.EstimationApproachConfiguration#getType <em>Type</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationApproachConfiguration#getParameters <em>Parameters</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationApproachConfiguration()
  * @model

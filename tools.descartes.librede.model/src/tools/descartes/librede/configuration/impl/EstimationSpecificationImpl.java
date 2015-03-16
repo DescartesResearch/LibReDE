@@ -51,6 +51,7 @@ import tools.descartes.librede.configuration.EstimationSpecification;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getApproaches <em>Approaches</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#isRecursive <em>Recursive</em>}</li>
@@ -60,7 +61,6 @@ import tools.descartes.librede.configuration.EstimationSpecification;
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getEndTimestamp <em>End Timestamp</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getAlgorithms <em>Algorithms</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
