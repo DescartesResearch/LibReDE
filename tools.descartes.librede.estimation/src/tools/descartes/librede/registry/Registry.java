@@ -30,16 +30,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.MetricsFactory;
+import tools.descartes.librede.metrics.MetricsRepository;
 import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.UnitsFactory;
+import tools.descartes.librede.units.UnitsRepository;
 
 public class Registry {
 	
 	public static final Registry INSTANCE = new Registry();
 	
-	private Map<String, IMetric> metrics = new HashMap<String, IMetric>();
+	private UnitsRepository units = UnitsFactory.eINSTANCE.createUnitsRepository();
+	
+	private MetricsRepository metrics = MetricsFactory.eINSTANCE.createMetricsRepository();
 	
 	private Map<String, Class<?>> instances = new HashMap<String, Class<?>>();	
 	
@@ -47,21 +56,28 @@ public class Registry {
 	
 	private Registry() {}
 	
-	public void registerMetric(String literal, IMetric metric) {
-		if (literal == null || metric == null) {
+	public void registerMetric(Metric metric) {
+		if (metric == null) {
 			throw new NullPointerException();
 		}
-		metrics.put(literal, metric);
+		metrics.getMetrics().add(metric);
 	}
 	
-	public Collection<IMetric> getMetrics() {
-		return metrics.values();
+	public List<Metric> getMetrics() {
+		return Collections.unmodifiableList(metrics.getMetrics());
 	}
 	
-	public IMetric getMetric(String literal) {
-		return metrics.get(literal);
+	public void registerDimension(Dimension dimension) {
+		if (dimension == null) {
+			throw new NullPointerException();
+		}
+		units.getDimensions().add(dimension);
 	}
 	
+	public List<Dimension> getDimensions() {
+		return Collections.unmodifiableList(units.getDimensions());
+	}
+
 	public void registerImplementationType(Class<?> componentClass, Class<?> instanceClass) {
 		Component comp = instanceClass.getAnnotation(Component.class);
 		if (comp == null) {

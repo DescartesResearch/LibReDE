@@ -82,11 +82,13 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public <D extends Dimension> Unit<D> createUnit(String name, String symbol, double baseFactor) {
+	public <D extends Dimension> Unit<D> createUnit(D dimension, String name, String symbol, double baseFactor) {
 		UnitImpl<D> unit = new UnitImpl<D>();
 		unit.name = name;
 		unit.symbol = symbol;
 		unit.baseFactor = baseFactor;
+		
+		dimension.getUnits().add(unit);
 		return unit;
 	}
 

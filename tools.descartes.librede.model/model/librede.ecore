@@ -54,8 +54,8 @@
     <eLiterals name="UNKOWN" literal="Unkown"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TraceConfiguration">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="metric" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metric" lowerBound="1"
+        eType="ecore:EClass metrics.ecore#//Metric"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="interval" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="dataSource" lowerBound="1"

@@ -68,6 +68,7 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
@@ -77,6 +78,10 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Proportion;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.validation.CrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
@@ -87,10 +92,19 @@ public class Librede {
 	private static final Logger log = Logger.getLogger(Librede.class);	
 	
 	public static void init() {
+		Registry.INSTANCE.registerDimension(Time.INSTANCE);
+		Registry.INSTANCE.registerDimension(RequestCount.INSTANCE);
+		Registry.INSTANCE.registerDimension(RequestRate.INSTANCE);
+		Registry.INSTANCE.registerDimension(Proportion.INSTANCE);
 		
-		for (StandardMetric metric : StandardMetric.class.getEnumConstants()) {
-			Registry.INSTANCE.registerMetric(metric.toString(), metric);
-		}
+		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVAL_RATE);
+		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS);
+		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME);
+		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES);
+		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME);
+		Registry.INSTANCE.registerMetric(StandardMetrics.RESPONSE_TIME);
+		Registry.INSTANCE.registerMetric(StandardMetrics.THROUGHPUT);
+		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION);
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		
@@ -160,7 +174,8 @@ public class Librede {
 				}
 				IDataSource source = dataSources.get(dataSourceType);
 				
-				IMetric metric = Registry.INSTANCE.getMetric(fileTrace.getMetric());
+				IMetric metric = null;
+						//TODO: Registry.INSTANCE.getMetric(fileTrace.getMetric());
 				if (metric == null) {
 					log.error("Unknown metric type: " + fileTrace.getMetric());
 					continue;

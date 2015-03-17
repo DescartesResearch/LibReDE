@@ -23,11 +23,11 @@ public interface Proportion extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Proportion> NONE = UnitsFactory.eINSTANCE.createUnit("none", "", 1);
+	public static final Unit<Proportion> NONE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "none", "", 1);
 
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Proportion> PERCENTAGE = UnitsFactory.eINSTANCE.createUnit("precentage", "%", 100);
+	public static final Unit<Proportion> PERCENTAGE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "precentage", "%", 100);
 	
 } // Proportion

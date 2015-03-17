@@ -10,6 +10,9 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: tools.descartes.librede.configuration,
  tools.descartes.librede.configuration.impl,
  tools.descartes.librede.configuration.util,
+ tools.descartes.librede.metrics,
+ tools.descartes.librede.metrics.impl,
+ tools.descartes.librede.metrics.util,
  tools.descartes.librede.units,
  tools.descartes.librede.units.impl,
  tools.descartes.librede.units.util

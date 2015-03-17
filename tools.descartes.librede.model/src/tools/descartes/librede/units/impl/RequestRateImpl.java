@@ -2,11 +2,9 @@
  */
 package tools.descartes.librede.units.impl;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 
 import tools.descartes.librede.units.RequestRate;
-import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
 
 /**
@@ -20,19 +18,10 @@ public class RequestRateImpl extends DimensionImpl implements RequestRate {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
+	 * @generated
 	 */
 	protected RequestRateImpl() {
 		super();
-		EList<Unit<?>> units = getUnits();
-		units.add(REQ_PER_DAY);
-		units.add(REQ_PER_HOUR);
-		units.add(REQ_PER_MINUTE);
-		units.add(REQ_PER_SECOND);
-		units.add(REQ_PER_MILLISECOND);
-		units.add(REQ_PER_MICROSECOND);
-		units.add(REQ_PER_NANOSECOND);
-		setBaseUnit(REQ_PER_SECOND);
 	}
 
 	/**

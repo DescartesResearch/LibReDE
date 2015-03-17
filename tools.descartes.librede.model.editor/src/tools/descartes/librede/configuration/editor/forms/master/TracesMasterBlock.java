@@ -57,6 +57,7 @@ import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.FileTraceDetailsPage;
 import tools.descartes.librede.configuration.editor.util.PrettyPrinter;
 import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetric;
 import tools.descartes.librede.repository.StandardMetric;
@@ -89,7 +90,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 			if (model.getInput().getDataSources().size() > 0) {
 				series.setDataSource(model.getInput().getDataSources().get(0));
 			}
-			series.setMetric(r.toString());
+			series.setMetric((Metric)r);
 			ModelEntity entity = null;
 			if (model.getWorkloadDescription().getResources().size() > 0) {
 				entity = model.getWorkloadDescription().getResources().get(0);
@@ -133,7 +134,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(page.getSite().getShell(), new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return PrettyPrinter.toCamelCase(((IMetric)element).getDisplayName());
+				return PrettyPrinter.toCamelCase(((Metric)element).getName());
 			}
 		});
 		dialog.setElements(Registry.INSTANCE.getMetrics().toArray());

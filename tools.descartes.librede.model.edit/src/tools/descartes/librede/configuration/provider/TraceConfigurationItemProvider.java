@@ -108,7 +108,7 @@ public class TraceConfigurationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}
@@ -228,10 +228,8 @@ public class TraceConfigurationItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((TraceConfiguration)object).getMetric();
-		return label == null || label.length() == 0 ?
-			getString("_UI_TraceConfiguration_type") :
-			getString("_UI_TraceConfiguration_type") + " " + label;
+		TraceConfiguration traceConfiguration = (TraceConfiguration)object;
+		return getString("_UI_TraceConfiguration_type") + " " + traceConfiguration.getInterval();
 	}
 	
 

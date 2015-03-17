@@ -623,7 +623,7 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE_OPERATION_COUNT = MODEL_ENTITY_OPERATION_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Metric</b></em>' attribute.
+	 * The feature id for the '<em><b>Metric</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -929,7 +929,7 @@ public interface ConfigurationPackage extends EPackage {
 	int EXPORTER_CONFIGURATION_OPERATION_COUNT = NAMED_ELEMENT_OPERATION_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Metric</b></em>' attribute.
+	 * The feature id for the '<em><b>Metric</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1370,15 +1370,15 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getTraceConfiguration();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}'.
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Metric</em>'.
+	 * @return the meta object for the reference '<em>Metric</em>'.
 	 * @see tools.descartes.librede.configuration.TraceConfiguration#getMetric()
 	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EAttribute getTraceConfiguration_Metric();
+	EReference getTraceConfiguration_Metric();
 
 	/**
 	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}'.
@@ -2018,12 +2018,12 @@ public interface ConfigurationPackage extends EPackage {
 		EClass TRACE_CONFIGURATION = eINSTANCE.getTraceConfiguration();
 
 		/**
-		 * The meta object literal for the '<em><b>Metric</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Metric</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TRACE_CONFIGURATION__METRIC = eINSTANCE.getTraceConfiguration_Metric();
+		EReference TRACE_CONFIGURATION__METRIC = eINSTANCE.getTraceConfiguration_Metric();
 
 		/**
 		 * The meta object literal for the '<em><b>Unit</b></em>' reference feature.

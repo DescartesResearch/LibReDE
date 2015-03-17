@@ -42,6 +42,7 @@ import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Unit;
 
 /**
@@ -63,24 +64,14 @@ import tools.descartes.librede.units.Unit;
  */
 public class TraceConfigurationImpl extends MinimalEObjectImpl.Container implements TraceConfiguration {
 	/**
-	 * The default value of the '{@link #getMetric() <em>Metric</em>}' attribute.
+	 * The cached value of the '{@link #getMetric() <em>Metric</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getMetric()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String METRIC_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getMetric() <em>Metric</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMetric()
-	 * @generated
-	 * @ordered
-	 */
-	protected String metric = METRIC_EDEFAULT;
+	protected Metric metric;
 
 	/**
 	 * The default value of the '{@link #getInterval() <em>Interval</em>}' attribute.
@@ -156,7 +147,15 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getMetric() {
+	public Metric getMetric() {
+		if (metric != null && metric.eIsProxy()) {
+			InternalEObject oldMetric = (InternalEObject)metric;
+			metric = (Metric)eResolveProxy(oldMetric);
+			if (metric != oldMetric) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
+			}
+		}
 		return metric;
 	}
 
@@ -165,8 +164,17 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setMetric(String newMetric) {
-		String oldMetric = metric;
+	public Metric basicGetMetric() {
+		return metric;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setMetric(Metric newMetric) {
+		Metric oldMetric = metric;
 		metric = newMetric;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
@@ -304,7 +312,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				return getMetric();
+				if (resolve) return getMetric();
+				return basicGetMetric();
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return getInterval();
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
@@ -329,7 +338,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				setMetric((String)newValue);
+				setMetric((Metric)newValue);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval((Long)newValue);
@@ -357,7 +366,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				setMetric(METRIC_EDEFAULT);
+				setMetric((Metric)null);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval(INTERVAL_EDEFAULT);
@@ -384,7 +393,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				return METRIC_EDEFAULT == null ? metric != null : !METRIC_EDEFAULT.equals(metric);
+				return metric != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return interval != INTERVAL_EDEFAULT;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
@@ -407,9 +416,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (metric: ");
-		result.append(metric);
-		result.append(", interval: ");
+		result.append(" (interval: ");
 		result.append(interval);
 		result.append(')');
 		return result.toString();

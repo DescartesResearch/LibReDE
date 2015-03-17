@@ -16,6 +16,8 @@ import tools.descartes.librede.configuration.ConfigurationPackage;
 
 import tools.descartes.librede.configuration.impl.ConfigurationPackageImpl;
 
+import tools.descartes.librede.metrics.MetricsPackage;
+import tools.descartes.librede.metrics.impl.MetricsPackageImpl;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Proportion;
 import tools.descartes.librede.units.RequestCount;
@@ -130,14 +132,17 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 
 		// Obtain or create and register interdependencies
 		ConfigurationPackageImpl theConfigurationPackage = (ConfigurationPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(ConfigurationPackage.eNS_URI) instanceof ConfigurationPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(ConfigurationPackage.eNS_URI) : ConfigurationPackage.eINSTANCE);
+		MetricsPackageImpl theMetricsPackage = (MetricsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI) instanceof MetricsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI) : MetricsPackage.eINSTANCE);
 
 		// Create package meta-data objects
 		theUnitsPackage.createPackageContents();
 		theConfigurationPackage.createPackageContents();
+		theMetricsPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theUnitsPackage.initializePackageContents();
 		theConfigurationPackage.initializePackageContents();
+		theMetricsPackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theUnitsPackage.freeze();

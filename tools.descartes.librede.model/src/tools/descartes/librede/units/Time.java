@@ -18,41 +18,41 @@ public interface Time extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Dimension INSTANCE = UnitsFactory.eINSTANCE.createTime();
+	public static final Time INSTANCE = UnitsFactory.eINSTANCE.createTime();
 	
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> NANOSECONDS = UnitsFactory.eINSTANCE.createUnit("nanoseconds", "ns", 1e-9);
+	public static final Unit<Time> NANOSECONDS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "nanoseconds", "ns", 1e-9);
 	
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> MICROSECONDS = UnitsFactory.eINSTANCE.createUnit("microseconds", "\u00B5s", 1e-6);
+	public static final Unit<Time> MICROSECONDS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "microseconds", "\u00B5s", 1e-6);
 	
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> MILLISECONDS = UnitsFactory.eINSTANCE.createUnit("milliseconds", "ms", 1e-3);
+	public static final Unit<Time> MILLISECONDS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "milliseconds", "ms", 1e-3);
 	
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> SECONDS = UnitsFactory.eINSTANCE.createUnit("seconds", "s", 1);
+	public static final Unit<Time> SECONDS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "seconds", "s", 1);
 
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> MINUTES = UnitsFactory.eINSTANCE.createUnit("minutes", "min", 60);
+	public static final Unit<Time> MINUTES = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "minutes", "min", 60);
 	
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> HOURS = UnitsFactory.eINSTANCE.createUnit("hours", "h", 60 * 60);
+	public static final Unit<Time> HOURS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "hours", "h", 60 * 60);
 	
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> DAYS = UnitsFactory.eINSTANCE.createUnit("days", "d", 60 * 60 * 24);
+	public static final Unit<Time> DAYS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "days", "d", 60 * 60 * 24);
 
 } // Time

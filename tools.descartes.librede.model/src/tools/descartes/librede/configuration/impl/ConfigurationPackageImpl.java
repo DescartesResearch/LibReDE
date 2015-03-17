@@ -57,6 +57,8 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.ValidationSpecification;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.MetricsPackage;
+import tools.descartes.librede.metrics.impl.MetricsPackageImpl;
 import tools.descartes.librede.units.UnitsPackage;
 import tools.descartes.librede.units.impl.UnitsPackageImpl;
 
@@ -255,14 +257,17 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		// Obtain or create and register interdependencies
 		UnitsPackageImpl theUnitsPackage = (UnitsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) instanceof UnitsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) : UnitsPackage.eINSTANCE);
+		MetricsPackageImpl theMetricsPackage = (MetricsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI) instanceof MetricsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI) : MetricsPackage.eINSTANCE);
 
 		// Create package meta-data objects
 		theConfigurationPackage.createPackageContents();
 		theUnitsPackage.createPackageContents();
+		theMetricsPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theConfigurationPackage.initializePackageContents();
 		theUnitsPackage.initializePackageContents();
+		theMetricsPackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theConfigurationPackage.freeze();
@@ -503,8 +508,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTraceConfiguration_Metric() {
-		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(0);
+	public EReference getTraceConfiguration_Metric() {
+		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -901,7 +906,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		serviceEClass = createEClass(SERVICE);
 
 		traceConfigurationEClass = createEClass(TRACE_CONFIGURATION);
-		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
+		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
 		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__INTERVAL);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__DATA_SOURCE);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__MAPPINGS);
@@ -977,6 +982,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
+		MetricsPackage theMetricsPackage = (MetricsPackage)EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI);
 		UnitsPackage theUnitsPackage = (UnitsPackage)EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI);
 
 		// Create type parameters
@@ -1025,7 +1031,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(serviceEClass, Service.class, "Service", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTraceConfiguration_Metric(), ecorePackage.getEString(), "metric", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTraceConfiguration_Metric(), theMetricsPackage.getMetric(), null, "metric", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTraceConfiguration_Interval(), ecorePackage.getELong(), "interval", "0", 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTraceConfiguration_DataSource(), this.getDataSourceConfiguration(), null, "dataSource", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTraceConfiguration_Mappings(), this.getTraceToEntityMapping(), null, "mappings", null, 1, -1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

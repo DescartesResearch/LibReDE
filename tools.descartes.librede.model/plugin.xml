@@ -22,4 +22,12 @@
             genModel="model/librede.genmodel"/>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated librede -->
+      <package
+            uri="http://www.descartes-research.net/librede/metrics/1.0"
+            class="tools.descartes.librede.metrics.MetricsPackage"
+            genModel="model/librede.genmodel"/>
+   </extension>
+
 </plugin>

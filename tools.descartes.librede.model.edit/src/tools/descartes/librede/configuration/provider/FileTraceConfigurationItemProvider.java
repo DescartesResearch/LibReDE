@@ -42,6 +42,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetric;
 
@@ -127,9 +128,9 @@ public class FileTraceConfigurationItemProvider extends TraceConfigurationItemPr
 			label.append("No file");
 		}
 		label.append(" (");
-		IMetric metric = Registry.INSTANCE.getMetric(trace.getMetric());
+		Metric metric = trace.getMetric();
 		if (metric != null) {
-			label.append(metric.getDisplayName());
+			label.append(metric.getName());
 		}
 		if (trace.getInterval() == 0) {
 			label.append(", ").append("non-aggregated");

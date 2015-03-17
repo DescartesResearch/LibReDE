@@ -90,6 +90,7 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
 import tools.descartes.librede.configuration.editor.util.PrettyPrinter;
 import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetric;
 
@@ -305,9 +306,9 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 
 			@Override
 			public Object convert(Object fromObject) {
-				IMetric metric = Registry.INSTANCE.getMetric((String)fromObject);
+				Metric metric = (Metric)fromObject;
 				if (metric != null) {
-					return PrettyPrinter.toCamelCase(metric.getDisplayName());
+					return PrettyPrinter.toCamelCase(metric.getName());
 				}
 				return "Unkown";
 			}
