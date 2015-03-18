@@ -141,6 +141,7 @@ import tools.descartes.librede.configuration.editor.forms.master.OutputMasterBlo
 import tools.descartes.librede.configuration.editor.forms.master.TracesMasterBlock;
 import tools.descartes.librede.configuration.editor.forms.master.ValidationMasterBlock;
 import tools.descartes.librede.configuration.provider.ConfigurationItemProviderAdapterFactory;
+import tools.descartes.librede.registry.Registry;
 
 
 /**
@@ -673,7 +674,7 @@ public class ConfigurationEditor
 
 		// Create the editing domain with a special command stack.
 		//
-		editingDomain = new AdapterFactoryEditingDomain(adapterFactory, commandStack, new HashMap<Resource, Boolean>());
+		editingDomain = new AdapterFactoryEditingDomain(adapterFactory, commandStack, Registry.INSTANCE.createResourceSet());
 	}
 
 	/**
@@ -1423,7 +1424,16 @@ public class ConfigurationEditor
 
 	@Override
 	protected void addPages() {
-		LibredeConfiguration conf = (LibredeConfiguration) editingDomain.getResourceSet().getResources().get(0).getContents().get(0);
+		LibredeConfiguration conf = null;
+		for (Resource res : editingDomain.getResourceSet().getResources()) {
+			if (res.getContents().get(0) instanceof LibredeConfiguration) {
+				conf = (LibredeConfiguration) res.getContents().get(0);
+				break;
+			}
+		}
+		if (conf == null) {
+			throw new IllegalStateException();
+		}		
 		
 		try {
 			addPage(new WorkloadDescriptionFormPage(this, "workloadmodel", "Workload Description", editingDomain, conf));

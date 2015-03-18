@@ -8,7 +8,8 @@ Bundle-Activator: tools.descartes.librede.configuration.provider.LibredeEditPlug
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: tools.descartes.librede.configuration.provider,
+Export-Package: tools.descartes.librede,
+ tools.descartes.librede.configuration.provider,
  tools.descartes.librede.metrics.provider,
  tools.descartes.librede.units.provider
 Require-Bundle: org.eclipse.core.runtime,

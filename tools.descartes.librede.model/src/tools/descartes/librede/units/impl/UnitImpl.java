@@ -212,7 +212,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		return name + "(" + symbol + ")";
+		return symbol + " (" + name + ")";
 	}
 
 } //UnitImpl

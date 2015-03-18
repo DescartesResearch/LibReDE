@@ -47,6 +47,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IManagedForm;
 
+import tools.descartes.librede.PrettyPrinter;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.LibredeConfiguration;
@@ -55,7 +56,6 @@ import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.FileTraceDetailsPage;
-import tools.descartes.librede.configuration.editor.util.PrettyPrinter;
 import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
@@ -84,31 +84,6 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		part.registerPage(FileTraceConfigurationImpl.class, details);
 	}
 
-	private void addMeasurementTraces(Object[] results) {
-		for (Object r : results) {
-			TraceConfiguration series = ConfigurationFactory.eINSTANCE.createFileTraceConfiguration();
-			if (model.getInput().getDataSources().size() > 0) {
-				series.setDataSource(model.getInput().getDataSources().get(0));
-			}
-			series.setMetric((Metric)r);
-			ModelEntity entity = null;
-			if (model.getWorkloadDescription().getResources().size() > 0) {
-				entity = model.getWorkloadDescription().getResources().get(0);
-			} else if (model.getWorkloadDescription().getServices().size() > 0) {
-				entity = model.getWorkloadDescription().getServices().get(0);
-			}
-			if (entity != null) {
-				TraceToEntityMapping mapping = ConfigurationFactory.eINSTANCE.createTraceToEntityMapping();
-				mapping.setEntity(entity);
-				mapping.setTraceColumn(1);
-				series.getMappings().add(mapping);
-			}
-			
-			Command cmd = AddCommand.create(domain, model.getInput(), ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS, series);
-			domain.getCommandStack().execute(cmd);
-		}
-	}
-
 	@Override
 	protected String getMasterSectionTitle() {
 		return "All Measurement Traces";
@@ -131,21 +106,25 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 
 	@Override
 	protected void handleAdd() {
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(page.getSite().getShell(), new LabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return PrettyPrinter.toCamelCase(((Metric)element).getName());
-			}
-		});
-		dialog.setElements(Registry.INSTANCE.getMetrics().toArray());
-		dialog.setAllowDuplicates(false);
-		dialog.setMultipleSelection(false);
-		dialog.setTitle("Metrics");
-		dialog.setMessage("Select a metric for the new measurement trace:");
-		dialog.create();
-		if (dialog.open() == Window.OK) {
-			addMeasurementTraces(dialog.getResult());
-		}		
+		TraceConfiguration series = ConfigurationFactory.eINSTANCE.createFileTraceConfiguration();
+		if (model.getInput().getDataSources().size() > 0) {
+			series.setDataSource(model.getInput().getDataSources().get(0));
+		}
+		ModelEntity entity = null;
+		if (model.getWorkloadDescription().getResources().size() > 0) {
+			entity = model.getWorkloadDescription().getResources().get(0);
+		} else if (model.getWorkloadDescription().getServices().size() > 0) {
+			entity = model.getWorkloadDescription().getServices().get(0);
+		}
+		if (entity != null) {
+			TraceToEntityMapping mapping = ConfigurationFactory.eINSTANCE.createTraceToEntityMapping();
+			mapping.setEntity(entity);
+			mapping.setTraceColumn(1);
+			series.getMappings().add(mapping);
+		}
+		
+		Command cmd = AddCommand.create(domain, model.getInput(), ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS, series);
+		domain.getCommandStack().execute(cmd);
 	}
 
 	@Override

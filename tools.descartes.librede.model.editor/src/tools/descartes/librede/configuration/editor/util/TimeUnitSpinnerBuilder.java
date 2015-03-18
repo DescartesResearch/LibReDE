@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import tools.descartes.librede.PrettyPrinter;
+
 public class TimeUnitSpinnerBuilder {
 	
 	public static Composite createComposite(FormToolkit toolkit, Composite parent) {

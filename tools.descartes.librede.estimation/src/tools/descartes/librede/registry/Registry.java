@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede.registry;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,19 +33,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsFactory;
 import tools.descartes.librede.metrics.MetricsRepository;
-import tools.descartes.librede.repository.IMetric;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsRepository;
 
 public class Registry {
 	
+	public static final String LIBREDE_UNITS_NAMESPACE = "units";
+	public static final String LIBREDE_METRICS_NAMESPACE = "metrics";
+	public static final String LIBREDE_URI_SCHEME = "librede";
+	
 	public static final Registry INSTANCE = new Registry();
 	
+	private Resource unitsResource = null;
+	
 	private UnitsRepository units = UnitsFactory.eINSTANCE.createUnitsRepository();
+	
+	private Resource metricsResource = null;
 	
 	private MetricsRepository metrics = MetricsFactory.eINSTANCE.createMetricsRepository();
 	
@@ -54,7 +66,31 @@ public class Registry {
 	
 	private Map< Class<?>, Set<String> > components = new HashMap< Class<?>, Set<String> >();
 	
-	private Registry() {}
+	private Registry() {
+		// This registry also provides an extension mechanism to reference elements from EMF models
+		// This is done by registrating a handler for the librede protocol handler which is
+		// called whenever EMF tries to resolve a reference with a corresponding URI
+		unitsResource = new ResourceImpl(URI.createGenericURI(LIBREDE_URI_SCHEME, LIBREDE_UNITS_NAMESPACE, null));
+		unitsResource.getContents().add(units);
+		metricsResource = new ResourceImpl(URI.createGenericURI(LIBREDE_URI_SCHEME, LIBREDE_METRICS_NAMESPACE, null));
+		metricsResource.getContents().add(metrics);
+	}
+	
+	public ResourceSet createResourceSet() {
+		return new ResourceSetImpl() {
+			@Override
+			protected Resource delegatedGetResource(URI uri, boolean loadOnDemand) {
+				if (uri.scheme().equalsIgnoreCase(LIBREDE_URI_SCHEME)) {
+					if (uri.opaquePart().equals(LIBREDE_METRICS_NAMESPACE)) {
+						return metricsResource;
+					} else if (uri.opaquePart().equals(LIBREDE_UNITS_NAMESPACE)) {
+						return unitsResource;
+					}
+				}
+				return super.delegatedGetResource(uri, loadOnDemand);
+			}
+		};
+	}
 	
 	public void registerMetric(Metric metric) {
 		if (metric == null) {
@@ -67,6 +103,10 @@ public class Registry {
 		return Collections.unmodifiableList(metrics.getMetrics());
 	}
 	
+	public MetricsRepository getMetricsRepository() {
+		return metrics;
+	}
+	
 	public void registerDimension(Dimension dimension) {
 		if (dimension == null) {
 			throw new NullPointerException();
@@ -76,6 +116,10 @@ public class Registry {
 	
 	public List<Dimension> getDimensions() {
 		return Collections.unmodifiableList(units.getDimensions());
+	}
+	
+	public UnitsRepository getUnitsRepository() {
+		return units;
 	}
 
 	public void registerImplementationType(Class<?> componentClass, Class<?> instanceClass) {
@@ -113,5 +157,14 @@ public class Registry {
 	public String getDisplayName(Class<?> instanceClass) {
 		Component comp = instanceClass.getAnnotation(Component.class);
 		return comp.displayName();
+	}
+	
+	private Resource getResource(URI uri) {
+		if (uri.opaquePart().equals(LIBREDE_METRICS_NAMESPACE)) {
+			return metricsResource;
+		} else if (uri.opaquePart().equals(LIBREDE_UNITS_NAMESPACE)) {
+			return unitsResource;
+		}
+		return null;
 	}
 }

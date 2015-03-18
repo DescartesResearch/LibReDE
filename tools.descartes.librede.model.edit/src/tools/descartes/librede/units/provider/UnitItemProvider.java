@@ -8,9 +8,7 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.ResourceLocator;
-
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
@@ -23,8 +21,8 @@ import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
+import tools.descartes.librede.PrettyPrinter;
 import tools.descartes.librede.configuration.provider.LibredeEditPlugin;
-
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
 
@@ -156,10 +154,7 @@ public class UnitItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((Unit<?>)object).getName();
-		return label == null || label.length() == 0 ?
-			getString("_UI_Unit_type") :
-			getString("_UI_Unit_type") + " " + label;
+		return ((Unit<?>)object).toString();
 	}
 	
 
