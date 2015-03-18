@@ -31,16 +31,18 @@ import java.util.List;
 import java.util.Map;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 
 
 public class AggregationRepositoryCursor implements IRepositoryCursor {
 	
 	private static class SeriesCacheKey {
 		
-		public final IMetric metric;
+		public final Metric metric;
 		public final ModelEntity entity;
 		
-		public SeriesCacheKey(IMetric metric, ModelEntity entity) {
+		public SeriesCacheKey(Metric metric, ModelEntity entity) {
 			this.metric = metric;
 			this.entity = entity;
 		}
@@ -81,11 +83,11 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	
 	private static class AggregationCacheKey {
 		
-		public final IMetric metric;
+		public final Metric metric;
 		public final ModelEntity entity;
 		public final Aggregation aggregation;
 		
-		public AggregationCacheKey(IMetric metric, ModelEntity entity, Aggregation aggregation) {
+		public AggregationCacheKey(Metric metric, ModelEntity entity, Aggregation aggregation) {
 			this.metric = metric;
 			this.entity = entity;
 			this.aggregation = aggregation;
@@ -212,13 +214,13 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getValues(tools.descartes.librede.repository.IMetric, tools.descartes.librede.workload.IModelEntity)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getValues(tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity)
 	 */
 	@Override
-	public TimeSeries getValues(IMetric metric, ModelEntity entity) {
+	public TimeSeries getValues(Metric metric, ModelEntity entity) {
 		SeriesCacheKey key = new SeriesCacheKey(metric, entity);
 		if (!seriesCache.containsKey(key)) {
-			TimeSeries series = metric.retrieve(repository, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
+			TimeSeries series = repository.select(metric, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
 			seriesCache.put(key, series);
 			return series;
 		}
@@ -226,13 +228,13 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getAggregatedValue(tools.descartes.librede.repository.IMetric, tools.descartes.librede.workload.IModelEntity, tools.descartes.librede.repository.Aggregation)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getAggregatedValue(tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity, tools.descartes.librede.repository.Aggregation)
 	 */
 	@Override
-	public double getAggregatedValue(IMetric metric, ModelEntity entity, Aggregation func) {
+	public double getAggregatedValue(Metric metric, ModelEntity entity, Aggregation func) {
 		AggregationCacheKey key = new AggregationCacheKey(metric, entity, func);
 		if (!aggregationCache.containsKey(key)) {
-			double value = metric.aggregate(repository, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
+			double value = repository.select(metric, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
 			aggregationCache.put(key, value);
 			return value;
 		}		
@@ -248,18 +250,18 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#hasData(tools.descartes.librede.repository.IMetric, java.util.List, tools.descartes.librede.repository.Aggregation)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#hasData(tools.descartes.librede.metrics.Metric, java.util.List, tools.descartes.librede.repository.Aggregation)
 	 */
 	@Override
-	public boolean hasData(IMetric metric, List<ModelEntity> entities,
+	public boolean hasData(Metric metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
-		if (metric.isAggregationSupported(aggregation)) {
+		if (metric.isAggregationAllowed(aggregation)) {
 			boolean data = true;
 			for (ModelEntity e : entities) {
 				if (aggregation == Aggregation.NONE) {
-					data = data && metric.hasData(repository, e, 0.0);
+					data = data && repository.contains(metric, e, 0.0);
 				} else {
-					data = data && metric.hasData(repository, e, stepSize);
+					data = data && repository.contains(metric, e, stepSize);
 				}
 			}
 			return data;

@@ -2,6 +2,7 @@
  */
 package tools.descartes.librede.metrics.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -189,6 +190,15 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public boolean isAggregationAllowed(Aggregation aggregation) {
+		return allowedAggregations.contains(aggregation);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -263,6 +273,20 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 				return allowedAggregations != null && !allowedAggregations.isEmpty();
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
+		switch (operationID) {
+			case MetricsPackage.METRIC___IS_AGGREGATION_ALLOWED__AGGREGATION:
+				return isAggregationAllowed((Aggregation)arguments.get(0));
+		}
+		return super.eInvoke(operationID, arguments);
 	}
 
 	/**

@@ -30,7 +30,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -38,9 +37,7 @@ import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
-import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.metrics.StandardMetrics;
 
 public class MemoryObservationRepositoryTest {
 	
@@ -93,15 +90,15 @@ public class MemoryObservationRepositoryTest {
 
 	@Test
 	public void testSetAndGetData() {
-		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1);
-		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(5);
-		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(6);
+		repo.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
+		assertThat(repo.select(StandardMetrics.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(5);
+		repo.setData(StandardMetrics.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
+		assertThat(repo.select(StandardMetrics.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(6);
 	}
 	
 	@Test
 	public void testGetDataEmpty() {
-		TimeSeries ts = repo.getData(StandardMetric.RESPONSE_TIME, resources[0]);
+		TimeSeries ts = repo.select(StandardMetrics.RESPONSE_TIME, resources[0]);
 		assertThat(ts).isNotNull();
 		assertThat(ts.isEmpty()).isTrue();
 	}

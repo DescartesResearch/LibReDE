@@ -26,9 +26,16 @@
  */
 package tools.descartes.librede.repository;
 
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 
-public enum Aggregation {
+public interface IMetricHandler {
 	
-	NONE, MINIMUM, MAXIMUM,	AVERAGE, SUM;
+	public TimeSeries retrieve(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end);
 
+	public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func);
+	
+	public boolean hasData(IMonitoringRepository repository, Metric metric, ModelEntity entity, double aggregationInterval);
+	
 }

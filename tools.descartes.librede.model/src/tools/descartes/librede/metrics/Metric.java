@@ -102,4 +102,12 @@ public interface Metric extends EObject {
 	 */
 	EList<Aggregation> getAllowedAggregations();
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model required="true" aggregationRequired="true"
+	 * @generated
+	 */
+	boolean isAggregationAllowed(Aggregation aggregation);
+
 } // Metric

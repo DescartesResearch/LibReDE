@@ -36,6 +36,8 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 
 public final class Query<T extends Vector> {
 	
@@ -45,11 +47,11 @@ public final class Query<T extends Vector> {
 	
 	private Aggregation aggregation;
 	private Query.Type type;
-	private IMetric metric;
+	private Metric metric;
 	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, IMetric metric,
+	protected Query(Aggregation aggregation, Type type, Metric metric,
 			ModelEntity entity, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
@@ -69,7 +71,7 @@ public final class Query<T extends Vector> {
 		return type;
 	}
 	
-	public IMetric getMetric() {
+	public Metric getMetric() {
 		return metric;
 	}
 	

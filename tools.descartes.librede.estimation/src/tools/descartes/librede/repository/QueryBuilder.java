@@ -31,20 +31,22 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.Query.Type;
 
 public class QueryBuilder {
 	
 	private Query.Type type;
-	private IMetric metric;
+	private Metric metric;
 	private ModelEntity entity;
 	private Aggregation aggregation;
 	
-	private QueryBuilder(IMetric metric) {
+	private QueryBuilder(Metric metric) {
 		this.metric = metric;
 	}
 	
-	public static SelectClause select(IMetric metric) {
+	public static SelectClause select(Metric metric) {
 		QueryBuilder builder = new QueryBuilder(metric);
 		return builder.new SelectClause();
 	}

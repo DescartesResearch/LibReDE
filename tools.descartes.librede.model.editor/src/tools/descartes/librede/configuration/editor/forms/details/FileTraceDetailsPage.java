@@ -98,7 +98,7 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.repository.IMetricHandler;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;

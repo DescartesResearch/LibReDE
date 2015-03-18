@@ -32,13 +32,21 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 
 
 public interface IMonitoringRepository {
+	
+	public TimeSeries select(Metric metric, ModelEntity entity, double start, double end);
 
-	public double getAggregationInterval(IMetric m, ModelEntity entity);
-	public TimeSeries getData(IMetric metric, ModelEntity entity);
-	public boolean containsData(IMetric responseTime,
+	public double select(Metric metric, ModelEntity entity, double start, double end, Aggregation func);
+	
+	public TimeSeries select(Metric metric, ModelEntity entity);
+	
+	public double getAggregationInterval(Metric m, ModelEntity entity);
+
+	public boolean contains(Metric responseTime,
 			ModelEntity entity, double maximumAggregationInterval);
 	
 	public List<Resource> listResources();

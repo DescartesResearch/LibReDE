@@ -5,6 +5,7 @@ package tools.descartes.librede.metrics;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -113,13 +114,22 @@ public interface MetricsPackage extends EPackage {
 	int METRIC_FEATURE_COUNT = 4;
 
 	/**
+	 * The operation id for the '<em>Is Aggregation Allowed</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int METRIC___IS_AGGREGATION_ALLOWED__AGGREGATION = 0;
+
+	/**
 	 * The number of operations of the '<em>Metric</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int METRIC_OPERATION_COUNT = 0;
+	int METRIC_OPERATION_COUNT = 1;
 
 	/**
 	 * The meta object id for the '{@link tools.descartes.librede.metrics.impl.MetricsRepositoryImpl <em>Repository</em>}' class.
@@ -224,6 +234,16 @@ public interface MetricsPackage extends EPackage {
 	EAttribute getMetric_AllowedAggregations();
 
 	/**
+	 * Returns the meta object for the '{@link tools.descartes.librede.metrics.Metric#isAggregationAllowed(tools.descartes.librede.metrics.Aggregation) <em>Is Aggregation Allowed</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Is Aggregation Allowed</em>' operation.
+	 * @see tools.descartes.librede.metrics.Metric#isAggregationAllowed(tools.descartes.librede.metrics.Aggregation)
+	 * @generated
+	 */
+	EOperation getMetric__IsAggregationAllowed__Aggregation();
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.metrics.MetricsRepository <em>Repository</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -318,6 +338,14 @@ public interface MetricsPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute METRIC__ALLOWED_AGGREGATIONS = eINSTANCE.getMetric_AllowedAggregations();
+
+		/**
+		 * The meta object literal for the '<em><b>Is Aggregation Allowed</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation METRIC___IS_AGGREGATION_ALLOWED__AGGREGATION = eINSTANCE.getMetric__IsAggregationAllowed__Aggregation();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.metrics.impl.MetricsRepositoryImpl <em>Repository</em>}' class.

@@ -5,6 +5,7 @@ package tools.descartes.librede.metrics.impl;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -171,6 +172,15 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EOperation getMetric__IsAggregationAllowed__Aggregation() {
+		return metricEClass.getEOperations().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getMetricsRepository() {
 		return metricsRepositoryEClass;
 	}
@@ -226,6 +236,7 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 		createEAttribute(metricEClass, METRIC__NAME);
 		createEReference(metricEClass, METRIC__DIMENSION);
 		createEAttribute(metricEClass, METRIC__ALLOWED_AGGREGATIONS);
+		createEOperation(metricEClass, METRIC___IS_AGGREGATION_ALLOWED__AGGREGATION);
 
 		metricsRepositoryEClass = createEClass(METRICS_REPOSITORY);
 		createEReference(metricsRepositoryEClass, METRICS_REPOSITORY__METRICS);
@@ -272,6 +283,9 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 		initEAttribute(getMetric_Name(), ecorePackage.getEString(), "name", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getMetric_Dimension(), theUnitsPackage.getDimension(), null, "dimension", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMetric_AllowedAggregations(), this.getAggregation(), "allowedAggregations", null, 1, -1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		EOperation op = initEOperation(getMetric__IsAggregationAllowed__Aggregation(), ecorePackage.getEBoolean(), "isAggregationAllowed", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getAggregation(), "aggregation", 1, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(metricsRepositoryEClass, MetricsRepository.class, "MetricsRepository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getMetricsRepository_Metrics(), this.getMetric(), null, "metrics", null, 0, -1, MetricsRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

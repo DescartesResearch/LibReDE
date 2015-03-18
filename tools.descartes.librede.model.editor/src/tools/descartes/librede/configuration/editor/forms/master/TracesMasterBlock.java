@@ -63,8 +63,8 @@ import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.repository.IMetricHandler;
+import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.units.Time;
 
 public class TracesMasterBlock extends AbstractMasterBlockWithButtons {

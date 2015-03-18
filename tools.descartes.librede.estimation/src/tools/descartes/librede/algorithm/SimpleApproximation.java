@@ -38,11 +38,11 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
 
 @Component(displayName="Simple Approximation")
 public class SimpleApproximation extends AbstractEstimationAlgorithm {

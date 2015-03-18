@@ -68,11 +68,12 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.repository.IMetricHandler;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
@@ -173,12 +174,7 @@ public class Librede {
 				}
 				IDataSource source = dataSources.get(dataSourceType);
 				
-				IMetric metric = null;
-						//TODO: Registry.INSTANCE.getMetric(fileTrace.getMetric());
-				if (metric == null) {
-					log.error("Unknown metric type: " + fileTrace.getMetric());
-					continue;
-				}
+				Metric metric = fileTrace.getMetric();
 				
 				for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
 					try {

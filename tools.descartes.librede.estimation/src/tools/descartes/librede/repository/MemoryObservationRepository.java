@@ -34,6 +34,7 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Metric;
 
 /**
  * This class implements the IMonitoringRepository
@@ -41,14 +42,14 @@ import tools.descartes.librede.configuration.WorkloadDescription;
  * @author Mehran Saliminia
  * 
  */
-public class MemoryObservationRepository implements IMonitoringRepository {
+public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	
 	private static class DataKey {
 		
-		public final IMetric metric;
+		public final Metric metric;
 		public final ModelEntity entity;
 		
-		public DataKey(IMetric metric, ModelEntity entity) {
+		public DataKey(Metric metric, ModelEntity entity) {
 			this.metric = metric;
 			this.entity = entity;
 		}
@@ -101,7 +102,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		this.workload = workload;
 	}
 	
-	public double getAggregationInterval(IMetric m, ModelEntity entity) {
+	public double getAggregationInterval(Metric m, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -110,7 +111,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return entry.aggregationInterval;
 	}
 	
-	public TimeSeries getData(IMetric m, ModelEntity entity) {
+	public TimeSeries select(Metric m, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -119,19 +120,19 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return entry.data;
 	}
 	
-	public void setData(IMetric m, ModelEntity entity, TimeSeries observations) {
+	public void setData(Metric m, ModelEntity entity, TimeSeries observations) {
 		this.setData(m, entity, observations, 0);
 	}
 	
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations) {
+	public void setAggregatedData(Metric m, ModelEntity entity, TimeSeries aggregatedObservations) {
 		this.setData(m, entity, aggregatedObservations, aggregatedObservations.getAverageTimeIncrement());
 	}
 	
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
+	public void setAggregatedData(Metric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
 		this.setData(m, entity, aggregatedObservations, aggregationInterval);
 	}
 	
-	private void setData(IMetric m, ModelEntity entity, TimeSeries observations, double aggregationInterval) {
+	private void setData(Metric m, ModelEntity entity, TimeSeries observations, double aggregationInterval) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -143,7 +144,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	@Override
-	public boolean containsData(IMetric m,
+	public boolean contains(Metric m,
 			ModelEntity entity, double maximumAggregationInterval) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);

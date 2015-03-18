@@ -29,6 +29,8 @@ package tools.descartes.librede.repository;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 
 public interface IRepositoryCursor {
 
@@ -44,14 +46,14 @@ public interface IRepositoryCursor {
 
 	double getCurrentIntervalEnd();
 
-	TimeSeries getValues(IMetric metric, ModelEntity entity);
+	TimeSeries getValues(Metric metric, ModelEntity entity);
 
-	double getAggregatedValue(IMetric metric,
+	double getAggregatedValue(Metric metric,
 			ModelEntity entity, Aggregation func);
 
 	IMonitoringRepository getRepository();
 
-	boolean hasData(IMetric metric,
+	boolean hasData(Metric metric,
 			List<ModelEntity> entities, Aggregation aggregation);
 
 	int getAvailableIntervals();

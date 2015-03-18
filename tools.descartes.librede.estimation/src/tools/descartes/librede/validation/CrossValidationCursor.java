@@ -30,8 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.repository.Aggregation;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
@@ -97,12 +97,12 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public TimeSeries getValues(IMetric metric, ModelEntity entity) {
+	public TimeSeries getValues(Metric metric, ModelEntity entity) {
 		return delegate.getValues(metric, entity);
 	}
 
 	@Override
-	public double getAggregatedValue(IMetric metric, ModelEntity entity,
+	public double getAggregatedValue(Metric metric, ModelEntity entity,
 			Aggregation func) {
 		return delegate.getAggregatedValue(metric, entity, func);
 	}
@@ -113,7 +113,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public boolean hasData(IMetric metric, List<ModelEntity> entities,
+	public boolean hasData(Metric metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		return delegate.hasData(metric, entities, aggregation);
 	}
