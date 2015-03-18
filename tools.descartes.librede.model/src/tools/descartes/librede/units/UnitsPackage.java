@@ -141,13 +141,22 @@ public interface UnitsPackage extends EPackage {
 	int UNIT__BASE_FACTOR = 2;
 
 	/**
+	 * The feature id for the '<em><b>Dimension</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__DIMENSION = 3;
+
+	/**
 	 * The number of structural features of the '<em>Unit</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT_FEATURE_COUNT = 3;
+	int UNIT_FEATURE_COUNT = 4;
 
 	/**
 	 * The operation id for the '<em>Convert To</em>' operation.
@@ -474,6 +483,17 @@ public interface UnitsPackage extends EPackage {
 	EAttribute getUnit_BaseFactor();
 
 	/**
+	 * Returns the meta object for the container reference '{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the container reference '<em>Dimension</em>'.
+	 * @see tools.descartes.librede.units.Unit#getDimension()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EReference getUnit_Dimension();
+
+	/**
 	 * Returns the meta object for the '{@link tools.descartes.librede.units.Unit#convertTo(double, tools.descartes.librede.units.Unit) <em>Convert To</em>}' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -636,6 +656,14 @@ public interface UnitsPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute UNIT__BASE_FACTOR = eINSTANCE.getUnit_BaseFactor();
+
+		/**
+		 * The meta object literal for the '<em><b>Dimension</b></em>' container reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNIT__DIMENSION = eINSTANCE.getUnit_Dimension();
 
 		/**
 		 * The meta object literal for the '<em><b>Convert To</b></em>' operation.

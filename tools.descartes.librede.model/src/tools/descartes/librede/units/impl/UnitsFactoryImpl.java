@@ -91,6 +91,17 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 		dimension.getUnits().add(unit);
 		return unit;
 	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public <D extends Dimension> Unit<D> createBaseUnit(D dimension, String name, String symbol) {
+		Unit<D> unit = createUnit(dimension, name, symbol, 1.0);
+		dimension.setBaseUnit(unit);
+		return unit;
+	}
 
 	/**
 	 * <!-- begin-user-doc -->

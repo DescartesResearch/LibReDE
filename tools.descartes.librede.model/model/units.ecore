@@ -9,7 +9,7 @@
       </eGenericType>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="units" lowerBound="1" upperBound="-1"
-        containment="true">
+        containment="true" eOpposite="#//Unit/dimension">
       <eGenericType eClassifier="#//Unit">
         <eTypeArguments/>
       </eGenericType>
@@ -41,6 +41,10 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="baseFactor" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble" changeable="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dimension" lowerBound="1"
+        eOpposite="#//Dimension/units">
+      <eGenericType eTypeParameter="#//Unit/D"/>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RequestRate" eSuperTypes="#//Dimension"/>
   <eClassifiers xsi:type="ecore:EClass" name="Time" eSuperTypes="#//Dimension"/>

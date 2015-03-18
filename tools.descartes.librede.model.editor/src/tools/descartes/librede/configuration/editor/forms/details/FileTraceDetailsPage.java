@@ -85,6 +85,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import tools.descartes.librede.PrettyPrinter;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
@@ -95,8 +96,11 @@ import tools.descartes.librede.configuration.editor.forms.AbstractEstimationConf
 import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsPackage;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
 
 public class FileTraceDetailsPage extends AbstractDetailsPage {
@@ -152,6 +156,21 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		Label lblMetric = toolkit.createLabel(composite, "Metric:", SWT.NONE);
 		IObservableList metrics = EMFEditProperties.list(domain, MetricsPackage.Literals.METRICS_REPOSITORY__METRICS).observe(Registry.INSTANCE.getMetricsRepository());
 		comboMetricViewer = createComboBoxViewer(composite, toolkit, metrics);
+		
+		// make this a post selection listener, as changes should only propagated to the 
+		// unit combo box if they are persistent
+		comboMetricViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+			
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (!event.getSelection().isEmpty()) {
+					Metric newMetric = (Metric)((IStructuredSelection)event.getSelection()).getFirstElement();
+					if ((input.getUnit() == null) || (newMetric.getDimension() != input.getUnit().getDimension())) {
+						input.setUnit(newMetric.getDimension().getBaseUnit());
+					}
+				}
+			}
+		});
 
 		Label lblFile = toolkit.createLabel(composite, "File:");
 
@@ -187,7 +206,6 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 
 		Label lblDataSource = toolkit.createLabel(composite,
 				"Data Source:", SWT.NONE);
-
 		comboDataSourceViewer = createComboBoxViewer(composite, 
 				toolkit, 
 				EMFEditProperties.list(domain,
@@ -355,7 +373,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		}
 		update();
 	}
-	
+
 	private void handleAddMapping() {
 		Set<ModelEntity> usedEntities = new HashSet<>();
 		int maxIndex = 0;

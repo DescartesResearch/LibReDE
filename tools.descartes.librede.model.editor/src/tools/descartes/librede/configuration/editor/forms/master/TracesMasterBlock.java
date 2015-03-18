@@ -29,12 +29,14 @@ package tools.descartes.librede.configuration.editor.forms.master;
 import java.util.Iterator;
 
 import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -50,6 +52,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import tools.descartes.librede.PrettyPrinter;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.TraceConfiguration;
@@ -58,14 +61,17 @@ import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.FileTraceDetailsPage;
 import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetric;
 import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.Time;
 
 public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 
 	private Table tableTraces;
 	private TableViewer tableTracesViewer;
+	private FileTraceDetailsPage details;
 
 	/**
 	 * Create the master details block.
@@ -80,7 +86,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 	 */
 	@Override
 	protected void registerPages(DetailsPart part) {
-		FileTraceDetailsPage details = new FileTraceDetailsPage(page, domain, model);
+		details = new FileTraceDetailsPage(page, domain, model);
 		part.registerPage(FileTraceConfigurationImpl.class, details);
 	}
 
@@ -106,23 +112,40 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 
 	@Override
 	protected void handleAdd() {
-		TraceConfiguration series = ConfigurationFactory.eINSTANCE.createFileTraceConfiguration();
-		if (model.getInput().getDataSources().size() > 0) {
-			series.setDataSource(model.getInput().getDataSources().get(0));
-		}
-		ModelEntity entity = null;
-		if (model.getWorkloadDescription().getResources().size() > 0) {
-			entity = model.getWorkloadDescription().getResources().get(0);
-		} else if (model.getWorkloadDescription().getServices().size() > 0) {
-			entity = model.getWorkloadDescription().getServices().get(0);
-		}
-		if (entity != null) {
-			TraceToEntityMapping mapping = ConfigurationFactory.eINSTANCE.createTraceToEntityMapping();
-			mapping.setEntity(entity);
-			mapping.setTraceColumn(1);
-			series.getMappings().add(mapping);
+		TraceConfiguration series = null;
+		
+		// The user can select any trace before clicking add
+		// and the new configuration will have the same initial values
+		ISelection sel = tableTracesViewer.getSelection();
+		if (!sel.isEmpty()) {
+			TraceConfiguration selSeries = (TraceConfiguration)((IStructuredSelection)sel).getFirstElement();
+			series = EcoreUtil.copy(selSeries);
 		}
 		
+		if (series == null) {
+			series = ConfigurationFactory.eINSTANCE.createFileTraceConfiguration();
+			
+			// Initialize default values
+			if (model.getInput().getDataSources().size() > 0) {
+				series.setDataSource(model.getInput().getDataSources().get(0));
+				series.setMetric(StandardMetrics.RESPONSE_TIME);
+				series.setUnit(Time.INSTANCE.getBaseUnit());
+				
+				ModelEntity entity = null;
+				if (model.getWorkloadDescription().getResources().size() > 0) {
+					entity = model.getWorkloadDescription().getResources().get(0);
+				} else if (model.getWorkloadDescription().getServices().size() > 0) {
+					entity = model.getWorkloadDescription().getServices().get(0);
+				}
+				
+				if (entity != null) {
+					TraceToEntityMapping mapping = ConfigurationFactory.eINSTANCE.createTraceToEntityMapping();
+					mapping.setEntity(entity);
+					mapping.setTraceColumn(1);
+					series.getMappings().add(mapping);
+				}
+			}
+		}		
 		Command cmd = AddCommand.create(domain, model.getInput(), ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS, series);
 		domain.getCommandStack().execute(cmd);
 	}

@@ -3,9 +3,14 @@
 package tools.descartes.librede.units.impl;
 
 import java.lang.reflect.InvocationTargetException;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
@@ -21,6 +26,7 @@ import tools.descartes.librede.units.UnitsPackage;
  *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getName <em>Name</em>}</li>
  *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getSymbol <em>Symbol</em>}</li>
  *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getBaseFactor <em>Base Factor</em>}</li>
+ *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getDimension <em>Dimension</em>}</li>
  * </ul>
  *
  * @generated
@@ -135,6 +141,48 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	public D getDimension() {
+		if (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION) return null;
+		return (D)eInternalContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetDimension(D newDimension, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newDimension, UnitsPackage.UNIT__DIMENSION, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setDimension(D newDimension) {
+		if (newDimension != eInternalContainer() || (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION && newDimension != null)) {
+			if (EcoreUtil.isAncestor(this, newDimension))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newDimension != null)
+				msgs = ((InternalEObject)newDimension).eInverseAdd(this, UnitsPackage.DIMENSION__UNITS, Dimension.class, msgs);
+			msgs = basicSetDimension(newDimension, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, UnitsPackage.UNIT__DIMENSION, newDimension, newDimension));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
 	public double convertTo(double value, Unit<D> targetUnit) {
@@ -155,6 +203,51 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case UnitsPackage.UNIT__DIMENSION:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetDimension((D)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case UnitsPackage.UNIT__DIMENSION:
+				return basicSetDimension(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
+		switch (eContainerFeatureID()) {
+			case UnitsPackage.UNIT__DIMENSION:
+				return eInternalContainer().eInverseRemove(this, UnitsPackage.DIMENSION__UNITS, Dimension.class, msgs);
+		}
+		return super.eBasicRemoveFromContainerFeature(msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -164,8 +257,41 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 				return getSymbol();
 			case UnitsPackage.UNIT__BASE_FACTOR:
 				return getBaseFactor();
+			case UnitsPackage.UNIT__DIMENSION:
+				return getDimension();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case UnitsPackage.UNIT__DIMENSION:
+				setDimension((D)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case UnitsPackage.UNIT__DIMENSION:
+				setDimension((D)null);
+				return;
+		}
+		super.eUnset(featureID);
 	}
 
 	/**
@@ -182,6 +308,8 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 				return SYMBOL_EDEFAULT == null ? symbol != null : !SYMBOL_EDEFAULT.equals(symbol);
 			case UnitsPackage.UNIT__BASE_FACTOR:
 				return baseFactor != BASE_FACTOR_EDEFAULT;
+			case UnitsPackage.UNIT__DIMENSION:
+				return getDimension() != null;
 		}
 		return super.eIsSet(featureID);
 	}

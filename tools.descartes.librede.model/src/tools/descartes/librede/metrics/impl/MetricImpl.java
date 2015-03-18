@@ -137,18 +137,6 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setDimension(Dimension newDimension) {
-		Dimension oldDimension = dimension;
-		dimension = newDimension;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, MetricsPackage.METRIC__DIMENSION, oldDimension, dimension));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EList<Aggregation> getAllowedAggregations() {
 		if (allowedAggregations == null) {
 			allowedAggregations = new EDataTypeUniqueEList<Aggregation>(Aggregation.class, this, MetricsPackage.METRIC__ALLOWED_AGGREGATIONS);
@@ -184,9 +172,6 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case MetricsPackage.METRIC__DIMENSION:
-				setDimension((Dimension)newValue);
-				return;
 			case MetricsPackage.METRIC__ALLOWED_AGGREGATIONS:
 				getAllowedAggregations().clear();
 				getAllowedAggregations().addAll((Collection<? extends Aggregation>)newValue);
@@ -203,9 +188,6 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case MetricsPackage.METRIC__DIMENSION:
-				setDimension((Dimension)null);
-				return;
 			case MetricsPackage.METRIC__ALLOWED_AGGREGATIONS:
 				getAllowedAggregations().clear();
 				return;

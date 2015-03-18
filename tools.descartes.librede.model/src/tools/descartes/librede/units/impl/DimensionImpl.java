@@ -3,21 +3,15 @@
 package tools.descartes.librede.units.impl;
 
 import java.util.Collection;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
-
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
@@ -121,9 +115,24 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 */
 	public EList<Unit<?>> getUnits() {
 		if (units == null) {
-			units = new EObjectContainmentEList<Unit<?>>(Unit.class, this, UnitsPackage.DIMENSION__UNITS);
+			units = new EObjectContainmentWithInverseEList<Unit<?>>(Unit.class, this, UnitsPackage.DIMENSION__UNITS, UnitsPackage.UNIT__DIMENSION);
 		}
 		return units;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case UnitsPackage.DIMENSION__UNITS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getUnits()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**

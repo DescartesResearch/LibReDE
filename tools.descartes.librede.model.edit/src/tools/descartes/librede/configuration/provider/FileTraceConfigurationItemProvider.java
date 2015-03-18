@@ -32,19 +32,15 @@ package tools.descartes.librede.configuration.provider;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
 
 /**
  * This is the item provider adapter for a {@link tools.descartes.librede.configuration.FileTraceConfiguration} object.

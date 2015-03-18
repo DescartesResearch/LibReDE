@@ -53,6 +53,7 @@ public interface Dimension extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Units</b></em>' containment reference list.
 	 * The list contents are of type {@link tools.descartes.librede.units.Unit}&lt;?>.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * A list of all defined units of this dimension.
@@ -60,7 +61,8 @@ public interface Dimension extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Units</em>' containment reference list.
 	 * @see tools.descartes.librede.units.UnitsPackage#getDimension_Units()
-	 * @model containment="true" required="true"
+	 * @see tools.descartes.librede.units.Unit#getDimension
+	 * @model opposite="dimension" containment="true" required="true"
 	 * @generated
 	 */
 	EList<Unit<?>> getUnits();

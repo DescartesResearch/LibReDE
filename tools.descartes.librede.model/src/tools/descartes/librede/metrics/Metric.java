@@ -51,22 +51,11 @@ public interface Metric extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Dimension</em>' reference.
-	 * @see #setDimension(Dimension)
 	 * @see tools.descartes.librede.metrics.MetricsPackage#getMetric_Dimension()
-	 * @model required="true"
+	 * @model required="true" changeable="false"
 	 * @generated
 	 */
 	Dimension getDimension();
-
-	/**
-	 * Sets the value of the '{@link tools.descartes.librede.metrics.Metric#getDimension <em>Dimension</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Dimension</em>' reference.
-	 * @see #getDimension()
-	 * @generated
-	 */
-	void setDimension(Dimension value);
 
 	/**
 	 * Returns the value of the '<em><b>Allowed Aggregations</b></em>' attribute list.

@@ -38,6 +38,15 @@ public interface UnitsFactory extends EFactory {
 	 * @generated NOT
 	 */
 	<D extends Dimension> Unit<D> createUnit(D dimension, String name, String symbol, double baseFactor);
+	
+	/**
+	 * Returns a new object of class '<em>Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Unit</em>'.
+	 * @generated NOT
+	 */
+	<D extends Dimension> Unit<D> createBaseUnit(D dimension, String name, String symbol);
 
 	/**
 	 * Returns a new object of class '<em>Request Rate</em>'.

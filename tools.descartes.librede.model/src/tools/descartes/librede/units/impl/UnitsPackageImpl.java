@@ -221,6 +221,15 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getUnit_Dimension() {
+		return (EReference)unitEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EOperation getUnit__ConvertTo__double_Unit() {
 		return unitEClass.getEOperations().get(0);
 	}
@@ -324,6 +333,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		createEAttribute(unitEClass, UNIT__NAME);
 		createEAttribute(unitEClass, UNIT__SYMBOL);
 		createEAttribute(unitEClass, UNIT__BASE_FACTOR);
+		createEReference(unitEClass, UNIT__DIMENSION);
 		createEOperation(unitEClass, UNIT___CONVERT_TO__DOUBLE_UNIT);
 		createEOperation(unitEClass, UNIT___CONVERT_FROM__DOUBLE_UNIT);
 
@@ -384,12 +394,14 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		g1 = createEGenericType(this.getUnit());
 		g2 = createEGenericType();
 		g1.getETypeArguments().add(g2);
-		initEReference(getDimension_Units(), g1, null, "units", null, 1, -1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDimension_Units(), g1, this.getUnit_Dimension(), "units", null, 1, -1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getUnit_Name(), ecorePackage.getEString(), "name", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_Symbol(), ecorePackage.getEString(), "symbol", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_BaseFactor(), ecorePackage.getEDouble(), "baseFactor", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(unitEClass_D);
+		initEReference(getUnit_Dimension(), g1, this.getDimension_Units(), "dimension", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		EOperation op = initEOperation(getUnit__ConvertTo__double_Unit(), ecorePackage.getEDouble(), "convertTo", 1, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, ecorePackage.getEDouble(), "value", 1, 1, IS_UNIQUE, IS_ORDERED);

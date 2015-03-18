@@ -16,6 +16,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link tools.descartes.librede.units.Unit#getName <em>Name</em>}</li>
  *   <li>{@link tools.descartes.librede.units.Unit#getSymbol <em>Symbol</em>}</li>
  *   <li>{@link tools.descartes.librede.units.Unit#getBaseFactor <em>Base Factor</em>}</li>
+ *   <li>{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.units.UnitsPackage#getUnit()
@@ -65,6 +66,34 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @generated
 	 */
 	double getBaseFactor();
+
+	/**
+	 * Returns the value of the '<em><b>Dimension</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.units.Dimension#getUnits <em>Units</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Dimension</em>' container reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Dimension</em>' container reference.
+	 * @see #setDimension(Dimension)
+	 * @see tools.descartes.librede.units.UnitsPackage#getUnit_Dimension()
+	 * @see tools.descartes.librede.units.Dimension#getUnits
+	 * @model opposite="units" required="true" transient="false"
+	 * @generated
+	 */
+	D getDimension();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Dimension</em>' container reference.
+	 * @see #getDimension()
+	 * @generated
+	 */
+	void setDimension(D value);
 
 	/**
 	 * <!-- begin-user-doc -->

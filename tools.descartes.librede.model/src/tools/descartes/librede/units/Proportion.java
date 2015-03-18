@@ -23,7 +23,7 @@ public interface Proportion extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Proportion> NONE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "none", "", 1);
+	public static final Unit<Proportion> NONE = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "none", "");
 
 	/**
 	 * @generated NOT

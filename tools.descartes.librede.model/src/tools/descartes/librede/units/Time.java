@@ -38,7 +38,7 @@ public interface Time extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Time> SECONDS = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "seconds", "s", 1);
+	public static final Unit<Time> SECONDS = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "seconds", "s");
 
 	/**
 	 * @generated NOT

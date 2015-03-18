@@ -38,7 +38,7 @@ public interface RequestRate extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<RequestRate> REQ_PER_SECOND = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "requests_per_second", "req/s", 1);
+	public static final Unit<RequestRate> REQ_PER_SECOND = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "requests_per_second", "req/s");
 
 	/**
 	 * @generated NOT
