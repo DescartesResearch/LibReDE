@@ -76,9 +76,8 @@ import tools.descartes.librede.repository.IMetric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.units.Proportion;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
@@ -95,7 +94,7 @@ public class Librede {
 		Registry.INSTANCE.registerDimension(Time.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestCount.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestRate.INSTANCE);
-		Registry.INSTANCE.registerDimension(Proportion.INSTANCE);
+		Registry.INSTANCE.registerDimension(Ratio.INSTANCE);
 		
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVAL_RATE);
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS);

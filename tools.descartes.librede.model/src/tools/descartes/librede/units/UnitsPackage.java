@@ -114,13 +114,22 @@ public interface UnitsPackage extends EPackage {
 	int UNIT = 1;
 
 	/**
+	 * The feature id for the '<em><b>Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNIT__ID = 0;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__NAME = 0;
+	int UNIT__NAME = 1;
 
 	/**
 	 * The feature id for the '<em><b>Symbol</b></em>' attribute.
@@ -129,7 +138,7 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__SYMBOL = 1;
+	int UNIT__SYMBOL = 2;
 
 	/**
 	 * The feature id for the '<em><b>Base Factor</b></em>' attribute.
@@ -138,7 +147,7 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__BASE_FACTOR = 2;
+	int UNIT__BASE_FACTOR = 3;
 
 	/**
 	 * The feature id for the '<em><b>Dimension</b></em>' container reference.
@@ -147,7 +156,7 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT__DIMENSION = 3;
+	int UNIT__DIMENSION = 4;
 
 	/**
 	 * The number of structural features of the '<em>Unit</em>' class.
@@ -156,7 +165,7 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int UNIT_FEATURE_COUNT = 4;
+	int UNIT_FEATURE_COUNT = 5;
 
 	/**
 	 * The operation id for the '<em>Convert To</em>' operation.
@@ -324,14 +333,14 @@ public interface UnitsPackage extends EPackage {
 	int REQUEST_COUNT_OPERATION_COUNT = DIMENSION_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link tools.descartes.librede.units.impl.ProportionImpl <em>Proportion</em>}' class.
+	 * The meta object id for the '{@link tools.descartes.librede.units.impl.RatioImpl <em>Ratio</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see tools.descartes.librede.units.impl.ProportionImpl
-	 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getProportion()
+	 * @see tools.descartes.librede.units.impl.RatioImpl
+	 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getRatio()
 	 * @generated
 	 */
-	int PROPORTION = 5;
+	int RATIO = 5;
 
 	/**
 	 * The feature id for the '<em><b>Base Unit</b></em>' reference.
@@ -340,7 +349,7 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROPORTION__BASE_UNIT = DIMENSION__BASE_UNIT;
+	int RATIO__BASE_UNIT = DIMENSION__BASE_UNIT;
 
 	/**
 	 * The feature id for the '<em><b>Units</b></em>' containment reference list.
@@ -349,25 +358,25 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROPORTION__UNITS = DIMENSION__UNITS;
+	int RATIO__UNITS = DIMENSION__UNITS;
 
 	/**
-	 * The number of structural features of the '<em>Proportion</em>' class.
+	 * The number of structural features of the '<em>Ratio</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROPORTION_FEATURE_COUNT = DIMENSION_FEATURE_COUNT + 0;
+	int RATIO_FEATURE_COUNT = DIMENSION_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of operations of the '<em>Proportion</em>' class.
+	 * The number of operations of the '<em>Ratio</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROPORTION_OPERATION_COUNT = DIMENSION_OPERATION_COUNT + 0;
+	int RATIO_OPERATION_COUNT = DIMENSION_OPERATION_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link tools.descartes.librede.units.impl.UnitsRepositoryImpl <em>Repository</em>}' class.
@@ -448,6 +457,17 @@ public interface UnitsPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getUnit();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.units.Unit#getId <em>Id</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Id</em>'.
+	 * @see tools.descartes.librede.units.Unit#getId()
+	 * @see #getUnit()
+	 * @generated
+	 */
+	EAttribute getUnit_Id();
 
 	/**
 	 * Returns the meta object for the attribute '{@link tools.descartes.librede.units.Unit#getName <em>Name</em>}'.
@@ -544,14 +564,14 @@ public interface UnitsPackage extends EPackage {
 	EClass getRequestCount();
 
 	/**
-	 * Returns the meta object for class '{@link tools.descartes.librede.units.Proportion <em>Proportion</em>}'.
+	 * Returns the meta object for class '{@link tools.descartes.librede.units.Ratio <em>Ratio</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Proportion</em>'.
-	 * @see tools.descartes.librede.units.Proportion
+	 * @return the meta object for class '<em>Ratio</em>'.
+	 * @see tools.descartes.librede.units.Ratio
 	 * @generated
 	 */
-	EClass getProportion();
+	EClass getRatio();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.units.UnitsRepository <em>Repository</em>}'.
@@ -634,6 +654,14 @@ public interface UnitsPackage extends EPackage {
 		EClass UNIT = eINSTANCE.getUnit();
 
 		/**
+		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute UNIT__ID = eINSTANCE.getUnit_Id();
+
+		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -712,14 +740,14 @@ public interface UnitsPackage extends EPackage {
 		EClass REQUEST_COUNT = eINSTANCE.getRequestCount();
 
 		/**
-		 * The meta object literal for the '{@link tools.descartes.librede.units.impl.ProportionImpl <em>Proportion</em>}' class.
+		 * The meta object literal for the '{@link tools.descartes.librede.units.impl.RatioImpl <em>Ratio</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see tools.descartes.librede.units.impl.ProportionImpl
-		 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getProportion()
+		 * @see tools.descartes.librede.units.impl.RatioImpl
+		 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getRatio()
 		 * @generated
 		 */
-		EClass PROPORTION = eINSTANCE.getProportion();
+		EClass RATIO = eINSTANCE.getRatio();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.units.impl.UnitsRepositoryImpl <em>Repository</em>}' class.

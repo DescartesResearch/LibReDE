@@ -59,11 +59,34 @@ public class UnitItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
+			addIdPropertyDescriptor(object);
 			addNamePropertyDescriptor(object);
 			addSymbolPropertyDescriptor(object);
 			addBaseFactorPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
+	}
+
+	/**
+	 * This adds a property descriptor for the Id feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addIdPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Unit_id_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Unit_id_feature", "_UI_Unit_type"),
+				 UnitsPackage.Literals.UNIT__ID,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
 	}
 
 	/**
@@ -147,14 +170,11 @@ public class UnitItemProvider
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((Unit<?>)object).getName();
-		return label == null || label.length() == 0 ?
-			getString("_UI_Unit_type") :
-			getString("_UI_Unit_type") + " " + label;
+		return ((Unit<?>)object).toString();
 	}
 	
 
@@ -170,6 +190,7 @@ public class UnitItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(Unit.class)) {
+			case UnitsPackage.UNIT__ID:
 			case UnitsPackage.UNIT__NAME:
 			case UnitsPackage.UNIT__SYMBOL:
 			case UnitsPackage.UNIT__BASE_FACTOR:

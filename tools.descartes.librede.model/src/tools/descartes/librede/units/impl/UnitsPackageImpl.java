@@ -9,17 +9,13 @@ import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.ETypeParameter;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
-
 import tools.descartes.librede.configuration.ConfigurationPackage;
-
 import tools.descartes.librede.configuration.impl.ConfigurationPackageImpl;
-
 import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.impl.MetricsPackageImpl;
 import tools.descartes.librede.units.Dimension;
-import tools.descartes.librede.units.Proportion;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
@@ -75,7 +71,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass proportionEClass = null;
+	private EClass ratioEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -194,7 +190,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getUnit_Name() {
+	public EAttribute getUnit_Id() {
 		return (EAttribute)unitEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -203,7 +199,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getUnit_Symbol() {
+	public EAttribute getUnit_Name() {
 		return (EAttribute)unitEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -212,7 +208,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getUnit_BaseFactor() {
+	public EAttribute getUnit_Symbol() {
 		return (EAttribute)unitEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -221,8 +217,17 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getUnit_BaseFactor() {
+		return (EAttribute)unitEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getUnit_Dimension() {
-		return (EReference)unitEClass.getEStructuralFeatures().get(3);
+		return (EReference)unitEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -275,8 +280,8 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getProportion() {
-		return proportionEClass;
+	public EClass getRatio() {
+		return ratioEClass;
 	}
 
 	/**
@@ -330,6 +335,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		createEReference(dimensionEClass, DIMENSION__UNITS);
 
 		unitEClass = createEClass(UNIT);
+		createEAttribute(unitEClass, UNIT__ID);
 		createEAttribute(unitEClass, UNIT__NAME);
 		createEAttribute(unitEClass, UNIT__SYMBOL);
 		createEAttribute(unitEClass, UNIT__BASE_FACTOR);
@@ -343,7 +349,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 
 		requestCountEClass = createEClass(REQUEST_COUNT);
 
-		proportionEClass = createEClass(PROPORTION);
+		ratioEClass = createEClass(RATIO);
 
 		unitsRepositoryEClass = createEClass(UNITS_REPOSITORY);
 		createEReference(unitsRepositoryEClass, UNITS_REPOSITORY__DIMENSIONS);
@@ -383,7 +389,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		requestRateEClass.getESuperTypes().add(this.getDimension());
 		timeEClass.getESuperTypes().add(this.getDimension());
 		requestCountEClass.getESuperTypes().add(this.getDimension());
-		proportionEClass.getESuperTypes().add(this.getDimension());
+		ratioEClass.getESuperTypes().add(this.getDimension());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(dimensionEClass, Dimension.class, "Dimension", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -397,6 +403,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		initEReference(getDimension_Units(), g1, this.getUnit_Dimension(), "units", null, 1, -1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getUnit_Id(), ecorePackage.getEString(), "id", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_Name(), ecorePackage.getEString(), "name", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_Symbol(), ecorePackage.getEString(), "symbol", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_BaseFactor(), ecorePackage.getEDouble(), "baseFactor", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -423,7 +430,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 
 		initEClass(requestCountEClass, RequestCount.class, "RequestCount", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-		initEClass(proportionEClass, Proportion.class, "Proportion", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(ratioEClass, Ratio.class, "Ratio", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(unitsRepositoryEClass, UnitsRepository.class, "UnitsRepository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUnitsRepository_Dimensions(), this.getDimension(), null, "dimensions", null, 0, -1, UnitsRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -165,26 +165,26 @@ public class UnitsItemProviderAdapterFactory extends UnitsAdapterFactory impleme
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.units.Proportion} instances.
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.units.Ratio} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ProportionItemProvider proportionItemProvider;
+	protected RatioItemProvider ratioItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link tools.descartes.librede.units.Proportion}.
+	 * This creates an adapter for a {@link tools.descartes.librede.units.Ratio}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public Adapter createProportionAdapter() {
-		if (proportionItemProvider == null) {
-			proportionItemProvider = new ProportionItemProvider(this);
+	public Adapter createRatioAdapter() {
+		if (ratioItemProvider == null) {
+			ratioItemProvider = new RatioItemProvider(this);
 		}
 
-		return proportionItemProvider;
+		return ratioItemProvider;
 	}
 
 	/**

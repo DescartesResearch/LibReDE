@@ -23,6 +23,7 @@ import tools.descartes.librede.units.UnitsPackage;
  * The following features are implemented:
  * </p>
  * <ul>
+ *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getId <em>Id</em>}</li>
  *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getName <em>Name</em>}</li>
  *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getSymbol <em>Symbol</em>}</li>
  *   <li>{@link tools.descartes.librede.units.impl.UnitImpl#getBaseFactor <em>Base Factor</em>}</li>
@@ -32,6 +33,26 @@ import tools.descartes.librede.units.UnitsPackage;
  * @generated
  */
 public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container implements Unit<D> {
+	/**
+	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getId()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String ID_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getId()
+	 * @generated
+	 * @ordered
+	 */
+	protected String id = ID_EDEFAULT;
+
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -109,6 +130,27 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	@Override
 	protected EClass eStaticClass() {
 		return UnitsPackage.Literals.UNIT;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setId(String newId) {
+		String oldId = id;
+		id = newId;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, UnitsPackage.UNIT__ID, oldId, id));
 	}
 
 	/**
@@ -251,6 +293,8 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case UnitsPackage.UNIT__ID:
+				return getId();
 			case UnitsPackage.UNIT__NAME:
 				return getName();
 			case UnitsPackage.UNIT__SYMBOL:
@@ -272,6 +316,9 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case UnitsPackage.UNIT__ID:
+				setId((String)newValue);
+				return;
 			case UnitsPackage.UNIT__DIMENSION:
 				setDimension((D)newValue);
 				return;
@@ -287,6 +334,9 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case UnitsPackage.UNIT__ID:
+				setId(ID_EDEFAULT);
+				return;
 			case UnitsPackage.UNIT__DIMENSION:
 				setDimension((D)null);
 				return;
@@ -302,6 +352,8 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case UnitsPackage.UNIT__ID:
+				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 			case UnitsPackage.UNIT__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case UnitsPackage.UNIT__SYMBOL:

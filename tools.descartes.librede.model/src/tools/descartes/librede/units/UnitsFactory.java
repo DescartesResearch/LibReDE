@@ -37,7 +37,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Unit</em>'.
 	 * @generated NOT
 	 */
-	<D extends Dimension> Unit<D> createUnit(D dimension, String name, String symbol, double baseFactor);
+	<D extends Dimension> Unit<D> createUnit(D dimension, String id, String name, String symbol, double baseFactor);
 	
 	/**
 	 * Returns a new object of class '<em>Unit</em>'.
@@ -46,7 +46,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Unit</em>'.
 	 * @generated NOT
 	 */
-	<D extends Dimension> Unit<D> createBaseUnit(D dimension, String name, String symbol);
+	<D extends Dimension> Unit<D> createBaseUnit(D dimension, String id, String name, String symbol);
 
 	/**
 	 * Returns a new object of class '<em>Request Rate</em>'.
@@ -76,13 +76,13 @@ public interface UnitsFactory extends EFactory {
 	RequestCount createRequestCount();
 
 	/**
-	 * Returns a new object of class '<em>Proportion</em>'.
+	 * Returns a new object of class '<em>Ratio</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Proportion</em>'.
+	 * @return a new object of class '<em>Ratio</em>'.
 	 * @generated
 	 */
-	Proportion createProportion();
+	Ratio createRatio();
 
 	/**
 	 * Returns a new object of class '<em>Repository</em>'.

@@ -88,8 +88,8 @@ public class UnitsAdapterFactory extends AdapterFactoryImpl {
 				return createRequestCountAdapter();
 			}
 			@Override
-			public Adapter caseProportion(Proportion object) {
-				return createProportionAdapter();
+			public Adapter caseRatio(Ratio object) {
+				return createRatioAdapter();
 			}
 			@Override
 			public Adapter caseUnitsRepository(UnitsRepository object) {
@@ -186,16 +186,16 @@ public class UnitsAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.units.Proportion <em>Proportion</em>}'.
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.units.Ratio <em>Ratio</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see tools.descartes.librede.units.Proportion
+	 * @see tools.descartes.librede.units.Ratio
 	 * @generated
 	 */
-	public Adapter createProportionAdapter() {
+	public Adapter createRatioAdapter() {
 		return null;
 	}
 

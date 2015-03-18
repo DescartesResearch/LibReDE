@@ -12,19 +12,19 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 
 /**
- * This is the item provider adapter for a {@link tools.descartes.librede.units.Proportion} object.
+ * This is the item provider adapter for a {@link tools.descartes.librede.units.Ratio} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class ProportionItemProvider extends DimensionItemProvider {
+public class RatioItemProvider extends DimensionItemProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ProportionItemProvider(AdapterFactory adapterFactory) {
+	public RatioItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -44,14 +44,14 @@ public class ProportionItemProvider extends DimensionItemProvider {
 	}
 
 	/**
-	 * This returns Proportion.gif.
+	 * This returns Ratio.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/Proportion"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/Ratio"));
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class ProportionItemProvider extends DimensionItemProvider {
 	 */
 	@Override
 	public String getText(Object object) {
-		return getString("_UI_Proportion_type");
+		return getString("_UI_Ratio_type");
 	}
 	
 

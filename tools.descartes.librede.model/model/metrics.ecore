@@ -3,8 +3,10 @@
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="metrics" nsURI="http://www.descartes-research.net/librede/metrics/1.0"
     nsPrefix="librede-metrics">
   <eClassifiers xsi:type="ecore:EClass" name="Metric">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
-        changeable="false" iD="true"/>
+        changeable="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="dimension" lowerBound="1"
         eType="ecore:EClass units.ecore#//Dimension" changeable="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowedAggregations" lowerBound="1"

@@ -99,10 +99,10 @@ public class UnitsSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case UnitsPackage.PROPORTION: {
-				Proportion proportion = (Proportion)theEObject;
-				T result = caseProportion(proportion);
-				if (result == null) result = caseDimension(proportion);
+			case UnitsPackage.RATIO: {
+				Ratio ratio = (Ratio)theEObject;
+				T result = caseRatio(ratio);
+				if (result == null) result = caseDimension(ratio);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -192,17 +192,17 @@ public class UnitsSwitch<T> extends Switch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Proportion</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Ratio</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Proportion</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Ratio</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseProportion(Proportion object) {
+	public T caseRatio(Ratio object) {
 		return null;
 	}
 

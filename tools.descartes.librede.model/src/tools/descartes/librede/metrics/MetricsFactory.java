@@ -39,7 +39,7 @@ public interface MetricsFactory extends EFactory {
 	 * @return a new object of class '<em>Metric</em>'.
 	 * @generated NOT
 	 */
-	Metric createMetric(String name, Dimension dimension, Aggregation...aggregations);
+	Metric createMetric(String id, String name, Dimension dimension, Aggregation...aggregations);
 
 	/**
 	 * Returns a new object of class '<em>Repository</em>'.

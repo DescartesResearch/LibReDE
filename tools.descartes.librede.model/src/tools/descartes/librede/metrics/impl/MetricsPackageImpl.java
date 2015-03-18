@@ -135,7 +135,7 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMetric_Name() {
+	public EAttribute getMetric_Id() {
 		return (EAttribute)metricEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -144,8 +144,17 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getMetric_Name() {
+		return (EAttribute)metricEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getMetric_Dimension() {
-		return (EReference)metricEClass.getEStructuralFeatures().get(1);
+		return (EReference)metricEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -154,7 +163,7 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 	 * @generated
 	 */
 	public EAttribute getMetric_AllowedAggregations() {
-		return (EAttribute)metricEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)metricEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -213,6 +222,7 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 
 		// Create classes and their features
 		metricEClass = createEClass(METRIC);
+		createEAttribute(metricEClass, METRIC__ID);
 		createEAttribute(metricEClass, METRIC__NAME);
 		createEReference(metricEClass, METRIC__DIMENSION);
 		createEAttribute(metricEClass, METRIC__ALLOWED_AGGREGATIONS);
@@ -258,7 +268,8 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(metricEClass, Metric.class, "Metric", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getMetric_Name(), ecorePackage.getEString(), "name", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMetric_Id(), ecorePackage.getEString(), "id", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMetric_Name(), ecorePackage.getEString(), "name", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getMetric_Dimension(), theUnitsPackage.getDimension(), null, "dimension", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMetric_AllowedAggregations(), this.getAggregation(), "allowedAggregations", null, 1, -1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

@@ -4,23 +4,23 @@ package tools.descartes.librede.units.impl;
 
 import org.eclipse.emf.ecore.EClass;
 
-import tools.descartes.librede.units.Proportion;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.UnitsPackage;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Proportion</b></em>'.
+ * An implementation of the model object '<em><b>Ratio</b></em>'.
  * <!-- end-user-doc -->
  *
  * @generated
  */
-public class ProportionImpl extends DimensionImpl implements Proportion {
+public class RatioImpl extends DimensionImpl implements Ratio {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ProportionImpl() {
+	protected RatioImpl() {
 		super();
 	}
 
@@ -31,7 +31,7 @@ public class ProportionImpl extends DimensionImpl implements Proportion {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return UnitsPackage.Literals.PROPORTION;
+		return UnitsPackage.Literals.RATIO;
 	}
 
-} //ProportionImpl
+} //RatioImpl

@@ -170,7 +170,7 @@ public class UnitsRepositoryItemProvider
 		newChildDescriptors.add
 			(createChildParameter
 				(UnitsPackage.Literals.UNITS_REPOSITORY__DIMENSIONS,
-				 UnitsFactory.eINSTANCE.createProportion()));
+				 UnitsFactory.eINSTANCE.createRatio()));
 	}
 
 	/**

@@ -35,6 +35,8 @@
         </eGenericType>
       </eParameters>
     </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         changeable="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="symbol" lowerBound="1"
@@ -49,7 +51,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="RequestRate" eSuperTypes="#//Dimension"/>
   <eClassifiers xsi:type="ecore:EClass" name="Time" eSuperTypes="#//Dimension"/>
   <eClassifiers xsi:type="ecore:EClass" name="RequestCount" eSuperTypes="#//Dimension"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Proportion" eSuperTypes="#//Dimension"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Ratio" eSuperTypes="#//Dimension"/>
   <eClassifiers xsi:type="ecore:EClass" name="UnitsRepository">
     <eStructuralFeatures xsi:type="ecore:EReference" name="dimensions" upperBound="-1"
         eType="#//Dimension" containment="true"/>

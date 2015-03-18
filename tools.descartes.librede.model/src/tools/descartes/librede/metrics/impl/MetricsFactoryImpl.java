@@ -110,8 +110,9 @@ public class MetricsFactoryImpl extends EFactoryImpl implements MetricsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Metric createMetric(String name, Dimension dimension, Aggregation...aggregations) {
+	public Metric createMetric(String id, String name, Dimension dimension, Aggregation...aggregations) {
 		MetricImpl metric = new MetricImpl();
+		metric.id = id;
 		metric.name = name;
 		metric.dimension = dimension;
 		metric.getAllowedAggregations().addAll(Arrays.asList(aggregations));

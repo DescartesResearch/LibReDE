@@ -62,11 +62,34 @@ public class MetricItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
+			addIdPropertyDescriptor(object);
 			addNamePropertyDescriptor(object);
 			addDimensionPropertyDescriptor(object);
 			addAllowedAggregationsPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
+	}
+
+	/**
+	 * This adds a property descriptor for the Id feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addIdPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Metric_id_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Metric_id_feature", "_UI_Metric_type"),
+				 MetricsPackage.Literals.METRIC__ID,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
 	}
 
 	/**
@@ -154,7 +177,7 @@ public class MetricItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		return PrettyPrinter.toCamelCase(((Metric)object).getName());
+		return ((Metric)object).getName();
 	}
 	
 
@@ -170,6 +193,7 @@ public class MetricItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(Metric.class)) {
+			case MetricsPackage.METRIC__ID:
 			case MetricsPackage.METRIC__NAME:
 			case MetricsPackage.METRIC__ALLOWED_AGGREGATIONS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));

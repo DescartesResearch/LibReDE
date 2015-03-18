@@ -39,8 +39,8 @@ import java.util.UUID;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.units.Proportion;
 import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
@@ -143,7 +143,7 @@ public enum StandardMetric implements IMetric {
 		
 		@Override
 		public Dimension getDimension() {
-			return Proportion.INSTANCE;
+			return Ratio.INSTANCE;
 		}
 	},
 

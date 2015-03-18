@@ -68,13 +68,22 @@ public interface MetricsPackage extends EPackage {
 	int METRIC = 0;
 
 	/**
+	 * The feature id for the '<em><b>Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int METRIC__ID = 0;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int METRIC__NAME = 0;
+	int METRIC__NAME = 1;
 
 	/**
 	 * The feature id for the '<em><b>Dimension</b></em>' reference.
@@ -83,7 +92,7 @@ public interface MetricsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int METRIC__DIMENSION = 1;
+	int METRIC__DIMENSION = 2;
 
 	/**
 	 * The feature id for the '<em><b>Allowed Aggregations</b></em>' attribute list.
@@ -92,7 +101,7 @@ public interface MetricsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int METRIC__ALLOWED_AGGREGATIONS = 2;
+	int METRIC__ALLOWED_AGGREGATIONS = 3;
 
 	/**
 	 * The number of structural features of the '<em>Metric</em>' class.
@@ -101,7 +110,7 @@ public interface MetricsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int METRIC_FEATURE_COUNT = 3;
+	int METRIC_FEATURE_COUNT = 4;
 
 	/**
 	 * The number of operations of the '<em>Metric</em>' class.
@@ -169,6 +178,17 @@ public interface MetricsPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getMetric();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.metrics.Metric#getId <em>Id</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Id</em>'.
+	 * @see tools.descartes.librede.metrics.Metric#getId()
+	 * @see #getMetric()
+	 * @generated
+	 */
+	EAttribute getMetric_Id();
 
 	/**
 	 * Returns the meta object for the attribute '{@link tools.descartes.librede.metrics.Metric#getName <em>Name</em>}'.
@@ -266,6 +286,14 @@ public interface MetricsPackage extends EPackage {
 		 * @generated
 		 */
 		EClass METRIC = eINSTANCE.getMetric();
+
+		/**
+		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute METRIC__ID = eINSTANCE.getMetric_Id();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.

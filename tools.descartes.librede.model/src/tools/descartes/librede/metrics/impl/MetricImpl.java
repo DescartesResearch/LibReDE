@@ -30,6 +30,7 @@ import tools.descartes.librede.units.Dimension;
  * The following features are implemented:
  * </p>
  * <ul>
+ *   <li>{@link tools.descartes.librede.metrics.impl.MetricImpl#getId <em>Id</em>}</li>
  *   <li>{@link tools.descartes.librede.metrics.impl.MetricImpl#getName <em>Name</em>}</li>
  *   <li>{@link tools.descartes.librede.metrics.impl.MetricImpl#getDimension <em>Dimension</em>}</li>
  *   <li>{@link tools.descartes.librede.metrics.impl.MetricImpl#getAllowedAggregations <em>Allowed Aggregations</em>}</li>
@@ -38,6 +39,26 @@ import tools.descartes.librede.units.Dimension;
  * @generated
  */
 public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
+	/**
+	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getId()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String ID_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getId()
+	 * @generated
+	 * @ordered
+	 */
+	protected String id = ID_EDEFAULT;
+
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -102,6 +123,27 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setId(String newId) {
+		String oldId = id;
+		id = newId;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MetricsPackage.METRIC__ID, oldId, id));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public String getName() {
 		return name;
 	}
@@ -152,6 +194,8 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
+			case MetricsPackage.METRIC__ID:
+				return getId();
 			case MetricsPackage.METRIC__NAME:
 				return getName();
 			case MetricsPackage.METRIC__DIMENSION:
@@ -172,6 +216,9 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
+			case MetricsPackage.METRIC__ID:
+				setId((String)newValue);
+				return;
 			case MetricsPackage.METRIC__ALLOWED_AGGREGATIONS:
 				getAllowedAggregations().clear();
 				getAllowedAggregations().addAll((Collection<? extends Aggregation>)newValue);
@@ -188,6 +235,9 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
+			case MetricsPackage.METRIC__ID:
+				setId(ID_EDEFAULT);
+				return;
 			case MetricsPackage.METRIC__ALLOWED_AGGREGATIONS:
 				getAllowedAggregations().clear();
 				return;
@@ -203,6 +253,8 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
+			case MetricsPackage.METRIC__ID:
+				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 			case MetricsPackage.METRIC__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case MetricsPackage.METRIC__DIMENSION:
@@ -223,7 +275,9 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (name: ");
+		result.append(" (id: ");
+		result.append(id);
+		result.append(", name: ");
 		result.append(name);
 		result.append(", allowedAggregations: ");
 		result.append(allowedAggregations);

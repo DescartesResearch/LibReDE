@@ -60,7 +60,7 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 			case UnitsPackage.REQUEST_RATE: return createRequestRate();
 			case UnitsPackage.TIME: return createTime();
 			case UnitsPackage.REQUEST_COUNT: return createRequestCount();
-			case UnitsPackage.PROPORTION: return createProportion();
+			case UnitsPackage.RATIO: return createRatio();
 			case UnitsPackage.UNITS_REPOSITORY: return createUnitsRepository();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
@@ -82,8 +82,9 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public <D extends Dimension> Unit<D> createUnit(D dimension, String name, String symbol, double baseFactor) {
+	public <D extends Dimension> Unit<D> createUnit(D dimension, String id, String name, String symbol, double baseFactor) {
 		UnitImpl<D> unit = new UnitImpl<D>();
+		unit.id = id;
 		unit.name = name;
 		unit.symbol = symbol;
 		unit.baseFactor = baseFactor;
@@ -97,8 +98,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public <D extends Dimension> Unit<D> createBaseUnit(D dimension, String name, String symbol) {
-		Unit<D> unit = createUnit(dimension, name, symbol, 1.0);
+	public <D extends Dimension> Unit<D> createBaseUnit(D dimension, String id, String name, String symbol) {
+		Unit<D> unit = createUnit(dimension, id, name, symbol, 1.0);
 		dimension.setBaseUnit(unit);
 		return unit;
 	}
@@ -138,9 +139,9 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Proportion createProportion() {
-		ProportionImpl proportion = new ProportionImpl();
-		return proportion;
+	public Ratio createRatio() {
+		RatioImpl ratio = new RatioImpl();
+		return ratio;
 	}
 
 	/**
