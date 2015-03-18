@@ -44,6 +44,9 @@ import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 public class ServiceDemandLawTest extends LibredeTest {
 	
@@ -77,16 +80,16 @@ public class ServiceDemandLawTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(cursor).execute();
-		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forAllServices().average().using(cursor).execute();
-		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor).execute();
+		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(cursor).execute();
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		
 		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
 		double expected = x * state.get(generator.getStateModel().getStateVariableIndex(resource, service));
 		
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
@@ -94,7 +97,7 @@ public class ServiceDemandLawTest extends LibredeTest {
 	
 	@Test
 	public void testGetFactor() {
-		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
 		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
 	}
 

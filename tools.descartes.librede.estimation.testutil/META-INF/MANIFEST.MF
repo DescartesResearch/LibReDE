@@ -15,4 +15,5 @@ Import-Package: org.eclipse.emf.common.util,
  tools.descartes.librede.models.observation.functions,
  tools.descartes.librede.models.state,
  tools.descartes.librede.models.state.constraints,
- tools.descartes.librede.repository
+ tools.descartes.librede.repository,
+ tools.descartes.librede.units

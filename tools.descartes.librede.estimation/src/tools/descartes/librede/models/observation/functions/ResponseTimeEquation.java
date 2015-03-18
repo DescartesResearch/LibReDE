@@ -46,6 +46,8 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 /**
  * This output function describes the relationship between the mean response time and the resource demands. 
@@ -97,8 +99,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 //		}
 //		precalculateFactorials(maxParallel);
 		
-		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forService(service).average().using(repository);
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(repository);
+		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
 	}
 	
 	/* (non-Javadoc)

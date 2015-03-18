@@ -72,8 +72,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public <D extends Dimension> Unit<D> createUnit() {
-		UnitImpl<D> unit = new UnitImpl<D>();
+	public Unit createUnit() {
+		UnitImpl unit = new UnitImpl();
 		return unit;
 	}
 
@@ -82,8 +82,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public <D extends Dimension> Unit<D> createUnit(D dimension, String id, String name, String symbol, double baseFactor) {
-		UnitImpl<D> unit = new UnitImpl<D>();
+	public Unit createUnit(Dimension dimension, String id, String name, String symbol, double baseFactor) {
+		UnitImpl unit = new UnitImpl();
 		unit.id = id;
 		unit.name = name;
 		unit.symbol = symbol;
@@ -98,8 +98,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public <D extends Dimension> Unit<D> createBaseUnit(D dimension, String id, String name, String symbol) {
-		Unit<D> unit = createUnit(dimension, id, name, symbol, 1.0);
+	public Unit createBaseUnit(Dimension dimension, String id, String name, String symbol) {
+		Unit unit = createUnit(dimension, id, name, symbol, 1.0);
 		dimension.setBaseUnit(unit);
 		return unit;
 	}

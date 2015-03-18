@@ -174,7 +174,7 @@ public class UnitItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		return ((Unit<?>)object).toString();
+		return ((Unit)object).toString();
 	}
 	
 

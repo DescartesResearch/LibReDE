@@ -38,6 +38,9 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 /**
  * This output function describes the relationship between the per-service utilization and the resource demands. 
@@ -97,10 +100,10 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		res_i = resource;
 		cls_r = service;
 		
-		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).forResource(res_i).average().using(repository);
-		avgResponseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forAllServices().average().using(repository);
-		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(repository);
-		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).forService(service).average().using(repository);
+		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
+		avgResponseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(repository);
+		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
+		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
 	}
 	
 	/* (non-Javadoc)

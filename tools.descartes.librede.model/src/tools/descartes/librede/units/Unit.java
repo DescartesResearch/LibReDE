@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Unit<D extends Dimension> extends EObject {
+public interface Unit extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -110,7 +110,7 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @model opposite="units" required="true" transient="false"
 	 * @generated
 	 */
-	D getDimension();
+	Dimension getDimension();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}' container reference.
@@ -120,7 +120,7 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @see #getDimension()
 	 * @generated
 	 */
-	void setDimension(D value);
+	void setDimension(Dimension value);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -131,7 +131,7 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @model required="true" valueRequired="true" targetUnitRequired="true"
 	 * @generated
 	 */
-	double convertTo(double value, Unit<D> targetUnit);
+	double convertTo(double value, Unit targetUnit);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -142,6 +142,6 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @model required="true" valueRequired="true" sourceUnitRequired="true"
 	 * @generated
 	 */
-	double convertFrom(double value, Unit<D> sourceUnit);
+	double convertFrom(double value, Unit sourceUnit);
 
 } // Unit

@@ -38,7 +38,7 @@ public interface Dimension extends EObject {
 	 * @model required="true"
 	 * @generated
 	 */
-	Unit<?> getBaseUnit();
+	Unit getBaseUnit();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.units.Dimension#getBaseUnit <em>Base Unit</em>}' reference.
@@ -48,11 +48,11 @@ public interface Dimension extends EObject {
 	 * @see #getBaseUnit()
 	 * @generated
 	 */
-	void setBaseUnit(Unit<?> value);
+	void setBaseUnit(Unit value);
 
 	/**
 	 * Returns the value of the '<em><b>Units</b></em>' containment reference list.
-	 * The list contents are of type {@link tools.descartes.librede.units.Unit}&lt;?>.
+	 * The list contents are of type {@link tools.descartes.librede.units.Unit}.
 	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -65,6 +65,6 @@ public interface Dimension extends EObject {
 	 * @model opposite="dimension" containment="true" required="true"
 	 * @generated
 	 */
-	EList<Unit<?>> getUnits();
+	EList<Unit> getUnits();
 
 } // Dimension

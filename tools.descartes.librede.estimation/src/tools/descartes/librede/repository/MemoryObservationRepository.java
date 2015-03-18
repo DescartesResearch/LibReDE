@@ -35,6 +35,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Unit;
 
 /**
  * This class implements the IMonitoringRepository
@@ -111,31 +112,31 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		return entry.aggregationInterval;
 	}
 	
-	public TimeSeries select(Metric m, ModelEntity entity) {
+	public TimeSeries select(Metric m, Unit unit, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
 			return TimeSeries.EMPTY;
 		}
-		return entry.data;
+		return UnitConverter.convertTo(entry.data, m.getDimension().getBaseUnit(), unit);
 	}
 	
-	public void insert(Metric m, ModelEntity entity, TimeSeries observations) {
-		this.setData(m, entity, observations, 0);
+	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries observations) {
+		this.setData(m, unit, entity, observations, 0);
 	}
 	
-	public void insert(Metric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
-		this.setData(m, entity, aggregatedObservations, aggregationInterval);
+	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
+		this.setData(m, unit, entity, aggregatedObservations, aggregationInterval);
 	}
 	
-	private void setData(Metric m, ModelEntity entity, TimeSeries observations, double aggregationInterval) {
+	private void setData(Metric m, Unit unit, ModelEntity entity, TimeSeries observations, double aggregationInterval) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
 			entry = new DataEntry();
 			data.put(key, entry);
 		}
-		entry.data = observations;
+		entry.data = UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit());
 		entry.aggregationInterval = aggregationInterval;
 	}
 	

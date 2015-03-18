@@ -7,20 +7,22 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Unit;
 
 public abstract class AbstractMonitoringRepository implements IMonitoringRepository {
 	
 	public static class DefaultMetricHandler implements IMetricHandler {
 
 		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start,
 				double end) {
-			TimeSeries series = repository.select(metric, entity);
+			TimeSeries series = repository.select(metric, unit, entity);
 			return series.subset(start, end);
 		}
 
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start,
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start,
 				double end, Aggregation func) {
 			throw new UnsupportedOperationException();
 		}
@@ -36,15 +38,15 @@ public abstract class AbstractMonitoringRepository implements IMonitoringReposit
 	private Map<Metric, IMetricHandler> metricHandlers = new HashMap<Metric, IMetricHandler>();
 
 	@Override
-	public TimeSeries select(Metric metric, ModelEntity entity, double start, double end) {
+	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity, double start, double end) {
 		IMetricHandler handler = getMetricHandler(metric);
-		return handler.select(this, metric, entity, start, end);
+		return handler.select(this, metric, unit, entity, start, end);
 	}
 	
 	@Override
-	public double select(Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+	public double select(Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
 		IMetricHandler handler = getMetricHandler(metric);
-		return handler.select(this, metric, entity, start, end, func);
+		return handler.aggregate(this, metric, unit, entity, start, end, func);
 	}
 	
 	@Override

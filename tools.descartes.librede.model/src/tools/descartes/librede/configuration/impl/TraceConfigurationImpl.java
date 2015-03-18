@@ -121,7 +121,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 * @ordered
 	 */
-	protected Unit<?> unit;
+	protected Unit unit;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -185,10 +185,10 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit<?> getUnit() {
+	public Unit getUnit() {
 		if (unit != null && unit.eIsProxy()) {
 			InternalEObject oldUnit = (InternalEObject)unit;
-			unit = (Unit<?>)eResolveProxy(oldUnit);
+			unit = (Unit)eResolveProxy(oldUnit);
 			if (unit != oldUnit) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
@@ -202,7 +202,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit<?> basicGetUnit() {
+	public Unit basicGetUnit() {
 		return unit;
 	}
 
@@ -211,8 +211,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setUnit(Unit<?> newUnit) {
-		Unit<?> oldUnit = unit;
+	public void setUnit(Unit newUnit) {
+		Unit oldUnit = unit;
 		unit = newUnit;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
@@ -351,7 +351,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				getMappings().addAll((Collection<? extends TraceToEntityMapping>)newValue);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				setUnit((Unit<?>)newValue);
+				setUnit((Unit)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -378,7 +378,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				getMappings().clear();
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				setUnit((Unit<?>)null);
+				setUnit((Unit)null);
 				return;
 		}
 		super.eUnset(featureID);

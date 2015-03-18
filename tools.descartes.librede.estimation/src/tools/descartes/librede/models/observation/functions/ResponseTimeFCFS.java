@@ -37,6 +37,8 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.Time;
 
 public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	
@@ -47,8 +49,8 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 			Resource resource, Service service) {
 		super(stateModel, resource, service);
 		
-		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forService(service).average().using(repository);
-		queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL).forResource(resource).average().using(repository);
+		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
+		queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL).in(RequestCount.REQUESTS).forResource(resource).average().using(repository);
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import java.util.Map;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Unit;
 
 
 public class AggregationRepositoryCursor implements IRepositoryCursor {
@@ -40,10 +41,12 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	private static class SeriesCacheKey {
 		
 		public final Metric metric;
+		public final Unit unit;
 		public final ModelEntity entity;
 		
-		public SeriesCacheKey(Metric metric, ModelEntity entity) {
+		public SeriesCacheKey(Metric metric, Unit unit, ModelEntity entity) {
 			this.metric = metric;
+			this.unit = unit;
 			this.entity = entity;
 		}
 
@@ -51,10 +54,9 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result
-					+ ((entity == null) ? 0 : entity.hashCode());
-			result = prime * result
-					+ ((metric == null) ? 0 : metric.hashCode());
+			result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+			result = prime * result + ((metric == null) ? 0 : metric.hashCode());
+			result = prime * result + ((unit == null) ? 0 : unit.hashCode());
 			return result;
 		}
 
@@ -77,6 +79,11 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 					return false;
 			} else if (!metric.equals(other.metric))
 				return false;
+			if (unit == null) {
+				if (other.unit != null)
+					return false;
+			} else if (!unit.equals(other.unit))
+				return false;
 			return true;
 		}		
 	}
@@ -84,11 +91,13 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	private static class AggregationCacheKey {
 		
 		public final Metric metric;
+		public final Unit unit;
 		public final ModelEntity entity;
 		public final Aggregation aggregation;
 		
-		public AggregationCacheKey(Metric metric, ModelEntity entity, Aggregation aggregation) {
+		public AggregationCacheKey(Metric metric, Unit unit, ModelEntity entity, Aggregation aggregation) {
 			this.metric = metric;
+			this.unit = unit;
 			this.entity = entity;
 			this.aggregation = aggregation;
 		}
@@ -97,12 +106,10 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result
-					+ ((aggregation == null) ? 0 : aggregation.hashCode());
-			result = prime * result
-					+ ((entity == null) ? 0 : entity.hashCode());
-			result = prime * result
-					+ ((metric == null) ? 0 : metric.hashCode());
+			result = prime * result + ((aggregation == null) ? 0 : aggregation.hashCode());
+			result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+			result = prime * result + ((metric == null) ? 0 : metric.hashCode());
+			result = prime * result + ((unit == null) ? 0 : unit.hashCode());
 			return result;
 		}
 
@@ -126,6 +133,11 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 				if (other.metric != null)
 					return false;
 			} else if (!metric.equals(other.metric))
+				return false;
+			if (unit == null) {
+				if (other.unit != null)
+					return false;
+			} else if (!unit.equals(other.unit))
 				return false;
 			return true;
 		}		
@@ -217,10 +229,10 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see tools.descartes.librede.repository.IRepositoryCursor#getValues(tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity)
 	 */
 	@Override
-	public TimeSeries getValues(Metric metric, ModelEntity entity) {
-		SeriesCacheKey key = new SeriesCacheKey(metric, entity);
+	public TimeSeries getValues(Metric metric, Unit unit, ModelEntity entity) {
+		SeriesCacheKey key = new SeriesCacheKey(metric, unit, entity);
 		if (!seriesCache.containsKey(key)) {
-			TimeSeries series = repository.select(metric, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
+			TimeSeries series = repository.select(metric, unit, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
 			seriesCache.put(key, series);
 			return series;
 		}
@@ -231,10 +243,10 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see tools.descartes.librede.repository.IRepositoryCursor#getAggregatedValue(tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity, tools.descartes.librede.repository.Aggregation)
 	 */
 	@Override
-	public double getAggregatedValue(Metric metric, ModelEntity entity, Aggregation func) {
-		AggregationCacheKey key = new AggregationCacheKey(metric, entity, func);
+	public double getAggregatedValue(Metric metric, Unit unit, ModelEntity entity, Aggregation func) {
+		AggregationCacheKey key = new AggregationCacheKey(metric, unit, entity, func);
 		if (!aggregationCache.containsKey(key)) {
-			double value = repository.select(metric, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
+			double value = repository.select(metric, unit, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
 			aggregationCache.put(key, value);
 			return value;
 		}		

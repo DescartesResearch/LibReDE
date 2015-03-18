@@ -44,6 +44,8 @@ import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
 
 public class UtilizationLawTest extends LibredeTest {
 		
@@ -72,7 +74,7 @@ public class UtilizationLawTest extends LibredeTest {
 
 	@Test
 	public void testGetIndependentVariables() {
-		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();		
 		Vector expectedVarVector = zeros(state.rows()).set(generator.getStateModel().getStateVariableIndexRange(resource), x);
 		
@@ -81,13 +83,13 @@ public class UtilizationLawTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
 	}
 

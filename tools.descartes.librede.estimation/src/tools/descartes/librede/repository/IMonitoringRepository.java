@@ -34,15 +34,16 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Unit;
 
 
 public interface IMonitoringRepository {
 	
-	public TimeSeries select(Metric metric, ModelEntity entity, double start, double end);
+	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity, double start, double end);
 
-	public double select(Metric metric, ModelEntity entity, double start, double end, Aggregation func);
+	public double select(Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func);
 	
-	public TimeSeries select(Metric metric, ModelEntity entity);
+	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity);
 	
 	public double getAggregationInterval(Metric m, ModelEntity entity);
 

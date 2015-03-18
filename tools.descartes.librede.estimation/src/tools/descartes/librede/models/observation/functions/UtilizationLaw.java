@@ -40,6 +40,8 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
 
 /**
  * This output function implements the Utilization Law:
@@ -85,8 +87,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		variables = zeros(stateModel.getStateSize());
 		varFocusedRange = stateModel.getStateVariableIndexRange(resource);
 		
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(repository);
-		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).forResource(res_i).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
+		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	
 	/* (non-Javadoc)

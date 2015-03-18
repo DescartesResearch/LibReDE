@@ -73,7 +73,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 				return result;
 			}
 			case UnitsPackage.UNIT: {
-				Unit<?> unit = (Unit<?>)theEObject;
+				Unit unit = (Unit)theEObject;
 				T result = caseUnit(unit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -142,7 +142,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public <D extends Dimension> T caseUnit(Unit<D> object) {
+	public T caseUnit(Unit object) {
 		return null;
 	}
 

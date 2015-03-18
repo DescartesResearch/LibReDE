@@ -49,6 +49,9 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.testutils.LibredeTest;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 public class QueryTest extends LibredeTest {
 
@@ -101,13 +104,13 @@ public class QueryTest extends LibredeTest {
 		workload.getResources().addAll(Arrays.asList(resources));
 		workload.getServices().addAll(Arrays.asList(services));
 		repository = new MemoryObservationRepository(workload);
-		repository.insert(StandardMetrics.UTILIZATION, resources[0], cpuUtilTable);
-		repository.insert(StandardMetrics.UTILIZATION, resources[1], hd1UtilTable);
-		repository.insert(StandardMetrics.UTILIZATION, resources[2], hd2UtilTable);
-		repository.insert(StandardMetrics.THROUGHPUT, services[0], addServTputTable);
-		repository.insert(StandardMetrics.THROUGHPUT, services[1], payServTputTable);
-		repository.insert(StandardMetrics.RESPONSE_TIME, services[0], addServRtTable);
-		repository.insert(StandardMetrics.RESPONSE_TIME, services[1], payServRtTable);
+		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], cpuUtilTable);
+		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], hd1UtilTable);
+		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], hd2UtilTable);
+		repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[0], addServTputTable);
+		repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[1], payServTputTable);
+		repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[0], addServRtTable);
+		repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[1], payServRtTable);
 		
 		repository.setCurrentTime(5);
 	}
@@ -159,7 +162,7 @@ public class QueryTest extends LibredeTest {
 		IRepositoryCursor cursor = repository.getCursor(0, 5);
 		assertThat(cursor.next()).isTrue();
 		
-		Query<Vector> respSingle = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forService(services[1]).all().using(cursor);
+		Query<Vector> respSingle = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(services[1]).all().using(cursor);
 		Vector result = respSingle.execute();
 		
 		assertThat(result).isEqualTo(rtMeasurements.column(1), offset(1e-9));

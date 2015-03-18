@@ -35,6 +35,7 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Unit;
 import cern.jet.random.sampling.RandomSampler;
 
 public class CrossValidationCursor implements IRepositoryCursor {
@@ -97,14 +98,14 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public TimeSeries getValues(Metric metric, ModelEntity entity) {
-		return delegate.getValues(metric, entity);
+	public TimeSeries getValues(Metric metric, Unit unit, ModelEntity entity) {
+		return delegate.getValues(metric, unit, entity);
 	}
 
 	@Override
-	public double getAggregatedValue(Metric metric, ModelEntity entity,
+	public double getAggregatedValue(Metric metric, Unit unit, ModelEntity entity,
 			Aggregation func) {
-		return delegate.getAggregatedValue(metric, entity, func);
+		return delegate.getAggregatedValue(metric, unit, entity, func);
 	}
 
 	@Override

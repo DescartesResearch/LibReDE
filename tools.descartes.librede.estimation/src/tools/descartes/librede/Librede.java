@@ -98,14 +98,14 @@ public class Librede {
 		Registry.INSTANCE.registerDimension(Ratio.INSTANCE);
 		
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVAL_RATE, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.RESPONSE_TIME, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.THROUGHPUT, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
-		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
+		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVALS));
+		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, StandardMetricHelpers.createHandler(StandardMetrics.BUSY_TIME));
+		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, StandardMetricHelpers.createHandler(StandardMetrics.DEPARTURES));
+		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, StandardMetricHelpers.createHandler(StandardMetrics.IDLE_TIME));
+		Registry.INSTANCE.registerMetric(StandardMetrics.RESPONSE_TIME, StandardMetricHelpers.createHandler(StandardMetrics.RESPONSE_TIME));
+		Registry.INSTANCE.registerMetric(StandardMetrics.THROUGHPUT, StandardMetricHelpers.createHandler(StandardMetrics.THROUGHPUT));
+		Registry.INSTANCE.registerMetric(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, StandardMetricHelpers.createHandler(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL));
+		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION, StandardMetricHelpers.createHandler(StandardMetrics.UTILIZATION));
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		
@@ -187,9 +187,9 @@ public class Librede {
 							data.setEndTime(conf.getEstimation().getEndTimestamp() / 1000.0);
 							
 							if (fileTrace.getInterval() > 0) {
-								repo.insert(metric, mapping.getEntity(), data, fileTrace.getInterval() / 1000.0);
+								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data, fileTrace.getInterval() / 1000.0);
 							} else {
-								repo.insert(metric, mapping.getEntity(), data);
+								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data);
 							}
 						} finally {
 							if (in != null) in.close();

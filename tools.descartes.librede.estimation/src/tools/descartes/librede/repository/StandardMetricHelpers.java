@@ -36,6 +36,10 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 public class StandardMetricHelpers {
 	
@@ -59,10 +63,10 @@ public class StandardMetricHelpers {
 	
 	private static class IdleTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric,
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit,
 				ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries series = select(repository, metric, entity, start, end);
+				TimeSeries series = select(repository, metric, unit, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
 				return series.sum(0);
 			} else {
@@ -73,10 +77,10 @@ public class StandardMetricHelpers {
 	
 	private static class BusyTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric,
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit,
 				ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries series = select(repository, metric,entity, start, end);
+				TimeSeries series = select(repository, metric, unit, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
 				return series.sum(0);
 			} else {
@@ -87,9 +91,9 @@ public class StandardMetricHelpers {
 
 	private static class UtilizationHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries series = select(repository, metric, entity, start, end);
+				TimeSeries series = select(repository, metric, unit, entity, start, end);
 				series.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
 				return series.timeWeightedMean(0);
 			} else {
@@ -109,17 +113,17 @@ public class StandardMetricHelpers {
 
 	private static class ArrivalsHelper extends AbstractMonitoringRepository.DefaultMetricHandler {		
 		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit,
 				ModelEntity entity, double start, double end) {
-			TimeSeries ts = repository.select(StandardMetrics.ARRIVALS, entity);
+			TimeSeries ts = repository.select(StandardMetrics.ARRIVALS, unit, entity);
 			if (ts.isEmpty()) {
-				TimeSeries resp = repository.select(StandardMetrics.RESPONSE_TIME, entity);
+				TimeSeries resp = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity);
 				double interval = repository.getAggregationInterval(StandardMetrics.RESPONSE_TIME, entity);
 				if (!resp.isEmpty() && (interval == 0.0)) {
 					ts = new TimeSeries(resp.getTime().minus(resp.getData(0)), ones(resp.getData(0).rows()));
 					ts.setStartTime(resp.getStartTime());
 					ts.setEndTime(ts.getEndTime());
-					return ts.subset(start, end);
+					return UnitConverter.convertTo(ts.subset(start, end), RequestCount.REQUESTS, unit);
 				} else {
 					return TimeSeries.EMPTY;
 				}
@@ -128,8 +132,8 @@ public class StandardMetricHelpers {
 		}
 
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = select(repository, metric, entity, start, end);
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
 			case SUM: {
@@ -158,17 +162,17 @@ public class StandardMetricHelpers {
 	
 	private static class DeparturesHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit,
 				ModelEntity entity, double start, double end) {
-			TimeSeries ts = repository.select(StandardMetrics.DEPARTURES, entity);
+			TimeSeries ts = repository.select(StandardMetrics.DEPARTURES, unit, entity);
 			if (ts.isEmpty()) {
-				TimeSeries resp = repository.select(StandardMetrics.RESPONSE_TIME, entity);
+				TimeSeries resp = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity);
 				double interval = repository.getAggregationInterval(StandardMetrics.RESPONSE_TIME, entity);
 				if (!resp.isEmpty() && (interval == 0.0)) {
 					ts = new TimeSeries(resp.getTime(), ones(resp.getData(0).rows()));
 					ts.setStartTime(resp.getStartTime());
 					ts.setEndTime(resp.getEndTime());
-					return ts.subset(start, end);
+					return UnitConverter.convertTo(ts.subset(start, end), RequestCount.REQUESTS, unit);
 				} else {
 					return TimeSeries.EMPTY;
 				}
@@ -177,8 +181,8 @@ public class StandardMetricHelpers {
 		}
 
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = select(repository, metric, entity, start, end);
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
 			case SUM: {
@@ -207,13 +211,13 @@ public class StandardMetricHelpers {
 
 	private static class ArrivalRateHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries ts = select(repository, metric, entity, start, end);
+				TimeSeries ts = select(repository, metric, unit, entity, start, end);
 				if (ts.isEmpty()) {
-					double arrivals = repository.select(StandardMetrics.ARRIVALS,
+					double arrivals = repository.select(StandardMetrics.ARRIVALS, RequestCount.REQUESTS,
 							entity, start, end, Aggregation.SUM);
-					return arrivals / (end - start);
+					return unit.convertFrom(arrivals / (end - start), RequestRate.REQ_PER_SECOND);
 				}
 				return ts.timeWeightedMean(0);
 			} else {
@@ -233,25 +237,18 @@ public class StandardMetricHelpers {
 	
 	private static class ThroughputHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries ts = select(repository, metric, entity, start, end);
+				TimeSeries ts = select(repository, metric, unit, entity, start, end);
 				if (ts.isEmpty()) {
-					double departures = repository.select(StandardMetrics.DEPARTURES,
+					double departures = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS,
 							entity, start, end, Aggregation.SUM);
-					return departures / (end - start);
+					return unit.convertFrom(departures / (end - start), RequestRate.REQ_PER_SECOND);
 				}
 				return ts.timeWeightedMean(0);
 			} else {
 				throw new IllegalArgumentException();
 			}
-		}
-		
-		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double start, double end) {
-			TimeSeries series = repository.select(metric, entity);
-			return series.subset(start, end);
 		}
 		
 		@Override
@@ -266,16 +263,16 @@ public class StandardMetricHelpers {
 	
 	private static class ResponseTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = select(repository, metric, entity, start, end);
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			switch (func) {
 			case AVERAGE: {
 				double interval = repository.getAggregationInterval(metric,
 						entity);
 				if (interval > 0) {
-					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, entity, start, end);
+					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, entity, start, end);
 					if (weights.isEmpty()) {
-						weights = repository.select(StandardMetrics.DEPARTURES, entity, start, end);
+						weights = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, start, end);
 					}
 					if (weights.isEmpty()) {
 						throw new IllegalStateException();
@@ -297,15 +294,15 @@ public class StandardMetricHelpers {
 		}
 
 		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit,
 				ModelEntity entity, double start, double end) {
-			TimeSeries ts = repository.select(metric, entity);
+			TimeSeries ts = repository.select(metric, unit, entity);
 			if (ts.isEmpty()) {
-				TimeSeries arriv = repository.select(StandardMetrics.ARRIVALS, entity);
-				TimeSeries departures = repository.select(StandardMetrics.DEPARTURES, entity);
+				TimeSeries arriv = repository.select(StandardMetrics.ARRIVALS, RequestCount.REQUESTS, entity);
+				TimeSeries departures = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity);
 				if (!arriv.isEmpty() && !departures.isEmpty()) {
 					ts = new TimeSeries(departures.getTime(), departures.getTime().minus(arriv.getTime()));
-					return ts.subset(start, end);
+					return UnitConverter.convertTo(ts.subset(start, end), Time.SECONDS, unit);
 				}				
 			}
 			return ts.subset(start, end);
@@ -323,17 +320,17 @@ public class StandardMetricHelpers {
 	
 	private static class QueueLengthSeenOnArrivalHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double select(IMonitoringRepository repository, Metric metric,
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit,
 				ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = select(repository, metric, entity, start, end);
+			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			switch(func) {
 			case AVERAGE: {
 				double interval = repository.getAggregationInterval(metric,
 						entity);
 				if (interval > 0) {
-					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, entity, start, end);
+					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, entity, start, end);
 					if (weights.isEmpty()) {
-						weights = repository.select(StandardMetrics.DEPARTURES, entity, start, end);
+						weights = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, start, end);
 					}
 					if (weights.isEmpty()) {
 						throw new IllegalStateException();

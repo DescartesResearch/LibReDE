@@ -4,11 +4,9 @@ package tools.descartes.librede.units.impl;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.impl.ConfigurationPackageImpl;
@@ -379,11 +377,8 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		setNsURI(eNS_URI);
 
 		// Create type parameters
-		ETypeParameter unitEClass_D = addETypeParameter(unitEClass, "D");
 
 		// Set bounds for type parameters
-		EGenericType g1 = createEGenericType(this.getDimension());
-		unitEClass_D.getEBounds().add(g1);
 
 		// Add supertypes to classes
 		requestRateEClass.getESuperTypes().add(this.getDimension());
@@ -393,36 +388,23 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(dimensionEClass, Dimension.class, "Dimension", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		g1 = createEGenericType(this.getUnit());
-		EGenericType g2 = createEGenericType();
-		g1.getETypeArguments().add(g2);
-		initEReference(getDimension_BaseUnit(), g1, null, "baseUnit", null, 1, 1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		g1 = createEGenericType(this.getUnit());
-		g2 = createEGenericType();
-		g1.getETypeArguments().add(g2);
-		initEReference(getDimension_Units(), g1, this.getUnit_Dimension(), "units", null, 1, -1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDimension_BaseUnit(), this.getUnit(), null, "baseUnit", null, 1, 1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getDimension_Units(), this.getUnit(), this.getUnit_Dimension(), "units", null, 1, -1, Dimension.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(unitEClass, Unit.class, "Unit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getUnit_Id(), ecorePackage.getEString(), "id", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_Name(), ecorePackage.getEString(), "name", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_Symbol(), ecorePackage.getEString(), "symbol", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getUnit_BaseFactor(), ecorePackage.getEDouble(), "baseFactor", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		g1 = createEGenericType(unitEClass_D);
-		initEReference(getUnit_Dimension(), g1, this.getDimension_Units(), "dimension", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getUnit_Dimension(), this.getDimension(), this.getDimension_Units(), "dimension", null, 1, 1, Unit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		EOperation op = initEOperation(getUnit__ConvertTo__double_Unit(), ecorePackage.getEDouble(), "convertTo", 1, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, ecorePackage.getEDouble(), "value", 1, 1, IS_UNIQUE, IS_ORDERED);
-		g1 = createEGenericType(this.getUnit());
-		g2 = createEGenericType(unitEClass_D);
-		g1.getETypeArguments().add(g2);
-		addEParameter(op, g1, "targetUnit", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getUnit(), "targetUnit", 1, 1, IS_UNIQUE, IS_ORDERED);
 
 		op = initEOperation(getUnit__ConvertFrom__double_Unit(), ecorePackage.getEDouble(), "convertFrom", 1, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, ecorePackage.getEDouble(), "value", 1, 1, IS_UNIQUE, IS_ORDERED);
-		g1 = createEGenericType(this.getUnit());
-		g2 = createEGenericType(unitEClass_D);
-		g1.getETypeArguments().add(g2);
-		addEParameter(op, g1, "sourceUnit", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getUnit(), "sourceUnit", 1, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(requestRateEClass, RequestRate.class, "RequestRate", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

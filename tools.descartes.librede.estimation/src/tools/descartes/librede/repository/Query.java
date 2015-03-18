@@ -38,6 +38,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Unit;
 
 public final class Query<T extends Vector> {
 	
@@ -48,15 +49,17 @@ public final class Query<T extends Vector> {
 	private Aggregation aggregation;
 	private Query.Type type;
 	private Metric metric;
+	private Unit unit;
 	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, Metric metric,
+	protected Query(Aggregation aggregation, Type type, Metric metric, Unit unit,
 			ModelEntity entity, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
 		this.type = type;
 		this.metric = metric;
+		this.unit = unit;
 		this.repositoryCursor = repositoryCursor;
 		if (entity != null) {
 			entities.add(entity);
@@ -75,6 +78,10 @@ public final class Query<T extends Vector> {
 		return metric;
 	}
 	
+	public Unit getUnit() {
+		return unit;
+	}
+	
 	public T execute() {		
 		if (entities.isEmpty()) {
 			load();
@@ -84,15 +91,15 @@ public final class Query<T extends Vector> {
 			Vector result = vector(entities.size(), new VectorFunction() {				
 				@Override
 				public double cell(int row) {
-					return repositoryCursor.getAggregatedValue(metric, entities.get(row), aggregation);
+					return repositoryCursor.getAggregatedValue(metric, unit, entities.get(row), aggregation);
 				}
 			});
 			return (T)result;
 		} else {
 			if (aggregation != Aggregation.NONE) {
-				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, entities.get(0), aggregation));
+				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, unit, entities.get(0), aggregation));
 			} else {
-				return (T)repositoryCursor.getValues(metric, entities.get(0)).getData(0);
+				return (T)repositoryCursor.getValues(metric, unit, entities.get(0)).getData(0);
 			}			
 		}
 	}

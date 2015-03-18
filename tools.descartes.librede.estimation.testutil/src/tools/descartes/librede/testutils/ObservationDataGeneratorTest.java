@@ -41,6 +41,9 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetricHelpers;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 public class ObservationDataGeneratorTest {
 	
@@ -59,9 +62,9 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
 		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
-		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).forAllResources().average().using(view);
-		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(view);
-		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forAllServices().average().using(view);
+		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
+		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
+		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(view);
 		
 		Vector demands = vector(0.25);
 		generator.setDemands(demands);
@@ -78,9 +81,9 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
-		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).forAllResources().average().using(view);
-		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(view);
-		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forAllServices().average().using(view);
+		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
+		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
+		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(view);
 		
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
@@ -98,9 +101,9 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 4);
 		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
-		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).forAllResources().average().using(view);
-		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(view);
-		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forAllServices().average().using(view);
+		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
+		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
+		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(view);
 		
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
@@ -117,9 +120,9 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 4);
 		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
-		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).forAllResources().average().using(view);
-		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(view);
-		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forAllServices().average().using(view);
+		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
+		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
+		Query<Vector> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(view);
 		
 		Vector demands = vector(
 				0.25, 0.3, 0.35, 0.4,
@@ -142,7 +145,7 @@ public class ObservationDataGeneratorTest {
 		generator.setUpperUtilizationBound(0.6);
 		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
-		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).forAllResources().average().using(view);
+		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
 		
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
@@ -163,7 +166,7 @@ public class ObservationDataGeneratorTest {
 		generator.setWorkloadMixVariation(0);
 		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
 		
-		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(view);
+		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
 		
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);

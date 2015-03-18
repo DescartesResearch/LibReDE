@@ -34,11 +34,13 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.Query.Type;
+import tools.descartes.librede.units.Unit;
 
 public class QueryBuilder {
 	
 	private Query.Type type;
 	private Metric metric;
+	private Unit unit;
 	private ModelEntity entity;
 	private Aggregation aggregation;
 	
@@ -52,6 +54,13 @@ public class QueryBuilder {
 	}
 	
 	public class SelectClause {
+		public InClause in(Unit unit) {
+			QueryBuilder.this.unit = unit;
+			return new InClause();
+		}		
+	}
+	
+	public class InClause {
 	
 		public ForClause forResource(Resource resource) {
 			type = Type.RESOURCE;
@@ -130,7 +139,7 @@ public class QueryBuilder {
 	
 	public class UsingClause<T extends Vector> {
 		public Query<T> using(IRepositoryCursor repository) {
-			return new Query<T>(aggregation, type, metric, entity, repository);
+			return new Query<T>(aggregation, type, metric, unit, entity, repository);
 		}
 	}
 	

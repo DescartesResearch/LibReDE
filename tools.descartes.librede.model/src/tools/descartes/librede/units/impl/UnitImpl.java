@@ -32,7 +32,7 @@ import tools.descartes.librede.units.UnitsPackage;
  *
  * @generated
  */
-public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container implements Unit<D> {
+public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -186,9 +186,9 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
-	public D getDimension() {
+	public Dimension getDimension() {
 		if (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION) return null;
-		return (D)eInternalContainer();
+		return (Dimension)eInternalContainer();
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetDimension(D newDimension, NotificationChain msgs) {
+	public NotificationChain basicSetDimension(Dimension newDimension, NotificationChain msgs) {
 		msgs = eBasicSetContainer((InternalEObject)newDimension, UnitsPackage.UNIT__DIMENSION, msgs);
 		return msgs;
 	}
@@ -206,7 +206,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setDimension(D newDimension) {
+	public void setDimension(Dimension newDimension) {
 		if (newDimension != eInternalContainer() || (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION && newDimension != null)) {
 			if (EcoreUtil.isAncestor(this, newDimension))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
@@ -227,7 +227,10 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public double convertTo(double value, Unit<D> targetUnit) {
+	public double convertTo(double value, Unit targetUnit) {
+		if (!targetUnit.getDimension().equals(this.getDimension())) {
+			throw new IllegalArgumentException("Incompatible dimensions");
+		}
 		return value / targetUnit.getBaseFactor() * baseFactor;
 	}
 
@@ -236,7 +239,10 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public double convertFrom(double value, Unit<D> sourceUnit) {
+	public double convertFrom(double value, Unit sourceUnit) {
+		if (!sourceUnit.getDimension().equals(this.getDimension())) {
+			throw new IllegalArgumentException("Incompatible dimensions");
+		}
 		return sourceUnit.convertTo(value, this);
 	}
 
@@ -252,7 +258,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 			case UnitsPackage.UNIT__DIMENSION:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetDimension((D)otherEnd, msgs);
+				return basicSetDimension((Dimension)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -320,7 +326,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 				setId((String)newValue);
 				return;
 			case UnitsPackage.UNIT__DIMENSION:
-				setDimension((D)newValue);
+				setDimension((Dimension)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -338,7 +344,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 				setId(ID_EDEFAULT);
 				return;
 			case UnitsPackage.UNIT__DIMENSION:
-				setDimension((D)null);
+				setDimension((Dimension)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -376,9 +382,9 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
 			case UnitsPackage.UNIT___CONVERT_TO__DOUBLE_UNIT:
-				return convertTo((Double)arguments.get(0), (Unit<D>)arguments.get(1));
+				return convertTo((Double)arguments.get(0), (Unit)arguments.get(1));
 			case UnitsPackage.UNIT___CONVERT_FROM__DOUBLE_UNIT:
-				return convertFrom((Double)arguments.get(0), (Unit<D>)arguments.get(1));
+				return convertFrom((Double)arguments.get(0), (Unit)arguments.get(1));
 		}
 		return super.eInvoke(operationID, arguments);
 	}

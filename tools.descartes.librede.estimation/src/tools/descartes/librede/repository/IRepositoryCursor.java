@@ -31,6 +31,7 @@ import java.util.List;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Unit;
 
 public interface IRepositoryCursor {
 
@@ -46,9 +47,9 @@ public interface IRepositoryCursor {
 
 	double getCurrentIntervalEnd();
 
-	TimeSeries getValues(Metric metric, ModelEntity entity);
+	TimeSeries getValues(Metric metric, Unit unit, ModelEntity entity);
 
-	double getAggregatedValue(Metric metric,
+	double getAggregatedValue(Metric metric, Unit unit,
 			ModelEntity entity, Aggregation func);
 
 	IMonitoringRepository getRepository();

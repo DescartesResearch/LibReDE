@@ -38,6 +38,7 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.Time;
 
 /**
  * This output function approximates the resource demands with the observed response times (min, max, or mean) of a service.
@@ -70,13 +71,13 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		
 		switch(aggregation) {
 		case AVERAGE:
-			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forService(cls_r).average().using(repository);
+			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(cls_r).average().using(repository);
 			break;
 		case MAXIMUM:
-			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forService(cls_r).max().using(repository);
+			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(cls_r).max().using(repository);
 			break;
 		case MINIMUM:
-			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).forService(cls_r).min().using(repository);
+			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(cls_r).min().using(repository);
 			break;
 		default:
 			throw new IllegalArgumentException();

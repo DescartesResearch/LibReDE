@@ -23,6 +23,6 @@ public interface RequestCount extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<RequestCount> REQUESTS = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "REQUESTS", "requests", "req");
+	public static final Unit REQUESTS = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "REQUESTS", "requests", "req");
 
 } // RequestCount

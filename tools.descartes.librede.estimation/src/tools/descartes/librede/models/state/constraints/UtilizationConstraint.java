@@ -40,6 +40,7 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.RequestRate;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
@@ -52,7 +53,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	public UtilizationConstraint(Resource resource, IRepositoryCursor repository) {
 		this.res_i = resource;
 		
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).forAllServices().average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
 	}
 	
 	@Override

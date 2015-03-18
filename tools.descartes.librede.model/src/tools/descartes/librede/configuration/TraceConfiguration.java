@@ -95,7 +95,7 @@ public interface TraceConfiguration extends EObject {
 	 * @model required="true"
 	 * @generated
 	 */
-	Unit<?> getUnit();
+	Unit getUnit();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}' reference.
@@ -105,7 +105,7 @@ public interface TraceConfiguration extends EObject {
 	 * @see #getUnit()
 	 * @generated
 	 */
-	void setUnit(Unit<?> value);
+	void setUnit(Unit value);
 
 	/**
 	 * Returns the value of the '<em><b>Interval</b></em>' attribute.
