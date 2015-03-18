@@ -32,10 +32,10 @@ import tools.descartes.librede.metrics.Metric;
 
 public interface IMetricHandler {
 	
-	public TimeSeries retrieve(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end);
+	public TimeSeries select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end);
 
-	public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func);
+	public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func);
 	
-	public boolean hasData(IMonitoringRepository repository, Metric metric, ModelEntity entity, double aggregationInterval);
+	public boolean contains(IMonitoringRepository repository, Metric metric, ModelEntity entity, double aggregationInterval);
 	
 }

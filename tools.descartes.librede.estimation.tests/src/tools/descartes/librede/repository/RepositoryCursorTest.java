@@ -39,8 +39,9 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.testutils.LibredeTest;
 
-public class RepositoryCursorTest {
+public class RepositoryCursorTest extends LibredeTest {
 	
 	Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"), WorkloadBuilder.newResource("HardDisk1"), WorkloadBuilder.newResource("HardDisk2") };
 	Service[] services = new Service[] { WorkloadBuilder.newService("AddToCard"), WorkloadBuilder.newService("Payment") };
@@ -60,9 +61,9 @@ public class RepositoryCursorTest {
 	@Test
 	public void test1StepCursor() {
 		ts1.setStartTime(1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], ts1);
 		repository.setCurrentTime(8);
 		IRepositoryCursor cur = repository.getCursor(1, 1);
 	
@@ -79,9 +80,9 @@ public class RepositoryCursorTest {
 	public void test1StepWithOffsetCursor() {
 		ts1.setStartTime(1);
 		ts2.setStartTime(1.2);
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], ts2);
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], ts2);
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], ts1);
 		repository.setCurrentTime(7.2);
 		IRepositoryCursor cur = repository.getCursor(1.2, 1);
 
@@ -96,9 +97,9 @@ public class RepositoryCursorTest {
 	@Test
 	public void test1StepWithAddCursor() {
 		ts1.setStartTime(1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], ts1);
 		repository.setCurrentTime(8);
 		IRepositoryCursor cur = repository.getCursor(1, 1);
 		
@@ -109,9 +110,9 @@ public class RepositoryCursorTest {
 		}
 		assertThat(cur.next()).isFalse();
 		
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], ts1.addSample(10.0, 1.0));
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], ts1.addSample(10.0, 1.0));
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], ts1.addSample(10.0, 1.0));
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], ts1.addSample(10.0, 1.0));
 		repository.setCurrentTime(10);
 		
 		for (int i = 9; i <= 10; i++) {
@@ -125,9 +126,9 @@ public class RepositoryCursorTest {
 	@Test
 	public void test3StepCursor() {	
 		ts1.setStartTime(1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], ts1);
 		repository.setCurrentTime(8);
 		IRepositoryCursor cur = repository.getCursor(1, 3);
 		
@@ -142,9 +143,9 @@ public class RepositoryCursorTest {
 	
 	@Test
 	public void testTooBigStepCursor() {		
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], ts1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], ts1);
 		IRepositoryCursor cur = repository.getCursor(0, 100);
 		assertThat(cur.next()).isFalse();		
 	}
@@ -156,7 +157,7 @@ public class RepositoryCursorTest {
 		assertThat(cur.next()).isFalse();
 		
 		ts1.setStartTime(1);
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
 		repository.setCurrentTime(8);
 		assertThat(cur.next()).isTrue();
 		assertThat(cur.getCurrentIntervalStart()).isEqualTo(ts1.getStartTime(), offset(1e-9));

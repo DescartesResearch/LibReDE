@@ -38,8 +38,9 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.testutils.LibredeTest;
 
-public class MemoryObservationRepositoryTest {
+public class MemoryObservationRepositoryTest extends LibredeTest {
 	
 	Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"), WorkloadBuilder.newResource("HardDisk1"), WorkloadBuilder.newResource("HardDisk2") };
 	Service[] services = new Service[] { WorkloadBuilder.newService("AddToCard"), WorkloadBuilder.newService("Payment") };
@@ -90,9 +91,9 @@ public class MemoryObservationRepositoryTest {
 
 	@Test
 	public void testSetAndGetData() {
-		repo.setData(StandardMetrics.UTILIZATION, resources[0], ts1);
+		repo.insert(StandardMetrics.UTILIZATION, resources[0], ts1);
 		assertThat(repo.select(StandardMetrics.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(5);
-		repo.setData(StandardMetrics.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
+		repo.insert(StandardMetrics.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
 		assertThat(repo.select(StandardMetrics.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(6);
 	}
 	

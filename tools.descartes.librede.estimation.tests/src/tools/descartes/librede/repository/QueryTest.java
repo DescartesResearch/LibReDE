@@ -48,8 +48,9 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.testutils.LibredeTest;
 
-public class QueryTest {
+public class QueryTest extends LibredeTest {
 
 	private MemoryObservationRepository repository;
 	private Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"),
@@ -100,13 +101,13 @@ public class QueryTest {
 		workload.getResources().addAll(Arrays.asList(resources));
 		workload.getServices().addAll(Arrays.asList(services));
 		repository = new MemoryObservationRepository(workload);
-		repository.setData(StandardMetrics.UTILIZATION, resources[0], cpuUtilTable);
-		repository.setData(StandardMetrics.UTILIZATION, resources[1], hd1UtilTable);
-		repository.setData(StandardMetrics.UTILIZATION, resources[2], hd2UtilTable);
-		repository.setData(StandardMetrics.THROUGHPUT, services[0], addServTputTable);
-		repository.setData(StandardMetrics.THROUGHPUT, services[1], payServTputTable);
-		repository.setData(StandardMetrics.RESPONSE_TIME, services[0], addServRtTable);
-		repository.setData(StandardMetrics.RESPONSE_TIME, services[1], payServRtTable);
+		repository.insert(StandardMetrics.UTILIZATION, resources[0], cpuUtilTable);
+		repository.insert(StandardMetrics.UTILIZATION, resources[1], hd1UtilTable);
+		repository.insert(StandardMetrics.UTILIZATION, resources[2], hd2UtilTable);
+		repository.insert(StandardMetrics.THROUGHPUT, services[0], addServTputTable);
+		repository.insert(StandardMetrics.THROUGHPUT, services[1], payServTputTable);
+		repository.insert(StandardMetrics.RESPONSE_TIME, services[0], addServRtTable);
+		repository.insert(StandardMetrics.RESPONSE_TIME, services[1], payServRtTable);
 		
 		repository.setCurrentTime(5);
 	}

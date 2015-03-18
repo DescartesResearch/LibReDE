@@ -48,6 +48,9 @@ public interface IMonitoringRepository {
 
 	public boolean contains(Metric responseTime,
 			ModelEntity entity, double maximumAggregationInterval);
+
+	public boolean contains(Metric responseTime,
+			ModelEntity entity, double maximumAggregationInterval, boolean includeDerived);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();

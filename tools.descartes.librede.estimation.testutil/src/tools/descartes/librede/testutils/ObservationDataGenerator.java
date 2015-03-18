@@ -212,7 +212,7 @@ public class ObservationDataGenerator {
 				ts = ts.addSample(time, throughput.get(i));
 			}
 			ts.setEndTime(time);
-			repository.setData(StandardMetrics.THROUGHPUT, services[i], ts);	
+			repository.insert(StandardMetrics.THROUGHPUT, services[i], ts);	
 		}
 		
 		
@@ -226,7 +226,7 @@ public class ObservationDataGenerator {
 				ts = ts.addSample(time, utilization.get(i));
 			}
 			ts.setEndTime(time);
-			repository.setData(StandardMetrics.UTILIZATION, resources[i], ts);	
+			repository.insert(StandardMetrics.UTILIZATION, resources[i], ts);	
 		}
 	
 		for (int i = 0; i < services.length; i++) {
@@ -243,7 +243,7 @@ public class ObservationDataGenerator {
 				ts = ts.addSample(time, sumRT);
 			}
 			ts.setEndTime(time);
-			repository.setData(StandardMetrics.RESPONSE_TIME, services[i], ts);	
+			repository.insert(StandardMetrics.RESPONSE_TIME, services[i], ts);	
 		}
 		
 		repository.setCurrentTime(time);

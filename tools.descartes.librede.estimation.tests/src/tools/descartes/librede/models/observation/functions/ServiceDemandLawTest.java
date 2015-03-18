@@ -42,9 +42,10 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
-public class ServiceDemandLawTest {
+public class ServiceDemandLawTest extends LibredeTest {
 	
 	private final static int SERVICE_IDX = 2;
 	private final static int RESOURCE_IDX = 1;

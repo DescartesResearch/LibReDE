@@ -120,15 +120,11 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		return entry.data;
 	}
 	
-	public void setData(Metric m, ModelEntity entity, TimeSeries observations) {
+	public void insert(Metric m, ModelEntity entity, TimeSeries observations) {
 		this.setData(m, entity, observations, 0);
 	}
 	
-	public void setAggregatedData(Metric m, ModelEntity entity, TimeSeries aggregatedObservations) {
-		this.setData(m, entity, aggregatedObservations, aggregatedObservations.getAverageTimeIncrement());
-	}
-	
-	public void setAggregatedData(Metric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
+	public void insert(Metric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
 		this.setData(m, entity, aggregatedObservations, aggregationInterval);
 	}
 	
@@ -145,13 +141,17 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	
 	@Override
 	public boolean contains(Metric m,
-			ModelEntity entity, double maximumAggregationInterval) {
-		DataKey key = new DataKey(m, entity);
-		DataEntry entry = data.get(key);
-		if (entry == null) {
-			return false;
+			ModelEntity entity, double maximumAggregationInterval, boolean includeDerived) {
+		if (includeDerived) {
+			return getMetricHandler(m).contains(this, m, entity, maximumAggregationInterval);
+		} else {
+			DataKey key = new DataKey(m, entity);
+			DataEntry entry = data.get(key);
+			if (entry == null) {
+				return false;
+			}
+			return entry.aggregationInterval <= maximumAggregationInterval;
 		}
-		return entry.aggregationInterval <= maximumAggregationInterval;
 	}
 	
 	@Override

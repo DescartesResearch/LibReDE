@@ -42,6 +42,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsFactory;
 import tools.descartes.librede.metrics.MetricsRepository;
+import tools.descartes.librede.repository.IMetricHandler;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsRepository;
@@ -61,6 +62,8 @@ public class Registry {
 	private Resource metricsResource = null;
 	
 	private MetricsRepository metrics = MetricsFactory.eINSTANCE.createMetricsRepository();
+	
+	private Map<Metric, IMetricHandler> metricHandlers = new HashMap<Metric, IMetricHandler>();
 	
 	private Map<String, Class<?>> instances = new HashMap<String, Class<?>>();	
 	
@@ -92,11 +95,12 @@ public class Registry {
 		};
 	}
 	
-	public void registerMetric(Metric metric) {
+	public void registerMetric(Metric metric, IMetricHandler handler) {
 		if (metric == null) {
 			throw new NullPointerException();
 		}
 		metrics.getMetrics().add(metric);
+		metricHandlers.put(metric, handler);
 	}
 	
 	public List<Metric> getMetrics() {
@@ -105,6 +109,10 @@ public class Registry {
 	
 	public MetricsRepository getMetricsRepository() {
 		return metrics;
+	}
+	
+	public IMetricHandler getMetricHandler(Metric metric) {
+		return metricHandlers.get(metric);
 	}
 	
 	public void registerDimension(Dimension dimension) {

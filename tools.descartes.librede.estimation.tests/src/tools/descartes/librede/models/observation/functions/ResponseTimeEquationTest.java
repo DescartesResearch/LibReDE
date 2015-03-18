@@ -43,9 +43,10 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
-public class ResponseTimeEquationTest {
+public class ResponseTimeEquationTest extends LibredeTest {
 	
 	private final static int SERVICE_IDX = 2;
 	

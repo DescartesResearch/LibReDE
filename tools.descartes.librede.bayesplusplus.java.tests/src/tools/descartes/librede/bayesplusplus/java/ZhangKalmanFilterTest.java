@@ -44,9 +44,10 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
-public class ZhangKalmanFilterTest {
+public class ZhangKalmanFilterTest extends LibredeTest {
 	
 	private static final int ITERATIONS = 1000;
 	

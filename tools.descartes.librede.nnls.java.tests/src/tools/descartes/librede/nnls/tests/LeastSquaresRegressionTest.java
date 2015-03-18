@@ -42,9 +42,10 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
-public class LeastSquaresRegressionTest {
+public class LeastSquaresRegressionTest extends LibredeTest {
 
 	private static final int ITERATIONS = 100;
 

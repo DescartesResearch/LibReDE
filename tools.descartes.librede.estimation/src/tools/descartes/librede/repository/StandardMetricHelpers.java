@@ -27,75 +27,69 @@
 package tools.descartes.librede.repository;
 
 import static tools.descartes.librede.linalg.LinAlg.ones;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 
-public enum StandardMetricHelpers implements IMetricHandler {
+public class StandardMetricHelpers {
 	
-	IDLE_TIME {
-		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double start, double end) {
-			TimeSeries series = repository.select(metric, entity);
-			return series.subset(start, end);
+	private static Map<Metric, IMetricHandler> handlers = null;
+	
+	public static IMetricHandler createHandler(Metric metric) {
+		if (handlers == null) {
+			handlers = new HashMap<Metric, IMetricHandler>();
+			handlers.put(StandardMetrics.ARRIVAL_RATE, new ArrivalRateHelper());
+			handlers.put(StandardMetrics.ARRIVALS, new ArrivalsHelper());
+			handlers.put(StandardMetrics.BUSY_TIME, new BusyTimeHelper());
+			handlers.put(StandardMetrics.DEPARTURES, new DeparturesHelper());
+			handlers.put(StandardMetrics.IDLE_TIME, new IdleTimeHelper());
+			handlers.put(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, new QueueLengthSeenOnArrivalHelper());
+			handlers.put(StandardMetrics.RESPONSE_TIME, new ResponseTimeHelper());			
+			handlers.put(StandardMetrics.THROUGHPUT, new ThroughputHelper());
+			handlers.put(StandardMetrics.UTILIZATION, new UtilizationHelper());
 		}
-
+		return handlers.get(metric);
+	}
+	
+	private static class IdleTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric,
+		public double select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries series = retrieve(repository, metric, entity, start, end);
+				TimeSeries series = select(repository, metric, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
 				return series.sum(0);
 			} else {
 				throw new IllegalArgumentException();
 			}
 		}
-
-		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
-			return repository.contains(metric, entity, aggregationInterval);
-		}
-	},
+	}
 	
-	BUSY_TIME {
-
+	private static class BusyTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double start, double end) {
-			TimeSeries series = repository.select(metric, entity);
-			return series.subset(start, end);
-		}
-
-		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric,
+		public double select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries series = retrieve(repository, metric,entity, start, end);
+				TimeSeries series = select(repository, metric,entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
 				return series.sum(0);
 			} else {
 				throw new IllegalArgumentException();
 			}
 		}
+	}
 
+	private static class UtilizationHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
-			return repository.contains(metric, entity, aggregationInterval);
-		}
-	},
-
-	UTILIZATION {	
-
-		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries series = retrieve(repository, metric, entity, start, end);
+				TimeSeries series = select(repository, metric, entity, start, end);
 				series.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
 				return series.timeWeightedMean(0);
 			} else {
@@ -104,26 +98,18 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double start, double end) {
-			TimeSeries series = repository.select(metric, entity);
-			return series.subset(start, end);
-		}
-		
-		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
+		public boolean contains(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double aggregationInterval) {
-			if (repository.contains(metric, entity, aggregationInterval)) {
+			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
 			return repository.contains(StandardMetrics.BUSY_TIME, entity, aggregationInterval) && repository.contains(StandardMetrics.IDLE_TIME, entity, aggregationInterval);
 		}
-	},
+	}
 
-	ARRIVALS {
-		
+	private static class ArrivalsHelper extends AbstractMonitoringRepository.DefaultMetricHandler {		
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end) {
 			TimeSeries ts = repository.select(StandardMetrics.ARRIVALS, entity);
 			if (ts.isEmpty()) {
@@ -142,8 +128,8 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = retrieve(repository, metric, entity, start, end);
+		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = select(repository, metric, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
 			case SUM: {
@@ -161,18 +147,18 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 		
 		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
+		public boolean contains(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double aggregationInterval) {
-			if (repository.contains(metric, entity, aggregationInterval)) {
+			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
 			return repository.contains(StandardMetrics.RESPONSE_TIME, entity, 0.0);
 		}
-	},
-	DEPARTURES {
-		
+	}
+	
+	private static class DeparturesHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end) {
 			TimeSeries ts = repository.select(StandardMetrics.DEPARTURES, entity);
 			if (ts.isEmpty()) {
@@ -191,8 +177,8 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = retrieve(repository, metric, entity, start, end);
+		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = select(repository, metric, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
 			case SUM: {
@@ -210,22 +196,22 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 		
 		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
+		public boolean contains(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double aggregationInterval) {
-			if (repository.contains(metric, entity, aggregationInterval)) {
+			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
 			return repository.contains(StandardMetrics.RESPONSE_TIME, entity, 0.0);
 		}
-	},
-	ARRIVAL_RATE {
+	}
 
+	private static class ArrivalRateHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries ts = retrieve(repository, metric, entity, start, end);
+				TimeSeries ts = select(repository, metric, entity, start, end);
 				if (ts.isEmpty()) {
-					double arrivals = StandardMetricHelpers.ARRIVALS.aggregate(repository, StandardMetrics.ARRIVALS,
+					double arrivals = repository.select(StandardMetrics.ARRIVALS,
 							entity, start, end, Aggregation.SUM);
 					return arrivals / (end - start);
 				}
@@ -234,31 +220,24 @@ public enum StandardMetricHelpers implements IMetricHandler {
 				throw new IllegalArgumentException();
 			}
 		}
-
-		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double start, double end) {
-			TimeSeries series = repository.select(metric, entity);
-			return series.subset(start, end);
-		}
 		
 		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
+		public boolean contains(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double aggregationInterval) {
-			if (repository.contains(metric, entity, aggregationInterval)) {
+			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return ARRIVALS.hasData(repository, StandardMetrics.ARRIVALS, entity, aggregationInterval);
+			return repository.contains(StandardMetrics.ARRIVALS, entity, aggregationInterval);
 		}
-	},
-	THROUGHPUT {
-
+	}
+	
+	private static class ThroughputHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
-				TimeSeries ts = retrieve(repository, metric, entity, start, end);
+				TimeSeries ts = select(repository, metric, entity, start, end);
 				if (ts.isEmpty()) {
-					double departures = StandardMetricHelpers.DEPARTURES.aggregate(repository, StandardMetrics.DEPARTURES,
+					double departures = repository.select(StandardMetrics.DEPARTURES,
 							entity, start, end, Aggregation.SUM);
 					return departures / (end - start);
 				}
@@ -269,34 +248,34 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 		
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end) {
 			TimeSeries series = repository.select(metric, entity);
 			return series.subset(start, end);
 		}
 		
 		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
+		public boolean contains(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double aggregationInterval) {
-			if (repository.contains(metric, entity, aggregationInterval)) {
+			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return DEPARTURES.hasData(repository, StandardMetrics.DEPARTURES, entity, aggregationInterval);
+			return repository.contains(StandardMetrics.DEPARTURES, entity, aggregationInterval);
 		}
-	},
-	RESPONSE_TIME {
-
+	}
+	
+	private static class ResponseTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = retrieve(repository, metric, entity, start, end);
+		public double select(IMonitoringRepository repository, Metric metric, ModelEntity entity, double start, double end, Aggregation func) {
+			TimeSeries series = select(repository, metric, entity, start, end);
 			switch (func) {
 			case AVERAGE: {
 				double interval = repository.getAggregationInterval(metric,
 						entity);
 				if (interval > 0) {
-					TimeSeries weights = THROUGHPUT.retrieve(repository, StandardMetrics.THROUGHPUT, entity, start, end);
+					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, entity, start, end);
 					if (weights.isEmpty()) {
-						weights = DEPARTURES.retrieve(repository, StandardMetrics.DEPARTURES, entity, start, end);
+						weights = repository.select(StandardMetrics.DEPARTURES, entity, start, end);
 					}
 					if (weights.isEmpty()) {
 						throw new IllegalStateException();
@@ -318,7 +297,7 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
+		public TimeSeries select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end) {
 			TimeSeries ts = repository.select(metric, entity);
 			if (ts.isEmpty()) {
@@ -333,34 +312,28 @@ public enum StandardMetricHelpers implements IMetricHandler {
 		}
 		
 		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
+		public boolean contains(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double aggregationInterval) {
-			if (repository.contains(metric, entity, aggregationInterval)) {
+			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return DEPARTURES.hasData(repository, StandardMetrics.DEPARTURES, entity, 0.0) && ARRIVALS.hasData(repository, StandardMetrics.ARRIVALS, entity, 0.0);
+			return repository.contains(StandardMetrics.DEPARTURES, entity, 0.0) && repository.contains(StandardMetrics.ARRIVALS, entity, 0.0);
 		}
-	},
-	QUEUE_LENGTH_SEEN_ON_ARRIVAL {
-
+	}
+	
+	private static class QueueLengthSeenOnArrivalHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public TimeSeries retrieve(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double start, double end) {
-			return repository.select(metric, entity).subset(start, end);
-		}
-
-		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric,
+		public double select(IMonitoringRepository repository, Metric metric,
 				ModelEntity entity, double start, double end, Aggregation func) {
-			TimeSeries series = retrieve(repository, metric, entity, start, end);
+			TimeSeries series = select(repository, metric, entity, start, end);
 			switch(func) {
 			case AVERAGE: {
 				double interval = repository.getAggregationInterval(metric,
 						entity);
 				if (interval > 0) {
-					TimeSeries weights = THROUGHPUT.retrieve(repository, StandardMetrics.THROUGHPUT, entity, start, end);
+					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, entity, start, end);
 					if (weights.isEmpty()) {
-						weights = DEPARTURES.retrieve(repository, StandardMetrics.DEPARTURES, entity, start, end);
+						weights = repository.select(StandardMetrics.DEPARTURES, entity, start, end);
 					}
 					if (weights.isEmpty()) {
 						throw new IllegalStateException();
@@ -377,12 +350,6 @@ public enum StandardMetricHelpers implements IMetricHandler {
 			default:
 				throw new IllegalArgumentException();
 			}
-		}
-
-		@Override
-		public boolean hasData(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
-			return repository.contains(metric, entity, aggregationInterval);
 		}
 	};
 
