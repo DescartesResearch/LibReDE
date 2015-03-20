@@ -35,6 +35,7 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 import cern.jet.random.sampling.RandomSampler;
 
@@ -83,17 +84,17 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public double getCurrentIntervalStart() {
+	public Quantity getCurrentIntervalStart() {
 		return delegate.getCurrentIntervalStart();
 	}
 
 	@Override
-	public double getCurrentIntervalLength() {
+	public Quantity getCurrentIntervalLength() {
 		return delegate.getCurrentIntervalLength();
 	}
 
 	@Override
-	public double getCurrentIntervalEnd() {
+	public Quantity getCurrentIntervalEnd() {
 		return delegate.getCurrentIntervalEnd();
 	}
 
@@ -153,7 +154,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 	
 	@Override
-	public boolean seek(double newTime) {
+	public boolean seek(Quantity newTime) {
 		return delegate.seek(newTime);
 	}
 	

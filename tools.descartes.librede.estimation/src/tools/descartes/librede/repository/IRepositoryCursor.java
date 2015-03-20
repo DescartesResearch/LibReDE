@@ -31,6 +31,7 @@ import java.util.List;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 
 public interface IRepositoryCursor {
@@ -39,13 +40,13 @@ public interface IRepositoryCursor {
 	
 	boolean seek(int interval);
 	
-	boolean seek(double newTime);
+	boolean seek(Quantity newTime);
 
-	double getCurrentIntervalStart();
+	Quantity getCurrentIntervalStart();
 
-	double getCurrentIntervalLength();
+	Quantity getCurrentIntervalLength();
 
-	double getCurrentIntervalEnd();
+	Quantity getCurrentIntervalEnd();
 
 	TimeSeries getValues(Metric metric, Unit unit, ModelEntity entity);
 

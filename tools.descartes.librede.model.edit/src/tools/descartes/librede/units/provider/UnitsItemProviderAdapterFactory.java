@@ -211,6 +211,29 @@ public class UnitsItemProviderAdapterFactory extends UnitsAdapterFactory impleme
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.units.Quantity} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected QuantityItemProvider quantityItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.units.Quantity}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createQuantityAdapter() {
+		if (quantityItemProvider == null) {
+			quantityItemProvider = new QuantityItemProvider(this);
+		}
+
+		return quantityItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

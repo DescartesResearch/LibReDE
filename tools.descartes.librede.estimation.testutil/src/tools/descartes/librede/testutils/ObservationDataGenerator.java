@@ -52,6 +52,7 @@ import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class ObservationDataGenerator {
 	
@@ -249,7 +250,7 @@ public class ObservationDataGenerator {
 			repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], ts);	
 		}
 		
-		repository.setCurrentTime(time);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(time, Time.SECONDS));
 		
 		time++;
 	}

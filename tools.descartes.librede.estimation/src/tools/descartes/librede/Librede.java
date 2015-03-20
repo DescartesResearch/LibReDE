@@ -126,7 +126,7 @@ public class Librede {
 	
 	public static void execute(LibredeConfiguration conf) {
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
-		repo.setCurrentTime(conf.getEstimation().getEndTimestamp() / 1000);
+		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
 		loadRepository(conf, repo);
 		
@@ -183,11 +183,11 @@ public class Librede {
 						try {						
 							in = new FileInputStream(file);
 							TimeSeries data = source.load(in, mapping.getTraceColumn());
-							data.setStartTime(conf.getEstimation().getStartTimestamp() / 1000.0);
-							data.setEndTime(conf.getEstimation().getEndTimestamp() / 1000.0);
+							data.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
+							data.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
 							
-							if (fileTrace.getInterval() > 0) {
-								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data, fileTrace.getInterval() / 1000.0);
+							if (fileTrace.getInterval().getValue() > 0) {
+								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data, fileTrace.getInterval());
 							} else {
 								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data);
 							}
@@ -207,8 +207,8 @@ public class Librede {
 		
 		List<ResultTable[]> results = new ArrayList<ResultTable[]>();
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
-			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp() / 1000.0, 
-					conf.getEstimation().getStepSize() / 1000.0);
+			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize());
 			
 			IEstimationApproach currentApproach;
 			try {
@@ -236,8 +236,8 @@ public class Librede {
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
 			ResultTable[] folds = new ResultTable[conf.getValidation().getValidationFolds()];
 			CrossValidationCursor cursor = new CrossValidationCursor(repository.getCursor(
-					conf.getEstimation().getStartTimestamp() / 1000.0, 
-					conf.getEstimation().getStepSize() / 1000.0), 
+					conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize()), 
 					conf.getValidation().getValidationFolds());
 			cursor.initPartitions();
 			

@@ -36,12 +36,16 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class StandardMetricHelpers {
+	
+	private static final Quantity ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 	
 	private static Map<Metric, IMetricHandler> handlers = null;
 	
@@ -64,7 +68,7 @@ public class StandardMetricHelpers {
 	private static class IdleTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
 		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit,
-				ModelEntity entity, double start, double end, Aggregation func) {
+				ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
 				TimeSeries series = select(repository, metric, unit, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
@@ -78,7 +82,7 @@ public class StandardMetricHelpers {
 	private static class BusyTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
 		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit,
-				ModelEntity entity, double start, double end, Aggregation func) {
+				ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
 				TimeSeries series = select(repository, metric, unit, entity, start, end);
 				series.setInterpolationMethod(Interpolation.LINEAR);
@@ -91,7 +95,7 @@ public class StandardMetricHelpers {
 
 	private static class UtilizationHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
 				TimeSeries series = select(repository, metric, unit, entity, start, end);
 				series.setInterpolationMethod(Interpolation.PIECEWISE_CONSTANT);
@@ -103,7 +107,7 @@ public class StandardMetricHelpers {
 
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, Quantity aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
@@ -114,25 +118,25 @@ public class StandardMetricHelpers {
 	private static class ArrivalsHelper extends AbstractMonitoringRepository.DefaultMetricHandler {		
 		@Override
 		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit,
-				ModelEntity entity, double start, double end) {
+				ModelEntity entity, Quantity start, Quantity end) {
 			TimeSeries ts = repository.select(StandardMetrics.ARRIVALS, unit, entity);
 			if (ts.isEmpty()) {
 				TimeSeries resp = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity);
-				double interval = repository.getAggregationInterval(StandardMetrics.RESPONSE_TIME, entity);
-				if (!resp.isEmpty() && (interval == 0.0)) {
+				boolean isAggregated = repository.isAggregated(StandardMetrics.RESPONSE_TIME, entity);
+				if (!resp.isEmpty() && !isAggregated) {
 					ts = new TimeSeries(resp.getTime().minus(resp.getData(0)), ones(resp.getData(0).rows()));
 					ts.setStartTime(resp.getStartTime());
 					ts.setEndTime(ts.getEndTime());
-					return UnitConverter.convertTo(ts.subset(start, end), RequestCount.REQUESTS, unit);
+					return UnitConverter.convertTo(ts.subset(start.getValue(Time.SECONDS), start.getValue(Time.SECONDS)), RequestCount.REQUESTS, unit);
 				} else {
 					return TimeSeries.EMPTY;
 				}
 			}
-			return ts.subset(start, end);
+			return ts.subset(start.getValue(Time.SECONDS), start.getValue(Time.SECONDS));
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
@@ -152,36 +156,36 @@ public class StandardMetricHelpers {
 		
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, Quantity aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return repository.contains(StandardMetrics.RESPONSE_TIME, entity, 0.0);
+			return repository.contains(StandardMetrics.RESPONSE_TIME, entity, ZERO_SECONDS);
 		}
 	}
 	
 	private static class DeparturesHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
 		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit,
-				ModelEntity entity, double start, double end) {
+				ModelEntity entity, Quantity start, Quantity end) {
 			TimeSeries ts = repository.select(StandardMetrics.DEPARTURES, unit, entity);
 			if (ts.isEmpty()) {
 				TimeSeries resp = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity);
-				double interval = repository.getAggregationInterval(StandardMetrics.RESPONSE_TIME, entity);
-				if (!resp.isEmpty() && (interval == 0.0)) {
+				boolean isAggregated = repository.isAggregated(StandardMetrics.RESPONSE_TIME, entity);
+				if (!resp.isEmpty() && !isAggregated) {
 					ts = new TimeSeries(resp.getTime(), ones(resp.getData(0).rows()));
 					ts.setStartTime(resp.getStartTime());
 					ts.setEndTime(resp.getEndTime());
-					return UnitConverter.convertTo(ts.subset(start, end), RequestCount.REQUESTS, unit);
+					return UnitConverter.convertTo(ts.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS)), RequestCount.REQUESTS, unit);
 				} else {
 					return TimeSeries.EMPTY;
 				}
 			}		
-			return ts.subset(start, end);
+			return ts.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS));
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			series.setInterpolationMethod(Interpolation.LINEAR);
 			switch(func) {
@@ -201,23 +205,23 @@ public class StandardMetricHelpers {
 		
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, Quantity aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return repository.contains(StandardMetrics.RESPONSE_TIME, entity, 0.0);
+			return repository.contains(StandardMetrics.RESPONSE_TIME, entity, ZERO_SECONDS);
 		}
 	}
 
 	private static class ArrivalRateHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
 				TimeSeries ts = select(repository, metric, unit, entity, start, end);
 				if (ts.isEmpty()) {
 					double arrivals = repository.select(StandardMetrics.ARRIVALS, RequestCount.REQUESTS,
 							entity, start, end, Aggregation.SUM);
-					return unit.convertFrom(arrivals / (end - start), RequestRate.REQ_PER_SECOND);
+					return unit.convertFrom(arrivals / (end.minus(start).getValue(Time.SECONDS)), RequestRate.REQ_PER_SECOND);
 				}
 				return ts.timeWeightedMean(0);
 			} else {
@@ -227,23 +231,23 @@ public class StandardMetricHelpers {
 		
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, Quantity aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return repository.contains(StandardMetrics.ARRIVALS, entity, aggregationInterval);
+			return repository.contains(StandardMetrics.ARRIVALS, entity, ZERO_SECONDS);
 		}
 	}
 	
 	private static class ThroughputHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			if (metric.isAggregationAllowed(func)) {
 				TimeSeries ts = select(repository, metric, unit, entity, start, end);
 				if (ts.isEmpty()) {
 					double departures = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS,
 							entity, start, end, Aggregation.SUM);
-					return unit.convertFrom(departures / (end - start), RequestRate.REQ_PER_SECOND);
+					return unit.convertFrom(departures / (end.minus(start).getValue(Time.SECONDS)), RequestRate.REQ_PER_SECOND);
 				}
 				return ts.timeWeightedMean(0);
 			} else {
@@ -253,7 +257,7 @@ public class StandardMetricHelpers {
 		
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, Quantity aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
@@ -263,13 +267,11 @@ public class StandardMetricHelpers {
 	
 	private static class ResponseTimeHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			switch (func) {
 			case AVERAGE: {
-				double interval = repository.getAggregationInterval(metric,
-						entity);
-				if (interval > 0) {
+				if (repository.isAggregated(metric, entity)) {
 					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, entity, start, end);
 					if (weights.isEmpty()) {
 						weights = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, start, end);
@@ -295,39 +297,37 @@ public class StandardMetricHelpers {
 
 		@Override
 		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit,
-				ModelEntity entity, double start, double end) {
+				ModelEntity entity, Quantity start, Quantity end) {
 			TimeSeries ts = repository.select(metric, unit, entity);
 			if (ts.isEmpty()) {
 				TimeSeries arriv = repository.select(StandardMetrics.ARRIVALS, RequestCount.REQUESTS, entity);
 				TimeSeries departures = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity);
 				if (!arriv.isEmpty() && !departures.isEmpty()) {
 					ts = new TimeSeries(departures.getTime(), departures.getTime().minus(arriv.getTime()));
-					return UnitConverter.convertTo(ts.subset(start, end), Time.SECONDS, unit);
+					return UnitConverter.convertTo(ts.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS)), Time.SECONDS, unit);
 				}				
 			}
-			return ts.subset(start, end);
+			return ts.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS));
 		}
 		
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric,
-				ModelEntity entity, double aggregationInterval) {
+				ModelEntity entity, Quantity aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return repository.contains(StandardMetrics.DEPARTURES, entity, 0.0) && repository.contains(StandardMetrics.ARRIVALS, entity, 0.0);
+			return repository.contains(StandardMetrics.DEPARTURES, entity, ZERO_SECONDS) && repository.contains(StandardMetrics.ARRIVALS, entity, ZERO_SECONDS);
 		}
 	}
 	
 	private static class QueueLengthSeenOnArrivalHelper extends AbstractMonitoringRepository.DefaultMetricHandler {
 		@Override
 		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit,
-				ModelEntity entity, double start, double end, Aggregation func) {
+				ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 			TimeSeries series = select(repository, metric, unit, entity, start, end);
 			switch(func) {
 			case AVERAGE: {
-				double interval = repository.getAggregationInterval(metric,
-						entity);
-				if (interval > 0) {
+				if (repository.isAggregated(metric, entity)) {
 					TimeSeries weights = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, entity, start, end);
 					if (weights.isEmpty()) {
 						weights = repository.select(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, start, end);

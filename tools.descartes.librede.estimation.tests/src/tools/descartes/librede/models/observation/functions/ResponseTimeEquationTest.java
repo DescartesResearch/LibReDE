@@ -46,6 +46,7 @@ import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class ResponseTimeEquationTest extends LibredeTest {
 	
@@ -62,7 +63,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		service = generator.getStateModel().getServices().get(SERVICE_IDX);
 		

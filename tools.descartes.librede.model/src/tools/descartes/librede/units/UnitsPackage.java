@@ -417,6 +417,126 @@ public interface UnitsPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link java.lang.Comparable <em>Comparable</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see java.lang.Comparable
+	 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getComparable()
+	 * @generated
+	 */
+	int COMPARABLE = 8;
+
+	/**
+	 * The number of structural features of the '<em>Comparable</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPARABLE_FEATURE_COUNT = 0;
+
+	/**
+	 * The number of operations of the '<em>Comparable</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPARABLE_OPERATION_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link tools.descartes.librede.units.impl.QuantityImpl <em>Quantity</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.units.impl.QuantityImpl
+	 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getQuantity()
+	 * @generated
+	 */
+	int QUANTITY = 7;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY__VALUE = COMPARABLE_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Unit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY__UNIT = COMPARABLE_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Quantity</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY_FEATURE_COUNT = COMPARABLE_FEATURE_COUNT + 2;
+
+	/**
+	 * The operation id for the '<em>Convert To</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY___CONVERT_TO__UNIT = COMPARABLE_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Value</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY___GET_VALUE__UNIT = COMPARABLE_OPERATION_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Plus</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY___PLUS__QUANTITY = COMPARABLE_OPERATION_COUNT + 2;
+
+	/**
+	 * The operation id for the '<em>Minus</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY___MINUS__QUANTITY = COMPARABLE_OPERATION_COUNT + 3;
+
+	/**
+	 * The operation id for the '<em>Times</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY___TIMES__DOUBLE = COMPARABLE_OPERATION_COUNT + 4;
+
+	/**
+	 * The number of operations of the '<em>Quantity</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY_OPERATION_COUNT = COMPARABLE_OPERATION_COUNT + 5;
+
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.units.Dimension <em>Dimension</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -595,6 +715,99 @@ public interface UnitsPackage extends EPackage {
 	EReference getUnitsRepository_Dimensions();
 
 	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.units.Quantity <em>Quantity</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Quantity</em>'.
+	 * @see tools.descartes.librede.units.Quantity
+	 * @generated
+	 */
+	EClass getQuantity();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.units.Quantity#getValue <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see tools.descartes.librede.units.Quantity#getValue()
+	 * @see #getQuantity()
+	 * @generated
+	 */
+	EAttribute getQuantity_Value();
+
+	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.units.Quantity#getUnit <em>Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Unit</em>'.
+	 * @see tools.descartes.librede.units.Quantity#getUnit()
+	 * @see #getQuantity()
+	 * @generated
+	 */
+	EReference getQuantity_Unit();
+
+	/**
+	 * Returns the meta object for the '{@link tools.descartes.librede.units.Quantity#convertTo(tools.descartes.librede.units.Unit) <em>Convert To</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Convert To</em>' operation.
+	 * @see tools.descartes.librede.units.Quantity#convertTo(tools.descartes.librede.units.Unit)
+	 * @generated
+	 */
+	EOperation getQuantity__ConvertTo__Unit();
+
+	/**
+	 * Returns the meta object for the '{@link tools.descartes.librede.units.Quantity#getValue(tools.descartes.librede.units.Unit) <em>Get Value</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Get Value</em>' operation.
+	 * @see tools.descartes.librede.units.Quantity#getValue(tools.descartes.librede.units.Unit)
+	 * @generated
+	 */
+	EOperation getQuantity__GetValue__Unit();
+
+	/**
+	 * Returns the meta object for the '{@link tools.descartes.librede.units.Quantity#plus(tools.descartes.librede.units.Quantity) <em>Plus</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Plus</em>' operation.
+	 * @see tools.descartes.librede.units.Quantity#plus(tools.descartes.librede.units.Quantity)
+	 * @generated
+	 */
+	EOperation getQuantity__Plus__Quantity();
+
+	/**
+	 * Returns the meta object for the '{@link tools.descartes.librede.units.Quantity#minus(tools.descartes.librede.units.Quantity) <em>Minus</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Minus</em>' operation.
+	 * @see tools.descartes.librede.units.Quantity#minus(tools.descartes.librede.units.Quantity)
+	 * @generated
+	 */
+	EOperation getQuantity__Minus__Quantity();
+
+	/**
+	 * Returns the meta object for the '{@link tools.descartes.librede.units.Quantity#times(double) <em>Times</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Times</em>' operation.
+	 * @see tools.descartes.librede.units.Quantity#times(double)
+	 * @generated
+	 */
+	EOperation getQuantity__Times__double();
+
+	/**
+	 * Returns the meta object for class '{@link java.lang.Comparable <em>Comparable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Comparable</em>'.
+	 * @see java.lang.Comparable
+	 * @model instanceClass="java.lang.Comparable" typeParameters="T"
+	 * @generated
+	 */
+	EClass getComparable();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -766,6 +979,82 @@ public interface UnitsPackage extends EPackage {
 		 * @generated
 		 */
 		EReference UNITS_REPOSITORY__DIMENSIONS = eINSTANCE.getUnitsRepository_Dimensions();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.units.impl.QuantityImpl <em>Quantity</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.units.impl.QuantityImpl
+		 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getQuantity()
+		 * @generated
+		 */
+		EClass QUANTITY = eINSTANCE.getQuantity();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute QUANTITY__VALUE = eINSTANCE.getQuantity_Value();
+
+		/**
+		 * The meta object literal for the '<em><b>Unit</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference QUANTITY__UNIT = eINSTANCE.getQuantity_Unit();
+
+		/**
+		 * The meta object literal for the '<em><b>Convert To</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation QUANTITY___CONVERT_TO__UNIT = eINSTANCE.getQuantity__ConvertTo__Unit();
+
+		/**
+		 * The meta object literal for the '<em><b>Get Value</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation QUANTITY___GET_VALUE__UNIT = eINSTANCE.getQuantity__GetValue__Unit();
+
+		/**
+		 * The meta object literal for the '<em><b>Plus</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation QUANTITY___PLUS__QUANTITY = eINSTANCE.getQuantity__Plus__Quantity();
+
+		/**
+		 * The meta object literal for the '<em><b>Minus</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation QUANTITY___MINUS__QUANTITY = eINSTANCE.getQuantity__Minus__Quantity();
+
+		/**
+		 * The meta object literal for the '<em><b>Times</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation QUANTITY___TIMES__DOUBLE = eINSTANCE.getQuantity__Times__double();
+
+		/**
+		 * The meta object literal for the '{@link java.lang.Comparable <em>Comparable</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see java.lang.Comparable
+		 * @see tools.descartes.librede.units.impl.UnitsPackageImpl#getComparable()
+		 * @generated
+		 */
+		EClass COMPARABLE = eINSTANCE.getComparable();
 
 	}
 

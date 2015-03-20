@@ -8,6 +8,8 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
 public abstract class AbstractMonitoringRepository implements IMonitoringRepository {
@@ -15,21 +17,21 @@ public abstract class AbstractMonitoringRepository implements IMonitoringReposit
 	public static class DefaultMetricHandler implements IMetricHandler {
 
 		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start,
-				double end) {
+		public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start,
+				Quantity end) {
 			TimeSeries series = repository.select(metric, unit, entity);
-			return series.subset(start, end);
+			return series.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS));
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start,
-				double end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start,
+				Quantity end, Aggregation func) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric metric, ModelEntity entity,
-				double aggregationInterval) {
+				Quantity aggregationInterval) {
 			return repository.contains(metric, entity, aggregationInterval, false);
 		}
 		
@@ -38,19 +40,19 @@ public abstract class AbstractMonitoringRepository implements IMonitoringReposit
 	private Map<Metric, IMetricHandler> metricHandlers = new HashMap<Metric, IMetricHandler>();
 
 	@Override
-	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity, double start, double end) {
+	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end) {
 		IMetricHandler handler = getMetricHandler(metric);
 		return handler.select(this, metric, unit, entity, start, end);
 	}
 	
 	@Override
-	public double select(Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func) {
+	public double select(Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func) {
 		IMetricHandler handler = getMetricHandler(metric);
 		return handler.aggregate(this, metric, unit, entity, start, end, func);
 	}
 	
 	@Override
-	public boolean contains(Metric metric, ModelEntity entity, double maximumAggregationInterval) {
+	public boolean contains(Metric metric, ModelEntity entity, Quantity maximumAggregationInterval) {
 		return contains(metric, entity, maximumAggregationInterval, true);
 	}
 

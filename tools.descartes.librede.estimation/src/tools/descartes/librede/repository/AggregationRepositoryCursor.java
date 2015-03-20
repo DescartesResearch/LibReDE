@@ -33,10 +33,15 @@ import java.util.Map;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
 
 
 public class AggregationRepositoryCursor implements IRepositoryCursor {
+	
+	private static final Quantity ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 	
 	private static class SeriesCacheKey {
 		
@@ -145,13 +150,13 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 	
 	private IMonitoringRepository repository;
-	private double currentTime;
-	private double startTime;
-	private double stepSize;
+	private Quantity currentTime;
+	private Quantity startTime;
+	private Quantity stepSize;
 	private Map<SeriesCacheKey, TimeSeries> seriesCache = new HashMap<SeriesCacheKey, TimeSeries>();
 	private Map<AggregationCacheKey, Double> aggregationCache = new HashMap<AggregationCacheKey, Double>();
 	
-	public AggregationRepositoryCursor(IMonitoringRepository repository, double startTime, double stepSize) {
+	public AggregationRepositoryCursor(IMonitoringRepository repository, Quantity startTime, Quantity stepSize) {
 		this.repository = repository;
 		this.stepSize = stepSize;
 		this.startTime = startTime;
@@ -163,8 +168,9 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 */
 	@Override
 	public boolean next() {
-		if (currentTime + stepSize <= repository.getCurrentTime()) {
-			currentTime += stepSize;
+		Quantity newTime = currentTime.plus(stepSize);
+		if (newTime.compareTo(repository.getCurrentTime()) <= 0) {
+			currentTime = newTime;
 			seriesCache.clear();
 			aggregationCache.clear();
 			return true;
@@ -177,8 +183,8 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 */
 	@Override
 	public boolean seek(int interval) {
-		double newCurrentTime = startTime + stepSize * interval;
-		if (newCurrentTime <= repository.getCurrentTime()) {
+		Quantity newCurrentTime = startTime.plus(stepSize.times(interval));
+		if (newCurrentTime.compareTo(repository.getCurrentTime()) <= 0) {
 			currentTime = newCurrentTime;
 			seriesCache.clear();
 			aggregationCache.clear();
@@ -191,8 +197,8 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see tools.descartes.librede.repository.IRepositoryCursor#seek(int)
 	 */
 	@Override
-	public boolean seek(double newCurrentTime) {
-		if (newCurrentTime <= repository.getCurrentTime()) {
+	public boolean seek(Quantity newCurrentTime) {
+		if (newCurrentTime.compareTo(repository.getCurrentTime()) <= 0) {
 			currentTime = newCurrentTime;
 			seriesCache.clear();
 			aggregationCache.clear();
@@ -205,15 +211,15 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalStart()
 	 */
 	@Override
-	public double getCurrentIntervalStart() {
-		return currentTime - stepSize;
+	public Quantity getCurrentIntervalStart() {
+		return currentTime.minus(stepSize);
 	}
 	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalLength()
 	 */
 	@Override
-	public double getCurrentIntervalLength() {
+	public Quantity getCurrentIntervalLength() {
 		return stepSize;
 	}
 	
@@ -221,7 +227,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalEnd()
 	 */
 	@Override
-	public double getCurrentIntervalEnd() {
+	public Quantity getCurrentIntervalEnd() {
 		return currentTime;
 	}
 	
@@ -271,7 +277,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 			boolean data = true;
 			for (ModelEntity e : entities) {
 				if (aggregation == Aggregation.NONE) {
-					data = data && repository.contains(metric, e, 0.0);
+					data = data && repository.contains(metric, e, ZERO_SECONDS);
 				} else {
 					data = data && repository.contains(metric, e, stepSize);
 				}
@@ -283,6 +289,6 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	
 	@Override
 	public int getAvailableIntervals() {
-		return (int) ((repository.getCurrentTime() - startTime) / stepSize);
+		return (int) ((repository.getCurrentTime().minus(startTime).getValue(Time.SECONDS)) / stepSize.getValue(Time.SECONDS));
 	}
 }

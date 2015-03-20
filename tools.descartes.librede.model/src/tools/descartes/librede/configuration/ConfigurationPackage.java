@@ -632,22 +632,13 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_CONFIGURATION__METRIC = 0;
 
 	/**
-	 * The feature id for the '<em><b>Interval</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__INTERVAL = 1;
-
-	/**
 	 * The feature id for the '<em><b>Data Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__DATA_SOURCE = 2;
+	int TRACE_CONFIGURATION__DATA_SOURCE = 1;
 
 	/**
 	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
@@ -656,7 +647,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__MAPPINGS = 3;
+	int TRACE_CONFIGURATION__MAPPINGS = 2;
 
 	/**
 	 * The feature id for the '<em><b>Unit</b></em>' reference.
@@ -665,7 +656,16 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__UNIT = 4;
+	int TRACE_CONFIGURATION__UNIT = 3;
+
+	/**
+	 * The feature id for the '<em><b>Interval</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__INTERVAL = 4;
 
 	/**
 	 * The number of structural features of the '<em>Trace Configuration</em>' class.
@@ -749,40 +749,40 @@ public interface ConfigurationPackage extends EPackage {
 	int ESTIMATION_SPECIFICATION__WINDOW = 2;
 
 	/**
-	 * The feature id for the '<em><b>Step Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ESTIMATION_SPECIFICATION__STEP_SIZE = 3;
-
-	/**
-	 * The feature id for the '<em><b>Start Timestamp</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ESTIMATION_SPECIFICATION__START_TIMESTAMP = 4;
-
-	/**
-	 * The feature id for the '<em><b>End Timestamp</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ESTIMATION_SPECIFICATION__END_TIMESTAMP = 5;
-
-	/**
 	 * The feature id for the '<em><b>Algorithms</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_SPECIFICATION__ALGORITHMS = 6;
+	int ESTIMATION_SPECIFICATION__ALGORITHMS = 3;
+
+	/**
+	 * The feature id for the '<em><b>Step Size</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_SPECIFICATION__STEP_SIZE = 4;
+
+	/**
+	 * The feature id for the '<em><b>Start Timestamp</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_SPECIFICATION__START_TIMESTAMP = 5;
+
+	/**
+	 * The feature id for the '<em><b>End Timestamp</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_SPECIFICATION__END_TIMESTAMP = 6;
 
 	/**
 	 * The number of structural features of the '<em>Estimation Specification</em>' class.
@@ -938,15 +938,6 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION__METRIC = TRACE_CONFIGURATION__METRIC;
 
 	/**
-	 * The feature id for the '<em><b>Interval</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FILE_TRACE_CONFIGURATION__INTERVAL = TRACE_CONFIGURATION__INTERVAL;
-
-	/**
 	 * The feature id for the '<em><b>Data Source</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -972,6 +963,15 @@ public interface ConfigurationPackage extends EPackage {
 	 * @ordered
 	 */
 	int FILE_TRACE_CONFIGURATION__UNIT = TRACE_CONFIGURATION__UNIT;
+
+	/**
+	 * The feature id for the '<em><b>Interval</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FILE_TRACE_CONFIGURATION__INTERVAL = TRACE_CONFIGURATION__INTERVAL;
 
 	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
@@ -1392,15 +1392,15 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getTraceConfiguration_Unit();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}'.
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Interval</em>'.
+	 * @return the meta object for the containment reference '<em>Interval</em>'.
 	 * @see tools.descartes.librede.configuration.TraceConfiguration#getInterval()
 	 * @see #getTraceConfiguration()
 	 * @generated
 	 */
-	EAttribute getTraceConfiguration_Interval();
+	EReference getTraceConfiguration_Interval();
 
 	/**
 	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}'.
@@ -1500,37 +1500,37 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getEstimationSpecification_Window();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.EstimationSpecification#getStepSize <em>Step Size</em>}'.
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.EstimationSpecification#getStepSize <em>Step Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Step Size</em>'.
+	 * @return the meta object for the containment reference '<em>Step Size</em>'.
 	 * @see tools.descartes.librede.configuration.EstimationSpecification#getStepSize()
 	 * @see #getEstimationSpecification()
 	 * @generated
 	 */
-	EAttribute getEstimationSpecification_StepSize();
+	EReference getEstimationSpecification_StepSize();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.EstimationSpecification#getStartTimestamp <em>Start Timestamp</em>}'.
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.EstimationSpecification#getStartTimestamp <em>Start Timestamp</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Start Timestamp</em>'.
+	 * @return the meta object for the containment reference '<em>Start Timestamp</em>'.
 	 * @see tools.descartes.librede.configuration.EstimationSpecification#getStartTimestamp()
 	 * @see #getEstimationSpecification()
 	 * @generated
 	 */
-	EAttribute getEstimationSpecification_StartTimestamp();
+	EReference getEstimationSpecification_StartTimestamp();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp <em>End Timestamp</em>}'.
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp <em>End Timestamp</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>End Timestamp</em>'.
+	 * @return the meta object for the containment reference '<em>End Timestamp</em>'.
 	 * @see tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp()
 	 * @see #getEstimationSpecification()
 	 * @generated
 	 */
-	EAttribute getEstimationSpecification_EndTimestamp();
+	EReference getEstimationSpecification_EndTimestamp();
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}'.
@@ -2034,12 +2034,12 @@ public interface ConfigurationPackage extends EPackage {
 		EReference TRACE_CONFIGURATION__UNIT = eINSTANCE.getTraceConfiguration_Unit();
 
 		/**
-		 * The meta object literal for the '<em><b>Interval</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Interval</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TRACE_CONFIGURATION__INTERVAL = eINSTANCE.getTraceConfiguration_Interval();
+		EReference TRACE_CONFIGURATION__INTERVAL = eINSTANCE.getTraceConfiguration_Interval();
 
 		/**
 		 * The meta object literal for the '<em><b>Data Source</b></em>' reference feature.
@@ -2118,28 +2118,28 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute ESTIMATION_SPECIFICATION__WINDOW = eINSTANCE.getEstimationSpecification_Window();
 
 		/**
-		 * The meta object literal for the '<em><b>Step Size</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Step Size</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ESTIMATION_SPECIFICATION__STEP_SIZE = eINSTANCE.getEstimationSpecification_StepSize();
+		EReference ESTIMATION_SPECIFICATION__STEP_SIZE = eINSTANCE.getEstimationSpecification_StepSize();
 
 		/**
-		 * The meta object literal for the '<em><b>Start Timestamp</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Start Timestamp</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ESTIMATION_SPECIFICATION__START_TIMESTAMP = eINSTANCE.getEstimationSpecification_StartTimestamp();
+		EReference ESTIMATION_SPECIFICATION__START_TIMESTAMP = eINSTANCE.getEstimationSpecification_StartTimestamp();
 
 		/**
-		 * The meta object literal for the '<em><b>End Timestamp</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>End Timestamp</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ESTIMATION_SPECIFICATION__END_TIMESTAMP = eINSTANCE.getEstimationSpecification_EndTimestamp();
+		EReference ESTIMATION_SPECIFICATION__END_TIMESTAMP = eINSTANCE.getEstimationSpecification_EndTimestamp();
 
 		/**
 		 * The meta object literal for the '<em><b>Algorithms</b></em>' containment reference list feature.

@@ -34,31 +34,32 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 
 
 public interface IMonitoringRepository {
 	
-	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity, double start, double end);
+	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end);
 
-	public double select(Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func);
+	public double select(Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func);
 	
 	public TimeSeries select(Metric metric, Unit unit, ModelEntity entity);
 	
-	public double getAggregationInterval(Metric m, ModelEntity entity);
+	public boolean isAggregated(Metric m, ModelEntity entity);
 
 	public boolean contains(Metric responseTime,
-			ModelEntity entity, double maximumAggregationInterval);
+			ModelEntity entity, Quantity maximumAggregationInterval);
 
 	public boolean contains(Metric responseTime,
-			ModelEntity entity, double maximumAggregationInterval, boolean includeDerived);
+			ModelEntity entity, Quantity maximumAggregationInterval, boolean includeDerived);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
-	public IRepositoryCursor getCursor(double startTime, double stepSize);
+	public IRepositoryCursor getCursor(Quantity startTime, Quantity stepSize);
 	
-	public double getCurrentTime();
-	public void setCurrentTime(double currentTime);
+	public Quantity getCurrentTime();
+	public void setCurrentTime(Quantity currentTime);
 	public WorkloadDescription getWorkload();
 }

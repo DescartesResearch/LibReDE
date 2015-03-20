@@ -44,6 +44,7 @@ import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class ObservationDataGeneratorTest {
 	
@@ -60,7 +61,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation1WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
-		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
@@ -79,7 +80,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation4WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
-		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
@@ -99,7 +100,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation1WC4R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 4);
-		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
@@ -118,7 +119,7 @@ public class ObservationDataGeneratorTest {
 	@Test
 	public void testNextObservation4WC4R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 4);
-		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
 		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
@@ -143,7 +144,7 @@ public class ObservationDataGeneratorTest {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setLowerUtilizationBound(0.4);
 		generator.setUpperUtilizationBound(0.6);
-		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forAllResources().average().using(view);
 		
@@ -164,7 +165,7 @@ public class ObservationDataGeneratorTest {
 	public void testNextObservation4WC1RWithNoMix() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setWorkloadMixVariation(0);
-		IRepositoryCursor view = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(view);
 		

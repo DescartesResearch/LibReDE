@@ -43,7 +43,9 @@ import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
@@ -99,8 +101,11 @@ import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetricHandler;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsPackage;
 
 public class FileTraceDetailsPage extends AbstractDetailsPage {
@@ -223,7 +228,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 
 		Composite intervalEditorComposite = TimeUnitSpinnerBuilder.createComposite(toolkit, composite);
 		spnIntervalValue = TimeUnitSpinnerBuilder.createSpinnerControl(toolkit, intervalEditorComposite);
-		comboIntervalUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, intervalEditorComposite, spnIntervalValue);
+		comboIntervalUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, page.getAdapterFactory(), intervalEditorComposite);
 
 		Label lblMapping = toolkit.createLabel(composite, "Mapping:",
 				SWT.NONE);
@@ -335,9 +340,20 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 						WidgetProperties.selection().observe(spnIntervalValue),
 						EMFEditProperties
 								.value(domain,
-										ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL)
-								.observe(input), TimeUnitSpinnerBuilder.createTargetToModelStrategy(comboIntervalUnitViewer),
-								TimeUnitSpinnerBuilder.createModelToTargetStrategy(comboIntervalUnitViewer));
+										FeaturePath.fromList(
+												ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
+												UnitsPackage.Literals.QUANTITY__VALUE))
+								.observe(input), TimeUnitSpinnerBuilder.createTargetToModelConverter(),
+								TimeUnitSpinnerBuilder.createModelToTargetConverter());
+		detailBindingContext
+				.bindValue(
+						ViewerProperties.singleSelection().observe(comboIntervalUnitViewer),
+						EMFEditProperties
+								.value(domain,
+										FeaturePath.fromList(
+												ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
+												UnitsPackage.Literals.QUANTITY__UNIT))
+								.observe(input));
 		detailBindingContext
 				.bindValue(
 						ViewerProperties.singleSelection().observe(

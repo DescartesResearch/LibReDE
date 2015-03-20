@@ -29,13 +29,17 @@ package tools.descartes.librede.repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
 
 /**
  * This class implements the IMonitoringRepository
@@ -44,6 +48,8 @@ import tools.descartes.librede.units.Unit;
  * 
  */
 public class MemoryObservationRepository extends AbstractMonitoringRepository {
+	
+	private static final Quantity ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
 	
 	private static class DataKey {
 		
@@ -92,24 +98,24 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	
 	private static class DataEntry {
 		public TimeSeries data;
-		public double aggregationInterval = 0;
+		public double aggregationIntervalInSeconds = 0;
 	}
 	
 	private Map<DataKey, DataEntry> data = new HashMap<DataKey, DataEntry>();
 	private WorkloadDescription workload;
-	private double currentTime;
+	private Quantity currentTime;
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
 	}
 	
-	public double getAggregationInterval(Metric m, ModelEntity entity) {
+	public boolean isAggregated(Metric m, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
-			return -1;
+			return false;
 		}
-		return entry.aggregationInterval;
+		return (entry.aggregationIntervalInSeconds > 0);
 	}
 	
 	public TimeSeries select(Metric m, Unit unit, ModelEntity entity) {
@@ -122,14 +128,14 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	}
 	
 	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries observations) {
-		this.setData(m, unit, entity, observations, 0);
+		this.setData(m, unit, entity, observations, ZERO_SECONDS);
 	}
 	
-	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
+	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries aggregatedObservations, Quantity aggregationInterval) {
 		this.setData(m, unit, entity, aggregatedObservations, aggregationInterval);
 	}
 	
-	private void setData(Metric m, Unit unit, ModelEntity entity, TimeSeries observations, double aggregationInterval) {
+	private void setData(Metric m, Unit unit, ModelEntity entity, TimeSeries observations, Quantity aggregationInterval) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -137,21 +143,22 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 			data.put(key, entry);
 		}
 		entry.data = UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit());
-		entry.aggregationInterval = aggregationInterval;
+		entry.aggregationIntervalInSeconds = aggregationInterval.getUnit().convertTo(aggregationInterval.getValue(), Time.SECONDS);
 	}
 	
 	@Override
 	public boolean contains(Metric m,
-			ModelEntity entity, double maximumAggregationInterval, boolean includeDerived) {
+			ModelEntity entity, Quantity maximumAggregationInterval, boolean includeDerived) {		
 		if (includeDerived) {
 			return getMetricHandler(m).contains(this, m, entity, maximumAggregationInterval);
 		} else {
+			double requestedIntervalInSeconds = maximumAggregationInterval.getUnit().convertTo(maximumAggregationInterval.getValue(), Time.SECONDS);
 			DataKey key = new DataKey(m, entity);
 			DataEntry entry = data.get(key);
 			if (entry == null) {
 				return false;
 			}
-			return entry.aggregationInterval <= maximumAggregationInterval;
+			return entry.aggregationIntervalInSeconds <= requestedIntervalInSeconds;
 		}
 	}
 	
@@ -166,17 +173,17 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	}
 	
 	@Override
-	public IRepositoryCursor getCursor(double startTime, double stepSize) {
+	public IRepositoryCursor getCursor(Quantity startTime, Quantity stepSize) {
 		return new AggregationRepositoryCursor(this, startTime, stepSize);
 	}
 	
 	@Override
-	public double getCurrentTime() {
+	public Quantity getCurrentTime() {
 		return currentTime;
 	}
 	
 	@Override
-	public void setCurrentTime(double currentTime) {
+	public void setCurrentTime(Quantity currentTime) {
 		this.currentTime = currentTime;
 	}
 	

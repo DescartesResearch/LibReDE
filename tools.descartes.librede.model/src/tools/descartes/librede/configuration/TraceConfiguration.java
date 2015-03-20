@@ -32,6 +32,7 @@ import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 
 /**
@@ -44,10 +45,10 @@ import tools.descartes.librede.units.Unit;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration()
@@ -108,31 +109,30 @@ public interface TraceConfiguration extends EObject {
 	void setUnit(Unit value);
 
 	/**
-	 * Returns the value of the '<em><b>Interval</b></em>' attribute.
-	 * The default value is <code>"0"</code>.
+	 * Returns the value of the '<em><b>Interval</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Interval</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Interval</em>' attribute.
-	 * @see #setInterval(long)
+	 * @return the value of the '<em>Interval</em>' containment reference.
+	 * @see #setInterval(Quantity)
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Interval()
-	 * @model default="0" required="true"
+	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	long getInterval();
+	Quantity getInterval();
 
 	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}' attribute.
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Interval</em>' attribute.
+	 * @param value the new value of the '<em>Interval</em>' containment reference.
 	 * @see #getInterval()
 	 * @generated
 	 */
-	void setInterval(long value);
+	void setInterval(Quantity value);
 
 	/**
 	 * Returns the value of the '<em><b>Data Source</b></em>' reference.

@@ -94,6 +94,24 @@ public interface UnitsFactory extends EFactory {
 	UnitsRepository createUnitsRepository();
 
 	/**
+	 * Returns a new object of class '<em>Quantity</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Quantity</em>'.
+	 * @generated
+	 */
+	Quantity createQuantity();
+	
+	/**
+	 * Returns a new object of class '<em>Quantity</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Quantity</em>'.
+	 * @generated NOT
+	 */
+	Quantity createQuantity(double value, Unit unit);
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

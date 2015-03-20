@@ -36,4 +36,30 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="dimensions" upperBound="-1"
         eType="#//Dimension" containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Quantity">
+    <eOperations name="convertTo" lowerBound="1" eType="#//Quantity">
+      <eParameters name="targetUnit" lowerBound="1" eType="#//Unit"/>
+    </eOperations>
+    <eOperations name="getValue" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
+      <eParameters name="unit" lowerBound="1" eType="#//Unit"/>
+    </eOperations>
+    <eOperations name="plus" lowerBound="1" eType="#//Quantity">
+      <eParameters name="quantity" lowerBound="1" eType="#//Quantity"/>
+    </eOperations>
+    <eOperations name="minus" lowerBound="1" eType="#//Quantity">
+      <eParameters name="quantity" lowerBound="1" eType="#//Quantity"/>
+    </eOperations>
+    <eOperations name="times" lowerBound="1" eType="#//Quantity">
+      <eParameters name="factor" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1" eType="#//Unit"/>
+    <eGenericSuperTypes eClassifier="#//Comparable">
+      <eTypeArguments eClassifier="#//Quantity"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Comparable" instanceClassName="java.lang.Comparable"
+      abstract="true" interface="true">
+    <eTypeParameters name="T"/>
+  </eClassifiers>
 </ecore:EPackage>

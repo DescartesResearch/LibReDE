@@ -44,6 +44,8 @@ import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class LeastSquaresRegressionTest extends LibredeTest {
 
@@ -65,7 +67,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		Vector initialEstimate = vector(0.01);
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
@@ -109,7 +111,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 

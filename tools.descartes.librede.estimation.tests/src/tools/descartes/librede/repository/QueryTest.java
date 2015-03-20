@@ -52,6 +52,7 @@ import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class QueryTest extends LibredeTest {
 
@@ -112,7 +113,7 @@ public class QueryTest extends LibredeTest {
 		repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[0], addServRtTable);
 		repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[1], payServRtTable);
 		
-		repository.setCurrentTime(5);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
 	}
 
 	@After
@@ -159,7 +160,7 @@ public class QueryTest extends LibredeTest {
 	// }
 	@Test
 	public void testAllQuery() {
-		IRepositoryCursor cursor = repository.getCursor(0, 5);
+		IRepositoryCursor cursor = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
 		assertThat(cursor.next()).isTrue();
 		
 		Query<Vector> respSingle = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(services[1]).all().using(cursor);

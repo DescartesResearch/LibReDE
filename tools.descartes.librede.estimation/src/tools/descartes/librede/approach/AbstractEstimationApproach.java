@@ -48,6 +48,7 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.units.Time;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
 	
@@ -162,7 +163,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 
 			if (iterative) {
 				while (cursor.next()) {					
-					builder.next(cursor.getCurrentIntervalEnd());
+					builder.next(cursor.getCurrentIntervalEnd().getValue(Time.MILLISECONDS));
 					
 					for (IEstimationAlgorithm a : algorithms) {
 						a.update();
@@ -181,7 +182,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 					}
 				}
 				
-				builder.next(cursor.getCurrentIntervalEnd());
+				builder.next(cursor.getCurrentIntervalEnd().getValue(Time.MILLISECONDS));
 				for (IEstimationAlgorithm a : algorithms) {
 					Vector curEstimates = a.estimate();
 					for (int i = 0; i < curEstimates.rows(); i++) {

@@ -46,6 +46,8 @@ import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class UtilizationLawTest extends LibredeTest {
 		
@@ -62,7 +64,7 @@ public class UtilizationLawTest extends LibredeTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
 		law = new UtilizationLaw(generator.getStateModel(), cursor, resource);

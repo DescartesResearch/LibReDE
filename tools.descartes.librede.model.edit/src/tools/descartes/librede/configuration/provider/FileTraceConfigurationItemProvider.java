@@ -128,7 +128,7 @@ public class FileTraceConfigurationItemProvider extends TraceConfigurationItemPr
 		if (metric != null) {
 			label.append(metric.getName());
 		}
-		if (trace.getInterval() == 0) {
+		if (trace.getInterval() != null && trace.getInterval().getValue() == 0) {
 			label.append(", ").append("non-aggregated");
 		} else {
 			label.append(", ").append("aggregated");

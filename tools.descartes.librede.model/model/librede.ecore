@@ -56,13 +56,13 @@
   <eClassifiers xsi:type="ecore:EClass" name="TraceConfiguration">
     <eStructuralFeatures xsi:type="ecore:EReference" name="metric" lowerBound="1"
         eType="ecore:EClass metrics.ecore#//Metric"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="interval" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="dataSource" lowerBound="1"
         eType="#//DataSourceConfiguration"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="mappings" lowerBound="1"
         upperBound="-1" eType="#//TraceToEntityMapping" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1" eType="ecore:EClass units.ecore#//Unit"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="interval" lowerBound="1"
+        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Parameter">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -75,14 +75,14 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="window" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="stepSize" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="1000"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startTimestamp" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="endTimestamp" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong" defaultValueLiteral="0"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="algorithms" upperBound="-1"
         eType="#//EstimationAlgorithmConfiguration" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="stepSize" lowerBound="1"
+        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="startTimestamp" lowerBound="1"
+        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="endTimestamp" lowerBound="1"
+        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ValidationSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="validators" upperBound="-1"

@@ -4,12 +4,17 @@ package tools.descartes.librede.units.util;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
-
-import tools.descartes.librede.units.*;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.units.UnitsRepository;
 
 /**
  * <!-- begin-user-doc -->
@@ -94,6 +99,14 @@ public class UnitsAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseUnitsRepository(UnitsRepository object) {
 				return createUnitsRepositoryAdapter();
+			}
+			@Override
+			public Adapter caseQuantity(Quantity object) {
+				return createQuantityAdapter();
+			}
+			@Override
+			public <T> Adapter caseComparable(Comparable<T> object) {
+				return createComparableAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -210,6 +223,34 @@ public class UnitsAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createUnitsRepositoryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.units.Quantity <em>Quantity</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.units.Quantity
+	 * @generated
+	 */
+	public Adapter createQuantityAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.lang.Comparable <em>Comparable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.lang.Comparable
+	 * @generated
+	 */
+	public Adapter createComparableAdapter() {
 		return null;
 	}
 

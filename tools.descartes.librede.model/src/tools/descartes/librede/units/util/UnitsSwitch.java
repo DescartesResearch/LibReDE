@@ -7,6 +7,15 @@ import org.eclipse.emf.ecore.EPackage;
 
 import org.eclipse.emf.ecore.util.Switch;
 
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.units.UnitsRepository;
 import tools.descartes.librede.units.*;
 
 /**
@@ -22,7 +31,7 @@ import tools.descartes.librede.units.*;
  * @see tools.descartes.librede.units.UnitsPackage
  * @generated
  */
-public class UnitsSwitch<T> extends Switch<T> {
+public class UnitsSwitch<T1> extends Switch<T1> {
 	/**
 	 * The cached model package
 	 * <!-- begin-user-doc -->
@@ -64,51 +73,64 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	@Override
-	protected T doSwitch(int classifierID, EObject theEObject) {
+	protected T1 doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
 			case UnitsPackage.DIMENSION: {
 				Dimension dimension = (Dimension)theEObject;
-				T result = caseDimension(dimension);
+				T1 result = caseDimension(dimension);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UnitsPackage.UNIT: {
 				Unit unit = (Unit)theEObject;
-				T result = caseUnit(unit);
+				T1 result = caseUnit(unit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UnitsPackage.REQUEST_RATE: {
 				RequestRate requestRate = (RequestRate)theEObject;
-				T result = caseRequestRate(requestRate);
+				T1 result = caseRequestRate(requestRate);
 				if (result == null) result = caseDimension(requestRate);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UnitsPackage.TIME: {
 				Time time = (Time)theEObject;
-				T result = caseTime(time);
+				T1 result = caseTime(time);
 				if (result == null) result = caseDimension(time);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UnitsPackage.REQUEST_COUNT: {
 				RequestCount requestCount = (RequestCount)theEObject;
-				T result = caseRequestCount(requestCount);
+				T1 result = caseRequestCount(requestCount);
 				if (result == null) result = caseDimension(requestCount);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UnitsPackage.RATIO: {
 				Ratio ratio = (Ratio)theEObject;
-				T result = caseRatio(ratio);
+				T1 result = caseRatio(ratio);
 				if (result == null) result = caseDimension(ratio);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UnitsPackage.UNITS_REPOSITORY: {
 				UnitsRepository unitsRepository = (UnitsRepository)theEObject;
-				T result = caseUnitsRepository(unitsRepository);
+				T1 result = caseUnitsRepository(unitsRepository);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case UnitsPackage.QUANTITY: {
+				Quantity quantity = (Quantity)theEObject;
+				T1 result = caseQuantity(quantity);
+				if (result == null) result = caseComparable(quantity);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case UnitsPackage.COMPARABLE: {
+				Comparable<?> comparable = (Comparable<?>)theEObject;
+				T1 result = caseComparable(comparable);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -127,7 +149,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseDimension(Dimension object) {
+	public T1 caseDimension(Dimension object) {
 		return null;
 	}
 
@@ -142,7 +164,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseUnit(Unit object) {
+	public T1 caseUnit(Unit object) {
 		return null;
 	}
 
@@ -157,7 +179,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseRequestRate(RequestRate object) {
+	public T1 caseRequestRate(RequestRate object) {
 		return null;
 	}
 
@@ -172,7 +194,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTime(Time object) {
+	public T1 caseTime(Time object) {
 		return null;
 	}
 
@@ -187,7 +209,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseRequestCount(RequestCount object) {
+	public T1 caseRequestCount(RequestCount object) {
 		return null;
 	}
 
@@ -202,7 +224,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseRatio(Ratio object) {
+	public T1 caseRatio(Ratio object) {
 		return null;
 	}
 
@@ -217,7 +239,37 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseUnitsRepository(UnitsRepository object) {
+	public T1 caseUnitsRepository(UnitsRepository object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Quantity</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Quantity</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseQuantity(Quantity object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Comparable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Comparable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public <T> T1 caseComparable(Comparable<T> object) {
 		return null;
 	}
 
@@ -233,7 +285,7 @@ public class UnitsSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	@Override
-	public T defaultCase(EObject object) {
+	public T1 defaultCase(EObject object) {
 		return null;
 	}
 

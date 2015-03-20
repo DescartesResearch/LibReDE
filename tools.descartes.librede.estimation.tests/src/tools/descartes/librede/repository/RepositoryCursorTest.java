@@ -41,6 +41,8 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class RepositoryCursorTest extends LibredeTest {
 	
@@ -65,13 +67,13 @@ public class RepositoryCursorTest extends LibredeTest {
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1);
-		repository.setCurrentTime(8);
-		IRepositoryCursor cur = repository.getCursor(1, 1);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(8, Time.SECONDS));
+		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 	
 		for (int i = 2; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
-			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 1);
-			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
+			assertThat(cur.getCurrentIntervalStart().getValue(Time.SECONDS)).isEqualTo(i - 1);
+			assertThat(cur.getCurrentIntervalEnd().getValue(Time.SECONDS)).isEqualTo(i);
 		}
 		assertThat(cur.next()).isFalse();
 		
@@ -84,13 +86,13 @@ public class RepositoryCursorTest extends LibredeTest {
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts2);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1);
-		repository.setCurrentTime(7.2);
-		IRepositoryCursor cur = repository.getCursor(1.2, 1);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(7.2, Time.SECONDS));
+		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(1.2, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		for (int i = 0; i < 6; i++) {
 			assertThat(cur.next()).isTrue();
-			assertThat(cur.getCurrentIntervalStart()).isEqualTo(1.2 + i, offset(1e-9));
-			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(2.2 + i, offset(1e-9));
+			assertThat(cur.getCurrentIntervalStart().getValue(Time.SECONDS)).isEqualTo(1.2 + i, offset(1e-9));
+			assertThat(cur.getCurrentIntervalEnd().getValue(Time.SECONDS)).isEqualTo(2.2 + i, offset(1e-9));
 		}
 		assertThat(cur.next()).isFalse();		
 	}
@@ -101,25 +103,25 @@ public class RepositoryCursorTest extends LibredeTest {
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1);
-		repository.setCurrentTime(8);
-		IRepositoryCursor cur = repository.getCursor(1, 1);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(8, Time.SECONDS));
+		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		for (int i = 2; i <= 8; i++) {
 			assertThat(cur.next()).isTrue();
-			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 1);
-			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
+			assertThat(cur.getCurrentIntervalStart().getValue(Time.SECONDS)).isEqualTo(i - 1);
+			assertThat(cur.getCurrentIntervalEnd().getValue(Time.SECONDS)).isEqualTo(i);
 		}
 		assertThat(cur.next()).isFalse();
 		
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1.addSample(10.0, 1.0));
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts1.addSample(10.0, 1.0));
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1.addSample(10.0, 1.0));
-		repository.setCurrentTime(10);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(10, Time.SECONDS));
 		
 		for (int i = 9; i <= 10; i++) {
 			assertThat(cur.next()).isTrue();
-			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 1);
-			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
+			assertThat(cur.getCurrentIntervalStart().getValue(Time.SECONDS)).isEqualTo(i - 1);
+			assertThat(cur.getCurrentIntervalEnd().getValue(Time.SECONDS)).isEqualTo(i);
 		}
 		assertThat(cur.next()).isFalse();		
 	}
@@ -130,13 +132,13 @@ public class RepositoryCursorTest extends LibredeTest {
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1);
-		repository.setCurrentTime(8);
-		IRepositoryCursor cur = repository.getCursor(1, 3);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(8, Time.SECONDS));
+		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(3, Time.SECONDS));
 		
 		for (int i = 4; i <= 8; i+=3) {
 			assertThat(cur.next()).isTrue();
-			assertThat(cur.getCurrentIntervalStart()).isEqualTo(i - 3);
-			assertThat(cur.getCurrentIntervalEnd()).isEqualTo(i);
+			assertThat(cur.getCurrentIntervalStart().getValue(Time.SECONDS)).isEqualTo(i - 3);
+			assertThat(cur.getCurrentIntervalEnd().getValue(Time.SECONDS)).isEqualTo(i);
 		}
 		assertThat(cur.next()).isFalse();
 		
@@ -147,22 +149,22 @@ public class RepositoryCursorTest extends LibredeTest {
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1);
-		IRepositoryCursor cur = repository.getCursor(0, 100);
+		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(100, Time.SECONDS));
 		assertThat(cur.next()).isFalse();		
 	}
 	
 	@Test
 	public void testEmptyCursor() {
-		repository.setCurrentTime(1);
-		IRepositoryCursor cur = repository.getCursor(1, 1);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		assertThat(cur.next()).isFalse();
 		
 		ts1.setStartTime(1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
-		repository.setCurrentTime(8);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(8, Time.SECONDS));
 		assertThat(cur.next()).isTrue();
-		assertThat(cur.getCurrentIntervalStart()).isEqualTo(ts1.getStartTime(), offset(1e-9));
-		assertThat(cur.getCurrentIntervalEnd()).isEqualTo(ts1.getStartTime() + 1.0, offset(1e-9));
+		assertThat(cur.getCurrentIntervalStart().getValue(Time.SECONDS)).isEqualTo(ts1.getStartTime(), offset(1e-9));
+		assertThat(cur.getCurrentIntervalEnd().getValue(Time.SECONDS)).isEqualTo(ts1.getStartTime() + 1.0, offset(1e-9));
 	}
 
 }

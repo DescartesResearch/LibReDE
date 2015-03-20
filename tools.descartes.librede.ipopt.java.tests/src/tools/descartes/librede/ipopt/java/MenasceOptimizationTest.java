@@ -46,6 +46,8 @@ import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class MenasceOptimizationTest extends LibredeTest {
 
@@ -67,7 +69,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		Vector initialEstimate = vector(0.01);
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
@@ -113,7 +115,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();

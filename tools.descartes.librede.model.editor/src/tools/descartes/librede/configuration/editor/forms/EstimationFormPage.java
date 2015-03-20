@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.core.databinding.observable.list.IObservableList;
@@ -45,9 +46,12 @@ import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
@@ -57,15 +61,19 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -85,74 +93,103 @@ import tools.descartes.librede.datasource.IDataSource;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
+import tools.descartes.librede.units.UnitsPackage;
 
 public class EstimationFormPage extends MasterDetailsFormPage {
-	
+
 	private Spinner spnStepValue;
 	private ComboViewer comboStepUnitViewer;
+	private ComboViewer comboStartUnitViewer;
+	private ComboViewer comboEndUnitViewer;
 	private Button btnRecursive;
 	private Spinner spnWindow;
-	
+
 	private EMFDataBindingContext bindingContext = new EMFDataBindingContext();
 
-	public EstimationFormPage(ConfigurationEditor editor, String id,
-			String title, String icon,
-			AdapterFactoryEditingDomain editingDomain,
-			LibredeConfiguration model, AbstractMasterBlock masterBlock) {
+	public EstimationFormPage(ConfigurationEditor editor, String id, String title, String icon,
+			AdapterFactoryEditingDomain editingDomain, LibredeConfiguration model, AbstractMasterBlock masterBlock) {
 		super(editor, id, title, icon, editingDomain, model, masterBlock);
+		initializeQuantityFields();
 	}
-	
+
 	@Override
-	protected void createFormContentBeginning(FormToolkit toolkit,
-			Composite parent) {
+	protected void createFormContentBeginning(FormToolkit toolkit, Composite parent) {
 		super.createFormContentBeginning(toolkit, parent);
-		
+
 		createEstimationSection(toolkit, parent);
-		
+
 		createIntervalSection(toolkit, parent);
 	}
-	
+
+	private void initializeQuantityFields() {
+		if (getModel().getEstimation().getStepSize() == null) {
+			Quantity stepSize = UnitsFactory.eINSTANCE.createQuantity();
+			stepSize.setValue(60);
+			stepSize.setUnit(Time.SECONDS);
+			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation(),
+					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__STEP_SIZE, stepSize);
+			getEditingDomain().getCommandStack().execute(cmd);
+		}
+
+		if (getModel().getEstimation().getStartTimestamp() == null) {
+			Quantity startTimestamp = UnitsFactory.eINSTANCE.createQuantity();
+			startTimestamp.setValue(0);
+			startTimestamp.setUnit(Time.SECONDS);
+			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation(),
+					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP, startTimestamp);
+			getEditingDomain().getCommandStack().execute(cmd);
+		}
+
+		if (getModel().getEstimation().getEndTimestamp() == null) {
+			Quantity endTimestamp = UnitsFactory.eINSTANCE.createQuantity();
+			endTimestamp.setValue(0);
+			endTimestamp.setUnit(Time.SECONDS);
+			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation(),
+					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP, endTimestamp);
+			getEditingDomain().getCommandStack().execute(cmd);
+		}
+	}
+
 	private void createIntervalSection(FormToolkit toolkit, Composite body) {
 		Section sctnIntervals = toolkit.createSection(body, Section.TWISTIE | Section.TITLE_BAR);
 		sctnIntervals.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		sctnIntervals.setText("Interval Settings");
 		sctnIntervals.setExpanded(true);
-		
+
+		createToolbar(sctnIntervals);
+
 		Composite client = toolkit.createComposite(sctnIntervals, SWT.NONE);
 		sctnIntervals.setClient(client);
 		toolkit.paintBordersFor(client);
 		client.setLayout(new GridLayout(4, false));
-		
+
 		toolkit.createLabel(client, "Step Size:");
-		
+
 		spnStepValue = TimeUnitSpinnerBuilder.createSpinnerControl(toolkit, client);
 		spnStepValue.setLayoutData(new GridData());
-		comboStepUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, client, spnStepValue);
+		comboStepUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, getAdapterFactory(), client);
 		comboStepUnitViewer.getCombo().setLayoutData(new GridData());
 		toolkit.createLabel(client, "");
-		
+
 		Label lblStartDate = toolkit.createLabel(client, "Start Date:");
 		GridData gd_lblStartDate = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd_lblStartDate.verticalSpan = 2;
 		lblStartDate.setLayoutData(gd_lblStartDate);
 		DateTime startDate = new DateTime(client, SWT.DATE | SWT.DROP_DOWN);
 		DateTime startTime = new DateTime(client, SWT.TIME);
-		Button btnReadFromTrace = toolkit.createButton(client, "Read from Traces", SWT.PUSH);
-		btnReadFromTrace.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleReadFromTrace();
-			}
-		});
-		
-		toolkit.createLabel(client, "In Unix Time:");
+		toolkit.createLabel(client, "");
+
+		toolkit.createLabel(client, "As Timestamp:");
 		Text txtStartTimestamp = toolkit.createText(client, "");
 		GridData gd_txtStartTimestamp = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 		gd_txtStartTimestamp.minimumWidth = 150;
 		txtStartTimestamp.setLayoutData(gd_txtStartTimestamp);
-		
-		toolkit.createLabel(client, "");
-		
+		comboStartUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, getAdapterFactory(), client);
+		comboStartUnitViewer.getCombo().setLayoutData(new GridData());
+
 		Label lblEndDate = toolkit.createLabel(client, "End Date:");
 		GridData gd_lblEndDate = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd_lblEndDate.verticalSpan = 2;
@@ -162,102 +199,145 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		GridData gd_endTime = new GridData();
 		gd_endTime.horizontalSpan = 2;
 		endTime.setLayoutData(gd_endTime);
-		
-		toolkit.createLabel(client, "In Unix Time:");
+
+		toolkit.createLabel(client, "As Timestamp:");
 		Text txtEndTimestamp = toolkit.createText(client, "");
 		GridData gd_txtEndTimestamp = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
 		gd_txtEndTimestamp.minimumWidth = 150;
 		txtEndTimestamp.setLayoutData(gd_txtEndTimestamp);
+		comboEndUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, getAdapterFactory(), client);
+		comboEndUnitViewer.getCombo().setLayoutData(new GridData());
 
-		toolkit.createLabel(client, "");
-		
 		btnRecursive = toolkit.createButton(client, "Recursive Execution", SWT.CHECK);
 		GridData gd_btnRecursive = new GridData();
 		gd_btnRecursive.horizontalSpan = 4;
 		btnRecursive.setLayoutData(gd_btnRecursive);
-		
+
 		toolkit.createLabel(client, "Window Size:");
 		spnWindow = new Spinner(client, SWT.BORDER);
 		spnWindow.setMinimum(1);
 		spnWindow.setMaximum(Integer.MAX_VALUE);
 		toolkit.paintBordersFor(spnWindow);
-		
-		bindingContext.bindValue(WidgetProperties.selection().observe(spnStepValue), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__STEP_SIZE
-								)).observe(getModel()),
-				TimeUnitSpinnerBuilder.createTargetToModelStrategy(comboStepUnitViewer),
-				TimeUnitSpinnerBuilder.createModelToTargetStrategy(comboStepUnitViewer));
-		
-		bindingContext.bindValue(new DateAndTimeObservableValue(
-				WidgetProperties.selection().observe(startDate),
-				WidgetProperties.selection().observe(startTime)), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP
-						)).observe(getModel()),
-				createDateConverterTargetToModel(),
-				createDateConverterModelToTarget());
-		bindingContext.bindValue(new DateAndTimeObservableValue(
-				WidgetProperties.selection().observe(endDate),
-				WidgetProperties.selection().observe(endTime)), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP
-						)).observe(getModel()),
-				createDateConverterTargetToModel(),
-				createDateConverterModelToTarget());
-		bindingContext.bindValue(WidgetProperties.text(SWT.Modify).observe(txtStartTimestamp), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP
-						)).observe(getModel()));
-		bindingContext.bindValue(WidgetProperties.text(SWT.Modify).observe(txtEndTimestamp), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP
-						)).observe(getModel()));		
-		bindingContext.bindValue(WidgetProperties.selection().observe(btnRecursive), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__RECURSIVE
-								)).observe(getModel()));
-		bindingContext.bindValue(WidgetProperties.selection().observe(spnWindow), 
-				EMFEditProperties.value(getEditingDomain(), 
-						FeaturePath.fromList(
-								ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__WINDOW
-								)).observe(getModel()));
+
+		bindingContext.bindValue(
+				WidgetProperties.selection().observe(spnStepValue),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__STEP_SIZE,
+								UnitsPackage.Literals.QUANTITY__VALUE)).observe(getModel()), TimeUnitSpinnerBuilder
+						.createTargetToModelConverter(), TimeUnitSpinnerBuilder.createModelToTargetConverter());
+
+		bindingContext.bindValue(
+				ViewerProperties.singleSelection().observe(comboStepUnitViewer),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__STEP_SIZE,
+								UnitsPackage.Literals.QUANTITY__UNIT)).observe(getModel()));
+
+		bindingContext.bindValue(
+				new DateAndTimeObservableValue(WidgetProperties.selection().observe(startDate), WidgetProperties
+						.selection().observe(startTime)),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP,
+								UnitsPackage.Literals.QUANTITY__VALUE)).observe(getModel()),
+				createDateConverterTargetToModel(getModel().getEstimation().getStartTimestamp()),
+				createDateConverterModelToTarget(getModel().getEstimation().getStartTimestamp()));
+		bindingContext.bindValue(
+				new DateAndTimeObservableValue(WidgetProperties.selection().observe(endDate), WidgetProperties
+						.selection().observe(endTime)),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP,
+								UnitsPackage.Literals.QUANTITY__VALUE)).observe(getModel()),
+				createDateConverterTargetToModel(getModel().getEstimation().getEndTimestamp()),
+				createDateConverterModelToTarget(getModel().getEstimation().getEndTimestamp()));
+		bindingContext.bindValue(
+				WidgetProperties.text(SWT.Modify).observe(txtStartTimestamp),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP,
+								UnitsPackage.Literals.QUANTITY__VALUE)).observe(getModel()));
+		bindingContext.bindValue(
+				ViewerProperties.singleSelection().observe(comboStartUnitViewer),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP,
+								UnitsPackage.Literals.QUANTITY__UNIT)).observe(getModel()));
+		bindingContext.bindValue(
+				WidgetProperties.text(SWT.Modify).observe(txtEndTimestamp),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP,
+								UnitsPackage.Literals.QUANTITY__VALUE)).observe(getModel()));
+		bindingContext.bindValue(
+				ViewerProperties.singleSelection().observe(comboEndUnitViewer),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP,
+								UnitsPackage.Literals.QUANTITY__UNIT)).observe(getModel()));
+		bindingContext
+				.bindValue(
+						WidgetProperties.selection().observe(btnRecursive),
+						EMFEditProperties.value(
+								getEditingDomain(),
+								FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+										ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__RECURSIVE)).observe(
+								getModel()));
+		bindingContext.bindValue(
+				WidgetProperties.selection().observe(spnWindow),
+				EMFEditProperties.value(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__WINDOW)).observe(getModel()));
 	}
-	
+
+	private void createToolbar(Section section) {
+		ToolBar toolbar = new ToolBar(section, SWT.NONE);
+		ToolItem readFromTracesItem = new ToolItem(toolbar, SWT.NONE);
+		readFromTracesItem.setImage(ExtendedImageRegistry.INSTANCE.getImage(LibredeEditorPlugin.getPlugin().getImage(
+				"full/obj16/refresh_remote")));
+		readFromTracesItem.setToolTipText("Update from Traces");
+		readFromTracesItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleReadFromTrace();
+			}
+		});
+		section.setTextClient(toolbar);
+	}
+
 	private void createEstimationSection(FormToolkit toolkit, Composite body) {
 		Section sctnEstimation = toolkit.createSection(body, Section.TWISTIE | Section.TITLE_BAR);
 		sctnEstimation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING));
 		sctnEstimation.setText("Activated Estimation Approaches");
 		sctnEstimation.setExpanded(true);
-		
+
 		Composite client = toolkit.createComposite(sctnEstimation, SWT.NONE);
 		sctnEstimation.setClient(client);
 		toolkit.paintBordersFor(client);
 		client.setLayout(new GridLayout(2, false));
-		
-		CheckboxTableViewer tableApproachesViewer = CheckboxTableViewer.newCheckList(client, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
+
+		CheckboxTableViewer tableApproachesViewer = CheckboxTableViewer.newCheckList(client, SWT.BORDER
+				| SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
 		Table tableApproaches = tableApproachesViewer.getTable();
 		tableApproaches.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		tableApproachesViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
-		tableApproachesViewer
-				.setContentProvider(new ObservableListContentProvider());
+		tableApproachesViewer.setContentProvider(new ObservableListContentProvider());
 
-		// We need to add the existing validators in the configuration first, so that the test for
-		// equality in the checked table binding works correctly. EMF always does an equality check on
+		// We need to add the existing validators in the configuration first, so
+		// that the test for
+		// equality in the checked table binding works correctly. EMF always
+		// does an equality check on
 		// the object instance.
 		IObservableList approaches = new WritableList();
 		Set<String> existingApproaches = new HashSet<String>();
@@ -265,63 +345,58 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 			approaches.add(v);
 			existingApproaches.add(v.getType());
 		}
-		for (String instance : Registry.INSTANCE
-				.getInstances(IEstimationApproach.class)) {
+		for (String instance : Registry.INSTANCE.getInstances(IEstimationApproach.class)) {
 			if (!existingApproaches.contains(instance)) {
-				EstimationApproachConfiguration a = ConfigurationFactory.eINSTANCE.createEstimationApproachConfiguration();
+				EstimationApproachConfiguration a = ConfigurationFactory.eINSTANCE
+						.createEstimationApproachConfiguration();
 				a.setType(instance);
 				approaches.add(a);
 			}
 		}
 		tableApproachesViewer.setInput(approaches);
-		
+
 		// Binding: All checked approaches are added to the model instance
-		bindingContext
-				.bindSet(
-						ViewerProperties.checkedElements(
-								EstimationApproachConfiguration.class).observe(
-								tableApproachesViewer),
-						EMFEditProperties
-								.set(getEditingDomain(),
-										FeaturePath
-												.fromList(
-														ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
-														ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__APPROACHES))
-								.observe(getModel()));
-		
+		bindingContext.bindSet(
+				ViewerProperties.checkedElements(EstimationApproachConfiguration.class).observe(tableApproachesViewer),
+				EMFEditProperties.set(
+						getEditingDomain(),
+						FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+								ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__APPROACHES))
+						.observe(getModel()));
+
 	}
-	
-	private EMFUpdateValueStrategy createDateConverterTargetToModel() {
+
+	private EMFUpdateValueStrategy createDateConverterTargetToModel(final Quantity quantity) {
 		EMFUpdateValueStrategy strategy = new EMFUpdateValueStrategy(EMFUpdateValueStrategy.POLICY_UPDATE);
-		strategy.setConverter(new Converter(Date.class, Long.class) {			
+		strategy.setConverter(new Converter(Date.class, Double.class) {
 			@Override
 			public Object convert(Object fromObject) {
-				return ((Date)fromObject).getTime();
+				return quantity.getUnit().convertFrom(((Date) fromObject).getTime(), Time.MILLISECONDS);
 			}
 		});
 		return strategy;
 	}
-	
-	private EMFUpdateValueStrategy createDateConverterModelToTarget() {
+
+	private EMFUpdateValueStrategy createDateConverterModelToTarget(final Quantity quantity) {
 		EMFUpdateValueStrategy strategy = new EMFUpdateValueStrategy(EMFUpdateValueStrategy.POLICY_UPDATE);
-		strategy.setConverter(new Converter(Long.class, Date.class) {			
+		strategy.setConverter(new Converter(Double.class, Date.class) {
 			@Override
 			public Object convert(Object fromObject) {
-				return new Date((long)fromObject);
+				return new Date((long) quantity.getUnit().convertTo((double) fromObject, Time.MILLISECONDS));
 			}
 		});
 		return strategy;
 	}
-	
+
 	private void handleReadFromTrace() {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
-		
+
 		double maxStart = Double.MIN_VALUE;
 		double minEnd = Double.MAX_VALUE;
-		
+
 		for (TraceConfiguration trace : getModel().getInput().getObservations()) {
 			if (trace instanceof FileTraceConfiguration) {
-				FileTraceConfiguration fileTrace = (FileTraceConfiguration)trace;
+				FileTraceConfiguration fileTrace = (FileTraceConfiguration) trace;
 				File inputFile = new File(fileTrace.getFile());
 				if (inputFile.exists()) {
 					DataSourceConfiguration dataSourceConf = fileTrace.getDataSource();
@@ -330,15 +405,17 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 						if (ds == null) {
 							try {
 								Class<?> cl = Registry.INSTANCE.getInstanceClass(dataSourceConf.getType());
-								ds = (IDataSource)Instantiator.newInstance(cl, dataSourceConf.getParameters());
+								ds = (IDataSource) Instantiator.newInstance(cl, dataSourceConf.getParameters());
 								dataSources.put(dataSourceConf.getType(), ds);
 							} catch (Exception e) {
-								ErrorDialog.openError(getEditor().getEditorSite().getShell(), null, null, 
-										new Status(IStatus.ERROR, LibredeEditorPlugin.ID, "Error instantiating data source instance.", e));
+								ErrorDialog.openError(getEditor().getEditorSite().getShell(), null, null, new Status(
+										IStatus.ERROR, LibredeEditorPlugin.ID,
+										"Error instantiating data source instance.", e));
 								return;
 							}
 						}
-						// it is enough to load the first mapping as all will have the same timestamps
+						// it is enough to load the first mapping as all will
+						// have the same timestamps
 						if (fileTrace.getMappings().size() >= 1) {
 							int col = fileTrace.getMappings().get(0).getTraceColumn();
 							FileInputStream in = null;
@@ -347,35 +424,31 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 								TimeSeries series = ds.load(in, col);
 								maxStart = Math.max(series.getStartTime(), maxStart);
 								minEnd = Math.min(series.getEndTime(), minEnd);
-							} catch(Exception e) {
+							} catch (Exception e) {
 								// Fail graciously
-							}						
+							}
 						}
 					}
 				}
 			}
 		}
-		
+
 		if (maxStart >= minEnd) {
-			ErrorDialog.openError(getEditor().getEditorSite().getShell(), null, null, 
-					new Status(IStatus.WARNING, LibredeEditorPlugin.ID, "The time spans of the traces to no overlap."));
+			ErrorDialog.openError(getEditor().getEditorSite().getShell(), null, null, new Status(IStatus.WARNING,
+					LibredeEditorPlugin.ID, "The time spans of the traces to no overlap."));
 			return;
 		}
 		if (maxStart != Double.MIN_VALUE) {
-			Command cmd = SetCommand.create(getEditingDomain(), 
-					getModel().getEstimation(), 
-					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__START_TIMESTAMP, 
-					(long)maxStart * 1000);
+			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation().getStartTimestamp(),
+					UnitsPackage.Literals.QUANTITY__VALUE, maxStart);
 			getEditingDomain().getCommandStack().execute(cmd);
 		}
 		if (minEnd != Double.MAX_VALUE) {
-			Command cmd = SetCommand.create(getEditingDomain(), 
-					getModel().getEstimation(), 
-					ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__END_TIMESTAMP, 
-					(long)minEnd * 1000);
+			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation().getEndTimestamp(),
+					UnitsPackage.Literals.QUANTITY__VALUE, minEnd);
 			getEditingDomain().getCommandStack().execute(cmd);
 		}
-		
+
 	}
 
 }

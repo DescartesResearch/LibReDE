@@ -43,6 +43,7 @@ import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 
 /**
@@ -54,10 +55,10 @@ import tools.descartes.librede.units.Unit;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  * </ul>
  *
  * @generated
@@ -72,26 +73,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected Metric metric;
-
-	/**
-	 * The default value of the '{@link #getInterval() <em>Interval</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInterval()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final long INTERVAL_EDEFAULT = 0L;
-
-	/**
-	 * The cached value of the '{@link #getInterval() <em>Interval</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInterval()
-	 * @generated
-	 * @ordered
-	 */
-	protected long interval = INTERVAL_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getDataSource() <em>Data Source</em>}' reference.
@@ -122,6 +103,16 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected Unit unit;
+
+	/**
+	 * The cached value of the '{@link #getInterval() <em>Interval</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInterval()
+	 * @generated
+	 * @ordered
+	 */
+	protected Quantity interval;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -223,7 +214,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public long getInterval() {
+	public Quantity getInterval() {
 		return interval;
 	}
 
@@ -232,11 +223,33 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setInterval(long newInterval) {
-		long oldInterval = interval;
+	public NotificationChain basicSetInterval(Quantity newInterval, NotificationChain msgs) {
+		Quantity oldInterval = interval;
 		interval = newInterval;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, oldInterval, interval));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, oldInterval, newInterval);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInterval(Quantity newInterval) {
+		if (newInterval != interval) {
+			NotificationChain msgs = null;
+			if (interval != null)
+				msgs = ((InternalEObject)interval).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, null, msgs);
+			if (newInterval != null)
+				msgs = ((InternalEObject)newInterval).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, null, msgs);
+			msgs = basicSetInterval(newInterval, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, newInterval, newInterval));
 	}
 
 	/**
@@ -299,6 +312,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return ((InternalEList<?>)getMappings()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				return basicSetInterval(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -314,8 +329,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				if (resolve) return getMetric();
 				return basicGetMetric();
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				return getInterval();
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				if (resolve) return getDataSource();
 				return basicGetDataSource();
@@ -324,6 +337,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				if (resolve) return getUnit();
 				return basicGetUnit();
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				return getInterval();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -340,9 +355,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				setMetric((Metric)newValue);
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				setInterval((Long)newValue);
-				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				setDataSource((DataSourceConfiguration)newValue);
 				return;
@@ -352,6 +364,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				setUnit((Unit)newValue);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				setInterval((Quantity)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -368,9 +383,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				setMetric((Metric)null);
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				setInterval(INTERVAL_EDEFAULT);
-				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				setDataSource((DataSourceConfiguration)null);
 				return;
@@ -379,6 +391,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				setUnit((Unit)null);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				setInterval((Quantity)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -394,32 +409,16 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 				return metric != null;
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				return interval != INTERVAL_EDEFAULT;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				return dataSource != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return mappings != null && !mappings.isEmpty();
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				return unit != null;
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				return interval != null;
 		}
 		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (interval: ");
-		result.append(interval);
-		result.append(')');
-		return result.toString();
 	}
 
 } //TraceConfigurationImpl

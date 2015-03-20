@@ -32,6 +32,7 @@ import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
@@ -65,7 +66,10 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetricHandler;
 import tools.descartes.librede.repository.StandardMetricHelpers;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
+import tools.descartes.librede.units.UnitsPackage;
 
 public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 
@@ -78,6 +82,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 	 */
 	public TracesMasterBlock(AdapterFactoryEditingDomain domain, LibredeConfiguration model) {
 		super(domain, model);
+		initializeValues();
 	}
 
 	/**
@@ -130,6 +135,10 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 				series.setDataSource(model.getInput().getDataSources().get(0));
 				series.setMetric(StandardMetrics.RESPONSE_TIME);
 				series.setUnit(Time.INSTANCE.getBaseUnit());
+				Quantity interval = UnitsFactory.eINSTANCE.createQuantity();
+				interval.setUnit(Time.SECONDS);
+				interval.setValue(0);				
+				series.setInterval(interval);
 				
 				ModelEntity entity = null;
 				if (model.getWorkloadDescription().getResources().size() > 0) {
@@ -161,5 +170,18 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 				domain.getCommandStack().execute(cmd);
 			}
 		}	
+	}
+	
+	private void initializeValues() {
+		for (TraceConfiguration trace : model.getInput().getObservations()) {
+			if (trace.getInterval() == null) {
+				Quantity interval = UnitsFactory.eINSTANCE.createQuantity();
+				interval.setValue(0);
+				interval.setUnit(Time.SECONDS);
+				Command cmd = SetCommand.create(domain, trace,
+						ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL, interval);
+				domain.getCommandStack().execute(cmd);
+			}
+		}
 	}
 }

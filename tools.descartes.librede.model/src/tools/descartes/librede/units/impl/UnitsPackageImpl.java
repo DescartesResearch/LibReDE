@@ -2,8 +2,10 @@
  */
 package tools.descartes.librede.units.impl;
 
+import java.lang.Comparable;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -13,6 +15,7 @@ import tools.descartes.librede.configuration.impl.ConfigurationPackageImpl;
 import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.impl.MetricsPackageImpl;
 import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
@@ -77,6 +80,20 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * @generated
 	 */
 	private EClass unitsRepositoryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass quantityEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass comparableEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -305,6 +322,87 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getQuantity() {
+		return quantityEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getQuantity_Value() {
+		return (EAttribute)quantityEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getQuantity_Unit() {
+		return (EReference)quantityEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EOperation getQuantity__ConvertTo__Unit() {
+		return quantityEClass.getEOperations().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EOperation getQuantity__GetValue__Unit() {
+		return quantityEClass.getEOperations().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EOperation getQuantity__Plus__Quantity() {
+		return quantityEClass.getEOperations().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EOperation getQuantity__Minus__Quantity() {
+		return quantityEClass.getEOperations().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EOperation getQuantity__Times__double() {
+		return quantityEClass.getEOperations().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getComparable() {
+		return comparableEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public UnitsFactory getUnitsFactory() {
 		return (UnitsFactory)getEFactoryInstance();
 	}
@@ -351,6 +449,17 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 
 		unitsRepositoryEClass = createEClass(UNITS_REPOSITORY);
 		createEReference(unitsRepositoryEClass, UNITS_REPOSITORY__DIMENSIONS);
+
+		quantityEClass = createEClass(QUANTITY);
+		createEAttribute(quantityEClass, QUANTITY__VALUE);
+		createEReference(quantityEClass, QUANTITY__UNIT);
+		createEOperation(quantityEClass, QUANTITY___CONVERT_TO__UNIT);
+		createEOperation(quantityEClass, QUANTITY___GET_VALUE__UNIT);
+		createEOperation(quantityEClass, QUANTITY___PLUS__QUANTITY);
+		createEOperation(quantityEClass, QUANTITY___MINUS__QUANTITY);
+		createEOperation(quantityEClass, QUANTITY___TIMES__DOUBLE);
+
+		comparableEClass = createEClass(COMPARABLE);
 	}
 
 	/**
@@ -377,6 +486,7 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		setNsURI(eNS_URI);
 
 		// Create type parameters
+		addETypeParameter(comparableEClass, "T");
 
 		// Set bounds for type parameters
 
@@ -385,6 +495,10 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		timeEClass.getESuperTypes().add(this.getDimension());
 		requestCountEClass.getESuperTypes().add(this.getDimension());
 		ratioEClass.getESuperTypes().add(this.getDimension());
+		EGenericType g1 = createEGenericType(this.getComparable());
+		EGenericType g2 = createEGenericType(this.getQuantity());
+		g1.getETypeArguments().add(g2);
+		quantityEClass.getEGenericSuperTypes().add(g1);
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(dimensionEClass, Dimension.class, "Dimension", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -416,6 +530,27 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 
 		initEClass(unitsRepositoryEClass, UnitsRepository.class, "UnitsRepository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUnitsRepository_Dimensions(), this.getDimension(), null, "dimensions", null, 0, -1, UnitsRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(quantityEClass, Quantity.class, "Quantity", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getQuantity_Value(), ecorePackage.getEDouble(), "value", null, 1, 1, Quantity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getQuantity_Unit(), this.getUnit(), null, "unit", null, 1, 1, Quantity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		op = initEOperation(getQuantity__ConvertTo__Unit(), this.getQuantity(), "convertTo", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getUnit(), "targetUnit", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+		op = initEOperation(getQuantity__GetValue__Unit(), ecorePackage.getEDouble(), "getValue", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getUnit(), "unit", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+		op = initEOperation(getQuantity__Plus__Quantity(), this.getQuantity(), "plus", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getQuantity(), "quantity", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+		op = initEOperation(getQuantity__Minus__Quantity(), this.getQuantity(), "minus", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getQuantity(), "quantity", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+		op = initEOperation(getQuantity__Times__double(), this.getQuantity(), "times", 1, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, ecorePackage.getEDouble(), "factor", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+		initEClass(comparableEClass, Comparable.class, "Comparable", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -10,6 +10,15 @@ import org.eclipse.emf.ecore.impl.EFactoryImpl;
 
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
+import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.units.UnitsRepository;
 import tools.descartes.librede.units.*;
 
 /**
@@ -62,6 +71,7 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 			case UnitsPackage.REQUEST_COUNT: return createRequestCount();
 			case UnitsPackage.RATIO: return createRatio();
 			case UnitsPackage.UNITS_REPOSITORY: return createUnitsRepository();
+			case UnitsPackage.QUANTITY: return createQuantity();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -152,6 +162,28 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	public UnitsRepository createUnitsRepository() {
 		UnitsRepositoryImpl unitsRepository = new UnitsRepositoryImpl();
 		return unitsRepository;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Quantity createQuantity() {
+		QuantityImpl quantity = new QuantityImpl();
+		return quantity;
+	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public Quantity createQuantity(double value, Unit unit) {
+		QuantityImpl quantity = new QuantityImpl();
+		quantity.unit = unit;
+		quantity.value = value;
+		return quantity;
 	}
 
 	/**

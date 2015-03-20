@@ -29,14 +29,15 @@ package tools.descartes.librede.repository;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 
 public interface IMetricHandler {
 	
-	public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end);
+	public TimeSeries select(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end);
 
-	public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, double start, double end, Aggregation func);
+	public double aggregate(IMonitoringRepository repository, Metric metric, Unit unit, ModelEntity entity, Quantity start, Quantity end, Aggregation func);
 	
-	public boolean contains(IMonitoringRepository repository, Metric metric, ModelEntity entity, double aggregationInterval);
+	public boolean contains(IMonitoringRepository repository, Metric metric, ModelEntity entity, Quantity aggregationInterval);
 	
 }
