@@ -74,8 +74,8 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	private Resource res_i;
 	private Service cls_r;
 	
-	private Query<Scalar> busyTimeQuery;
-	private Query<Scalar> sumDeparturesQuery;
+	private Query<Scalar, Time> busyTimeQuery;
+	private Query<Scalar, RequestCount> sumDeparturesQuery;
 	
 	
 	/**

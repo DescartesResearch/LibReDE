@@ -163,7 +163,7 @@ public class QueryTest extends LibredeTest {
 		IRepositoryCursor cursor = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
 		assertThat(cursor.next()).isTrue();
 		
-		Query<Vector> respSingle = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(services[1]).all().using(cursor);
+		Query<Vector, Time> respSingle = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(services[1]).all().using(cursor);
 		Vector result = respSingle.execute();
 		
 		assertThat(result).isEqualTo(rtMeasurements.column(1), offset(1e-9));

@@ -45,6 +45,7 @@ import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.EstimationSpecification;
 import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 
 /**
  * <!-- begin-user-doc -->
@@ -130,7 +131,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * @generated
 	 * @ordered
 	 */
-	protected Quantity stepSize;
+	protected Quantity<Time> stepSize;
 
 	/**
 	 * The cached value of the '{@link #getStartTimestamp() <em>Start Timestamp</em>}' containment reference.
@@ -140,7 +141,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * @generated
 	 * @ordered
 	 */
-	protected Quantity startTimestamp;
+	protected Quantity<Time> startTimestamp;
 
 	/**
 	 * The cached value of the '{@link #getEndTimestamp() <em>End Timestamp</em>}' containment reference.
@@ -150,7 +151,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * @generated
 	 * @ordered
 	 */
-	protected Quantity endTimestamp;
+	protected Quantity<Time> endTimestamp;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -230,7 +231,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Quantity getStepSize() {
+	public Quantity<Time> getStepSize() {
 		return stepSize;
 	}
 
@@ -239,8 +240,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetStepSize(Quantity newStepSize, NotificationChain msgs) {
-		Quantity oldStepSize = stepSize;
+	public NotificationChain basicSetStepSize(Quantity<Time> newStepSize, NotificationChain msgs) {
+		Quantity<Time> oldStepSize = stepSize;
 		stepSize = newStepSize;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__STEP_SIZE, oldStepSize, newStepSize);
@@ -254,7 +255,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setStepSize(Quantity newStepSize) {
+	public void setStepSize(Quantity<Time> newStepSize) {
 		if (newStepSize != stepSize) {
 			NotificationChain msgs = null;
 			if (stepSize != null)
@@ -273,7 +274,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Quantity getStartTimestamp() {
+	public Quantity<Time> getStartTimestamp() {
 		return startTimestamp;
 	}
 
@@ -282,8 +283,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetStartTimestamp(Quantity newStartTimestamp, NotificationChain msgs) {
-		Quantity oldStartTimestamp = startTimestamp;
+	public NotificationChain basicSetStartTimestamp(Quantity<Time> newStartTimestamp, NotificationChain msgs) {
+		Quantity<Time> oldStartTimestamp = startTimestamp;
 		startTimestamp = newStartTimestamp;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__START_TIMESTAMP, oldStartTimestamp, newStartTimestamp);
@@ -297,7 +298,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setStartTimestamp(Quantity newStartTimestamp) {
+	public void setStartTimestamp(Quantity<Time> newStartTimestamp) {
 		if (newStartTimestamp != startTimestamp) {
 			NotificationChain msgs = null;
 			if (startTimestamp != null)
@@ -316,7 +317,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Quantity getEndTimestamp() {
+	public Quantity<Time> getEndTimestamp() {
 		return endTimestamp;
 	}
 
@@ -325,8 +326,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetEndTimestamp(Quantity newEndTimestamp, NotificationChain msgs) {
-		Quantity oldEndTimestamp = endTimestamp;
+	public NotificationChain basicSetEndTimestamp(Quantity<Time> newEndTimestamp, NotificationChain msgs) {
+		Quantity<Time> oldEndTimestamp = endTimestamp;
 		endTimestamp = newEndTimestamp;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP, oldEndTimestamp, newEndTimestamp);
@@ -340,7 +341,7 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEndTimestamp(Quantity newEndTimestamp) {
+	public void setEndTimestamp(Quantity<Time> newEndTimestamp) {
 		if (newEndTimestamp != endTimestamp) {
 			NotificationChain msgs = null;
 			if (endTimestamp != null)
@@ -438,13 +439,13 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				getAlgorithms().addAll((Collection<? extends EstimationAlgorithmConfiguration>)newValue);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__STEP_SIZE:
-				setStepSize((Quantity)newValue);
+				setStepSize((Quantity<Time>)newValue);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__START_TIMESTAMP:
-				setStartTimestamp((Quantity)newValue);
+				setStartTimestamp((Quantity<Time>)newValue);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
-				setEndTimestamp((Quantity)newValue);
+				setEndTimestamp((Quantity<Time>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -471,13 +472,13 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				getAlgorithms().clear();
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__STEP_SIZE:
-				setStepSize((Quantity)null);
+				setStepSize((Quantity<Time>)null);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__START_TIMESTAMP:
-				setStartTimestamp((Quantity)null);
+				setStartTimestamp((Quantity<Time>)null);
 				return;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
-				setEndTimestamp((Quantity)null);
+				setEndTimestamp((Quantity<Time>)null);
 				return;
 		}
 		super.eUnset(featureID);

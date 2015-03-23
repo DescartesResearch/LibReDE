@@ -40,6 +40,7 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
@@ -48,7 +49,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	private Query<Vector> throughputQuery;
+	private Query<Vector, RequestRate> throughputQuery;
 	
 	public UtilizationConstraint(Resource resource, IRepositoryCursor repository) {
 		this.res_i = resource;

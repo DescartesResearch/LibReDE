@@ -34,27 +34,28 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.Query.Type;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Unit;
 
-public class QueryBuilder {
+public class QueryBuilder<D extends Dimension> {
 	
 	private Query.Type type;
-	private Metric metric;
-	private Unit unit;
+	private Metric<D> metric;
+	private Unit<D> unit;
 	private ModelEntity entity;
 	private Aggregation aggregation;
 	
-	private QueryBuilder(Metric metric) {
+	private QueryBuilder(Metric<D> metric) {
 		this.metric = metric;
 	}
 	
-	public static SelectClause select(Metric metric) {
-		QueryBuilder builder = new QueryBuilder(metric);
+	public static <D extends Dimension> QueryBuilder<D>.SelectClause select(Metric<D> metric) {
+		QueryBuilder<D> builder = new QueryBuilder<D>(metric);
 		return builder.new SelectClause();
 	}
 	
 	public class SelectClause {
-		public InClause in(Unit unit) {
+		public InClause in(Unit<D> unit) {
 			QueryBuilder.this.unit = unit;
 			return new InClause();
 		}		
@@ -138,8 +139,8 @@ public class QueryBuilder {
 	}
 	
 	public class UsingClause<T extends Vector> {
-		public Query<T> using(IRepositoryCursor repository) {
-			return new Query<T>(aggregation, type, metric, unit, entity, repository);
+		public Query<T, D> using(IRepositoryCursor repository) {
+			return new Query<T, D>(aggregation, type, metric, unit, entity, repository);
 		}
 	}
 	

@@ -29,13 +29,13 @@ package tools.descartes.librede.repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
@@ -49,14 +49,14 @@ import tools.descartes.librede.units.UnitsFactory;
  */
 public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	
-	private static final Quantity ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
+	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
 	
 	private static class DataKey {
 		
-		public final Metric metric;
+		public final Metric<?> metric;
 		public final ModelEntity entity;
 		
-		public DataKey(Metric metric, ModelEntity entity) {
+		public DataKey(Metric<?> metric, ModelEntity entity) {
 			this.metric = metric;
 			this.entity = entity;
 		}
@@ -103,13 +103,13 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	
 	private Map<DataKey, DataEntry> data = new HashMap<DataKey, DataEntry>();
 	private WorkloadDescription workload;
-	private Quantity currentTime;
+	private Quantity<Time> currentTime;
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
 	}
 	
-	public boolean isAggregated(Metric m, ModelEntity entity) {
+	public boolean isAggregated(Metric<? extends Dimension> m, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -118,7 +118,7 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		return (entry.aggregationIntervalInSeconds > 0);
 	}
 	
-	public TimeSeries select(Metric m, Unit unit, ModelEntity entity) {
+	public TimeSeries select(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -127,15 +127,15 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		return UnitConverter.convertTo(entry.data, m.getDimension().getBaseUnit(), unit);
 	}
 	
-	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries observations) {
+	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations) {
 		this.setData(m, unit, entity, observations, ZERO_SECONDS);
 	}
 	
-	public void insert(Metric m, Unit unit, ModelEntity entity, TimeSeries aggregatedObservations, Quantity aggregationInterval) {
+	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries aggregatedObservations, Quantity<Time> aggregationInterval) {
 		this.setData(m, unit, entity, aggregatedObservations, aggregationInterval);
 	}
 	
-	private void setData(Metric m, Unit unit, ModelEntity entity, TimeSeries observations, Quantity aggregationInterval) {
+	private void setData(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations, Quantity<Time> aggregationInterval) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
@@ -146,11 +146,12 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		entry.aggregationIntervalInSeconds = aggregationInterval.getUnit().convertTo(aggregationInterval.getValue(), Time.SECONDS);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public boolean contains(Metric m,
-			ModelEntity entity, Quantity maximumAggregationInterval, boolean includeDerived) {		
+	public boolean contains(Metric<? extends Dimension> m,
+			ModelEntity entity, Quantity<Time> maximumAggregationInterval, boolean includeDerived) {		
 		if (includeDerived) {
-			return getMetricHandler(m).contains(this, m, entity, maximumAggregationInterval);
+			return getMetricHandler(m, null).contains(this, (Metric)m, entity, maximumAggregationInterval);
 		} else {
 			double requestedIntervalInSeconds = maximumAggregationInterval.getUnit().convertTo(maximumAggregationInterval.getValue(), Time.SECONDS);
 			DataKey key = new DataKey(m, entity);
@@ -173,17 +174,17 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	}
 	
 	@Override
-	public IRepositoryCursor getCursor(Quantity startTime, Quantity stepSize) {
+	public IRepositoryCursor getCursor(Quantity<Time> startTime, Quantity<Time> stepSize) {
 		return new AggregationRepositoryCursor(this, startTime, stepSize);
 	}
 	
 	@Override
-	public Quantity getCurrentTime() {
+	public Quantity<Time> getCurrentTime() {
 		return currentTime;
 	}
 	
 	@Override
-	public void setCurrentTime(Quantity currentTime) {
+	public void setCurrentTime(Quantity<Time> currentTime) {
 		this.currentTime = currentTime;
 	}
 	

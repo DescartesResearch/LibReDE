@@ -76,13 +76,13 @@ public class ResponseTimeEquationTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
 		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 

@@ -32,7 +32,7 @@ import tools.descartes.librede.units.UnitsPackage;
  *
  * @generated
  */
-public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
+public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container implements Unit<D> {
 	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -185,7 +185,6 @@ public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
 	public Dimension getDimension() {
 		if (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION) return null;
 		return (Dimension)eInternalContainer();
@@ -227,7 +226,7 @@ public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public double convertTo(double value, Unit targetUnit) {
+	public double convertTo(double value, Unit<D> targetUnit) {
 		if (!targetUnit.getDimension().equals(this.getDimension())) {
 			throw new IllegalArgumentException("Incompatible dimensions");
 		}
@@ -239,7 +238,7 @@ public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public double convertFrom(double value, Unit sourceUnit) {
+	public double convertFrom(double value, Unit<D> sourceUnit) {
 		if (!sourceUnit.getDimension().equals(this.getDimension())) {
 			throw new IllegalArgumentException("Incompatible dimensions");
 		}
@@ -251,7 +250,6 @@ public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -318,7 +316,6 @@ public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
@@ -382,9 +379,9 @@ public class UnitImpl extends MinimalEObjectImpl.Container implements Unit {
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
 			case UnitsPackage.UNIT___CONVERT_TO__DOUBLE_UNIT:
-				return convertTo((Double)arguments.get(0), (Unit)arguments.get(1));
+				return convertTo((Double)arguments.get(0), (Unit<D>)arguments.get(1));
 			case UnitsPackage.UNIT___CONVERT_FROM__DOUBLE_UNIT:
-				return convertFrom((Double)arguments.get(0), (Unit)arguments.get(1));
+				return convertFrom((Double)arguments.get(0), (Unit<D>)arguments.get(1));
 		}
 		return super.eInvoke(operationID, arguments);
 	}

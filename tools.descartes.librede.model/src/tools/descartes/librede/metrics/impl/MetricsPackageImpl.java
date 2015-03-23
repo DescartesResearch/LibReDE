@@ -5,10 +5,12 @@ package tools.descartes.librede.metrics.impl;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
+import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
@@ -272,8 +274,11 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 		UnitsPackage theUnitsPackage = (UnitsPackage)EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI);
 
 		// Create type parameters
+		ETypeParameter metricEClass_D = addETypeParameter(metricEClass, "D");
 
 		// Set bounds for type parameters
+		EGenericType g1 = createEGenericType(theUnitsPackage.getDimension());
+		metricEClass_D.getEBounds().add(g1);
 
 		// Add supertypes to classes
 
@@ -281,14 +286,18 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 		initEClass(metricEClass, Metric.class, "Metric", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMetric_Id(), ecorePackage.getEString(), "id", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMetric_Name(), ecorePackage.getEString(), "name", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getMetric_Dimension(), theUnitsPackage.getDimension(), null, "dimension", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(metricEClass_D);
+		initEReference(getMetric_Dimension(), g1, null, "dimension", null, 1, 1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMetric_AllowedAggregations(), this.getAggregation(), "allowedAggregations", null, 1, -1, Metric.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		EOperation op = initEOperation(getMetric__IsAggregationAllowed__Aggregation(), ecorePackage.getEBoolean(), "isAggregationAllowed", 1, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, this.getAggregation(), "aggregation", 1, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(metricsRepositoryEClass, MetricsRepository.class, "MetricsRepository", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getMetricsRepository_Metrics(), this.getMetric(), null, "metrics", null, 0, -1, MetricsRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(this.getMetric());
+		EGenericType g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		initEReference(getMetricsRepository_Metrics(), g1, null, "metrics", null, 0, -1, MetricsRepository.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(aggregationEEnum, Aggregation.class, "Aggregation");

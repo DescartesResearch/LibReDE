@@ -78,6 +78,7 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
@@ -175,7 +176,7 @@ public class Librede {
 				}
 				IDataSource source = dataSources.get(dataSourceType);
 				
-				Metric metric = fileTrace.getMetric();
+				Metric<? extends Dimension> metric = fileTrace.getMetric();
 				
 				for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
 					try {

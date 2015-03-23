@@ -8,6 +8,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
 
 import tools.descartes.librede.metrics.*;
+import tools.descartes.librede.units.Dimension;
 
 /**
  * <!-- begin-user-doc -->
@@ -67,7 +68,7 @@ public class MetricsSwitch<T> extends Switch<T> {
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
 			case MetricsPackage.METRIC: {
-				Metric metric = (Metric)theEObject;
+				Metric<?> metric = (Metric<?>)theEObject;
 				T result = caseMetric(metric);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -93,7 +94,7 @@ public class MetricsSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseMetric(Metric object) {
+	public <D extends Dimension> T caseMetric(Metric<D> object) {
 		return null;
 	}
 

@@ -31,6 +31,7 @@ package tools.descartes.librede.configuration.impl;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
@@ -1030,11 +1031,24 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(serviceEClass, Service.class, "Service", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTraceConfiguration_Metric(), theMetricsPackage.getMetric(), null, "metric", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		EGenericType g1 = createEGenericType(theMetricsPackage.getMetric());
+		EGenericType g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		EGenericType g3 = createEGenericType(theUnitsPackage.getDimension());
+		g2.setEUpperBound(g3);
+		initEReference(getTraceConfiguration_Metric(), g1, null, "metric", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTraceConfiguration_DataSource(), this.getDataSourceConfiguration(), null, "dataSource", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTraceConfiguration_Mappings(), this.getTraceToEntityMapping(), null, "mappings", null, 1, -1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTraceConfiguration_Unit(), theUnitsPackage.getUnit(), null, "unit", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTraceConfiguration_Interval(), theUnitsPackage.getQuantity(), null, "interval", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(theUnitsPackage.getUnit());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g3 = createEGenericType(theUnitsPackage.getDimension());
+		g2.setEUpperBound(g3);
+		initEReference(getTraceConfiguration_Unit(), g1, null, "unit", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(theUnitsPackage.getQuantity());
+		g2 = createEGenericType(theUnitsPackage.getTime());
+		g1.getETypeArguments().add(g2);
+		initEReference(getTraceConfiguration_Interval(), g1, null, "interval", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(parameterEClass, Parameter.class, "Parameter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getParameter_Name(), ecorePackage.getEString(), "name", null, 1, 1, Parameter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1045,9 +1059,18 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEAttribute(getEstimationSpecification_Recursive(), ecorePackage.getEBoolean(), "recursive", "false", 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEstimationSpecification_Window(), ecorePackage.getEInt(), "window", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEstimationSpecification_Algorithms(), this.getEstimationAlgorithmConfiguration(), null, "algorithms", null, 0, -1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getEstimationSpecification_StepSize(), theUnitsPackage.getQuantity(), null, "stepSize", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getEstimationSpecification_StartTimestamp(), theUnitsPackage.getQuantity(), null, "startTimestamp", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getEstimationSpecification_EndTimestamp(), theUnitsPackage.getQuantity(), null, "endTimestamp", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(theUnitsPackage.getQuantity());
+		g2 = createEGenericType(theUnitsPackage.getTime());
+		g1.getETypeArguments().add(g2);
+		initEReference(getEstimationSpecification_StepSize(), g1, null, "stepSize", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(theUnitsPackage.getQuantity());
+		g2 = createEGenericType(theUnitsPackage.getTime());
+		g1.getETypeArguments().add(g2);
+		initEReference(getEstimationSpecification_StartTimestamp(), g1, null, "startTimestamp", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		g1 = createEGenericType(theUnitsPackage.getQuantity());
+		g2 = createEGenericType(theUnitsPackage.getTime());
+		g1.getETypeArguments().add(g2);
+		initEReference(getEstimationSpecification_EndTimestamp(), g1, null, "endTimestamp", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(validationSpecificationEClass, ValidationSpecification.class, "ValidationSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getValidationSpecification_Validators(), this.getValidatorConfiguration(), null, "validators", null, 0, -1, ValidationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

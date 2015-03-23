@@ -38,9 +38,10 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Unit;
 
-public final class Query<T extends Vector> {
+public final class Query<T extends Vector, D extends Dimension> {
 	
 	public static enum Type {
 		SERVICE, ALL_SERVICES, RESOURCE, ALL_RESOURCES
@@ -48,12 +49,12 @@ public final class Query<T extends Vector> {
 	
 	private Aggregation aggregation;
 	private Query.Type type;
-	private Metric metric;
-	private Unit unit;
+	private Metric<D> metric;
+	private Unit<D> unit;
 	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, Metric metric, Unit unit,
+	protected Query(Aggregation aggregation, Type type, Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
@@ -74,11 +75,11 @@ public final class Query<T extends Vector> {
 		return type;
 	}
 	
-	public Metric getMetric() {
+	public Metric<D> getMetric() {
 		return metric;
 	}
 	
-	public Unit getUnit() {
+	public Unit<D> getUnit() {
 		return unit;
 	}
 	
@@ -114,9 +115,7 @@ public final class Query<T extends Vector> {
 	
 	public List<? extends ModelEntity> getEntities() {
 		return Collections.unmodifiableList(entities);
-	}
-	
-	
+	}	
 	
 	private void load() {
 		if (type == Type.ALL_RESOURCES) {

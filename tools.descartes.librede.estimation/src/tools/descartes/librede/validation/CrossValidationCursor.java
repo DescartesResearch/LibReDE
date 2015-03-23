@@ -35,7 +35,9 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import cern.jet.random.sampling.RandomSampler;
 
@@ -84,27 +86,27 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public Quantity getCurrentIntervalStart() {
+	public Quantity<Time> getCurrentIntervalStart() {
 		return delegate.getCurrentIntervalStart();
 	}
 
 	@Override
-	public Quantity getCurrentIntervalLength() {
+	public Quantity<Time> getCurrentIntervalLength() {
 		return delegate.getCurrentIntervalLength();
 	}
 
 	@Override
-	public Quantity getCurrentIntervalEnd() {
+	public Quantity<Time> getCurrentIntervalEnd() {
 		return delegate.getCurrentIntervalEnd();
 	}
 
 	@Override
-	public TimeSeries getValues(Metric metric, Unit unit, ModelEntity entity) {
+	public <D extends Dimension> TimeSeries getValues(Metric<D> metric, Unit<D> unit, ModelEntity entity) {
 		return delegate.getValues(metric, unit, entity);
 	}
 
 	@Override
-	public double getAggregatedValue(Metric metric, Unit unit, ModelEntity entity,
+	public <D extends Dimension> double getAggregatedValue(Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation func) {
 		return delegate.getAggregatedValue(metric, unit, entity, func);
 	}
@@ -115,7 +117,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public boolean hasData(Metric metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(Metric<D> metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		return delegate.hasData(metric, entities, aggregation);
 	}
@@ -154,7 +156,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 	
 	@Override
-	public boolean seek(Quantity newTime) {
+	public boolean seek(Quantity<Time> newTime) {
 		return delegate.seek(newTime);
 	}
 	

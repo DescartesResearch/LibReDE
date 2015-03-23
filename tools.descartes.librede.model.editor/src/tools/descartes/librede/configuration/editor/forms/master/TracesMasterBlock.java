@@ -135,7 +135,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 				series.setDataSource(model.getInput().getDataSources().get(0));
 				series.setMetric(StandardMetrics.RESPONSE_TIME);
 				series.setUnit(Time.INSTANCE.getBaseUnit());
-				Quantity interval = UnitsFactory.eINSTANCE.createQuantity();
+				Quantity<Time> interval = UnitsFactory.eINSTANCE.createQuantity();
 				interval.setUnit(Time.SECONDS);
 				interval.setValue(0);				
 				series.setInterval(interval);
@@ -175,7 +175,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 	private void initializeValues() {
 		for (TraceConfiguration trace : model.getInput().getObservations()) {
 			if (trace.getInterval() == null) {
-				Quantity interval = UnitsFactory.eINSTANCE.createQuantity();
+				Quantity<Time> interval = UnitsFactory.eINSTANCE.createQuantity();
 				interval.setValue(0);
 				interval.setUnit(Time.SECONDS);
 				Command cmd = SetCommand.create(domain, trace,

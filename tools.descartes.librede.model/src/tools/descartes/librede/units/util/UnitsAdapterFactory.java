@@ -77,7 +77,7 @@ public class UnitsAdapterFactory extends AdapterFactoryImpl {
 				return createDimensionAdapter();
 			}
 			@Override
-			public Adapter caseUnit(Unit object) {
+			public <D extends Dimension> Adapter caseUnit(Unit<D> object) {
 				return createUnitAdapter();
 			}
 			@Override
@@ -101,7 +101,7 @@ public class UnitsAdapterFactory extends AdapterFactoryImpl {
 				return createUnitsRepositoryAdapter();
 			}
 			@Override
-			public Adapter caseQuantity(Quantity object) {
+			public <D extends Dimension> Adapter caseQuantity(Quantity<D> object) {
 				return createQuantityAdapter();
 			}
 			@Override

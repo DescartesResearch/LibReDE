@@ -32,6 +32,7 @@ import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
 import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 
 /**
  * <!-- begin-user-doc -->
@@ -139,7 +140,7 @@ public interface EstimationSpecification extends EObject {
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	Quantity getStepSize();
+	Quantity<Time> getStepSize();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationSpecification#getStepSize <em>Step Size</em>}' containment reference.
@@ -149,7 +150,7 @@ public interface EstimationSpecification extends EObject {
 	 * @see #getStepSize()
 	 * @generated
 	 */
-	void setStepSize(Quantity value);
+	void setStepSize(Quantity<Time> value);
 
 	/**
 	 * Returns the value of the '<em><b>Start Timestamp</b></em>' containment reference.
@@ -165,7 +166,7 @@ public interface EstimationSpecification extends EObject {
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	Quantity getStartTimestamp();
+	Quantity<Time> getStartTimestamp();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationSpecification#getStartTimestamp <em>Start Timestamp</em>}' containment reference.
@@ -175,7 +176,7 @@ public interface EstimationSpecification extends EObject {
 	 * @see #getStartTimestamp()
 	 * @generated
 	 */
-	void setStartTimestamp(Quantity value);
+	void setStartTimestamp(Quantity<Time> value);
 
 	/**
 	 * Returns the value of the '<em><b>End Timestamp</b></em>' containment reference.
@@ -191,7 +192,7 @@ public interface EstimationSpecification extends EObject {
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	Quantity getEndTimestamp();
+	Quantity<Time> getEndTimestamp();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp <em>End Timestamp</em>}' containment reference.
@@ -201,7 +202,7 @@ public interface EstimationSpecification extends EObject {
 	 * @see #getEndTimestamp()
 	 * @generated
 	 */
-	void setEndTimestamp(Quantity value);
+	void setEndTimestamp(Quantity<Time> value);
 
 	/**
 	 * Returns the value of the '<em><b>Algorithms</b></em>' containment reference list.

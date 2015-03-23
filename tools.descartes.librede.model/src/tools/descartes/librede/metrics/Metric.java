@@ -27,7 +27,7 @@ import tools.descartes.librede.units.Dimension;
  * @model
  * @generated
  */
-public interface Metric extends EObject {
+public interface Metric<D extends Dimension> extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -82,7 +82,7 @@ public interface Metric extends EObject {
 	 * @model required="true" changeable="false"
 	 * @generated
 	 */
-	Dimension getDimension();
+	D getDimension();
 
 	/**
 	 * Returns the value of the '<em><b>Allowed Aggregations</b></em>' attribute list.

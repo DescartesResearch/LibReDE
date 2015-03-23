@@ -10,6 +10,7 @@ import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.ecore.EObject;
 
 import tools.descartes.librede.metrics.*;
+import tools.descartes.librede.units.Dimension;
 
 /**
  * <!-- begin-user-doc -->
@@ -68,7 +69,7 @@ public class MetricsAdapterFactory extends AdapterFactoryImpl {
 	protected MetricsSwitch<Adapter> modelSwitch =
 		new MetricsSwitch<Adapter>() {
 			@Override
-			public Adapter caseMetric(Metric object) {
+			public <D extends Dimension> Adapter caseMetric(Metric<D> object) {
 				return createMetricAdapter();
 			}
 			@Override

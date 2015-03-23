@@ -124,7 +124,7 @@ public class FileTraceConfigurationItemProvider extends TraceConfigurationItemPr
 			label.append("No file");
 		}
 		label.append(" (");
-		Metric metric = trace.getMetric();
+		Metric<?> metric = trace.getMetric();
 		if (metric != null) {
 			label.append(metric.getName());
 		}

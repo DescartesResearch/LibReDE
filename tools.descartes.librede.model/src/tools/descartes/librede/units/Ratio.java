@@ -23,11 +23,11 @@ public interface Ratio extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit NONE = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "NONE", "no unit", "");
+	public static final Unit<Ratio> NONE = UnitsFactory.eINSTANCE.createBaseUnit(INSTANCE, "NONE", "no unit", "");
 
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit PERCENTAGE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "PERCENTAGE", "percentage", "%", 100);
+	public static final Unit<Ratio> PERCENTAGE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "PERCENTAGE", "percentage", "%", 100);
 	
 } // Ratio

@@ -149,6 +149,7 @@ public class RepositoryCursorTest extends LibredeTest {
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], ts1);
 		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], ts1);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS));
 		IRepositoryCursor cur = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(100, Time.SECONDS));
 		assertThat(cur.next()).isFalse();		
 	}

@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
 public interface MetricsRepository extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Metrics</b></em>' containment reference list.
-	 * The list contents are of type {@link tools.descartes.librede.metrics.Metric}.
+	 * The list contents are of type {@link tools.descartes.librede.metrics.Metric}&lt;?>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Metrics</em>' containment reference list isn't clear,
@@ -37,6 +37,6 @@ public interface MetricsRepository extends EObject {
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<Metric> getMetrics();
+	EList<Metric<?>> getMetrics();
 
 } // MetricsRepository

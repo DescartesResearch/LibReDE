@@ -32,7 +32,9 @@ import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
 /**
@@ -70,7 +72,7 @@ public interface TraceConfiguration extends EObject {
 	 * @model required="true"
 	 * @generated
 	 */
-	Metric getMetric();
+	Metric<? extends Dimension> getMetric();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}' reference.
@@ -80,7 +82,7 @@ public interface TraceConfiguration extends EObject {
 	 * @see #getMetric()
 	 * @generated
 	 */
-	void setMetric(Metric value);
+	void setMetric(Metric<? extends Dimension> value);
 
 	/**
 	 * Returns the value of the '<em><b>Unit</b></em>' reference.
@@ -96,7 +98,7 @@ public interface TraceConfiguration extends EObject {
 	 * @model required="true"
 	 * @generated
 	 */
-	Unit getUnit();
+	Unit<? extends Dimension> getUnit();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}' reference.
@@ -106,7 +108,7 @@ public interface TraceConfiguration extends EObject {
 	 * @see #getUnit()
 	 * @generated
 	 */
-	void setUnit(Unit value);
+	void setUnit(Unit<? extends Dimension> value);
 
 	/**
 	 * Returns the value of the '<em><b>Interval</b></em>' containment reference.
@@ -122,7 +124,7 @@ public interface TraceConfiguration extends EObject {
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	Quantity getInterval();
+	Quantity<Time> getInterval();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}' containment reference.
@@ -132,7 +134,7 @@ public interface TraceConfiguration extends EObject {
 	 * @see #getInterval()
 	 * @generated
 	 */
-	void setInterval(Quantity value);
+	void setInterval(Quantity<Time> value);
 
 	/**
 	 * Returns the value of the '<em><b>Data Source</b></em>' reference.

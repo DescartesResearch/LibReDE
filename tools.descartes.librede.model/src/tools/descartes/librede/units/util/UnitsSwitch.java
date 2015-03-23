@@ -4,9 +4,7 @@ package tools.descartes.librede.units.util;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.util.Switch;
-
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Ratio;
@@ -16,7 +14,6 @@ import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
 import tools.descartes.librede.units.UnitsRepository;
-import tools.descartes.librede.units.*;
 
 /**
  * <!-- begin-user-doc -->
@@ -82,7 +79,7 @@ public class UnitsSwitch<T1> extends Switch<T1> {
 				return result;
 			}
 			case UnitsPackage.UNIT: {
-				Unit unit = (Unit)theEObject;
+				Unit<?> unit = (Unit<?>)theEObject;
 				T1 result = caseUnit(unit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -122,7 +119,7 @@ public class UnitsSwitch<T1> extends Switch<T1> {
 				return result;
 			}
 			case UnitsPackage.QUANTITY: {
-				Quantity quantity = (Quantity)theEObject;
+				Quantity<?> quantity = (Quantity<?>)theEObject;
 				T1 result = caseQuantity(quantity);
 				if (result == null) result = caseComparable(quantity);
 				if (result == null) result = defaultCase(theEObject);
@@ -164,7 +161,7 @@ public class UnitsSwitch<T1> extends Switch<T1> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T1 caseUnit(Unit object) {
+	public <D extends Dimension> T1 caseUnit(Unit<D> object) {
 		return null;
 	}
 
@@ -254,7 +251,7 @@ public class UnitsSwitch<T1> extends Switch<T1> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T1 caseQuantity(Quantity object) {
+	public <D extends Dimension> T1 caseQuantity(Quantity<D> object) {
 		return null;
 	}
 

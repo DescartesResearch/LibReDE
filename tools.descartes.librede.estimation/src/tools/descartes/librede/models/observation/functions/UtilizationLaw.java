@@ -63,8 +63,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
 	
-	private final Query<Vector> throughputQuery;
-	private final Query<Scalar> utilizationQuery;
+	private final Query<Vector, RequestRate> throughputQuery;
+	private final Query<Scalar, Ratio> utilizationQuery;
 	
 	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
 	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function

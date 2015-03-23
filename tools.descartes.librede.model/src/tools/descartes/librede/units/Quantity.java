@@ -19,10 +19,10 @@ import org.eclipse.emf.ecore.EObject;
  * </ul>
  *
  * @see tools.descartes.librede.units.UnitsPackage#getQuantity()
- * @model superTypes="tools.descartes.librede.units.Comparable<tools.descartes.librede.units.Quantity>"
+ * @model superTypes="tools.descartes.librede.units.Comparable<tools.descartes.librede.units.Quantity<D>>"
  * @generated
  */
-public interface Quantity extends EObject, Comparable<Quantity> {
+public interface Quantity<D extends Dimension> extends EObject, Comparable<Quantity<D>> {
 	/**
 	 * Returns the value of the '<em><b>Value</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -63,7 +63,7 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @model required="true"
 	 * @generated
 	 */
-	Unit getUnit();
+	Unit<D> getUnit();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.units.Quantity#getUnit <em>Unit</em>}' reference.
@@ -73,7 +73,7 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @see #getUnit()
 	 * @generated
 	 */
-	void setUnit(Unit value);
+	void setUnit(Unit<D> value);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -81,7 +81,7 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @model required="true" targetUnitRequired="true"
 	 * @generated
 	 */
-	Quantity convertTo(Unit targetUnit);
+	Quantity<D> convertTo(Unit<D> targetUnit);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -89,7 +89,7 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @model required="true" unitRequired="true"
 	 * @generated
 	 */
-	double getValue(Unit unit);
+	double getValue(Unit<D> unit);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -97,7 +97,7 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @model required="true" quantityRequired="true"
 	 * @generated
 	 */
-	Quantity plus(Quantity quantity);
+	Quantity<D> plus(Quantity<D> quantity);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -105,7 +105,7 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @model required="true" quantityRequired="true"
 	 * @generated
 	 */
-	Quantity minus(Quantity quantity);
+	Quantity<D> minus(Quantity<D> quantity);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -113,6 +113,6 @@ public interface Quantity extends EObject, Comparable<Quantity> {
 	 * @model required="true" factorRequired="true"
 	 * @generated
 	 */
-	Quantity times(double factor);
+	Quantity<D> times(double factor);
 
 } // Quantity

@@ -50,7 +50,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	
 	private final Service cls_r;
 	
-	private final Query<Scalar> individualResponseTimesQuery;
+	private final Query<Scalar, Time> individualResponseTimesQuery;
 	
 	/**
 	 * Creates a new instance.

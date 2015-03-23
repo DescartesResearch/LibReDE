@@ -54,15 +54,30 @@
     <eLiterals name="UNKOWN" literal="Unkown"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TraceConfiguration">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="metric" lowerBound="1"
-        eType="ecore:EClass metrics.ecore#//Metric"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metric" lowerBound="1">
+      <eGenericType eClassifier="ecore:EClass metrics.ecore#//Metric">
+        <eTypeArguments>
+          <eUpperBound eClassifier="ecore:EClass units.ecore#//Dimension"/>
+        </eTypeArguments>
+      </eGenericType>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="dataSource" lowerBound="1"
         eType="#//DataSourceConfiguration"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="mappings" lowerBound="1"
         upperBound="-1" eType="#//TraceToEntityMapping" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1" eType="ecore:EClass units.ecore#//Unit"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Unit">
+        <eTypeArguments>
+          <eUpperBound eClassifier="ecore:EClass units.ecore#//Dimension"/>
+        </eTypeArguments>
+      </eGenericType>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="interval" lowerBound="1"
-        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
+        containment="true">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Quantity">
+        <eTypeArguments eClassifier="ecore:EClass units.ecore#//Time"/>
+      </eGenericType>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Parameter">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -78,11 +93,23 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="algorithms" upperBound="-1"
         eType="#//EstimationAlgorithmConfiguration" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="stepSize" lowerBound="1"
-        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
+        containment="true">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Quantity">
+        <eTypeArguments eClassifier="ecore:EClass units.ecore#//Time"/>
+      </eGenericType>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="startTimestamp" lowerBound="1"
-        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
+        containment="true">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Quantity">
+        <eTypeArguments eClassifier="ecore:EClass units.ecore#//Time"/>
+      </eGenericType>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="endTimestamp" lowerBound="1"
-        eType="ecore:EClass units.ecore#//Quantity" containment="true"/>
+        containment="true">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Quantity">
+        <eTypeArguments eClassifier="ecore:EClass units.ecore#//Time"/>
+      </eGenericType>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ValidationSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="validators" upperBound="-1"

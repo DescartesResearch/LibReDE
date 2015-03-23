@@ -73,8 +73,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	private Service cls_r;
 	
-	private Query<Scalar> responseTimeQuery;
-	private Query<Vector> throughputQuery;
+	private Query<Scalar, Time> responseTimeQuery;
+	private Query<Vector, RequestRate> throughputQuery;
 	
 	/**
 	 * Creates a new instance.

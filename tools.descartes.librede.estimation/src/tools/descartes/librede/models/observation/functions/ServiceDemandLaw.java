@@ -76,10 +76,10 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	private Resource res_i;
 	private Service cls_r;
 	
-	private Query<Scalar> utilizationQuery;
-	private Query<Vector> avgResponseTimeQuery;
-	private Query<Vector> avgThroughputQuery;
-	private Query<Scalar> avgThroughputQueryCurrentService;
+	private Query<Scalar, Ratio> utilizationQuery;
+	private Query<Vector, Time> avgResponseTimeQuery;
+	private Query<Vector, RequestRate> avgThroughputQuery;
+	private Query<Scalar, RequestRate> avgThroughputQueryCurrentService;
 	
 	
 	/**

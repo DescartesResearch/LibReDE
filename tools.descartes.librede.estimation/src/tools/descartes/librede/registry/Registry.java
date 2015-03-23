@@ -63,7 +63,7 @@ public class Registry {
 	
 	private MetricsRepository metrics = MetricsFactory.eINSTANCE.createMetricsRepository();
 	
-	private Map<Metric, IMetricHandler> metricHandlers = new HashMap<Metric, IMetricHandler>();
+	private Map<Metric<?>, IMetricHandler> metricHandlers = new HashMap<Metric<?>, IMetricHandler>();
 	
 	private Map<String, Class<?>> instances = new HashMap<String, Class<?>>();	
 	
@@ -95,7 +95,7 @@ public class Registry {
 		};
 	}
 	
-	public void registerMetric(Metric metric, IMetricHandler handler) {
+	public void registerMetric(Metric<?> metric, IMetricHandler handler) {
 		if (metric == null) {
 			throw new NullPointerException();
 		}
@@ -103,7 +103,7 @@ public class Registry {
 		metricHandlers.put(metric, handler);
 	}
 	
-	public List<Metric> getMetrics() {
+	public List<Metric<?>> getMetrics() {
 		return Collections.unmodifiableList(metrics.getMetrics());
 	}
 	
@@ -111,7 +111,7 @@ public class Registry {
 		return metrics;
 	}
 	
-	public IMetricHandler getMetricHandler(Metric metric) {
+	public IMetricHandler getMetricHandler(Metric<?> metric) {
 		return metricHandlers.get(metric);
 	}
 	

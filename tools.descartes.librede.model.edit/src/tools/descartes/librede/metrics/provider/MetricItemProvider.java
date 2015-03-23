@@ -174,7 +174,7 @@ public class MetricItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		return ((Metric)object).getName();
+		return ((Metric<?>)object).getName();
 	}
 	
 

@@ -169,7 +169,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				if (!event.getSelection().isEmpty()) {
-					Metric newMetric = (Metric)((IStructuredSelection)event.getSelection()).getFirstElement();
+					Metric<?> newMetric = (Metric<?>)((IStructuredSelection)event.getSelection()).getFirstElement();
 					if ((input.getUnit() == null) || (newMetric.getDimension() != input.getUnit().getDimension())) {
 						input.setUnit(newMetric.getDimension().getBaseUnit());
 					}

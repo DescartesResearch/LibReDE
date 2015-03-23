@@ -126,7 +126,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 
 	private void initializeQuantityFields() {
 		if (getModel().getEstimation().getStepSize() == null) {
-			Quantity stepSize = UnitsFactory.eINSTANCE.createQuantity();
+			Quantity<Time> stepSize = UnitsFactory.eINSTANCE.createQuantity();
 			stepSize.setValue(60);
 			stepSize.setUnit(Time.SECONDS);
 			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation(),
@@ -135,7 +135,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		}
 
 		if (getModel().getEstimation().getStartTimestamp() == null) {
-			Quantity startTimestamp = UnitsFactory.eINSTANCE.createQuantity();
+			Quantity<Time> startTimestamp = UnitsFactory.eINSTANCE.createQuantity();
 			startTimestamp.setValue(0);
 			startTimestamp.setUnit(Time.SECONDS);
 			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation(),
@@ -144,7 +144,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		}
 
 		if (getModel().getEstimation().getEndTimestamp() == null) {
-			Quantity endTimestamp = UnitsFactory.eINSTANCE.createQuantity();
+			Quantity<Time> endTimestamp = UnitsFactory.eINSTANCE.createQuantity();
 			endTimestamp.setValue(0);
 			endTimestamp.setUnit(Time.SECONDS);
 			Command cmd = SetCommand.create(getEditingDomain(), getModel().getEstimation(),
@@ -366,7 +366,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 
 	}
 
-	private EMFUpdateValueStrategy createDateConverterTargetToModel(final Quantity quantity) {
+	private EMFUpdateValueStrategy createDateConverterTargetToModel(final Quantity<Time> quantity) {
 		EMFUpdateValueStrategy strategy = new EMFUpdateValueStrategy(EMFUpdateValueStrategy.POLICY_UPDATE);
 		strategy.setConverter(new Converter(Date.class, Double.class) {
 			@Override
@@ -377,7 +377,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		return strategy;
 	}
 
-	private EMFUpdateValueStrategy createDateConverterModelToTarget(final Quantity quantity) {
+	private EMFUpdateValueStrategy createDateConverterModelToTarget(final Quantity<Time> quantity) {
 		EMFUpdateValueStrategy strategy = new EMFUpdateValueStrategy(EMFUpdateValueStrategy.POLICY_UPDATE);
 		strategy.setConverter(new Converter(Double.class, Date.class) {
 			@Override

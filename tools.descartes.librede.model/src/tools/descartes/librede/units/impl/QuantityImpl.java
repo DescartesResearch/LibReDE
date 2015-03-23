@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsFactory;
@@ -30,7 +31,7 @@ import tools.descartes.librede.units.UnitsPackage;
  *
  * @generated
  */
-public class QuantityImpl extends MinimalEObjectImpl.Container implements Quantity {
+public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Container implements Quantity<D> {
 	/**
 	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -59,7 +60,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * @generated
 	 * @ordered
 	 */
-	protected Unit unit;
+	protected Unit<D> unit;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -106,10 +107,11 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit getUnit() {
+	@SuppressWarnings("unchecked")
+	public Unit<D> getUnit() {
 		if (unit != null && unit.eIsProxy()) {
 			InternalEObject oldUnit = (InternalEObject)unit;
-			unit = (Unit)eResolveProxy(oldUnit);
+			unit = (Unit<D>)eResolveProxy(oldUnit);
 			if (unit != oldUnit) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, UnitsPackage.QUANTITY__UNIT, oldUnit, unit));
@@ -123,7 +125,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit basicGetUnit() {
+	public Unit<D> basicGetUnit() {
 		return unit;
 	}
 
@@ -132,8 +134,8 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setUnit(Unit newUnit) {
-		Unit oldUnit = unit;
+	public void setUnit(Unit<D> newUnit) {
+		Unit<D> oldUnit = unit;
 		unit = newUnit;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, UnitsPackage.QUANTITY__UNIT, oldUnit, unit));
@@ -144,7 +146,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Quantity convertTo(Unit targetUnit) {
+	public Quantity<D> convertTo(Unit<D> targetUnit) {
 		return UnitsFactory.eINSTANCE.createQuantity(unit.convertTo(value, targetUnit), targetUnit);
 	}
 
@@ -153,7 +155,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public double getValue(Unit unit) {
+	public double getValue(Unit<D> unit) {
 		return this.unit.convertTo(value, unit);
 	}
 
@@ -162,7 +164,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Quantity plus(Quantity quantity) {
+	public Quantity<D> plus(Quantity<D> quantity) {
 		return UnitsFactory.eINSTANCE.createQuantity(value + quantity.getValue(unit), unit);
 	}
 
@@ -171,7 +173,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Quantity minus(Quantity quantity) {
+	public Quantity<D> minus(Quantity<D> quantity) {
 		return UnitsFactory.eINSTANCE.createQuantity(value - quantity.getValue(unit), unit);
 	}
 
@@ -180,7 +182,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Quantity times(double factor) {
+	public Quantity<D> times(double factor) {
 		return UnitsFactory.eINSTANCE.createQuantity(value * factor, unit);
 	}
 
@@ -206,6 +208,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
@@ -213,7 +216,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 				setValue((Double)newValue);
 				return;
 			case UnitsPackage.QUANTITY__UNIT:
-				setUnit((Unit)newValue);
+				setUnit((Unit<D>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -231,7 +234,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 				setValue(VALUE_EDEFAULT);
 				return;
 			case UnitsPackage.QUANTITY__UNIT:
-				setUnit((Unit)null);
+				setUnit((Unit<D>)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -259,16 +262,17 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	 * @generated
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
 			case UnitsPackage.QUANTITY___CONVERT_TO__UNIT:
-				return convertTo((Unit)arguments.get(0));
+				return convertTo((Unit<D>)arguments.get(0));
 			case UnitsPackage.QUANTITY___GET_VALUE__UNIT:
-				return getValue((Unit)arguments.get(0));
+				return getValue((Unit<D>)arguments.get(0));
 			case UnitsPackage.QUANTITY___PLUS__QUANTITY:
-				return plus((Quantity)arguments.get(0));
+				return plus((Quantity<D>)arguments.get(0));
 			case UnitsPackage.QUANTITY___MINUS__QUANTITY:
-				return minus((Quantity)arguments.get(0));
+				return minus((Quantity<D>)arguments.get(0));
 			case UnitsPackage.QUANTITY___TIMES__DOUBLE:
 				return times((Double)arguments.get(0));
 		}
@@ -292,7 +296,7 @@ public class QuantityImpl extends MinimalEObjectImpl.Container implements Quanti
 	}
 
 	@Override
-	public int compareTo(Quantity o) {
+	public int compareTo(Quantity<D> o) {
 		return Double.compare(value, o.getValue(unit));
 	}
 

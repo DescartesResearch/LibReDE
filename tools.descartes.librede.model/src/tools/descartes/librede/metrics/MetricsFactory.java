@@ -30,7 +30,7 @@ public interface MetricsFactory extends EFactory {
 	 * @return a new object of class '<em>Metric</em>'.
 	 * @generated
 	 */
-	Metric createMetric();
+	<D extends Dimension> Metric<D> createMetric();
 	
 	/**
 	 * Returns a new object of class '<em>Metric</em>'.
@@ -39,7 +39,7 @@ public interface MetricsFactory extends EFactory {
 	 * @return a new object of class '<em>Metric</em>'.
 	 * @generated NOT
 	 */
-	Metric createMetric(String id, String name, Dimension dimension, Aggregation...aggregations);
+	<D extends Dimension> Metric<D> createMetric(String id, String name, D dimension, Aggregation...aggregations);
 
 	/**
 	 * Returns a new object of class '<em>Repository</em>'.

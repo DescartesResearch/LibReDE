@@ -39,7 +39,7 @@ import tools.descartes.librede.units.Dimension;
  *
  * @generated
  */
-public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
+public class MetricImpl<D extends Dimension> extends MinimalEObjectImpl.Container implements Metric<D> {
 	/**
 	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -88,7 +88,7 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	 * @generated
 	 * @ordered
 	 */
-	protected Dimension dimension;
+	protected D dimension;
 
 	/**
 	 * The cached value of the '{@link #getAllowedAggregations() <em>Allowed Aggregations</em>}' attribute list.
@@ -154,10 +154,11 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Dimension getDimension() {
+	@SuppressWarnings("unchecked")
+	public D getDimension() {
 		if (dimension != null && dimension.eIsProxy()) {
 			InternalEObject oldDimension = (InternalEObject)dimension;
-			dimension = (Dimension)eResolveProxy(oldDimension);
+			dimension = (D)eResolveProxy(oldDimension);
 			if (dimension != oldDimension) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, MetricsPackage.METRIC__DIMENSION, oldDimension, dimension));
@@ -171,7 +172,7 @@ public class MetricImpl extends MinimalEObjectImpl.Container implements Metric {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Dimension basicGetDimension() {
+	public D basicGetDimension() {
 		return dimension;
 	}
 

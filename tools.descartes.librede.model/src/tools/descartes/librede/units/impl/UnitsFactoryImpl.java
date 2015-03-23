@@ -10,6 +10,7 @@ import org.eclipse.emf.ecore.impl.EFactoryImpl;
 
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
@@ -19,7 +20,6 @@ import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsPackage;
 import tools.descartes.librede.units.UnitsRepository;
-import tools.descartes.librede.units.*;
 
 /**
  * <!-- begin-user-doc -->
@@ -82,8 +82,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit createUnit() {
-		UnitImpl unit = new UnitImpl();
+	public <D extends Dimension> Unit<D> createUnit() {
+		UnitImpl<D> unit = new UnitImpl<D>();
 		return unit;
 	}
 
@@ -92,8 +92,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Unit createUnit(Dimension dimension, String id, String name, String symbol, double baseFactor) {
-		UnitImpl unit = new UnitImpl();
+	public <D extends Dimension> Unit<D> createUnit(D dimension, String id, String name, String symbol, double baseFactor) {
+		UnitImpl<D> unit = new UnitImpl<D>();
 		unit.id = id;
 		unit.name = name;
 		unit.symbol = symbol;
@@ -108,8 +108,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Unit createBaseUnit(Dimension dimension, String id, String name, String symbol) {
-		Unit unit = createUnit(dimension, id, name, symbol, 1.0);
+	public <D extends Dimension> Unit<D> createBaseUnit(D dimension, String id, String name, String symbol) {
+		Unit<D> unit = createUnit(dimension, id, name, symbol, 1.0);
 		dimension.setBaseUnit(unit);
 		return unit;
 	}
@@ -169,8 +169,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Quantity createQuantity() {
-		QuantityImpl quantity = new QuantityImpl();
+	public <D extends Dimension> Quantity<D> createQuantity() {
+		QuantityImpl<D> quantity = new QuantityImpl<D>();
 		return quantity;
 	}
 	
@@ -179,8 +179,8 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Quantity createQuantity(double value, Unit unit) {
-		QuantityImpl quantity = new QuantityImpl();
+	public <D extends Dimension> Quantity<D> createQuantity(double value, Unit<D> unit) {
+		QuantityImpl<D> quantity = new QuantityImpl<D>();
 		quantity.unit = unit;
 		quantity.value = value;
 		return quantity;

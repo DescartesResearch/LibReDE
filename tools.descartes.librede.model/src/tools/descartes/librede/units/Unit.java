@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface Unit extends EObject {
+public interface Unit<D extends Dimension> extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -131,7 +131,7 @@ public interface Unit extends EObject {
 	 * @model required="true" valueRequired="true" targetUnitRequired="true"
 	 * @generated
 	 */
-	double convertTo(double value, Unit targetUnit);
+	double convertTo(double value, Unit<D> targetUnit);
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -142,6 +142,6 @@ public interface Unit extends EObject {
 	 * @model required="true" valueRequired="true" sourceUnitRequired="true"
 	 * @generated
 	 */
-	double convertFrom(double value, Unit sourceUnit);
+	double convertFrom(double value, Unit<D> sourceUnit);
 
 } // Unit

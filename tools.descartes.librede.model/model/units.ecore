@@ -3,19 +3,37 @@
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="units" nsURI="http://www.descartes-research.net/librede/units/1.0"
     nsPrefix="librede-units">
   <eClassifiers xsi:type="ecore:EClass" name="Dimension" abstract="true">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="baseUnit" lowerBound="1"
-        eType="#//Unit"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="baseUnit" lowerBound="1">
+      <eGenericType eClassifier="#//Unit">
+        <eTypeArguments/>
+      </eGenericType>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="units" lowerBound="1" upperBound="-1"
-        eType="#//Unit" containment="true" eOpposite="#//Unit/dimension"/>
+        containment="true" eOpposite="#//Unit/dimension">
+      <eGenericType eClassifier="#//Unit">
+        <eTypeArguments/>
+      </eGenericType>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Unit">
+    <eTypeParameters name="D">
+      <eBounds eClassifier="#//Dimension"/>
+    </eTypeParameters>
     <eOperations name="convertTo" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
       <eParameters name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
-      <eParameters name="targetUnit" lowerBound="1" eType="#//Unit"/>
+      <eParameters name="targetUnit" lowerBound="1">
+        <eGenericType eClassifier="#//Unit">
+          <eTypeArguments eTypeParameter="#//Unit/D"/>
+        </eGenericType>
+      </eParameters>
     </eOperations>
     <eOperations name="convertFrom" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
       <eParameters name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
-      <eParameters name="sourceUnit" lowerBound="1" eType="#//Unit"/>
+      <eParameters name="sourceUnit" lowerBound="1">
+        <eGenericType eClassifier="#//Unit">
+          <eTypeArguments eTypeParameter="#//Unit/D"/>
+        </eGenericType>
+      </eParameters>
     </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         iD="true"/>
@@ -37,25 +55,62 @@
         eType="#//Dimension" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Quantity">
-    <eOperations name="convertTo" lowerBound="1" eType="#//Quantity">
-      <eParameters name="targetUnit" lowerBound="1" eType="#//Unit"/>
+    <eTypeParameters name="D">
+      <eBounds eClassifier="#//Dimension"/>
+    </eTypeParameters>
+    <eOperations name="convertTo" lowerBound="1">
+      <eGenericType eClassifier="#//Quantity">
+        <eTypeArguments eTypeParameter="#//Quantity/D"/>
+      </eGenericType>
+      <eParameters name="targetUnit" lowerBound="1">
+        <eGenericType eClassifier="#//Unit">
+          <eTypeArguments eTypeParameter="#//Quantity/D"/>
+        </eGenericType>
+      </eParameters>
     </eOperations>
     <eOperations name="getValue" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
-      <eParameters name="unit" lowerBound="1" eType="#//Unit"/>
+      <eParameters name="unit" lowerBound="1">
+        <eGenericType eClassifier="#//Unit">
+          <eTypeArguments eTypeParameter="#//Quantity/D"/>
+        </eGenericType>
+      </eParameters>
     </eOperations>
-    <eOperations name="plus" lowerBound="1" eType="#//Quantity">
-      <eParameters name="quantity" lowerBound="1" eType="#//Quantity"/>
+    <eOperations name="plus" lowerBound="1">
+      <eGenericType eClassifier="#//Quantity">
+        <eTypeArguments eTypeParameter="#//Quantity/D"/>
+      </eGenericType>
+      <eParameters name="quantity" lowerBound="1">
+        <eGenericType eClassifier="#//Quantity">
+          <eTypeArguments eTypeParameter="#//Quantity/D"/>
+        </eGenericType>
+      </eParameters>
     </eOperations>
-    <eOperations name="minus" lowerBound="1" eType="#//Quantity">
-      <eParameters name="quantity" lowerBound="1" eType="#//Quantity"/>
+    <eOperations name="minus" lowerBound="1">
+      <eGenericType eClassifier="#//Quantity">
+        <eTypeArguments eTypeParameter="#//Quantity/D"/>
+      </eGenericType>
+      <eParameters name="quantity" lowerBound="1">
+        <eGenericType eClassifier="#//Quantity">
+          <eTypeArguments eTypeParameter="#//Quantity/D"/>
+        </eGenericType>
+      </eParameters>
     </eOperations>
-    <eOperations name="times" lowerBound="1" eType="#//Quantity">
+    <eOperations name="times" lowerBound="1">
+      <eGenericType eClassifier="#//Quantity">
+        <eTypeArguments eTypeParameter="#//Quantity/D"/>
+      </eGenericType>
       <eParameters name="factor" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
     </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1" eType="#//Unit"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1">
+      <eGenericType eClassifier="#//Unit">
+        <eTypeArguments eTypeParameter="#//Quantity/D"/>
+      </eGenericType>
+    </eStructuralFeatures>
     <eGenericSuperTypes eClassifier="#//Comparable">
-      <eTypeArguments eClassifier="#//Quantity"/>
+      <eTypeArguments eClassifier="#//Quantity">
+        <eTypeArguments eTypeParameter="#//Quantity/D"/>
+      </eTypeArguments>
     </eGenericSuperTypes>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Comparable" instanceClassName="java.lang.Comparable"

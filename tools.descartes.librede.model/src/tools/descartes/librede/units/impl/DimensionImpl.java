@@ -39,7 +39,7 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 * @ordered
 	 */
-	protected Unit baseUnit;
+	protected Unit<?> baseUnit;
 
 	/**
 	 * The cached value of the '{@link #getUnits() <em>Units</em>}' containment reference list.
@@ -49,7 +49,7 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Unit> units;
+	protected EList<Unit<?>> units;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -75,10 +75,10 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit getBaseUnit() {
+	public Unit<?> getBaseUnit() {
 		if (baseUnit != null && baseUnit.eIsProxy()) {
 			InternalEObject oldBaseUnit = (InternalEObject)baseUnit;
-			baseUnit = (Unit)eResolveProxy(oldBaseUnit);
+			baseUnit = (Unit<?>)eResolveProxy(oldBaseUnit);
 			if (baseUnit != oldBaseUnit) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, UnitsPackage.DIMENSION__BASE_UNIT, oldBaseUnit, baseUnit));
@@ -92,7 +92,7 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Unit basicGetBaseUnit() {
+	public Unit<?> basicGetBaseUnit() {
 		return baseUnit;
 	}
 
@@ -101,8 +101,8 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setBaseUnit(Unit newBaseUnit) {
-		Unit oldBaseUnit = baseUnit;
+	public void setBaseUnit(Unit<?> newBaseUnit) {
+		Unit<?> oldBaseUnit = baseUnit;
 		baseUnit = newBaseUnit;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, UnitsPackage.DIMENSION__BASE_UNIT, oldBaseUnit, baseUnit));
@@ -113,9 +113,9 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Unit> getUnits() {
+	public EList<Unit<?>> getUnits() {
 		if (units == null) {
-			units = new EObjectContainmentWithInverseEList<Unit>(Unit.class, this, UnitsPackage.DIMENSION__UNITS, UnitsPackage.UNIT__DIMENSION);
+			units = new EObjectContainmentWithInverseEList<Unit<?>>(Unit.class, this, UnitsPackage.DIMENSION__UNITS, UnitsPackage.UNIT__DIMENSION);
 		}
 		return units;
 	}
@@ -176,11 +176,11 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UnitsPackage.DIMENSION__BASE_UNIT:
-				setBaseUnit((Unit)newValue);
+				setBaseUnit((Unit<?>)newValue);
 				return;
 			case UnitsPackage.DIMENSION__UNITS:
 				getUnits().clear();
-				getUnits().addAll((Collection<? extends Unit>)newValue);
+				getUnits().addAll((Collection<? extends Unit<?>>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -195,7 +195,7 @@ public abstract class DimensionImpl extends MinimalEObjectImpl.Container impleme
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UnitsPackage.DIMENSION__BASE_UNIT:
-				setBaseUnit((Unit)null);
+				setBaseUnit((Unit<?>)null);
 				return;
 			case UnitsPackage.DIMENSION__UNITS:
 				getUnits().clear();

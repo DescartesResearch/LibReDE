@@ -28,7 +28,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Unit</em>'.
 	 * @generated
 	 */
-	Unit createUnit();
+	<D extends Dimension> Unit<D> createUnit();
 
 	/**
 	 * Returns a new object of class '<em>Unit</em>'.
@@ -37,7 +37,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Unit</em>'.
 	 * @generated NOT
 	 */
-	Unit createUnit(Dimension dimension, String id, String name, String symbol, double baseFactor);
+	<D extends Dimension> Unit<D> createUnit(D dimension, String id, String name, String symbol, double baseFactor);
 	
 	/**
 	 * Returns a new object of class '<em>Unit</em>'.
@@ -46,7 +46,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Unit</em>'.
 	 * @generated NOT
 	 */
-	Unit createBaseUnit(Dimension dimension, String id, String name, String symbol);
+	<D extends Dimension> Unit<D> createBaseUnit(D dimension, String id, String name, String symbol);
 
 	/**
 	 * Returns a new object of class '<em>Request Rate</em>'.
@@ -100,7 +100,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Quantity</em>'.
 	 * @generated
 	 */
-	Quantity createQuantity();
+	<D extends Dimension> Quantity<D> createQuantity();
 	
 	/**
 	 * Returns a new object of class '<em>Quantity</em>'.
@@ -109,7 +109,7 @@ public interface UnitsFactory extends EFactory {
 	 * @return a new object of class '<em>Quantity</em>'.
 	 * @generated NOT
 	 */
-	Quantity createQuantity(double value, Unit unit);
+	<D extends Dimension> Quantity<D> createQuantity(double value, Unit<D> unit);
 
 	/**
 	 * Returns the package supported by this factory.

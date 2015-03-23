@@ -42,7 +42,7 @@ public class MetricsRepositoryImpl extends MinimalEObjectImpl.Container implemen
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Metric> metrics;
+	protected EList<Metric<?>> metrics;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -68,9 +68,9 @@ public class MetricsRepositoryImpl extends MinimalEObjectImpl.Container implemen
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Metric> getMetrics() {
+	public EList<Metric<?>> getMetrics() {
 		if (metrics == null) {
-			metrics = new EObjectContainmentEList<Metric>(Metric.class, this, MetricsPackage.METRICS_REPOSITORY__METRICS);
+			metrics = new EObjectContainmentEList<Metric<?>>(Metric.class, this, MetricsPackage.METRICS_REPOSITORY__METRICS);
 		}
 		return metrics;
 	}
@@ -114,7 +114,7 @@ public class MetricsRepositoryImpl extends MinimalEObjectImpl.Container implemen
 		switch (featureID) {
 			case MetricsPackage.METRICS_REPOSITORY__METRICS:
 				getMetrics().clear();
-				getMetrics().addAll((Collection<? extends Metric>)newValue);
+				getMetrics().addAll((Collection<? extends Metric<?>>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

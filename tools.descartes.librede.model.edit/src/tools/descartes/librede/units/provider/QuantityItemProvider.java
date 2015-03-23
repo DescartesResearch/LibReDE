@@ -133,7 +133,7 @@ public class QuantityItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		Quantity quantity = (Quantity)object;
+		Quantity<?> quantity = (Quantity<?>)object;
 		return getString("_UI_Quantity_type") + " " + quantity.getValue();
 	}
 	

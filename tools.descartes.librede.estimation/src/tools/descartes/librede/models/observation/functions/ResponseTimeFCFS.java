@@ -42,8 +42,8 @@ import tools.descartes.librede.units.Time;
 
 public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	
-	private Query<Scalar> responseTimeQuery;
-	private Query<Scalar> queueLengthQuery;
+	private Query<Scalar, Time> responseTimeQuery;
+	private Query<Scalar, RequestCount> queueLengthQuery;
 
 	public  ResponseTimeFCFS(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource, Service service) {
