@@ -39,10 +39,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 @RunWith(Parameterized.class)
 public class WeightedTargetUtilizationInitializerTest {
@@ -69,14 +72,14 @@ public class WeightedTargetUtilizationInitializerTest {
 		generator.setLowerUtilizationBound(lowerUtil);
 		generator.setUpperUtilizationBound(upperUtil);
 		
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		generator.nextObservation();
 		cursor.next();
 		
 		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(4, 0.5, cursor);
 		Vector initialDemands = initializer.getInitialValue();
 		
-		Vector throughput = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor).execute();
 		
 		for (int i = 0; i < 4; i++) {
 			double util = initialDemands.slice(range(i * 5, (i + 1) * 5)).dot(throughput);

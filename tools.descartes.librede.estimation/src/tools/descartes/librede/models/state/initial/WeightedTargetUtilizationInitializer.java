@@ -26,13 +26,15 @@
  */
 package tools.descartes.librede.models.state.initial;
 
-import static tools.descartes.librede.linalg.LinAlg.repmat;
 import static tools.descartes.librede.linalg.LinAlg.empty;
+import static tools.descartes.librede.linalg.LinAlg.repmat;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 /**
  * This class initializes a state model with demands so that a specified target
@@ -49,15 +51,15 @@ import tools.descartes.librede.repository.StandardMetric;
 public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 
 	private final double targetUtilization;
-	private Query<Vector> respTime;
-	private Query<Vector> throughput;
+	private Query<Vector, Time> respTime;
+	private Query<Vector, RequestRate> throughput;
 	private final int resourceCount;
 
 	public WeightedTargetUtilizationInitializer(int resourceCount, double targetUtilization, IRepositoryCursor cursor) {
 		this.targetUtilization = targetUtilization;
 
-		respTime = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forAllServices().average().using(cursor);
-		throughput = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor);
+		respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(cursor);
+		throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor);
 
 		this.resourceCount = resourceCount;
 	}

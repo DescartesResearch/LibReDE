@@ -30,10 +30,11 @@ import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.RequestRate;
 
 /**
  * This class initializes a state model with demands so that a specified target
@@ -49,7 +50,7 @@ import tools.descartes.librede.repository.StandardMetric;
  */
 public class TargetUtilizationInitializer implements IStateInitializer {
 
-	private Query<Vector> throughput;
+	private Query<Vector, RequestRate> throughput;
 	private final double targetUtilization;
 	private final int stateSize;
 
@@ -62,7 +63,7 @@ public class TargetUtilizationInitializer implements IStateInitializer {
 		this.stateSize = stateSize;
 		this.targetUtilization = targetUtilization;
 
-		throughput = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor);
+		throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor);
 	}
 
 	@Override

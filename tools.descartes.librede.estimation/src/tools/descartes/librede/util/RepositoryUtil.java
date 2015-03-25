@@ -68,16 +68,13 @@ public class RepositoryUtil {
 	 * @param configuration
 	 * @return range
 	 */
-	public static Range deduceMaximumInterval(IMonitoringRepository repository,
-			LibredeConfiguration configuration) {
+	public static Range deduceMaximumInterval(IMonitoringRepository repository, LibredeConfiguration configuration) {
 		double maxStart = Double.MIN_VALUE;
 		double minEnd = Double.MAX_VALUE;
-		for (TraceConfiguration trace : configuration.getInput()
-				.getObservations()) {
+		for (TraceConfiguration trace : configuration.getInput().getObservations()) {
 			if (trace.getMappings().size() >= 1) {
-				TimeSeries series = repository.getData(
-						Registry.INSTANCE.getMetric(trace.getMetric()), trace
-								.getMappings().get(0).getEntity());
+				TimeSeries series = repository.select(trace.getMetric(), trace.getUnit(), trace.getMappings().get(0)
+						.getEntity());
 				maxStart = Math.max(series.getStartTime(), maxStart);
 				minEnd = Math.min(series.getEndTime(), minEnd);
 			}
