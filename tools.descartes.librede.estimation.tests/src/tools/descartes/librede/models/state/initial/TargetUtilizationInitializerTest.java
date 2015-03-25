@@ -42,13 +42,14 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
 @RunWith(Parameterized.class)
-public class TargetUtilizationInitializerTest {
+public class TargetUtilizationInitializerTest extends LibredeTest {
 	
 	@Parameters
     public static Collection<Object[]> data() {
