@@ -14,7 +14,10 @@ public class UnitConverter {
 			return series;
 		}
 		Matrix convertedData = series.getData().times(sourceUnit.getBaseFactor() / targetUnit.getBaseFactor());
-		return new TimeSeries(series.getTime(), convertedData);
+		TimeSeries converted = new TimeSeries(series.getTime(), convertedData);
+		converted.setStartTime(series.getStartTime());
+		converted.setEndTime(series.getEndTime());
+		return converted;
 	}
 
 }
