@@ -163,18 +163,18 @@ public class Librede {
 					continue;
 				}
 				
-				String dataSourceType = fileTrace.getDataSource().getType();
-				if (!dataSources.containsKey(dataSourceType)) {
-					Class<?> cl = Registry.INSTANCE.getInstanceClass(dataSourceType);
+				String dataSourceName = fileTrace.getDataSource().getName();
+				if (!dataSources.containsKey(dataSourceName)) {
+					Class<?> cl = Registry.INSTANCE.getInstanceClass(fileTrace.getDataSource().getType());
 					try {
 						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, fileTrace.getDataSource().getParameters());
-						dataSources.put(dataSourceType, newSource);
+						dataSources.put(dataSourceName, newSource);
 					} catch (Exception e) {
 						log.error("Could not instantiate data source " + fileTrace.getDataSource().getName(), e);
 						continue;
 					}
 				}
-				IDataSource source = dataSources.get(dataSourceType);
+				IDataSource source = dataSources.get(dataSourceName);
 				
 				Metric<? extends Dimension> metric = fileTrace.getMetric();
 				
