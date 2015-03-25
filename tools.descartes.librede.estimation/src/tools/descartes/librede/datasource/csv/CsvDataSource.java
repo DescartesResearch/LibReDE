@@ -31,8 +31,12 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -54,7 +58,20 @@ public class CsvDataSource implements IDataSource {
 	@ParameterDefinition(name = "SkipFirstLine", label = "Skip First Line", required = false, defaultValue = "false")
 	private boolean skipFirstLine;
 	
+	@ParameterDefinition(name = "TimestampFormat", label = "Timestamp Format", required = false, defaultValue = "")
+	private String timestampFormat;
+	
+	@ParameterDefinition(name = "NumberLocale", label = "Number Locale", required = false, defaultValue = "en_US")
+	private String numberLocale;
+	
 	public TimeSeries load(InputStream in, int column) throws Exception {
+		SimpleDateFormat format = null;
+		if (timestampFormat != null && !timestampFormat.isEmpty()) {
+			format = new SimpleDateFormat(timestampFormat);
+		}
+		
+		NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
+		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		try {
 			final List<Double> timestamps = new ArrayList<Double>();
@@ -66,9 +83,17 @@ public class CsvDataSource implements IDataSource {
 				if (!(skipFirstLine && lineNumber == 1)) {
 					if (!line.startsWith("#")) {
 						String[] fields = line.split(separators);
-						if (fields.length == 2) {
+						if (fields.length >= 2) {
 							try {
-								timestamps.add(Double.parseDouble(fields[0]));
+								if (format == null) {
+									timestamps.add(numberFormat.parse(fields[0]).doubleValue());									
+								} else {
+									try {
+										timestamps.add(format.parse(fields[0]).getTime() / 1000.0);
+									} catch(ParseException ex) {
+										log.error("Error parsing date: " + fields[0]);
+									}
+								}
 								if (column >= fields.length) {
 									log.error("Error parsing line " + lineNumber
 											+ ": too few columns.");
