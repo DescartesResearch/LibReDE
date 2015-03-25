@@ -350,7 +350,7 @@ public class StandardMetricHelpers {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
 				return true;
 			}
-			return repository.contains(StandardMetrics.DEPARTURES, entity, ZERO_SECONDS) && repository.contains(StandardMetrics.ARRIVALS, entity, ZERO_SECONDS);
+			return repository.contains(StandardMetrics.DEPARTURES, entity, ZERO_SECONDS, false) && repository.contains(StandardMetrics.ARRIVALS, entity, ZERO_SECONDS, false);
 		}
 	}
 	
