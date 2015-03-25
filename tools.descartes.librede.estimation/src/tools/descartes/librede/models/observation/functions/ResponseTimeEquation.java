@@ -39,13 +39,15 @@ import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
 /**
  * This output function describes the relationship between the mean response time and the resource demands. 
@@ -71,8 +73,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	private Service cls_r;
 	
-	private Query<Scalar> responseTimeQuery;
-	private Query<Vector> throughputQuery;
+	private Query<Scalar, Time> responseTimeQuery;
+	private Query<Vector, RequestRate> throughputQuery;
 	
 	/**
 	 * Creates a new instance.
@@ -97,8 +99,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 //		}
 //		precalculateFactorials(maxParallel);
 		
-		responseTimeQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(repository);
-		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
+		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
 	}
 	
 	/* (non-Javadoc)

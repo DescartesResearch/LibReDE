@@ -41,7 +41,6 @@ import org.junit.Test;
 
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 
 public class TimeSeriesTest {

@@ -153,7 +153,7 @@ public class EstimationSpecificationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}
@@ -175,7 +175,7 @@ public class EstimationSpecificationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}
@@ -197,7 +197,7 @@ public class EstimationSpecificationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}

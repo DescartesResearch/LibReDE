@@ -68,15 +68,21 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 import tools.descartes.librede.validation.CrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
@@ -87,10 +93,20 @@ public class Librede {
 	private static final Logger log = Logger.getLogger(Librede.class);	
 	
 	public static void init() {
+		Registry.INSTANCE.registerDimension(Time.INSTANCE);
+		Registry.INSTANCE.registerDimension(RequestCount.INSTANCE);
+		Registry.INSTANCE.registerDimension(RequestRate.INSTANCE);
+		Registry.INSTANCE.registerDimension(Ratio.INSTANCE);
 		
-		for (StandardMetric metric : StandardMetric.class.getEnumConstants()) {
-			Registry.INSTANCE.registerMetric(metric.toString(), metric);
-		}
+		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVAL_RATE, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVAL_RATE));
+		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS, StandardMetricHelpers.createHandler(StandardMetrics.ARRIVALS));
+		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, StandardMetricHelpers.createHandler(StandardMetrics.BUSY_TIME));
+		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, StandardMetricHelpers.createHandler(StandardMetrics.DEPARTURES));
+		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, StandardMetricHelpers.createHandler(StandardMetrics.IDLE_TIME));
+		Registry.INSTANCE.registerMetric(StandardMetrics.RESPONSE_TIME, StandardMetricHelpers.createHandler(StandardMetrics.RESPONSE_TIME));
+		Registry.INSTANCE.registerMetric(StandardMetrics.THROUGHPUT, StandardMetricHelpers.createHandler(StandardMetrics.THROUGHPUT));
+		Registry.INSTANCE.registerMetric(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, StandardMetricHelpers.createHandler(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL));
+		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION, StandardMetricHelpers.createHandler(StandardMetrics.UTILIZATION));
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		
@@ -110,8 +126,8 @@ public class Librede {
 	}
 	
 	public static void execute(LibredeConfiguration conf) {
-		IMonitoringRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
-		repo.setCurrentTime(conf.getEstimation().getEndTimestamp() / 1000);
+		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
+		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
 		loadRepository(conf, repo);
 		
@@ -135,7 +151,7 @@ public class Librede {
 		}
 	}
 	
-	public static void loadRepository(LibredeConfiguration conf, IMonitoringRepository repo) {
+	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
 		for (TraceConfiguration trace : conf.getInput().getObservations()) {
@@ -160,11 +176,7 @@ public class Librede {
 				}
 				IDataSource source = dataSources.get(dataSourceType);
 				
-				IMetric metric = Registry.INSTANCE.getMetric(fileTrace.getMetric());
-				if (metric == null) {
-					log.error("Unknown metric type: " + fileTrace.getMetric());
-					continue;
-				}
+				Metric<? extends Dimension> metric = fileTrace.getMetric();
 				
 				for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
 					try {
@@ -172,13 +184,13 @@ public class Librede {
 						try {						
 							in = new FileInputStream(file);
 							TimeSeries data = source.load(in, mapping.getTraceColumn());
-							data.setStartTime(conf.getEstimation().getStartTimestamp() / 1000.0);
-							data.setEndTime(conf.getEstimation().getEndTimestamp() / 1000.0);
+							data.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
+							data.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
 							
-							if (fileTrace.getInterval() > 0) {
-								repo.setAggregatedData(metric, mapping.getEntity(), data, fileTrace.getInterval() / 1000.0);
+							if (fileTrace.getInterval().getValue() > 0) {
+								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data, fileTrace.getInterval());
 							} else {
-								repo.setData(metric, mapping.getEntity(), data);
+								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data);
 							}
 						} finally {
 							if (in != null) in.close();
@@ -196,8 +208,8 @@ public class Librede {
 		
 		List<ResultTable[]> results = new ArrayList<ResultTable[]>();
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
-			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp() / 1000.0, 
-					conf.getEstimation().getStepSize() / 1000.0);
+			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize());
 			
 			IEstimationApproach currentApproach;
 			try {
@@ -225,8 +237,8 @@ public class Librede {
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
 			ResultTable[] folds = new ResultTable[conf.getValidation().getValidationFolds()];
 			CrossValidationCursor cursor = new CrossValidationCursor(repository.getCursor(
-					conf.getEstimation().getStartTimestamp() / 1000.0, 
-					conf.getEstimation().getStepSize() / 1000.0), 
+					conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize()), 
 					conf.getValidation().getValidationFolds());
 			cursor.initPartitions();
 			

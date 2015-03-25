@@ -50,12 +50,12 @@ import tools.descartes.librede.configuration.ValidatorConfiguration;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ValidationSpecificationImpl#getValidators <em>Validators</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ValidationSpecificationImpl#getValidationFolds <em>Validation Folds</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ValidationSpecificationImpl#isValidateEstimates <em>Validate Estimates</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

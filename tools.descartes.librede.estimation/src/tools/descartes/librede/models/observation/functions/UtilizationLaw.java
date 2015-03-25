@@ -28,19 +28,20 @@ package tools.descartes.librede.models.observation.functions;
 
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
-import java.util.Arrays;
 import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Range;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
 
 /**
  * This output function implements the Utilization Law:
@@ -62,8 +63,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
 	
-	private final Query<Vector> throughputQuery;
-	private final Query<Scalar> utilizationQuery;
+	private final Query<Vector, RequestRate> throughputQuery;
+	private final Query<Scalar, Ratio> utilizationQuery;
 	
 	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
 	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
@@ -86,8 +87,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		variables = zeros(stateModel.getStateSize());
 		varFocusedRange = stateModel.getStateVariableIndexRange(resource);
 		
-		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
-		utilizationQuery = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(res_i).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
+		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	
 	/* (non-Javadoc)

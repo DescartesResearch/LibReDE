@@ -37,6 +37,7 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.LibredeConfiguration#getWorkloadDescription <em>Workload Description</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.LibredeConfiguration#getInput <em>Input</em>}</li>
@@ -44,7 +45,6 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link tools.descartes.librede.configuration.LibredeConfiguration#getOutput <em>Output</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.LibredeConfiguration#getValidation <em>Validation</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getLibredeConfiguration()
  * @model

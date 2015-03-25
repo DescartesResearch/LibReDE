@@ -49,6 +49,7 @@ import tools.descartes.librede.configuration.WorkloadDescription;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.LibredeConfigurationImpl#getWorkloadDescription <em>Workload Description</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.LibredeConfigurationImpl#getInput <em>Input</em>}</li>
@@ -56,7 +57,6 @@ import tools.descartes.librede.configuration.WorkloadDescription;
  *   <li>{@link tools.descartes.librede.configuration.impl.LibredeConfigurationImpl#getOutput <em>Output</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.LibredeConfigurationImpl#getValidation <em>Validation</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

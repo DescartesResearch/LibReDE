@@ -24,21 +24,24 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.configuration.editor.util;
+package tools.descartes.librede.repository;
 
-public class PrettyPrinter {
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
+
+public interface IMetricHandler<D extends Dimension> {
 	
-	public static String toCamelCase(String s) {
-		String[] parts = s.split("\\s");
-		StringBuilder res = new StringBuilder(s.length());
-		for (int i = 0; i < parts.length; i++) {
-			if (i > 0) {
-				res.append(" ");
-			}
-			res.append(Character.toUpperCase(parts[i].charAt(0)));
-			res.append(parts[i].substring(1).toLowerCase());
-		}
-		return res.toString();
-	}
+	public Metric<D> getMetric();
+	
+	public TimeSeries select(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end);
 
+	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end, Aggregation func);
+	
+	public boolean contains(IMonitoringRepository repository, Metric<D> metric, ModelEntity entity, Quantity<Time> aggregationInterval);
+	
 }

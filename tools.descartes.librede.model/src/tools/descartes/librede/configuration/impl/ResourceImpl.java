@@ -42,11 +42,11 @@ import tools.descartes.librede.configuration.SchedulingStrategy;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getNumberOfServers <em>Number Of Servers</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getSchedulingStrategy <em>Scheduling Strategy</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

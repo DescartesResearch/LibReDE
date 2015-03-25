@@ -51,7 +51,7 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 		return stateModel;
 	}
 
-	protected boolean checkQueryPrecondition(Query<?> query, List<String> messages) {
+	protected boolean checkQueryPrecondition(Query<?,?> query, List<String> messages) {
 		if (!query.hasData()) {
 			StringBuilder msg = new StringBuilder("FAILED DATA PRECONDITION: ");
 			msg.append("metric = ").append(query.getMetric().toString()).append(" ");

@@ -36,11 +36,11 @@ package tools.descartes.librede.configuration;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.Resource#getNumberOfServers <em>Number Of Servers</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Resource#getSchedulingStrategy <em>Scheduling Strategy</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource()
  * @model

@@ -37,8 +37,6 @@ import tools.descartes.librede.configuration.Service;
  * <!-- begin-user-doc -->
  * An implementation of the model object '<em><b>Service</b></em>'.
  * <!-- end-user-doc -->
- * <p>
- * </p>
  *
  * @generated
  */

@@ -41,10 +41,10 @@ import tools.descartes.librede.configuration.FileTraceConfiguration;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl#getFile <em>File</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

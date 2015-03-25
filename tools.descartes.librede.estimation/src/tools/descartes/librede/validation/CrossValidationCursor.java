@@ -30,11 +30,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.repository.Aggregation;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 import cern.jet.random.sampling.RandomSampler;
 
 public class CrossValidationCursor implements IRepositoryCursor {
@@ -82,29 +86,29 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public double getCurrentIntervalStart() {
+	public Quantity<Time> getCurrentIntervalStart() {
 		return delegate.getCurrentIntervalStart();
 	}
 
 	@Override
-	public double getCurrentIntervalLength() {
+	public Quantity<Time> getCurrentIntervalLength() {
 		return delegate.getCurrentIntervalLength();
 	}
 
 	@Override
-	public double getCurrentIntervalEnd() {
+	public Quantity<Time> getCurrentIntervalEnd() {
 		return delegate.getCurrentIntervalEnd();
 	}
 
 	@Override
-	public TimeSeries getValues(IMetric metric, ModelEntity entity) {
-		return delegate.getValues(metric, entity);
+	public <D extends Dimension> TimeSeries getValues(Metric<D> metric, Unit<D> unit, ModelEntity entity) {
+		return delegate.getValues(metric, unit, entity);
 	}
 
 	@Override
-	public double getAggregatedValue(IMetric metric, ModelEntity entity,
+	public <D extends Dimension> double getAggregatedValue(Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation func) {
-		return delegate.getAggregatedValue(metric, entity, func);
+		return delegate.getAggregatedValue(metric, unit, entity, func);
 	}
 
 	@Override
@@ -113,7 +117,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public boolean hasData(IMetric metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(Metric<D> metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		return delegate.hasData(metric, entities, aggregation);
 	}
@@ -152,7 +156,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 	
 	@Override
-	public boolean seek(double newTime) {
+	public boolean seek(Quantity<Time> newTime) {
 		return delegate.seek(newTime);
 	}
 	

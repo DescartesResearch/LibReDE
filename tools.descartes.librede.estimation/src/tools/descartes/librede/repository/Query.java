@@ -36,8 +36,12 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Unit;
 
-public final class Query<T extends Vector> {
+public final class Query<T extends Vector, D extends Dimension> {
 	
 	public static enum Type {
 		SERVICE, ALL_SERVICES, RESOURCE, ALL_RESOURCES
@@ -45,16 +49,18 @@ public final class Query<T extends Vector> {
 	
 	private Aggregation aggregation;
 	private Query.Type type;
-	private IMetric metric;
+	private Metric<D> metric;
+	private Unit<D> unit;
 	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, IMetric metric,
+	protected Query(Aggregation aggregation, Type type, Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
 		this.type = type;
 		this.metric = metric;
+		this.unit = unit;
 		this.repositoryCursor = repositoryCursor;
 		if (entity != null) {
 			entities.add(entity);
@@ -69,8 +75,12 @@ public final class Query<T extends Vector> {
 		return type;
 	}
 	
-	public IMetric getMetric() {
+	public Metric<D> getMetric() {
 		return metric;
+	}
+	
+	public Unit<D> getUnit() {
+		return unit;
 	}
 	
 	public T execute() {		
@@ -82,15 +92,15 @@ public final class Query<T extends Vector> {
 			Vector result = vector(entities.size(), new VectorFunction() {				
 				@Override
 				public double cell(int row) {
-					return repositoryCursor.getAggregatedValue(metric, entities.get(row), aggregation);
+					return repositoryCursor.getAggregatedValue(metric, unit, entities.get(row), aggregation);
 				}
 			});
 			return (T)result;
 		} else {
 			if (aggregation != Aggregation.NONE) {
-				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, entities.get(0), aggregation));
+				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, unit, entities.get(0), aggregation));
 			} else {
-				return (T)repositoryCursor.getValues(metric, entities.get(0)).getData(0);
+				return (T)repositoryCursor.getValues(metric, unit, entities.get(0)).getData(0);
 			}			
 		}
 	}
@@ -105,9 +115,7 @@ public final class Query<T extends Vector> {
 	
 	public List<? extends ModelEntity> getEntities() {
 		return Collections.unmodifiableList(entities);
-	}
-	
-	
+	}	
 	
 	private void load() {
 		if (type == Type.ALL_RESOURCES) {

@@ -4,7 +4,7 @@ Bundle-Name: Estimation
 Bundle-SymbolicName: tools.descartes.librede.estimation
 Bundle-Version: 1.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: tools.descartes.librede;uses:="org.osgi.framework",
+Export-Package: tools.descartes.librede,
  tools.descartes.librede.algorithm;
   uses:="tools.descartes.librede.repository,
    tools.descartes.librede.linalg,
@@ -57,6 +57,11 @@ Import-Package: cern.jet.random.sampling;version="1.2.0",
  org.apache.log4j;version="1.2.15",
  org.eclipse.emf.common.util,
  org.eclipse.emf.ecore,
+ org.eclipse.emf.ecore.resource,
+ org.eclipse.emf.ecore.resource.impl,
+ org.eclipse.emf.ecore.util,
  org.osgi.framework;version="1.8.0",
  tools.descartes.librede.configuration,
- tools.descartes.librede.linalg
+ tools.descartes.librede.linalg,
+ tools.descartes.librede.metrics,
+ tools.descartes.librede.units

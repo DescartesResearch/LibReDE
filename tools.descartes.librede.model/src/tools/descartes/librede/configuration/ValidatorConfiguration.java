@@ -39,11 +39,11 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.ValidatorConfiguration#getType <em>Type</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.ValidatorConfiguration#getParameters <em>Parameters</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getValidatorConfiguration()
  * @model

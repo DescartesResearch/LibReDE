@@ -35,6 +35,7 @@ import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
@@ -44,7 +45,6 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Approximation with Response Times")

@@ -40,15 +40,18 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.repository.Aggregation;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class ResponseTimeApproximationTest {
+public class ResponseTimeApproximationTest extends LibredeTest {
 	
 	private final static int SERVICE_IDX = 2;
 	private final static int RESOURCE_IDX = 1;
@@ -67,7 +70,7 @@ public class ResponseTimeApproximationTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
 		service = generator.getStateModel().getServices().get(SERVICE_IDX);
@@ -87,7 +90,7 @@ public class ResponseTimeApproximationTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
 		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 

@@ -32,24 +32,36 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 
 public interface IMonitoringRepository {
+	
+	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end);
 
-	public double getAggregationInterval(IMetric m, ModelEntity entity);
-	public TimeSeries getData(IMetric metric, ModelEntity entity);
-	public void setData(IMetric metric, ModelEntity entity, TimeSeries observations);
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations);
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval);
-	public boolean containsData(IMetric responseTime,
-			ModelEntity entity, double maximumAggregationInterval);
+	public double select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end, Aggregation func);
+	
+	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity);
+	
+	public boolean isAggregated(Metric<? extends Dimension> m, ModelEntity entity);
+
+	public boolean contains(Metric<? extends Dimension> responseTime,
+			ModelEntity entity, Quantity<Time> maximumAggregationInterval);
+
+	public boolean contains(Metric<? extends Dimension> responseTime,
+			ModelEntity entity, Quantity<Time> maximumAggregationInterval, boolean includeDerived);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
-	public IRepositoryCursor getCursor(double startTime, double stepSize);
+	public IRepositoryCursor getCursor(Quantity<Time> startTime, Quantity<Time> stepSize);
 	
-	public double getCurrentTime();
-	public void setCurrentTime(double currentTime);
+	public Quantity<Time> getCurrentTime();
+	public void setCurrentTime(Quantity<Time> currentTime);
 	public WorkloadDescription getWorkload();
 }

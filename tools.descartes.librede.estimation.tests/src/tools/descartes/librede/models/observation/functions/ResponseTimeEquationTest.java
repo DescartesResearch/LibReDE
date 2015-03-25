@@ -38,14 +38,17 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class ResponseTimeEquationTest {
+public class ResponseTimeEquationTest extends LibredeTest {
 	
 	private final static int SERVICE_IDX = 2;
 	
@@ -60,7 +63,7 @@ public class ResponseTimeEquationTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		service = generator.getStateModel().getServices().get(SERVICE_IDX);
 		
@@ -73,13 +76,13 @@ public class ResponseTimeEquationTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
 		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		Query<Scalar> resp = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(cursor);
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 

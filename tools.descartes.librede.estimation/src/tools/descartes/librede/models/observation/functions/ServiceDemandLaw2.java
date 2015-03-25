@@ -31,12 +31,14 @@ import java.util.List;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.Time;
 
 /**
  * This output function describes the relationship between the per-service utilization and the resource demands. 
@@ -72,8 +74,8 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	private Resource res_i;
 	private Service cls_r;
 	
-	private Query<Scalar> busyTimeQuery;
-	private Query<Scalar> sumDeparturesQuery;
+	private Query<Scalar, Time> busyTimeQuery;
+	private Query<Scalar, RequestCount> sumDeparturesQuery;
 	
 	
 	/**
@@ -94,8 +96,8 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 		res_i = resource;
 		cls_r = service;
 		
-		busyTimeQuery = QueryBuilder.select(StandardMetric.BUSY_TIME).forResource(res_i).sum().using(repository);
-		sumDeparturesQuery = QueryBuilder.select(StandardMetric.DEPARTURES).forService(service).sum().using(repository);
+		busyTimeQuery = QueryBuilder.select(StandardMetrics.BUSY_TIME).in(Time.SECONDS).forResource(res_i).sum().using(repository);
+		sumDeparturesQuery = QueryBuilder.select(StandardMetrics.DEPARTURES).in(RequestCount.REQUESTS).forService(service).sum().using(repository);
 	}
 	
 	/* (non-Javadoc)

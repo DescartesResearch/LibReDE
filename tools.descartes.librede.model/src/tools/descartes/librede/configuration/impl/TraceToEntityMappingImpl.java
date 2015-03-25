@@ -44,11 +44,11 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl#getEntity <em>Entity</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl#getTraceColumn <em>Trace Column</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

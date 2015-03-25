@@ -24,11 +24,21 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.repository;
+package tools.descartes.librede;
 
-
-public enum Aggregation {
+public class PrettyPrinter {
 	
-	NONE, MINIMUM, MAXIMUM,	AVERAGE, SUM;
+	public static String toCamelCase(String s) {
+		String[] parts = s.split("\\s");
+		StringBuilder res = new StringBuilder(s.length());
+		for (int i = 0; i < parts.length; i++) {
+			if (i > 0) {
+				res.append(" ");
+			}
+			res.append(Character.toUpperCase(parts[i].charAt(0)));
+			res.append(parts[i].substring(1).toLowerCase());
+		}
+		return res.toString();
+	}
 
 }

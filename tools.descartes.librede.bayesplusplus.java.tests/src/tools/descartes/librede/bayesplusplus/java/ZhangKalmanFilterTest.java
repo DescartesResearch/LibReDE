@@ -45,9 +45,12 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class ZhangKalmanFilterTest {
+public class ZhangKalmanFilterTest extends LibredeTest {
 	
 	private static final int ITERATIONS = 1000;
 	
@@ -71,7 +74,7 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
@@ -110,7 +113,7 @@ public class ZhangKalmanFilterTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);

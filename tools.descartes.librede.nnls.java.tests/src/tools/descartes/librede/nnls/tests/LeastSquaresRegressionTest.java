@@ -42,9 +42,12 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class LeastSquaresRegressionTest {
+public class LeastSquaresRegressionTest extends LibredeTest {
 
 	private static final int ITERATIONS = 100;
 
@@ -64,7 +67,7 @@ public class LeastSquaresRegressionTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
@@ -106,7 +109,7 @@ public class LeastSquaresRegressionTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Service serv : workload.getServices()) {

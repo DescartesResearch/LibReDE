@@ -32,18 +32,15 @@ package tools.descartes.librede.configuration.provider;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
-import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.metrics.Metric;
 
 /**
  * This is the item provider adapter for a {@link tools.descartes.librede.configuration.FileTraceConfiguration} object.
@@ -127,11 +124,11 @@ public class FileTraceConfigurationItemProvider extends TraceConfigurationItemPr
 			label.append("No file");
 		}
 		label.append(" (");
-		IMetric metric = Registry.INSTANCE.getMetric(trace.getMetric());
+		Metric<?> metric = trace.getMetric();
 		if (metric != null) {
-			label.append(metric.getDisplayName());
+			label.append(metric.getName());
 		}
-		if (trace.getInterval() == 0) {
+		if (trace.getInterval() != null && trace.getInterval().getValue() == 0) {
 			label.append(", ").append("non-aggregated");
 		} else {
 			label.append(", ").append("aggregated");

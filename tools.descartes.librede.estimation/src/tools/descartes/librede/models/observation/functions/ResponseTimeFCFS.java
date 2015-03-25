@@ -31,24 +31,26 @@ import java.util.List;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.Time;
 
 public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	
-	private Query<Scalar> responseTimeQuery;
-	private Query<Scalar> queueLengthQuery;
+	private Query<Scalar, Time> responseTimeQuery;
+	private Query<Scalar, RequestCount> queueLengthQuery;
 
 	public  ResponseTimeFCFS(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource, Service service) {
 		super(stateModel, resource, service);
 		
-		responseTimeQuery = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(service).average().using(repository);
-		queueLengthQuery = QueryBuilder.select(StandardMetric.QUEUE_LENGTH_SEEN_ON_ARRIVAL).forResource(resource).average().using(repository);
+		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
+		queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL).in(RequestCount.REQUESTS).forResource(resource).average().using(repository);
 	}
 
 	@Override
