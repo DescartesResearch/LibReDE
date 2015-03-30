@@ -99,11 +99,12 @@ public class CsvDataSource implements IDataSource {
 											+ ": too few columns.");
 									values.add(Double.NaN);
 								} else {
-									values.add(Double.parseDouble(fields[column]));
+									values.add(numberFormat.parse(fields[column].trim()).doubleValue());
 								}
-							} catch (NumberFormatException ex) {
-								log.error("Error parsing line " + lineNumber
-										+ ": could not parse number.");
+							} catch (ParseException ex) {
+								log.error("Error parsing value in line " + lineNumber
+										+ ": " + fields[column].trim());
+								values.add(Double.NaN);
 							}
 						} else {
 							log.error("Error parsing line " + lineNumber
