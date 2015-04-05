@@ -5,9 +5,12 @@ Bundle-SymbolicName: tools.descartes.librede.estimation.tests
 Bundle-Version: 1.1.0.qualifier
 Fragment-Host: tools.descartes.librede.estimation;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: tools.descartes.librede.testutils,
+Import-Package: org.fest.assertions.api,
+ org.mockito;version="1.8.4",
+ org.mockito.stubbing;version="1.8.4",
+ tools.descartes.librede.configuration,
  tools.descartes.librede.linalg,
  tools.descartes.librede.linalg.testutil,
- tools.descartes.librede.configuration,
- org.fest.assertions.api
+ tools.descartes.librede.testutils,
+ tools.descartes.librede.units
 Require-Bundle: org.junit;bundle-version="4.11.0"

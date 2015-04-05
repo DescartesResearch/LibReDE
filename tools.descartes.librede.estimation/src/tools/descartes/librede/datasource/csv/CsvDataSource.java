@@ -26,29 +26,20 @@
  */
 package tools.descartes.librede.datasource.csv;
 
-import static tools.descartes.librede.linalg.LinAlg.vector;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.File;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.datasource.AbstractFileDataSource;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
-import tools.descartes.librede.repository.TimeSeries;
 
 @Component(displayName = "CSV Data Source")
-public class CsvDataSource implements IDataSource {
+public class CsvDataSource extends AbstractFileDataSource {
 	
 	private static final Logger log = Logger.getLogger(CsvDataSource.class);
 
@@ -59,78 +50,121 @@ public class CsvDataSource implements IDataSource {
 	private boolean skipFirstLine;
 	
 	@ParameterDefinition(name = "TimestampFormat", label = "Timestamp Format", required = false, defaultValue = "")
-	private String timestampFormat;
+	private String timestampFormatPattern;
 	
 	@ParameterDefinition(name = "NumberLocale", label = "Number Locale", required = false, defaultValue = "en_US")
 	private String numberLocale;
 	
-	public TimeSeries load(InputStream in, int column) throws Exception {
-		SimpleDateFormat format = null;
-		if (timestampFormat != null && !timestampFormat.isEmpty()) {
-			format = new SimpleDateFormat(timestampFormat);
+	private int readLines = 0;
+	private SimpleDateFormat timestampFormat;
+	private NumberFormat numberFormat;
+	
+	public String getSeparators() {
+		return separators;
+	}
+
+	public void setSeparators(String separators) {
+		this.separators = separators;
+	}
+
+	public boolean isSkipFirstLine() {
+		return skipFirstLine;
+	}
+
+	public void setSkipFirstLine(boolean skipFirstLine) {
+		this.skipFirstLine = skipFirstLine;
+	}
+
+	public String getNumberLocale() {
+		return numberLocale;
+	}
+
+	public void setNumberLocale(String numberLocale) {
+		this.numberLocale = numberLocale;
+	}
+
+	public SimpleDateFormat getTimestampFormat() {
+		return timestampFormat;
+	}
+
+	public void setTimestampFormat(SimpleDateFormat timestampFormat) {
+		this.timestampFormat = timestampFormat;
+	}
+
+	@Override
+	protected boolean skipLine(File file, String line) {
+		readLines++;
+		if (skipFirstLine && readLines == 1) {
+			return true;			
 		}
-		
-		NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
-		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		try {
-			final List<Double> timestamps = new ArrayList<Double>();
-			final List<Double> values = new ArrayList<Double>();
-			String line;
-			int lineNumber = 0;
-			while ((line = reader.readLine()) != null) {
-				lineNumber++;
-				if (!(skipFirstLine && lineNumber == 1)) {
-					if (!line.startsWith("#")) {
-						String[] fields = line.split(separators);
-						if (fields.length >= 2) {
-							try {
-								if (format == null) {
-									timestamps.add(numberFormat.parse(fields[0]).doubleValue());									
-								} else {
-									try {
-										timestamps.add(format.parse(fields[0]).getTime() / 1000.0);
-									} catch(ParseException ex) {
-										log.error("Error parsing date: " + fields[0]);
-									}
-								}
-								if (column >= fields.length) {
-									log.error("Error parsing line " + lineNumber
-											+ ": too few columns.");
-									values.add(Double.NaN);
-								} else {
-									values.add(numberFormat.parse(fields[column].trim()).doubleValue());
-								}
-							} catch (ParseException ex) {
-								log.error("Error parsing value in line " + lineNumber
-										+ ": " + fields[column].trim());
-								values.add(Double.NaN);
-							}
-						} else {
-							log.error("Error parsing line " + lineNumber
-									+ ": could not find seperator char.");
-						}
-					}
+		if (line.isEmpty()) {
+			return true;
+		}
+		if (line.startsWith("#")) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	protected double parse(File file, String line, double[] values) throws ParseException {
+		String[] fields = line.split(separators);
+		if (fields.length >= 1) {
+			double timestamp = getTimestamp(file, fields[0]);
+			if (Double.isNaN(timestamp)) {
+				throw new ParseException("Timestamp is invalid", readLines);
+			}
+			// We only consider columns < values.length,
+			// Possible additional columns are not required and are
+			// discarded.
+			for (int i = 0; i < values.length; i++) {
+				if ((i + 1) < fields.length) {
+					values[i] = getNumber(file, fields[i + 1]);
+				} else {					
+					values[i] = Double.NaN;
 				}
 			}
+			return timestamp;
+		}
+		throw new AssertionError(); // We should never be here if programmed correctly.
+	}
 
-			Vector v1 = vector(timestamps.size(), new VectorFunction() {
-				@Override
-				public double cell(int row) {
-					return timestamps.get(row);
-				}
-			});
-
-			Vector v2 = vector(values.size(), new VectorFunction() {
-				@Override
-				public double cell(int row) {
-					return values.get(row);
-				}
-			});
-			return new TimeSeries(v1, v2);
-		} finally {
-			reader.close();
+	private double getTimestamp(File file, String timestamp) {
+		if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
+			timestampFormat = new SimpleDateFormat(timestampFormatPattern);
+		}
+		if (timestampFormat == null) {
+			return getNumber(file, timestamp);
+		} else {
+			try {
+				return timestampFormat.parse(timestamp.trim()).getTime() / 1000.0;
+			} catch(ParseException ex) {
+				logDiagnosis(file, "Skipping line due to invalid timestamp: " + timestamp);
+			}
+			return Double.NaN;
 		}
 	}
 
+	private double getNumber(File file, String number) {
+		if (numberFormat == null) {
+			numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
+		}
+		try {
+			return numberFormat.parse(number.trim()).doubleValue();
+		} catch(ParseException ex) {
+			logDiagnosis(file, "Error parsing number: " + number);
+		}	
+		return Double.NaN;
+	}
+	
+	private void logDiagnosis(File file, String message) {
+		StringBuilder diagnosis = new StringBuilder(message);
+		diagnosis.append(" (");
+		diagnosis.append(file);
+		diagnosis.append(":");
+		diagnosis.append(readLines);
+		diagnosis.append(")");
+		log.warn(diagnosis.toString());
+	}
+	
 }

@@ -26,9 +26,11 @@
  */
 package tools.descartes.librede.datasource;
 
-import java.io.InputStream;
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.List;
 
-import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.configuration.TraceConfiguration;
 
 /**
  * This interface provides common methods supported by all data source
@@ -40,14 +42,48 @@ import tools.descartes.librede.repository.TimeSeries;
  * available measurement data points into an instance of a
  * {@link tools.descartes.librede.repository.IMonitoringRepository}.
  * 
- * TODO: Make this interface more general: no direct dependency on InputStream
- * and support iterativ reading from data source (currently always the all available
- * data is loaded)
+ * The data source provides an asynchronous interface for reading the measurement
+ * data similar to the asynchronous file operations from the NIO packages in the
+ * java standard library.
+ * 
  * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  */
-public interface IDataSource {
+public interface IDataSource extends Closeable {
 
-	public TimeSeries load(InputStream in, int column) throws Exception;
+	/**
+	 * This method must be called at the beginning, to start reading and waiting
+	 * for measurement data. In order to stop reading again, you MUST call the
+	 * close() method.
+	 * 
+	 * @throws IOException
+	 *             thrown if an error occurred when reading from this data
+	 *             sources.
+	 */
+	public void open() throws IOException;
+
+	/**
+	 * Loads the specified trace into this data source. The data source will
+	 * monitor for new data until this data source is closed.
+	 * 
+	 * @param configuration
+	 *            A TraceConfiguration containing the information where the data
+	 *            source can find the data for this trace.
+	 * @throws IOException
+	 *             thrown if the data source cannot read this trace.
+	 */
+	public List<TraceKey> load(TraceConfiguration configuration) throws IOException;
+
+	/**
+	 * Add a data source listener.
+	 * @param listener
+	 */
+	public void addListener(IDataSourceListener listener);
+
+	/**
+	 * Remove a data source listener
+	 * @param listener
+	 */
+	public void removeListener(IDataSourceListener listener);
 
 }

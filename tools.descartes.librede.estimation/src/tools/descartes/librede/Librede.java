@@ -26,8 +26,7 @@
  */
 package tools.descartes.librede;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +49,6 @@ import tools.descartes.librede.approach.WangKalmanFilterApproach;
 import tools.descartes.librede.approach.ZhangKalmanFilterApproach;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.ExporterConfiguration;
-import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
@@ -58,7 +56,10 @@ import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.datasource.DataSourceSelector;
 import tools.descartes.librede.datasource.IDataSource;
+import tools.descartes.librede.datasource.TraceEvent;
+import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
@@ -154,52 +155,56 @@ public class Librede {
 	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
-		for (TraceConfiguration trace : conf.getInput().getObservations()) {
-			if (trace instanceof FileTraceConfiguration) {
-				FileTraceConfiguration fileTrace = (FileTraceConfiguration)trace;
-				File file = new File(fileTrace.getFile());
-				if (!file.exists()) {
-					log.error("Measurement trace " + fileTrace.getFile() + " does not exist.");
-					continue;
-				}
-				
-				String dataSourceName = fileTrace.getDataSource().getName();
+		try (DataSourceSelector selector = new DataSourceSelector()) {		
+			for (TraceConfiguration trace : conf.getInput().getObservations()) {
+				String dataSourceName = trace.getDataSource().getName();
 				if (!dataSources.containsKey(dataSourceName)) {
-					Class<?> cl = Registry.INSTANCE.getInstanceClass(fileTrace.getDataSource().getType());
+					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
 					try {
-						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, fileTrace.getDataSource().getParameters());
+						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
+						selector.add(newSource);
 						dataSources.put(dataSourceName, newSource);
 					} catch (Exception e) {
-						log.error("Could not instantiate data source " + fileTrace.getDataSource().getName(), e);
+						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
 						continue;
 					}
 				}
 				IDataSource source = dataSources.get(dataSourceName);
-				
-				Metric<? extends Dimension> metric = fileTrace.getMetric();
-				
-				for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
-					try {
-						FileInputStream in = null;
-						try {						
-							in = new FileInputStream(file);
-							TimeSeries data = source.load(in, mapping.getTraceColumn());
-							data.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-							data.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-							
-							if (fileTrace.getInterval().getValue() > 0) {
-								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data, fileTrace.getInterval());
-							} else {
-								repo.insert(metric, fileTrace.getUnit(), mapping.getEntity(), data);
-							}
-						} finally {
-							if (in != null) in.close();
-						}
-					} catch (Exception e) {
-						log.error("Error reading measurement trace " + fileTrace.getFile() + ".", e);
-					}					
+				try {
+					source.load(trace);
+				} catch(IOException ex) {
+					log.error("Error loading data.", ex);
 				}
-			}		
+			}
+			
+			TraceEvent curEvent = null;
+			while ((curEvent = selector.poll()) != null) {
+				TraceKey key = curEvent.getKey();
+				TimeSeries ts = repo.select(key.getMetric(),key.getUnit(), key.getEntity());
+				if (ts == null) {
+					ts = curEvent.getData();
+				} else {
+					ts = ts.append(curEvent.getData());
+				}
+				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
+				ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
+				
+				if (curEvent.getKey().getInterval().getValue() > 0) {
+					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts, key.getInterval());
+				} else {
+					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts);
+				}
+			}
+		} catch (IOException e1) {
+			log.error("Error closing selector");
+		} finally {			
+			for (IDataSource ds : dataSources.values()) {
+				try {
+					ds.close();
+				} catch (IOException e) {
+					log.error("Error closing data source.", e);
+				}
+			}
 		}
 	}
 	
