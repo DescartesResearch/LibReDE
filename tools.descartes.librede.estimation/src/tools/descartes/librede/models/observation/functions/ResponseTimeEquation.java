@@ -160,14 +160,25 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 	
 	private double calculateResponseTimePS(Vector state, Resource res_i, Vector X) {
-		Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
 		double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-		double U_i = X.dot(D_i);
+		double U_i = calculateUtilization(res_i, state, X);
 
 		int p = res_i.getNumberOfServers();
 //		double P_q = calculateQueueingProbability(p, U_i);
 		
 		return D_ir / (p - U_i);
+	}
+	
+	private double calculateUtilization(Resource res_i, Vector state, Vector X) {
+		double U_i = 0;
+		for (int i = 0; i < X.rows(); i++) {
+			Service curService = (Service) throughputQuery.getEntity(i);
+			U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(i);
+		}
+		for (Service curService : getStateModel().getBackgroundServices()) {
+			U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService));
+		}
+		return U_i;
 	}
 
 	/* (non-Javadoc)
@@ -214,7 +225,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		
 	private double calculateFirstDerivativePS(Vector state, Resource res_i, Service cls_s) {
 		// get resource demands
-		Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
 		double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 		
 		// get current throughput data
@@ -226,7 +236,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		 *  
 		 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
 		 */
-		double beta = 1 - X.dot(D_i);
+		double beta = 1 - calculateUtilization(res_i, state, X);
 		
 		/*
 		 * Calculate derivatives:
@@ -292,7 +302,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		// if resources of x_{row} and x_{column} do not match the second derivative is zero
 		if (res_i.equals(res_j)) {
 			// get resource demands
-			Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			
 			// get current throughput data
@@ -305,7 +314,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 *  
 			 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
 			 */
-			double beta = 1 - X.dot(D_i);
+			double beta = 1 - calculateUtilization(res_i, state, X);
 			
 			/* 
 			 * Calculate 2nd derivatives:

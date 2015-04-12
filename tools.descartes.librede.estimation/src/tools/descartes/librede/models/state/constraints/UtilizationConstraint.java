@@ -32,6 +32,7 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -73,9 +74,16 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		Vector D_i = state.slice(stateModel.getStateVariableIndexRange(res_i));
 		Vector X = throughputQuery.execute();
-		return X.dot(D_i);
+		double U_i = 0.0;
+		for (int i = 0; i < X.rows(); i++) {
+			Service curService = (Service)throughputQuery.getEntity(i);
+			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService)) * X.get(i);
+		}
+		for (Service curService : stateModel.getBackgroundServices()) {
+			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService));
+		}
+		return U_i;
 	}
 
 	@Override

@@ -28,7 +28,9 @@ package tools.descartes.librede.models.state.initial;
 
 import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.repmat;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -87,8 +89,14 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 		// point (e.g., 50%).
 		double util = initialDemands.dot(throughput.execute());
 		initialDemands = initialDemands.times(targetUtilization / util);
+		
+		VectorBuilder initialState = new VectorBuilder(stateModel.getAllServices().size());
+		for (int i = 0; i < initialDemands.rows(); i++) {
+			Service curService = (Service) throughput.getEntity(i);
+			initialState.set(stateModel.getStateVariableIndex(stateModel.getResources().get(0),  curService), initialDemands.get(i));
+		}
 
 		// assume each resource has the same initial demands
-		return (Vector) repmat(initialDemands, resourceCount, 1);
+		return (Vector) repmat(initialState.toVector(), resourceCount, 1);
 	}
 }

@@ -30,10 +30,13 @@ import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import java.util.List;
 
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Range;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -66,7 +69,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	private final Query<Vector, RequestRate> throughputQuery;
 	private final Query<Scalar, Ratio> utilizationQuery;
 	
-	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
+	private final VectorBuilder variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
 	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
 	
 	/**
@@ -84,7 +87,13 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		
 		this.res_i = resource;
 		
-		variables = zeros(stateModel.getStateSize());
+		variables = new VectorBuilder(stateModel.getStateSize());
+		// All background services a value of 1 as throughput
+		for (Service backgroundService : stateModel.getBackgroundServices()) {
+			int stateIdx = getStateModel().getStateVariableIndex(res_i, backgroundService);
+			variables.set(stateIdx, 1.0);
+		}
+		
 		varFocusedRange = stateModel.getStateVariableIndexRange(resource);
 		
 		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
@@ -108,7 +117,12 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	@Override
 	public Vector getIndependentVariables() {
 		Vector X = throughputQuery.execute();
-		return variables.set(varFocusedRange, X);
+		// copy the throughput to the corresponding place in the state vector
+		for (int i = 0; i < X.rows(); i++) {
+			int stateIdx = getStateModel().getStateVariableIndex(res_i, (Service)throughputQuery.getEntity(i));
+			variables.set(stateIdx, X.get(i));
+		}
+		return variables.toVector();
 	}
 
 	/* (non-Javadoc)
