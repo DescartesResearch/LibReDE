@@ -421,9 +421,10 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 							FileInputStream in = null;
 							try {
 								in = new FileInputStream(inputFile);
-								TimeSeries series = ds.load(in, col);
-								maxStart = Math.max(series.getStartTime(), maxStart);
-								minEnd = Math.min(series.getEndTime(), minEnd);
+								//TODO:
+//								TimeSeries series = ds.load(in, col);
+//								maxStart = Math.max(series.getStartTime(), maxStart);
+//								minEnd = Math.min(series.getEndTime(), minEnd);
 							} catch (Exception e) {
 								// Fail graciously
 							}
