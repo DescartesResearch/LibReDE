@@ -132,16 +132,42 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		double X_total = sum(X);
 		
 		for (Resource res_i : getStateModel().getResources()) {
-			Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
-			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-			double U_i = X.dot(D_i);
-
-			int p = res_i.getNumberOfServers();
-//			double P_q = calculateQueueingProbability(p, U_i);
-			
-			rt += D_ir / (p - U_i);
+			switch(res_i.getSchedulingStrategy()) {
+			case PS:
+			case UNKOWN:
+				// For now we approximate unknown with PS
+				rt += calculateResponseTimePS(state, res_i, X);
+				break;
+			case IS:
+				rt += calculateResponseTimeIS(state, res_i, X);
+				break;
+			case FCFS:
+				rt += calculateResponseTimeFCFS(state, res_i, X);
+			default:
+				throw new AssertionError("Unsupported scheduling strategy.");
+			}
 		}
 		return rt;
+	}
+	
+	private double calculateResponseTimeFCFS(Vector state, Resource res_i, Vector X) {
+		// TODO: Implement FCFS correctly.
+		return calculateResponseTimePS(state, res_i, X);
+	}
+	
+	private double calculateResponseTimeIS(Vector state, Resource res_i, Vector X) {
+		return state.get(getStateModel().getStateVariableIndex(res_i, cls_r));		
+	}
+	
+	private double calculateResponseTimePS(Vector state, Resource res_i, Vector X) {
+		Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
+		double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+		double U_i = X.dot(D_i);
+
+		int p = res_i.getNumberOfServers();
+//		double P_q = calculateQueueingProbability(p, U_i);
+		
+		return D_ir / (p - U_i);
 	}
 
 	/* (non-Javadoc)
@@ -162,36 +188,59 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				Resource res_i = getStateModel().getResource(row);
 				Service cls_s = getStateModel().getService(row);
 				
-				// get resource demands
-				Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
-				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-				
-				// get current throughput data
-				Vector X = throughputQuery.execute();
-				double X_s = X.get(throughputQuery.indexOf(cls_s));
-				
-				/*
-				 * beta is a shorthand variable for the denominator of the response time equation
-				 *  
-				 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
-				 */
-				double beta = 1 - X.dot(D_i);
-				
-				/*
-				 * Calculate derivatives:
-				 * 
-				 * \frac{D_{i,r * X_{s}}{beta^{2}} if r != s
-				 * 
-				 * \frac{D_{i,r * X_{s}}{beta^{2}} + \frac{1}{beta} if r == s				 * 			
-				 */
-				double dev = (D_ir * X_s) / (beta * beta);				
-				if (cls_r.equals(cls_s)) {
-					return dev + (1 / beta);
-				} else {
-					return dev;
+				switch(res_i.getSchedulingStrategy()) {
+				case PS:
+				case UNKOWN:
+					return calculateFirstDerivativePS(state, res_i, cls_s);
+				case IS:
+					return calculateFirstDerivativeIS(state, res_i, cls_s);
+				case FCFS:
+					return calculateFirstDerivativeFCFS(state, res_i, cls_s);
+				default:
+					throw new AssertionError("Unsupported scheduling strategy.");
 				}
 			}
 		});
+	}
+	
+	private double calculateFirstDerivativeIS(Vector state, Resource res_i, Service cls_s) {
+		// It is just a linear function R = D --> 1 
+		return 1;
+	}
+	
+	private double calculateFirstDerivativeFCFS(Vector state, Resource res_i, Service cls_s) {
+		return calculateFirstDerivativePS(state, res_i, cls_s);
+	}
+		
+	private double calculateFirstDerivativePS(Vector state, Resource res_i, Service cls_s) {
+		// get resource demands
+		Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
+		double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+		
+		// get current throughput data
+		Vector X = throughputQuery.execute();
+		double X_s = X.get(throughputQuery.indexOf(cls_s));
+		
+		/*
+		 * beta is a shorthand variable for the denominator of the response time equation
+		 *  
+		 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
+		 */
+		double beta = 1 - X.dot(D_i);
+		
+		/*
+		 * Calculate derivatives:
+		 * 
+		 * \frac{D_{i,r * X_{s}}{beta^{2}} if r != s
+		 * 
+		 * \frac{D_{i,r * X_{s}}{beta^{2}} + \frac{1}{beta} if r == s				 * 			
+		 */
+		double dev = (D_ir * X_s) / (beta * beta);				
+		if (cls_r.equals(cls_s)) {
+			return dev + (1 / beta);
+		} else {
+			return dev;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -216,53 +265,75 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				Resource res_j = getStateModel().getResource(column);
 				Service cls_t = getStateModel().getService(column);
 				
-				// if resources of x_{row} and x_{column} do not match the second derivative is zero
-				if (res_i.equals(res_j)) {
-					// get resource demands
-					Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
-					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-					
-					// get current throughput data
-					Vector X = throughputQuery.execute();
-					double X_s = X.get(throughputQuery.indexOf(cls_s));
-					double X_t = X.get(throughputQuery.indexOf(cls_t));
-					
-					/*
-					 * beta is a shorthand variable for the denominator of the response time equation
-					 *  
-					 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
-					 */
-					double beta = 1 - X.dot(D_i);
-					
-					/* 
-					 * Calculate 2nd derivatives:
-					 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} if r != s and r != t
-					 * 
-					 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} + \frac{2 * X_{s}}{beta^{2}} if r == s == t
-					 * 
-					 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} + \frac{X_{t}}{beta^{2}} if r == s and r != t
-					 * 
-					 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} + \frac{X_{s}}{beta^{2}} if r != s and r == t					 * 
-					 */					
-					double dev = (2 * D_ir * X_s * X_t) / (beta * beta * beta);
-					
-					if (cls_r.equals(cls_t) || cls_r.equals(cls_s)) {
-						if (cls_t.equals(cls_s)) {
-							return dev + 2 * X_s / (beta * beta);
-						} else if (cls_r.equals(cls_s)) {
-							return dev + X_t / (beta * beta);
-						} else {
-							return dev + X_s / (beta * beta);
-						}
-					} else {
-						return dev;
-					}
-										
-				} else {				
-					return 0.0;
+				switch(res_i.getSchedulingStrategy()) {
+				case PS:
+				case UNKOWN:
+					return calculateSecondDerivativePS(state, res_i, res_j, cls_s, cls_t);
+				case IS:
+					return calculateSecondDerivativeIS(state, res_i, res_j, cls_s, cls_t);
+				case FCFS:
+					return calculateSecondDerivativeFCFS(state, res_i, res_j, cls_s, cls_t);
+				default:
+					throw new AssertionError("Unsupported scheduling strategy.");
 				}
 			}
 		});
+	}
+	
+	private double calculateSecondDerivativeIS(Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
+		return 0;	
+	}
+	
+	private double calculateSecondDerivativeFCFS(Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
+		return calculateSecondDerivativePS(state, res_i, res_j, cls_s, cls_t);
+	}
+	
+	private double calculateSecondDerivativePS(Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
+		// if resources of x_{row} and x_{column} do not match the second derivative is zero
+		if (res_i.equals(res_j)) {
+			// get resource demands
+			Vector D_i = state.slice(getStateModel().getStateVariableIndexRange(res_i));
+			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+			
+			// get current throughput data
+			Vector X = throughputQuery.execute();
+			double X_s = X.get(throughputQuery.indexOf(cls_s));
+			double X_t = X.get(throughputQuery.indexOf(cls_t));
+			
+			/*
+			 * beta is a shorthand variable for the denominator of the response time equation
+			 *  
+			 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
+			 */
+			double beta = 1 - X.dot(D_i);
+			
+			/* 
+			 * Calculate 2nd derivatives:
+			 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} if r != s and r != t
+			 * 
+			 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} + \frac{2 * X_{s}}{beta^{2}} if r == s == t
+			 * 
+			 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} + \frac{X_{t}}{beta^{2}} if r == s and r != t
+			 * 
+			 * \frac{2 * D_{i,r} * X_{s} * X_{t}}{beta^{3}} + \frac{X_{s}}{beta^{2}} if r != s and r == t					 * 
+			 */					
+			double dev = (2 * D_ir * X_s * X_t) / (beta * beta * beta);
+			
+			if (cls_r.equals(cls_t) || cls_r.equals(cls_s)) {
+				if (cls_t.equals(cls_s)) {
+					return dev + 2 * X_s / (beta * beta);
+				} else if (cls_r.equals(cls_s)) {
+					return dev + X_t / (beta * beta);
+				} else {
+					return dev + X_s / (beta * beta);
+				}
+			} else {
+				return dev;
+			}
+								
+		} else {				
+			return 0.0;
+		}
 	}
 	
 /*	private double calculatePhi0(int p, double U_i) {
