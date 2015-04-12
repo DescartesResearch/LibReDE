@@ -668,13 +668,22 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_CONFIGURATION__INTERVAL = 4;
 
 	/**
+	 * The feature id for the '<em><b>Location</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__LOCATION = 5;
+
+	/**
 	 * The number of structural features of the '<em>Trace Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION_FEATURE_COUNT = 5;
+	int TRACE_CONFIGURATION_FEATURE_COUNT = 6;
 
 	/**
 	 * The number of operations of the '<em>Trace Configuration</em>' class.
@@ -972,6 +981,15 @@ public interface ConfigurationPackage extends EPackage {
 	 * @ordered
 	 */
 	int FILE_TRACE_CONFIGURATION__INTERVAL = TRACE_CONFIGURATION__INTERVAL;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FILE_TRACE_CONFIGURATION__LOCATION = TRACE_CONFIGURATION__LOCATION;
 
 	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
@@ -1401,6 +1419,17 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getTraceConfiguration_Interval();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getLocation <em>Location</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Location</em>'.
+	 * @see tools.descartes.librede.configuration.TraceConfiguration#getLocation()
+	 * @see #getTraceConfiguration()
+	 * @generated
+	 */
+	EAttribute getTraceConfiguration_Location();
 
 	/**
 	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}'.
@@ -2040,6 +2069,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference TRACE_CONFIGURATION__INTERVAL = eINSTANCE.getTraceConfiguration_Interval();
+
+		/**
+		 * The meta object literal for the '<em><b>Location</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TRACE_CONFIGURATION__LOCATION = eINSTANCE.getTraceConfiguration_Location();
 
 		/**
 		 * The meta object literal for the '<em><b>Data Source</b></em>' reference feature.

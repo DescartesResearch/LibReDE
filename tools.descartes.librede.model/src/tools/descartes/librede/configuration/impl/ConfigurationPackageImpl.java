@@ -535,6 +535,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getTraceConfiguration_Location() {
+		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getTraceConfiguration_DataSource() {
 		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(1);
 	}
@@ -911,6 +920,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__MAPPINGS);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__UNIT);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__INTERVAL);
+		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__LOCATION);
 
 		parameterEClass = createEClass(PARAMETER);
 		createEAttribute(parameterEClass, PARAMETER__NAME);
@@ -1049,6 +1059,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		g2 = createEGenericType(theUnitsPackage.getTime());
 		g1.getETypeArguments().add(g2);
 		initEReference(getTraceConfiguration_Interval(), g1, null, "interval", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTraceConfiguration_Location(), ecorePackage.getEString(), "location", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(parameterEClass, Parameter.class, "Parameter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getParameter_Name(), ecorePackage.getEString(), "name", null, 1, 1, Parameter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

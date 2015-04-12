@@ -61,6 +61,7 @@ import tools.descartes.librede.units.Unit;
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getLocation <em>Location</em>}</li>
  * </ul>
  *
  * @generated
@@ -115,6 +116,26 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected Quantity<Time> interval;
+
+	/**
+	 * The default value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocation()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCATION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocation()
+	 * @generated
+	 * @ordered
+	 */
+	protected String location = LOCATION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -261,6 +282,27 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getLocation() {
+		return location;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLocation(String newLocation) {
+		String oldLocation = location;
+		location = newLocation;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__LOCATION, oldLocation, location));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public DataSourceConfiguration getDataSource() {
 		if (dataSource != null && dataSource.eIsProxy()) {
 			InternalEObject oldDataSource = (InternalEObject)dataSource;
@@ -343,6 +385,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return basicGetUnit();
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return getInterval();
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				return getLocation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -372,6 +416,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval((Quantity<Time>)newValue);
 				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				setLocation((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -399,6 +446,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				setInterval((Quantity<Time>)null);
 				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				setLocation(LOCATION_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -421,8 +471,26 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return unit != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return interval != null;
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (location: ");
+		result.append(location);
+		result.append(')');
+		return result.toString();
 	}
 
 } //TraceConfigurationImpl

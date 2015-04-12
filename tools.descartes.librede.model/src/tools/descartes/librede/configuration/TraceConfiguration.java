@@ -51,6 +51,7 @@ import tools.descartes.librede.units.Unit;
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getLocation <em>Location</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration()
@@ -135,6 +136,32 @@ public interface TraceConfiguration extends EObject {
 	 * @generated
 	 */
 	void setInterval(Quantity<Time> value);
+
+	/**
+	 * Returns the value of the '<em><b>Location</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Location</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Location</em>' attribute.
+	 * @see #setLocation(String)
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Location()
+	 * @model required="true"
+	 * @generated
+	 */
+	String getLocation();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getLocation <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Location</em>' attribute.
+	 * @see #getLocation()
+	 * @generated
+	 */
+	void setLocation(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Data Source</b></em>' reference.
