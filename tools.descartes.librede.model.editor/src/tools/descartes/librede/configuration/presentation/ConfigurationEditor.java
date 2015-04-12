@@ -831,6 +831,7 @@ public class ConfigurationEditor
 			// Load the resource through the editing domain.
 			//
 			resource = editingDomain.getResourceSet().getResource(resourceURI, true);
+			EcoreUtil.resolveAll(resource);
 		}
 		catch (Exception e) {
 			exception = e;
