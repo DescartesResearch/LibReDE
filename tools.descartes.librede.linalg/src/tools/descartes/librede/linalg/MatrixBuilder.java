@@ -29,6 +29,7 @@ package tools.descartes.librede.linalg;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MatrixBuilder {
@@ -48,7 +49,7 @@ public class MatrixBuilder {
 		if (values.length != columns) {
 			throw new IllegalArgumentException();
 		}
-		buffer.add(values);
+		buffer.add(Arrays.copyOf(values, values.length));
 	}
 	
 	public Matrix toMatrix() {
