@@ -28,9 +28,12 @@ package tools.descartes.librede.datasource;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 
 /**
  * This interface provides common methods supported by all data source
@@ -63,7 +66,7 @@ public interface IDataSource extends Closeable {
 	public void open() throws IOException;
 
 	/**
-	 * Loads the specified trace into this data source. The data source will
+	 * Adds the specified trace into this data source. The data source will
 	 * monitor for new data until this data source is closed.
 	 * 
 	 * @param configuration
@@ -72,7 +75,9 @@ public interface IDataSource extends Closeable {
 	 * @throws IOException
 	 *             thrown if the data source cannot read this trace.
 	 */
-	public List<TraceKey> load(TraceConfiguration configuration) throws IOException;
+	public List<TraceKey> addTrace(TraceConfiguration configuration) throws IOException;
+	
+	public void load() throws IOException;
 
 	/**
 	 * Add a data source listener.

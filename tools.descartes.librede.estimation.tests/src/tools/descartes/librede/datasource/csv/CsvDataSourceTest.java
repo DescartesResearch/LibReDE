@@ -108,7 +108,7 @@ public class CsvDataSourceTest extends LibredeTest {
 		for (int i = 0; i < services.length; i++) {
 			TraceToEntityMapping mapping = ConfigurationFactory.eINSTANCE.createTraceToEntityMapping();
 			mapping.setEntity(services[i]);
-			mapping.setTraceColumn(i);
+			mapping.setTraceColumn(i + 1);
 			configuration.getMappings().add(mapping);
 		}
 		return configuration;
@@ -118,8 +118,9 @@ public class CsvDataSourceTest extends LibredeTest {
 	public void testOneFilePreloadedSmall() throws IOException, InterruptedException {
 		// add data before registering the file with the data source
 		// to test whether existing data is also read.
-		Matrix refData = writeData(file1, 256, 10, 0);		
-		dataSource.load(configuration1);
+		Matrix refData = writeData(file1, 256, 10, 0);
+		dataSource.addTrace(configuration1);
+		dataSource.load();
 		
 		TraceEvent event;
 		TimeSeries[] data = new TimeSeries[services.length];
@@ -134,8 +135,9 @@ public class CsvDataSourceTest extends LibredeTest {
 	public void testOneFilePreloadedLarge() throws IOException, InterruptedException {
 		// add data before registering the file with the data source
 		// to test whether existing data is also read.
-		Matrix refData = writeData(file1, 32000, 10, 0);		
-		dataSource.load(configuration1);
+		Matrix refData = writeData(file1, 32000, 10, 0);
+		dataSource.addTrace(configuration1);
+		dataSource.load();
 		
 		TraceEvent event;
 		TimeSeries[] data = new TimeSeries[services.length];
@@ -150,8 +152,9 @@ public class CsvDataSourceTest extends LibredeTest {
 	public void testOneFileContinuous() throws IOException, InterruptedException {
 		// add data before registering the file with the data source
 		// to test whether existing data is also read.
-		Matrix refData = writeData(file1, 256, 10, 0);		
-		dataSource.load(configuration1);
+		Matrix refData = writeData(file1, 256, 10, 0);
+		dataSource.addTrace(configuration1);
+		dataSource.load();
 		
 		for (int i = 0; i < 3; i++) {
 			TraceEvent event;
@@ -173,8 +176,9 @@ public class CsvDataSourceTest extends LibredeTest {
 	public void testMultipleFiles() throws IOException, InterruptedException {
 		Matrix refData1 = writeData(file1, 256, 10, 0);
 		Matrix refData2 = writeData(file2, 256, 10, 0);
-		dataSource.load(configuration1);
-		dataSource.load(configuration2);
+		dataSource.addTrace(configuration1);
+		dataSource.addTrace(configuration2);
+		dataSource.load();
 
 		for (int i = 0; i < 3; i++) {
 			TraceEvent event;
@@ -204,8 +208,9 @@ public class CsvDataSourceTest extends LibredeTest {
 		// This test only writes in one of the file, letting the other to timeout.
 		Matrix refData1 = writeData(file1, 512, 10, 0);
 		writeData(file2, 512, 10, 0);
-		dataSource.load(configuration1);
-		dataSource.load(configuration2);
+		dataSource.addTrace(configuration1);
+		dataSource.addTrace(configuration2);
+		dataSource.load();
 
 		for (int i = 0; i < 3; i++) {
 			TraceEvent event;

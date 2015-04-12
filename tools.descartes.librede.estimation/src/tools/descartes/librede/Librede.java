@@ -171,10 +171,14 @@ public class Librede {
 				}
 				IDataSource source = dataSources.get(dataSourceName);
 				try {
-					source.load(trace);
+					source.addTrace(trace);
 				} catch(IOException ex) {
 					log.error("Error loading data.", ex);
 				}
+			}
+			
+			for (IDataSource ds : dataSources.values()) {
+				ds.load();
 			}
 			
 			TraceEvent curEvent = null;

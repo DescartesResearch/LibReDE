@@ -71,7 +71,7 @@ import tools.descartes.librede.units.UnitsFactory;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public abstract class AbstractFileDataSource implements IDataSource {
+public abstract class AbstractFileDataSource extends AbstractDataSource {
 
 	/**
 	 * The maximum number of bytes that are read into a buffer at once.
@@ -225,7 +225,7 @@ public abstract class AbstractFileDataSource implements IDataSource {
 					channelCurrentTime = UnitsFactory.eINSTANCE.createQuantity(newData.getEndTime(), Time.SECONDS);
 				}
 				TraceEvent event = new TraceEvent(trace.getKey(), newData, channelCurrentTime);
-				notifyListeners(channelCurrentTime, event);
+				notifyListeners(event);
 			}
 		}
 
@@ -355,16 +355,11 @@ public abstract class AbstractFileDataSource implements IDataSource {
 		}
 	}
 
-	@ParameterDefinition(name = "Timeout", label = "Timeout (after specified number of samples are missing)", required = false, defaultValue = "5")
-	private int timeout = 5;
-
 	private WatchThread parser;
-	private List<IDataSourceListener> listeners = new LinkedList<IDataSourceListener>(); 
 
 	public void open() throws IOException {
 		this.parser = new WatchThread();
 		this.parser.setDaemon(true);
-		this.parser.start();
 	}
 
 	public void close() throws IOException {
@@ -379,7 +374,7 @@ public abstract class AbstractFileDataSource implements IDataSource {
 		this.parser = null;
 	}
 
-	public List<TraceKey> load(TraceConfiguration configuration) throws IOException {
+	public List<TraceKey> addTrace(TraceConfiguration configuration) throws IOException {
 		if (parser == null) {
 			throw new IllegalStateException();
 		}
@@ -402,24 +397,18 @@ public abstract class AbstractFileDataSource implements IDataSource {
 			for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
 				TraceKey k = new TraceKey(fileTrace.getMetric(), fileTrace.getUnit(), fileTrace.getInterval(),
 						mapping.getEntity());
-				channel.addTrace(k, mapping.getTraceColumn());
+				channel.addTrace(k, mapping.getTraceColumn() - 1);
 				keys.add(k);
 			}
-			parser.poll();
 			return keys;
 		} else {
 			throw new FileNotFoundException(inputFile.toString());
 		}
 	}
-
-	@Override
-	public void addListener(IDataSourceListener listener) {
-		listeners.add(listener);		
-	}
 	
-	@Override
-	public void removeListener(IDataSourceListener listener) {
-		listeners.remove(listener);		
+	public void load() {
+		parser.start();
+		parser.poll();
 	}
 
 	/**
@@ -451,10 +440,4 @@ public abstract class AbstractFileDataSource implements IDataSource {
 	 *             if the line cannot be parsed correctly
 	 */
 	protected abstract double parse(File file, String line, double[] values) throws ParseException;
-	
-	private void notifyListeners(Quantity<Time> latestObservationTime, TraceEvent e) {
-		for (IDataSourceListener listener : listeners) {
-			listener.dataAvailable(this, e);
-		}
-	}
 }

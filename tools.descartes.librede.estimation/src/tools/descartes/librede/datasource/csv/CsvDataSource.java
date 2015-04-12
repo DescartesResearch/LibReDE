@@ -149,11 +149,13 @@ public class CsvDataSource extends AbstractFileDataSource {
 		if (numberFormat == null) {
 			numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
 		}
-		try {
-			return numberFormat.parse(number.trim()).doubleValue();
-		} catch(ParseException ex) {
-			logDiagnosis(file, "Error parsing number: " + number);
-		}	
+		if (!number.isEmpty()) {
+			try {
+				return numberFormat.parse(number.trim()).doubleValue();
+			} catch(ParseException ex) {
+				logDiagnosis(file, "Error parsing number: " + number);
+			}
+		}
 		return Double.NaN;
 	}
 	
