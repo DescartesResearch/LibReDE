@@ -116,7 +116,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 			}
 			if (!isApplicable) {
 				ignoredResources.addAll(a.getStateModel().getResources());
-				ignoredServices.addAll(a.getStateModel().getServices());				
+				ignoredServices.addAll(a.getStateModel().getAllServices());				
 				algorithms.remove(a);
 			}
 		}

@@ -83,7 +83,7 @@ public class TargetUtilizationInitializerTest extends LibredeTest {
 			assertThat(initialDemands.get(i)).isEqualTo(initialDemands.get(i - 1), offset(1e-9));
 		}
 		
-		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
 		
 		for (int i = 0; i < 4; i++) {
 			double util = initialDemands.slice(range(i * 5, (i + 1) * 5)).dot(throughput);

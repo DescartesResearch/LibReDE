@@ -87,7 +87,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		variables = zeros(stateModel.getStateSize());
 		varFocusedRange = stateModel.getStateVariableIndexRange(resource);
 		
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	

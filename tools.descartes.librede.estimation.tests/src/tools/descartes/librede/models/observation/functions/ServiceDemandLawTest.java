@@ -69,8 +69,8 @@ public class ServiceDemandLawTest extends LibredeTest {
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
-		service = generator.getStateModel().getServices().get(SERVICE_IDX);
+		resource = generator.getStateModel().getResource(RESOURCE_IDX);
+		service = generator.getStateModel().getService(SERVICE_IDX);
 		
 		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
@@ -81,8 +81,8 @@ public class ServiceDemandLawTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
-		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		
 		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));

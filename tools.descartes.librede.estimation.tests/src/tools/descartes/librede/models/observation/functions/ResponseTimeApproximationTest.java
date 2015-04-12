@@ -72,8 +72,8 @@ public class ResponseTimeApproximationTest extends LibredeTest {
 
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
-		service = generator.getStateModel().getServices().get(SERVICE_IDX);
+		resource = generator.getStateModel().getResource(RESOURCE_IDX);
+		service = generator.getStateModel().getService(SERVICE_IDX);
 		stateIdx = generator.getStateModel().getStateVariableIndex(resource, service);
 		
 		law = new ResponseTimeApproximation(generator.getStateModel(), cursor, resource, service, Aggregation.AVERAGE);

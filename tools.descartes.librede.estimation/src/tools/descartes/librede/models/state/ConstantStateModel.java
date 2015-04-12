@@ -108,6 +108,8 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 	
 	private final int stateSize;
+	private final List<Service> userServices;
+	private final List<Service> backgroundServices;
 	private final List<Service> services;
 	private final List<Resource> resources;
 	private final Map<Resource, Integer> resourcesToIdx;
@@ -127,6 +129,8 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		// Determine all resources and services contained in this state model
 		resources = new ArrayList<Resource>();
 		services = new ArrayList<Service>();
+		userServices = new ArrayList<Service>();
+		backgroundServices = new ArrayList<Service>();
 		resourcesToIdx = new HashMap<Resource, Integer>();
 		servicesToIdx = new HashMap<Service, Integer>();
 		for (StateVariable v : variables) {
@@ -135,6 +139,11 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 				resourcesToIdx.put(v.getResource(), resources.size() - 1);
 			}
 			if (!servicesToIdx.containsKey(v.getService())) {
+				if (v.getService().isBackgroundService()) {
+					backgroundServices.add(v.getService());
+				} else {
+					userServices.add(v.getService());
+				}
 				services.add(v.getService());
 				servicesToIdx.put(v.getService(), services.size() - 1);
 			}
@@ -246,10 +255,20 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public List<Service> getServices() {
+	public List<Service> getAllServices() {
 		return services;
 	}
+	
+	@Override
+	public List<Service> getBackgroundServices() {
+		return backgroundServices;
+	}
 
+	@Override
+	public List<Service> getUserServices() {
+		return userServices;
+	}
+	
 	@Override
 	public Resource getResource(int stateVariableIdx) {
 		return variables.get(stateVariableIdx).getResource();

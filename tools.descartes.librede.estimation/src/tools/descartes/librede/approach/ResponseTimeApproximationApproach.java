@@ -71,7 +71,7 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		Resource resource = stateModel.getResources().toArray(new Resource[1])[0];
 		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
-		for (Service service : stateModel.getServices()) {
+		for (Service service : stateModel.getUserServices()) {
 			ResponseTimeApproximation func = new ResponseTimeApproximation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
 			observationModel.addOutputFunction(func);
 		}

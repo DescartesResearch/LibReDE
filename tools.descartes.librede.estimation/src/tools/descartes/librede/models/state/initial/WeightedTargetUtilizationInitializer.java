@@ -61,8 +61,8 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 
 	@Override
 	public Vector getInitialValue(IStateModel<?> stateModel) {
-		Query<Vector, Time> respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getServices()).average().using(cursor);
-		Query<Vector, RequestRate> throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(cursor);
+		Query<Vector, Time> respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(cursor);
+		Query<Vector, RequestRate> throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(cursor);
 
 		int resourceCount = stateModel.getResources().size();
 		

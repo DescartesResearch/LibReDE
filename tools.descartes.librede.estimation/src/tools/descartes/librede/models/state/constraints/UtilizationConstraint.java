@@ -107,7 +107,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(cursor);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(cursor);
 	}
 
 }

@@ -100,7 +100,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 //		precalculateFactorials(maxParallel);
 		
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 	}
 	
 	/* (non-Javadoc)

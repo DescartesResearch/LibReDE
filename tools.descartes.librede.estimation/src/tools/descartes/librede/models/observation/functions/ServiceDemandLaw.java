@@ -101,8 +101,8 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		cls_r = service;
 		
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-		avgResponseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getServices()).average().using(repository);
-		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(repository);
+		avgResponseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
+		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
 	}
 	

@@ -43,7 +43,11 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	List<Resource> getResources();
 	
-	List<Service> getServices();
+	List<Service> getAllServices();
+	
+	List<Service> getBackgroundServices();
+	
+	List<Service> getUserServices();
 
 	Range getStateVariableIndexRange(Resource res);
 	
