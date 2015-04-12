@@ -81,8 +81,8 @@ public class ServiceDemandLawTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor).execute();
-		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(cursor).execute();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
+		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		
 		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));

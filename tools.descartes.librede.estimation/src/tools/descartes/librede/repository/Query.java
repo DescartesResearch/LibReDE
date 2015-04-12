@@ -55,16 +55,14 @@ public final class Query<T extends Vector, D extends Dimension> {
 	private IRepositoryCursor repositoryCursor;
 	
 	protected Query(Aggregation aggregation, Type type, Metric<D> metric, Unit<D> unit,
-			ModelEntity entity, IRepositoryCursor repositoryCursor) {
+			List<ModelEntity> entities, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
 		this.type = type;
 		this.metric = metric;
 		this.unit = unit;
 		this.repositoryCursor = repositoryCursor;
-		if (entity != null) {
-			entities.add(entity);
-		}
+		this.entities = entities;
 	}
 
 	public Aggregation getAggregation() {
@@ -84,10 +82,6 @@ public final class Query<T extends Vector, D extends Dimension> {
 	}
 	
 	public T execute() {		
-		if (entities.isEmpty()) {
-			load();
-		}
-		
 		if (entities.size() > 1) {
 			Vector result = vector(entities.size(), new VectorFunction() {				
 				@Override
@@ -116,14 +110,6 @@ public final class Query<T extends Vector, D extends Dimension> {
 	public List<? extends ModelEntity> getEntities() {
 		return Collections.unmodifiableList(entities);
 	}	
-	
-	private void load() {
-		if (type == Type.ALL_RESOURCES) {
-			entities.addAll(repositoryCursor.getRepository().listResources());
-		} else if (type == Type.ALL_SERVICES) {
-			entities.addAll(repositoryCursor.getRepository().listServices());
-		}		
-	}
 
 	public boolean hasData() {
 		return repositoryCursor.hasData(metric, entities, aggregation);

@@ -77,10 +77,10 @@ public class WeightedTargetUtilizationInitializerTest extends LibredeTest {
 		generator.nextObservation();
 		cursor.next();
 		
-		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(4, 0.5, cursor);
-		Vector initialDemands = initializer.getInitialValue();
+		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
+		Vector initialDemands = initializer.getInitialValue(generator.getStateModel());
 		
-		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor).execute();
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
 		
 		for (int i = 0; i < 4; i++) {
 			double util = initialDemands.slice(range(i * 5, (i + 1) * 5)).dot(throughput);

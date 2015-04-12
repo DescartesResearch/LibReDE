@@ -66,8 +66,7 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 				builder.addVariable(res, serv);
 			}
 		}
-		int stateSize = workload.getResources().size() * workload.getServices().size();
-		builder.setStateInitializer(new TargetUtilizationInitializer(stateSize, INITIAL_UTILIZATION, cursor));
+		builder.setStateInitializer(new TargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 

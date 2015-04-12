@@ -76,7 +76,7 @@ public class UtilizationLawTest extends LibredeTest {
 
 	@Test
 	public void testGetIndependentVariables() {
-		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor).execute();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getServices()).average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();		
 		Vector expectedVarVector = zeros(state.rows()).set(generator.getStateModel().getStateVariableIndexRange(resource), x);
 		

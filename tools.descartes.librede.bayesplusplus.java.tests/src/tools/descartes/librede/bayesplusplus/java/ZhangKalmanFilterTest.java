@@ -79,7 +79,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
-		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(1, 0.5, cursor));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();		
@@ -121,7 +121,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		for (Service service : workload.getServices()) {
 			builder.addVariable(workload.getResources().get(0), service);
 		}
-		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(1, 0.5, cursor));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();

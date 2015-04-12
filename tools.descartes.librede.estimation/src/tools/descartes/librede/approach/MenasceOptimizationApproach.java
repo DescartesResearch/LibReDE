@@ -69,7 +69,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 				builder.addVariable(res, service);
 			}
 		}
-		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(workload.getResources().size(), INITIAL_UTILIZATION, cursor));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 	

@@ -49,12 +49,13 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
+	private IRepositoryCursor cursor;
+	
 	private Query<Vector, RequestRate> throughputQuery;
 	
-	public UtilizationConstraint(Resource resource, IRepositoryCursor repository) {
+	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor) {
 		this.res_i = resource;
-		
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(repository);
+		this.cursor = cursor;
 	}
 	
 	@Override
@@ -106,6 +107,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(cursor);
 	}
 
 }

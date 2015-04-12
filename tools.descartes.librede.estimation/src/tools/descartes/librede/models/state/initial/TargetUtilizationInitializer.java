@@ -28,9 +28,15 @@ package tools.descartes.librede.models.state.initial;
 
 import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+
+import java.util.List;
+
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -50,27 +56,24 @@ import tools.descartes.librede.units.RequestRate;
  */
 public class TargetUtilizationInitializer implements IStateInitializer {
 
-	private Query<Vector, RequestRate> throughput;
 	private final double targetUtilization;
-	private final int stateSize;
+	private final IRepositoryCursor cursor;
 
 	/**
-	 * @param stateSize the state size of the state model
 	 * @param targetUtilization the requested initial target utilization
 	 * @param cursor handle to the monitoring data
 	 */
-	public TargetUtilizationInitializer(int stateSize, double targetUtilization, IRepositoryCursor cursor) {
-		this.stateSize = stateSize;
+	public TargetUtilizationInitializer(double targetUtilization, IRepositoryCursor cursor) {
+		this.cursor = cursor;
 		this.targetUtilization = targetUtilization;
-
-		throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor);
 	}
 
 	@Override
-	public Vector getInitialValue() {
+	public Vector getInitialValue(IStateModel<?> stateModel) {
+		Query<Vector, RequestRate> throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(cursor);
 		double totalThroughput = sum(throughput.execute());
 		final double initialDemand = targetUtilization / totalThroughput;
-		return vector(stateSize, new VectorFunction() {
+		return vector(stateModel.getStateSize(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
 				return initialDemand;

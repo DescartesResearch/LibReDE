@@ -27,6 +27,7 @@
 package tools.descartes.librede.models.state.initial;
 
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.state.IStateModel;
 
 /**
  * This is a simple implementation of IStateInitializer that simply returns a
@@ -46,7 +47,7 @@ public class PredefinedStateInitializer implements IStateInitializer {
 	}
 
 	@Override
-	public Vector getInitialValue() {
+	public Vector getInitialValue(IStateModel<?> stateModel) {
 		return initialState;
 	}
 

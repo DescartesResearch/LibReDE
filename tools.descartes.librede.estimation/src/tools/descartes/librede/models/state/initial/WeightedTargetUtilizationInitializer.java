@@ -30,6 +30,7 @@ import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.repmat;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -50,22 +51,21 @@ import tools.descartes.librede.units.Time;
  */
 public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 
+	private final IRepositoryCursor cursor;
 	private final double targetUtilization;
-	private Query<Vector, Time> respTime;
-	private Query<Vector, RequestRate> throughput;
-	private final int resourceCount;
 
-	public WeightedTargetUtilizationInitializer(int resourceCount, double targetUtilization, IRepositoryCursor cursor) {
+	public WeightedTargetUtilizationInitializer(double targetUtilization, IRepositoryCursor cursor) {
+		this.cursor = cursor;
 		this.targetUtilization = targetUtilization;
-
-		respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forAllServices().average().using(cursor);
-		throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forAllServices().average().using(cursor);
-
-		this.resourceCount = resourceCount;
 	}
 
 	@Override
-	public Vector getInitialValue() {
+	public Vector getInitialValue(IStateModel<?> stateModel) {
+		Query<Vector, Time> respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getServices()).average().using(cursor);
+		Query<Vector, RequestRate> throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getServices()).average().using(cursor);
+
+		int resourceCount = stateModel.getResources().size();
+		
 		Vector initialDemands = respTime.execute();
 		for (int i = 0; i < initialDemands.rows(); i++) {
 			if (Double.isNaN(initialDemands.get(i))) {

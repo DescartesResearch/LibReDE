@@ -26,6 +26,11 @@
  */
 package tools.descartes.librede.repository;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
@@ -42,7 +47,7 @@ public class QueryBuilder<D extends Dimension> {
 	private Query.Type type;
 	private Metric<D> metric;
 	private Unit<D> unit;
-	private ModelEntity entity;
+	private List<ModelEntity> entities = new LinkedList<>();
 	private Aggregation aggregation;
 	
 	private QueryBuilder(Metric<D> metric) {
@@ -65,25 +70,33 @@ public class QueryBuilder<D extends Dimension> {
 	
 		public ForClause forResource(Resource resource) {
 			type = Type.RESOURCE;
-			entity = resource;
+			entities.add(resource);
 			return new ForClause();
 		}
 		
 		public ForClause forService(Service cls) {
 			type = Type.SERVICE;
-			entity = cls;
+			entities.add(cls);
 			return new ForClause();
 		}
 		
-		public ForAllClause forAllServices() {
+		public ForAllClause forServices(Service...services) {
+			return forServices(Arrays.asList(services));
+		}
+		
+		public ForAllClause forServices(Collection<? extends Service> services) {
 			type = Type.ALL_SERVICES;
-			entity = null;
+			entities.addAll(services);
 			return new ForAllClause();
 		}
 		
-		public ForAllClause forAllResources() {
+		public ForAllClause forResources(Resource...resources) {
+			return forResources(Arrays.asList(resources));
+		}
+		
+		public ForAllClause forResources(Collection<? extends Resource> resources) {
 			type = Type.ALL_RESOURCES;
-			entity = null;
+			entities.addAll(resources);
 			return new ForAllClause();
 		}
 		
@@ -140,7 +153,7 @@ public class QueryBuilder<D extends Dimension> {
 	
 	public class UsingClause<T extends Vector> {
 		public Query<T, D> using(IRepositoryCursor repository) {
-			return new Query<T, D>(aggregation, type, metric, unit, entity, repository);
+			return new Query<T, D>(aggregation, type, metric, unit, entities, repository);
 		}
 	}
 	

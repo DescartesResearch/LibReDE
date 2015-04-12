@@ -27,6 +27,7 @@
 package tools.descartes.librede.models.state.initial;
 
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.state.IStateModel;
 
 /**
  * This interface allows to implement the logic for determining the initial
@@ -42,10 +43,13 @@ public interface IStateInitializer {
 	 * Called to initialized the state model with initial values of the resource
 	 * demands.
 	 * 
+	 * @param stateModel
+	 *            the state model to be initialized
+	 * 
 	 * @return a Vector containing the initial value for all state variables or
 	 *         an empty vector if the initial value could not be determined
 	 *         (e.g., due to missing observations)
 	 */
-	Vector getInitialValue();
+	Vector getInitialValue(IStateModel<?> stateModel);
 
 }
