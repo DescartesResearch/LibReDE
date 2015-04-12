@@ -143,7 +143,12 @@ public class Librede {
 			}			
 		} else {
 			try {
-				List<ResultTable[]> results = runEstimationWithCrossValidation(conf, repo);
+				List<ResultTable[]> results;
+				if (conf.getValidation().getValidationFolds() <= 2) {
+					results = runEstimationWithValidation(conf, repo);
+				} else {
+					results = runEstimationWithCrossValidation(conf, repo);
+				}				
 				printSummary(results);
 				exportResults(conf, results);
 			} catch (Exception e) {
@@ -237,6 +242,58 @@ public class Librede {
 			results.add(new ResultTable[] {estimates});
 		}
 		return results;
+	}
+	
+	public static List<ResultTable[]> runEstimationWithValidation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {
+		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory(conf);
+		
+		List<ResultTable[]> results = new ArrayList<ResultTable[]>();
+		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
+			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize());
+			
+			IEstimationApproach currentApproach;
+			try {
+				Class<?> cl = Registry.INSTANCE.getInstanceClass(currentConf.getType());
+				currentApproach = (IEstimationApproach) Instantiator.newInstance(cl, currentConf.getParameters());
+			} catch(Exception ex) {
+				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
+				continue;
+			}
+			
+			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
+			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
+				Class<?> cl = Registry.INSTANCE.getInstanceClass(validator.getType());
+				IValidator val = (IValidator) Instantiator.newInstance(cl, validator.getParameters());
+				val.initialize(conf.getWorkloadDescription(), cursor);
+				validators.add(val);
+			}
+			
+			ResultTable estimates = initAndExecuteEstimation(currentApproach, 
+					repository.getWorkload(), 
+					conf.getEstimation().getWindow(), 
+					conf.getEstimation().isRecursive(), 
+					cursor, algoFactory);
+			if (estimates.getEstimates().isEmpty()) {
+				break;
+			}
+			Vector state = estimates.getLastEstimates();
+			IRepositoryCursor validatingCursor = repository.getCursor(conf.getEstimation().getEndTimestamp().minus(conf.getEstimation().getStepSize().times(5)), 
+					conf.getEstimation().getStepSize());
+				
+			while(validatingCursor.next()) {
+				for (IValidator validator : validators) {
+					validator.predict(state);
+				}
+			}
+			
+			for (IValidator validator : validators) {
+				estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
+				estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
+			}				
+			results.add(new ResultTable[] {estimates});
+		}
+		return results;	
 	}
 	
 	public static List<ResultTable[]> runEstimationWithCrossValidation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {

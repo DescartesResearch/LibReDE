@@ -133,7 +133,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private Matrix estimationBuffer;
 	
 	// Flag indicating whether this is the first iteration.
-	private boolean initialized = true;
+	private boolean initialized = false;
 	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
@@ -178,7 +178,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 			Vector initialState = getStateModel().getInitialState();
 			if (!initialState.isEmpty()) {
 				copy(initialState, x);
-				initialized = false;
+				initialized = true;
 			}
 		}
 		
@@ -254,7 +254,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 //				IpoptOptionValue.YES.toNativeString());
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundsInfValue);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);		
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.MAX_ITER.toNativeString(), 300);
 	}
 
 	private void setOptimizationConstraints() {
