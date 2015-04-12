@@ -34,11 +34,44 @@ package tools.descartes.librede.configuration;
  * A representation of the model object '<em><b>Service</b></em>'.
  * <!-- end-user-doc -->
  *
+ * <p>
+ * The following features are supported:
+ * </p>
+ * <ul>
+ *   <li>{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}</li>
+ * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getService()
  * @model
  * @generated
  */
 public interface Service extends ModelEntity {
+
+	/**
+	 * Returns the value of the '<em><b>Background Service</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Background Service</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Background Service</em>' attribute.
+	 * @see #setBackgroundService(boolean)
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_BackgroundService()
+	 * @model default="false"
+	 * @generated
+	 */
+	boolean isBackgroundService();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Background Service</em>' attribute.
+	 * @see #isBackgroundService()
+	 * @generated
+	 */
+	void setBackgroundService(boolean value);
 
 } // Service

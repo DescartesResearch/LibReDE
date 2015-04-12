@@ -605,13 +605,22 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE__NAME = MODEL_ENTITY__NAME;
 
 	/**
+	 * The feature id for the '<em><b>Background Service</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__BACKGROUND_SERVICE = MODEL_ENTITY_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Service</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 0;
+	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Service</em>' class.
@@ -1378,6 +1387,17 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getService();
 
 	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Background Service</em>'.
+	 * @see tools.descartes.librede.configuration.Service#isBackgroundService()
+	 * @see #getService()
+	 * @generated
+	 */
+	EAttribute getService_BackgroundService();
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2035,6 +2055,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EClass SERVICE = eINSTANCE.getService();
+
+		/**
+		 * The meta object literal for the '<em><b>Background Service</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SERVICE__BACKGROUND_SERVICE = eINSTANCE.getService_BackgroundService();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.

@@ -46,7 +46,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="schedulingStrategy" eType="#//SchedulingStrategy"
         defaultValueLiteral="Unkown"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Service" eSuperTypes="#//ModelEntity"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Service" eSuperTypes="#//ModelEntity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backgroundService" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="SchedulingStrategy">
     <eLiterals name="FCFS"/>
     <eLiterals name="PS"/>

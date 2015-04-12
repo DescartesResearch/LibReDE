@@ -499,6 +499,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getService_BackgroundService() {
+		return (EAttribute)serviceEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTraceConfiguration() {
 		return traceConfigurationEClass;
 	}
@@ -913,6 +922,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEAttribute(resourceEClass, RESOURCE__SCHEDULING_STRATEGY);
 
 		serviceEClass = createEClass(SERVICE);
+		createEAttribute(serviceEClass, SERVICE__BACKGROUND_SERVICE);
 
 		traceConfigurationEClass = createEClass(TRACE_CONFIGURATION);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
@@ -1039,6 +1049,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEAttribute(getResource_SchedulingStrategy(), this.getSchedulingStrategy(), "schedulingStrategy", "Unkown", 0, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(serviceEClass, Service.class, "Service", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getService_BackgroundService(), ecorePackage.getEBoolean(), "backgroundService", "false", 0, 1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		EGenericType g1 = createEGenericType(theMetricsPackage.getMetric());

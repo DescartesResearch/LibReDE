@@ -242,8 +242,8 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		
 		initTableFromEMF(tableComposite_1, tblViewerServices, 
 				Service.class, 
-				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME },
-				new String[] { "Name" });
+				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME, ConfigurationPackage.Literals.SERVICE__BACKGROUND_SERVICE },
+				new String[] { "Name", "Background Service" });
 		
 		btnNewClass = new Button(wclComposite, SWT.NONE);
 		GridData gd_btnNewClass = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);

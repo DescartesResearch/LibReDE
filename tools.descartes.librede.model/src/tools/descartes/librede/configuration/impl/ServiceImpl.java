@@ -28,8 +28,10 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Service;
 
@@ -37,10 +39,35 @@ import tools.descartes.librede.configuration.Service;
  * <!-- begin-user-doc -->
  * An implementation of the model object '<em><b>Service</b></em>'.
  * <!-- end-user-doc -->
+ * <p>
+ * The following features are implemented:
+ * </p>
+ * <ul>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#isBackgroundService <em>Background Service</em>}</li>
+ * </ul>
  *
  * @generated
  */
 public class ServiceImpl extends ModelEntityImpl implements Service {
+	/**
+	 * The default value of the '{@link #isBackgroundService() <em>Background Service</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isBackgroundService()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean BACKGROUND_SERVICE_EDEFAULT = false;
+	/**
+	 * The cached value of the '{@link #isBackgroundService() <em>Background Service</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isBackgroundService()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean backgroundService = BACKGROUND_SERVICE_EDEFAULT;
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -58,6 +85,101 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	@Override
 	protected EClass eStaticClass() {
 		return ConfigurationPackage.Literals.SERVICE;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isBackgroundService() {
+		return backgroundService;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setBackgroundService(boolean newBackgroundService) {
+		boolean oldBackgroundService = backgroundService;
+		backgroundService = newBackgroundService;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.SERVICE__BACKGROUND_SERVICE, oldBackgroundService, backgroundService));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
+				return isBackgroundService();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
+				setBackgroundService((Boolean)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
+				setBackgroundService(BACKGROUND_SERVICE_EDEFAULT);
+				return;
+		}
+		super.eUnset(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
+				return backgroundService != BACKGROUND_SERVICE_EDEFAULT;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (backgroundService: ");
+		result.append(backgroundService);
+		result.append(')');
+		return result.toString();
 	}
 
 } //ServiceImpl
