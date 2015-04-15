@@ -33,6 +33,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
@@ -63,7 +64,9 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			builder.addConstraint(new UtilizationConstraint(res, cursor));
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				builder.addConstraint(new UtilizationConstraint(res, cursor));
+			}
 			for (Service service : workload.getServices()) {
 				builder.addConstraint(new StateBoundsConstraint(res, service, 0, Double.POSITIVE_INFINITY));
 				builder.addVariable(res, service);

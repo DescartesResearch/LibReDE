@@ -33,6 +33,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
@@ -79,8 +80,10 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 		}
 
 		for (Resource res : stateModel.getResources()) {
-			UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
-			observationModel.addOutputFunction(func);
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
+				observationModel.addOutputFunction(func);
+			}
 		}
 		return observationModel;
 	}
