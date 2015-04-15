@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
 import tools.descartes.librede.datasource.AbstractFileDataSource;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 @Component(displayName = "CSV Data Source")
 public class CsvDataSource extends AbstractFileDataSource {
@@ -58,6 +60,8 @@ public class CsvDataSource extends AbstractFileDataSource {
 	private int readLines = 0;
 	private SimpleDateFormat timestampFormat;
 	private NumberFormat numberFormat;
+	private Unit<Time> dateUnit = Time.SECONDS;
+	private boolean initialized = false;
 	
 	public String getSeparators() {
 		return separators;
@@ -108,6 +112,24 @@ public class CsvDataSource extends AbstractFileDataSource {
 
 	@Override
 	protected double parse(File file, String line, double[] values) throws ParseException {
+		if (!initialized) {
+			if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
+				if (timestampFormatPattern.startsWith("[") && timestampFormatPattern.endsWith("]")) {
+					String unit = timestampFormatPattern.substring(1, timestampFormatPattern.length() - 1);
+					for (Unit<?> u : Time.INSTANCE.getUnits()) {
+						if (u.getSymbol().equalsIgnoreCase(unit)) {
+							dateUnit = (Unit<Time>)u;
+							break;
+						}
+					}
+				} else {
+					timestampFormat = new SimpleDateFormat(timestampFormatPattern);
+					dateUnit = Time.MILLISECONDS;
+				}
+			}
+			numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
+			initialized = true;
+		}
 		String[] fields = line.split(separators);
 		if (fields.length >= 1) {
 			double timestamp = getTimestamp(file, fields[0]);
@@ -130,25 +152,21 @@ public class CsvDataSource extends AbstractFileDataSource {
 	}
 
 	private double getTimestamp(File file, String timestamp) {
-		if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
-			timestampFormat = new SimpleDateFormat(timestampFormatPattern);
-		}
+		double time;
 		if (timestampFormat == null) {
-			return getNumber(file, timestamp);
+			time = getNumber(file, timestamp);
 		} else {
 			try {
-				return timestampFormat.parse(timestamp.trim()).getTime() / 1000.0;
+				time = timestampFormat.parse(timestamp.trim()).getTime();
 			} catch(ParseException ex) {
 				logDiagnosis(file, "Skipping line due to invalid timestamp: " + timestamp);
 			}
 			return Double.NaN;
 		}
+		return dateUnit.convertTo(time, Time.SECONDS);
 	}
 
 	private double getNumber(File file, String number) {
-		if (numberFormat == null) {
-			numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
-		}
 		if (!number.isEmpty()) {
 			try {
 				return numberFormat.parse(number.trim()).doubleValue();
