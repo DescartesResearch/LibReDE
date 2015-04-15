@@ -100,6 +100,10 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		res_i = resource;
 		cls_r = service;
 		
+		/*
+		 * IMPORTANT: The Service Demand Law is ignoring background services, as it has no information required to determine
+		 * the amount of background work relative to the user services.
+		 */
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 		avgResponseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);

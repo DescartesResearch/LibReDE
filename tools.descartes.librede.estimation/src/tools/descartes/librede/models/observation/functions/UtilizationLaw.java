@@ -69,7 +69,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	private final Query<Vector, RequestRate> throughputQuery;
 	private final Query<Scalar, Ratio> utilizationQuery;
 	
-	private final VectorBuilder variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
+	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
 	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
 	
 	/**
@@ -87,16 +87,14 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		
 		this.res_i = resource;
 		
-		variables = new VectorBuilder(stateModel.getStateSize());
-		// All background services a value of 1 as throughput
-		for (Service backgroundService : stateModel.getBackgroundServices()) {
-			int stateIdx = getStateModel().getStateVariableIndex(res_i, backgroundService);
-			variables.set(stateIdx, 1.0);
-		}
-		
+		variables = zeros(stateModel.getStateSize());;
 		varFocusedRange = stateModel.getStateVariableIndexRange(resource);
 		
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
+		/*
+		 * IMPORTANT: we query the throughput for all services (including background services). For background services
+		 * the repository should by default return 1 as throughput (i.e. constant background work).
+		 */
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getAllServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	
@@ -117,12 +115,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	@Override
 	public Vector getIndependentVariables() {
 		Vector X = throughputQuery.execute();
-		// copy the throughput to the corresponding place in the state vector
-		for (int i = 0; i < X.rows(); i++) {
-			int stateIdx = getStateModel().getStateVariableIndex(res_i, (Service)throughputQuery.getEntity(i));
-			variables.set(stateIdx, X.get(i));
-		}
-		return variables.toVector();
+		return variables.set(varFocusedRange, X);
 	}
 
 	/* (non-Javadoc)
