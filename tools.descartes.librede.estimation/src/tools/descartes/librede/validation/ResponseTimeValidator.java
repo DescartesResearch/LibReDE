@@ -38,6 +38,7 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
@@ -49,6 +50,9 @@ public class ResponseTimeValidator implements IValidator {
 	private List<ModelEntity> services;
 	private List<ResponseTimeEquation> respEq;
 	private MatrixBuilder allErrors;
+	private MatrixBuilder predictedRespTimes;
+	private MatrixBuilder observedRespTimes;
+	private ConstantStateModel<Unconstrained> stateModel;
 	
 	@Override
 	public void initialize(WorkloadDescription workload,
@@ -59,7 +63,7 @@ public class ResponseTimeValidator implements IValidator {
 				builder.addVariable(res, serv);
 			}
 		}
-		ConstantStateModel<Unconstrained> stateModel = builder.build(); 
+		this.stateModel = builder.build(); 
 		
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
@@ -67,19 +71,30 @@ public class ResponseTimeValidator implements IValidator {
 			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv));
 			services.add(srv);
 		}
-		allErrors = new MatrixBuilder(stateModel.getUserServices().size());		
+		allErrors = new MatrixBuilder(stateModel.getUserServices().size());	
+		predictedRespTimes = new MatrixBuilder(stateModel.getUserServices().size());	
+		observedRespTimes = new MatrixBuilder(stateModel.getUserServices().size());	
+	}
+	
+	@Override
+	public IStateModel<?> getStateModel() {
+		return stateModel;
 	}
 	
 	public void predict(Vector state) {
 		double[] relErr = new double[respEq.size()];
+		double[] real = new double[respEq.size()];
+		double[] actual = new double[respEq.size()];
 		int i = 0;
 		for (ResponseTimeEquation cur : respEq) {
-			double real = cur.getObservedOutput();
-			double actual = cur.getCalculatedOutput(state);
-			relErr[i] = Math.abs(actual - real) / real;
+			real[i] = cur.getObservedOutput();
+			actual[i] = cur.getCalculatedOutput(state);
+			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
 			i++;
 		}
-		allErrors.addRow(relErr);		
+		allErrors.addRow(relErr);
+		predictedRespTimes.addRow(actual);
+		observedRespTimes.addRow(real);
 	}
 	
 	public Vector getPredictionError() {
@@ -89,5 +104,15 @@ public class ResponseTimeValidator implements IValidator {
 	@Override
 	public List<ModelEntity> getModelEntities() {
 		return services;
+	}
+	
+	@Override
+	public Vector getObservedValues() {
+		return LinAlg.mean(observedRespTimes.toMatrix(), 0);
+	}
+	
+	@Override
+	public Vector getPredictedValues() {
+		return LinAlg.mean(predictedRespTimes.toMatrix(), 0);
 	}
 }
