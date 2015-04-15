@@ -28,8 +28,10 @@ package tools.descartes.librede.bayesplusplus;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.mean;
+import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
+import static tools.descartes.librede.nativehelper.NativeHelper.nativeMatrix;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
@@ -128,6 +130,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Pointer nativeStateModel = null;
 	private Pointer nativeScheme = null;
 	private Pointer stateBuffer;
+	private Pointer stateCovarianceBuffer;
 	
 	private void initNativeKalmanFilter(Vector initialState) throws EstimationException {
 		nativeScheme = BayesPlusPlusLibrary.create_covariance_scheme(stateSize);
@@ -138,11 +141,10 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 
 		toNative(stateBuffer, initialState);
 
-		Pointer covBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
 		Matrix initialCovariance = getInitialStateCovariance(initialState);
-		toNative(covBuffer, initialCovariance);
+		toNative(stateCovarianceBuffer, initialCovariance);
 
-		if (BayesPlusPlusLibrary.init_kalman(nativeScheme, stateBuffer, covBuffer, stateSize) == BayesPlusPlusLibrary.ERROR) {
+		if (BayesPlusPlusLibrary.init_kalman(nativeScheme, stateBuffer, stateCovarianceBuffer, stateSize) == BayesPlusPlusLibrary.ERROR) {
 			throw new EstimationException("Could not initialize kalman filter: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
@@ -222,6 +224,14 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		if (BayesPlusPlusLibrary.update(nativeScheme) == BayesPlusPlusLibrary.ERROR) {
 			throw new EstimationException("Error in update phase: " + BayesPlusPlusLibrary.get_last_error());
 		}
+		
+		// Symmetrize the state covariance matrix to avoid numberical instabilities
+		// See Optimal State Estimation by Dan Simon, page 140
+		BayesPlusPlusLibrary.get_X(nativeScheme, stateCovarianceBuffer);
+		Matrix P = nativeMatrix(stateSize, stateSize, stateCovarianceBuffer);
+		Matrix symP = (P.plus(transpose(P))).times(0.5);
+//		toNative(stateCovarianceBuffer, symP);
+//		BayesPlusPlusLibrary.set_X(nativeScheme, stateCovarianceBuffer, stateSize);
 	}
 
 	private Vector getCurrentEstimate() {		
@@ -271,6 +281,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		this.outputSize = observationModel.getOutputSize();
 		
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
+		this.stateCovarianceBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
 		
 		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
 	}
