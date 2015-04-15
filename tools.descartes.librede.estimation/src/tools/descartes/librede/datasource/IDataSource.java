@@ -28,12 +28,9 @@ package tools.descartes.librede.datasource;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import tools.descartes.librede.configuration.TraceConfiguration;
-import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.Time;
 
 /**
  * This interface provides common methods supported by all data source
@@ -45,25 +42,14 @@ import tools.descartes.librede.units.Time;
  * available measurement data points into an instance of a
  * {@link tools.descartes.librede.repository.IMonitoringRepository}.
  * 
- * The data source provides an asynchronous interface for reading the measurement
- * data similar to the asynchronous file operations from the NIO packages in the
- * java standard library.
+ * The data source provides an asynchronous interface for reading the
+ * measurement data similar to the asynchronous file operations from the NIO
+ * packages in the java standard library.
  * 
  * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  */
 public interface IDataSource extends Closeable {
-
-	/**
-	 * This method must be called at the beginning, to start reading and waiting
-	 * for measurement data. In order to stop reading again, you MUST call the
-	 * close() method.
-	 * 
-	 * @throws IOException
-	 *             thrown if an error occurred when reading from this data
-	 *             sources.
-	 */
-	public void open() throws IOException;
 
 	/**
 	 * Adds the specified trace into this data source. The data source will
@@ -76,17 +62,25 @@ public interface IDataSource extends Closeable {
 	 *             thrown if the data source cannot read this trace.
 	 */
 	public List<TraceKey> addTrace(TraceConfiguration configuration) throws IOException;
-	
+
+	/**
+	 * Starts loading the existing data in the data source and watches for new
+	 * data to become available until the data source is closed.
+	 * 
+	 * @throws IOException
+	 */
 	public void load() throws IOException;
 
 	/**
 	 * Add a data source listener.
+	 * 
 	 * @param listener
 	 */
 	public void addListener(IDataSourceListener listener);
 
 	/**
 	 * Remove a data source listener
+	 * 
 	 * @param listener
 	 */
 	public void removeListener(IDataSourceListener listener);

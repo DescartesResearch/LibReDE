@@ -36,7 +36,6 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;

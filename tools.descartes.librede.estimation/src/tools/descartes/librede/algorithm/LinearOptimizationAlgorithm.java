@@ -30,9 +30,7 @@ import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 
 public class LinearOptimizationAlgorithm extends AbstractEstimationAlgorithm {
 

@@ -27,6 +27,7 @@
 package tools.descartes.librede.datasource.csv;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,6 +52,10 @@ public class CsvDataSource extends AbstractFileDataSource {
 	@ParameterDefinition(name = "SkipFirstLine", label = "Skip First Line", required = false, defaultValue = "false")
 	private boolean skipFirstLine;
 	
+	/*
+	 * The timestamp format can be either a pattern as expected by java.util.SimpleDataFormat or if it
+	 * is a numerical timestamp a specifier of the form [xx] where xx specifies the time unit, e.g., [ms]
+	 */
 	@ParameterDefinition(name = "TimestampFormat", label = "Timestamp Format", required = false, defaultValue = "")
 	private String timestampFormatPattern;
 	
@@ -62,6 +67,10 @@ public class CsvDataSource extends AbstractFileDataSource {
 	private NumberFormat numberFormat;
 	private Unit<Time> dateUnit = Time.SECONDS;
 	private boolean initialized = false;
+	
+	public CsvDataSource() throws IOException {
+		super();
+	}
 	
 	public String getSeparators() {
 		return separators;

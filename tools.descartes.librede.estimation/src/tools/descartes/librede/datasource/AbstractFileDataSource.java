@@ -56,7 +56,6 @@ import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -357,7 +356,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 
 	private WatchThread parser;
 
-	public void open() throws IOException {
+	public AbstractFileDataSource() throws IOException {
 		this.parser = new WatchThread();
 		this.parser.setDaemon(true);
 	}
