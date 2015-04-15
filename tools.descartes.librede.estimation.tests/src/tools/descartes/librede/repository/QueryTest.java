@@ -46,6 +46,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.testutils.LibredeTest;
@@ -60,7 +61,7 @@ public class QueryTest extends LibredeTest {
 	private Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"),
 			WorkloadBuilder.newResource("HardDisk1"), WorkloadBuilder.newResource("HardDisk2") };
 	private Service[] services = new Service[] { WorkloadBuilder.newService("AddToCard"),
-			WorkloadBuilder.newService("Payment") };
+			WorkloadBuilder.newService("Payment"), WorkloadBuilder.newBackgroundService("Cron") };
 	private Matrix utilMeasurements = matrix(row(0.2, 0.3, 0.4), row(0.3, 0.4, 0.5), row(0.4, 0.5, 0.6), row(0.5, 0.6, 0.7), row(0.6, 0.7, 0.8));
 	private Matrix throughputMeasurements = matrix(row(4, 5), row(6, 7), row(8, 9), row(10, 11), row(12, 13));
 	private Matrix rtMeasurements = matrix(row(0.4, 0.5), row(0.6, 0.7), row(0.8, 0.9), row(0.10, 0.11), row(0.12, 0.13));
@@ -168,6 +169,17 @@ public class QueryTest extends LibredeTest {
 		
 		assertThat(result).isEqualTo(rtMeasurements.column(1), offset(1e-9));
 		
+	}
+	
+	@Test
+	public void testGetBackgroundServiceQuery() {
+		IRepositoryCursor cursor = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
+		assertThat(cursor.next()).isTrue();
+		
+		Query<Scalar, RequestRate> tputSingle = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(services[2]).average().using(cursor);
+		assertThat(tputSingle.hasData()).isTrue();
+		Scalar result = tputSingle.execute();		
+		assertThat(result.getValue()).isEqualTo(1.0, offset(1e-9));
 	}
 
 //	@Test

@@ -27,11 +27,14 @@
 package tools.descartes.librede.repository;
 
 import static tools.descartes.librede.linalg.LinAlg.ones;
+import static tools.descartes.librede.linalg.LinAlg.scalar;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -269,6 +272,18 @@ public class StandardMetricHelpers {
 		public ThroughputHelper() {
 			super(StandardMetrics.THROUGHPUT);
 		}
+		
+		@Override
+		public TimeSeries select(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit,
+				ModelEntity entity, Quantity<Time> start, Quantity<Time> end) {
+			TimeSeries series = super.select(repository, metric, unit, entity, start, end);			
+			if (series.isEmpty() && ((Service)entity).isBackgroundService()) {
+				series = new TimeSeries(scalar(end.getValue(Time.SECONDS)), Scalar.ONE);
+				series.setStartTime(start.getValue(Time.SECONDS));
+				series.setEndTime(end.getValue(Time.SECONDS));
+			}
+			return series;
+		}
 
 		@Override
 		public double aggregate(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end, Aggregation func) {
@@ -289,6 +304,12 @@ public class StandardMetricHelpers {
 		public boolean contains(IMonitoringRepository repository, Metric<RequestRate> metric,
 				ModelEntity entity, Quantity<Time> aggregationInterval) {
 			if (super.contains(repository, metric, entity, aggregationInterval)) {
+				return true;
+			}
+			if (((Service)entity).isBackgroundService()) {
+				// Background services by default always have a throughput of 1.0 per sec.
+				// even if there is no time series in the repository. The background utilization
+				// is then U_0 = 1.0 * D_0
 				return true;
 			}
 			return repository.contains(StandardMetrics.DEPARTURES, entity, aggregationInterval);
