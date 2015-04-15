@@ -68,6 +68,7 @@ import tools.descartes.librede.export.csv.CsvExporter;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -77,6 +78,8 @@ import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
+import tools.descartes.librede.repository.Query;
+import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Dimension;
@@ -144,7 +147,7 @@ public class Librede {
 		} else {
 			try {
 				List<ResultTable[]> results;
-				if (conf.getValidation().getValidationFolds() <= 2) {
+				if (conf.getValidation().getValidationFolds() <= 1) {
 					results = runEstimationWithValidation(conf, repo);
 				} else {
 					results = runEstimationWithCrossValidation(conf, repo);
@@ -167,6 +170,7 @@ public class Librede {
 					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
 					try {
 						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
+						newSource.open();
 						selector.add(newSource);
 						dataSources.put(dataSourceName, newSource);
 					} catch (Exception e) {
@@ -261,14 +265,6 @@ public class Librede {
 				continue;
 			}
 			
-			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
-			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
-				Class<?> cl = Registry.INSTANCE.getInstanceClass(validator.getType());
-				IValidator val = (IValidator) Instantiator.newInstance(cl, validator.getParameters());
-				val.initialize(conf.getWorkloadDescription(), cursor);
-				validators.add(val);
-			}
-			
 			ResultTable estimates = initAndExecuteEstimation(currentApproach, 
 					repository.getWorkload(), 
 					conf.getEstimation().getWindow(), 
@@ -278,20 +274,17 @@ public class Librede {
 				break;
 			}
 			Vector state = estimates.getLastEstimates();
-			IRepositoryCursor validatingCursor = repository.getCursor(conf.getEstimation().getEndTimestamp().minus(conf.getEstimation().getStepSize().times(5)), 
-					conf.getEstimation().getStepSize());
-				
-			while(validatingCursor.next()) {
-				for (IValidator validator : validators) {
-					validator.predict(state);
-				}
-			}
 			
-			for (IValidator validator : validators) {
-				estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
-				estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
-			}				
-			results.add(new ResultTable[] {estimates});
+			
+			
+			IRepositoryCursor validatingCursor = repository.getCursor(conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize());
+			
+			List<IValidator> validators = initValidators(conf, validatingCursor);
+			
+			runValidation(validators, validatingCursor, state, estimates);
+				
+			results.add(new ResultTable[] { estimates });
 		}
 		return results;	
 	}
@@ -317,13 +310,7 @@ public class Librede {
 				continue;
 			}
 			
-			List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
-			for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
-				Class<?> cl = Registry.INSTANCE.getInstanceClass(validator.getType());
-				IValidator val = (IValidator) Instantiator.newInstance(cl, validator.getParameters());
-				val.initialize(conf.getWorkloadDescription(), cursor);
-				validators.add(val);
-			}
+			List<IValidator> validators = initValidators(conf, cursor);
 			
 			for (int i = 0; i < conf.getValidation().getValidationFolds(); i++) {
 				log.info("Running repetition " + (i + 1) + " of estimation approach " + currentConf.getType());
@@ -341,22 +328,52 @@ public class Librede {
 				
 				cursor.startValidationPhase(i);
 				
-				while(cursor.next()) {
-					for (IValidator validator : validators) {
-						validator.predict(state);
-					}
-				}
-				
-				for (IValidator validator : validators) {
-					estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
-					estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
-				}
+				runValidation(validators, cursor, state, estimates);
 				
 				folds[i] = estimates;
 			}
 			results.add(folds);
 		}
 		return results;
+	}
+	
+	private static List<IValidator> initValidators(LibredeConfiguration conf, IRepositoryCursor validatingCursor) throws InstantiationException, IllegalAccessException {
+		List<IValidator> validators = new ArrayList<IValidator>(conf.getValidation().getValidators().size());
+		for (ValidatorConfiguration validator : conf.getValidation().getValidators()) {
+			Class<?> cl = Registry.INSTANCE.getInstanceClass(validator.getType());
+			IValidator val = (IValidator) Instantiator.newInstance(cl, validator.getParameters());
+			val.initialize(conf.getWorkloadDescription(), validatingCursor);
+			validators.add(val);
+		}
+		return validators;
+	}
+	
+	private static void runValidation(List<IValidator> validators, IRepositoryCursor validatingCursor, Vector demands, ResultTable estimates){		
+		Query<Vector, Ratio> util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(validatingCursor.getRepository().listResources()).average().using(validatingCursor);
+		Query<Vector, RequestRate> tput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(validatingCursor.getRepository().listServices()).average().using(validatingCursor);
+		Query<Vector, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(validatingCursor.getRepository().listServices()).average().using(validatingCursor);
+		while(validatingCursor.next()) {
+			if (log.isDebugEnabled()) {
+				StringBuilder validationData = new StringBuilder();
+				validationData.append(validatingCursor.getCurrentIntervalEnd().getValue(Time.SECONDS)).append(", ");
+				validationData.append("U=").append(util.execute()).append(", ");
+				validationData.append("X=").append(tput.execute()).append(", ");
+				validationData.append("T=").append(resp.execute()).append(", ");
+				log.debug(validationData);
+			}
+			for (IValidator validator : validators) {
+				validator.predict(demands);
+			}
+		}
+		
+		for (IValidator validator : validators) {
+			if (log.isDebugEnabled()) {
+				log.debug("Predicted " + validator.getClass().getName() + ":" + validator.getPredictedValues());
+				log.debug("Observed " + validator.getClass().getName() + ":" + validator.getObservedValues());
+			}
+			estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
+			estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
+		}				
 	}
 	
 	private static ResultTable initAndExecuteEstimation(IEstimationApproach approach,
