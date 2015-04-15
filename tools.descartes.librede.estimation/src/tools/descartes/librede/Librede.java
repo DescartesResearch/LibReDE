@@ -167,7 +167,6 @@ public class Librede {
 					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
 					try {
 						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
-						newSource.open();
 						selector.add(newSource);
 						dataSources.put(dataSourceName, newSource);
 					} catch (Exception e) {
