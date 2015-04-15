@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

@@ -41,7 +41,6 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {

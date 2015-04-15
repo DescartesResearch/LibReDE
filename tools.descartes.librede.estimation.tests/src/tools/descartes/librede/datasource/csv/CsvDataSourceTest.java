@@ -95,7 +95,6 @@ public class CsvDataSourceTest extends LibredeTest {
 		
 		selector = new DataSourceSelector();
 		
-		dataSource.open();
 		selector.add(dataSource);
 	}
 

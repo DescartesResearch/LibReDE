@@ -28,7 +28,6 @@ package tools.descartes.librede.util;
 
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
-import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.TimeSeries;
 

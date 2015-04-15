@@ -27,6 +27,7 @@
 package tools.descartes.librede.datasource.csv;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,6 +38,8 @@ import org.apache.log4j.Logger;
 import tools.descartes.librede.datasource.AbstractFileDataSource;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 @Component(displayName = "CSV Data Source")
 public class CsvDataSource extends AbstractFileDataSource {
@@ -49,6 +52,10 @@ public class CsvDataSource extends AbstractFileDataSource {
 	@ParameterDefinition(name = "SkipFirstLine", label = "Skip First Line", required = false, defaultValue = "false")
 	private boolean skipFirstLine;
 	
+	/*
+	 * The timestamp format can be either a pattern as expected by java.util.SimpleDataFormat or if it
+	 * is a numerical timestamp a specifier of the form [xx] where xx specifies the time unit, e.g., [ms]
+	 */
 	@ParameterDefinition(name = "TimestampFormat", label = "Timestamp Format", required = false, defaultValue = "")
 	private String timestampFormatPattern;
 	
@@ -58,6 +65,12 @@ public class CsvDataSource extends AbstractFileDataSource {
 	private int readLines = 0;
 	private SimpleDateFormat timestampFormat;
 	private NumberFormat numberFormat;
+	private Unit<Time> dateUnit = Time.SECONDS;
+	private boolean initialized = false;
+	
+	public CsvDataSource() throws IOException {
+		super();
+	}
 	
 	public String getSeparators() {
 		return separators;
@@ -108,6 +121,24 @@ public class CsvDataSource extends AbstractFileDataSource {
 
 	@Override
 	protected double parse(File file, String line, double[] values) throws ParseException {
+		if (!initialized) {
+			if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
+				if (timestampFormatPattern.startsWith("[") && timestampFormatPattern.endsWith("]")) {
+					String unit = timestampFormatPattern.substring(1, timestampFormatPattern.length() - 1);
+					for (Unit<?> u : Time.INSTANCE.getUnits()) {
+						if (u.getSymbol().equalsIgnoreCase(unit)) {
+							dateUnit = (Unit<Time>)u;
+							break;
+						}
+					}
+				} else {
+					timestampFormat = new SimpleDateFormat(timestampFormatPattern);
+					dateUnit = Time.MILLISECONDS;
+				}
+			}
+			numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
+			initialized = true;
+		}
 		String[] fields = line.split(separators);
 		if (fields.length >= 1) {
 			double timestamp = getTimestamp(file, fields[0]);
@@ -130,25 +161,21 @@ public class CsvDataSource extends AbstractFileDataSource {
 	}
 
 	private double getTimestamp(File file, String timestamp) {
-		if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
-			timestampFormat = new SimpleDateFormat(timestampFormatPattern);
-		}
+		double time;
 		if (timestampFormat == null) {
-			return getNumber(file, timestamp);
+			time = getNumber(file, timestamp);
 		} else {
 			try {
-				return timestampFormat.parse(timestamp.trim()).getTime() / 1000.0;
+				time = timestampFormat.parse(timestamp.trim()).getTime();
 			} catch(ParseException ex) {
 				logDiagnosis(file, "Skipping line due to invalid timestamp: " + timestamp);
 			}
 			return Double.NaN;
 		}
+		return dateUnit.convertTo(time, Time.SECONDS);
 	}
 
 	private double getNumber(File file, String number) {
-		if (numberFormat == null) {
-			numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag(numberLocale));
-		}
 		if (!number.isEmpty()) {
 			try {
 				return numberFormat.parse(number.trim()).doubleValue();
