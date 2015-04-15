@@ -48,10 +48,10 @@ import tools.descartes.librede.configuration.OutputSpecification;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.OutputSpecificationImpl#getExporters <em>Exporters</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

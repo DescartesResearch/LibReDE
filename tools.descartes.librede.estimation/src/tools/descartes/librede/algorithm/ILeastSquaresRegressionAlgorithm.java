@@ -26,12 +26,13 @@
  */
 package tools.descartes.librede.algorithm;
 
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
 
+/**
+ * Marker interface for all least squares regression implementations.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public interface ILeastSquaresRegressionAlgorithm extends IEstimationAlgorithm {
 
 }

@@ -50,11 +50,11 @@ import tools.descartes.librede.configuration.ValidatorConfiguration;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ValidatorConfigurationImpl#getType <em>Type</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ValidatorConfigurationImpl#getParameters <em>Parameters</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

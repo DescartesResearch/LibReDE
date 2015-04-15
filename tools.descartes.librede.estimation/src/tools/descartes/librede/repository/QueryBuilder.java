@@ -26,52 +26,77 @@
  */
 package tools.descartes.librede.repository;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.Query.Type;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Unit;
 
-public class QueryBuilder {
+public class QueryBuilder<D extends Dimension> {
 	
 	private Query.Type type;
-	private IMetric metric;
-	private ModelEntity entity;
+	private Metric<D> metric;
+	private Unit<D> unit;
+	private List<ModelEntity> entities = new LinkedList<>();
 	private Aggregation aggregation;
 	
-	private QueryBuilder(IMetric metric) {
+	private QueryBuilder(Metric<D> metric) {
 		this.metric = metric;
 	}
 	
-	public static SelectClause select(IMetric metric) {
-		QueryBuilder builder = new QueryBuilder(metric);
+	public static <D extends Dimension> QueryBuilder<D>.SelectClause select(Metric<D> metric) {
+		QueryBuilder<D> builder = new QueryBuilder<D>(metric);
 		return builder.new SelectClause();
 	}
 	
 	public class SelectClause {
+		public InClause in(Unit<D> unit) {
+			QueryBuilder.this.unit = unit;
+			return new InClause();
+		}		
+	}
+	
+	public class InClause {
 	
 		public ForClause forResource(Resource resource) {
 			type = Type.RESOURCE;
-			entity = resource;
+			entities.add(resource);
 			return new ForClause();
 		}
 		
 		public ForClause forService(Service cls) {
 			type = Type.SERVICE;
-			entity = cls;
+			entities.add(cls);
 			return new ForClause();
 		}
 		
-		public ForAllClause forAllServices() {
+		public ForAllClause forServices(Service...services) {
+			return forServices(Arrays.asList(services));
+		}
+		
+		public ForAllClause forServices(Collection<? extends Service> services) {
 			type = Type.ALL_SERVICES;
-			entity = null;
+			entities.addAll(services);
 			return new ForAllClause();
 		}
 		
-		public ForAllClause forAllResources() {
+		public ForAllClause forResources(Resource...resources) {
+			return forResources(Arrays.asList(resources));
+		}
+		
+		public ForAllClause forResources(Collection<? extends Resource> resources) {
 			type = Type.ALL_RESOURCES;
-			entity = null;
+			entities.addAll(resources);
 			return new ForAllClause();
 		}
 		
@@ -127,8 +152,8 @@ public class QueryBuilder {
 	}
 	
 	public class UsingClause<T extends Vector> {
-		public Query<T> using(IRepositoryCursor repository) {
-			return new Query<T>(aggregation, type, metric, entity, repository);
+		public Query<T, D> using(IRepositoryCursor repository) {
+			return new Query<T, D>(aggregation, type, metric, unit, entities, repository);
 		}
 	}
 	

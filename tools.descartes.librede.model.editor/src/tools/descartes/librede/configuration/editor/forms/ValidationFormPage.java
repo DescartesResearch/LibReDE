@@ -86,7 +86,7 @@ public class ValidationFormPage extends MasterDetailsFormPage {
 		
 		toolkit.createLabel(client, "Number of Folds k:");
 		spnFolds = new Spinner(client, SWT.BORDER);
-		spnFolds.setMinimum(2);
+		spnFolds.setMinimum(1);
 		spnFolds.setMaximum(Integer.MAX_VALUE);
 		toolkit.paintBordersFor(spnFolds);
 		

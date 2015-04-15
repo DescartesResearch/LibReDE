@@ -43,11 +43,19 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.initial.TargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName="Kalman Filter using Utilization Law")
 public class WangKalmanFilterApproach extends AbstractEstimationApproach {
+	
+	/**
+	 * The initial demand is scaled to this utilization level, to avoid bad
+	 * starting points (e.g., demands that would result in a utilization value
+	 * above 100%)
+	 */
+	private static final double INITIAL_UTILIZATION = 0.5;
 
 	@Override
 	protected List<IStateModel<?>> deriveStateModels(
@@ -58,6 +66,7 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 				builder.addVariable(res, serv);
 			}
 		}
+		builder.setStateInitializer(new TargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 

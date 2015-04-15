@@ -39,11 +39,11 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.WorkloadDescription#getResources <em>Resources</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.WorkloadDescription#getServices <em>Services</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getWorkloadDescription()
  * @model

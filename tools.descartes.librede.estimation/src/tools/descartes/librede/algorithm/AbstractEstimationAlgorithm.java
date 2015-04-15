@@ -30,6 +30,12 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 
+/**
+ * This abstract class provides standard implementations for some of the methods in {@link IEstimationAlgorithm}.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm {
 	
 	private IStateModel<?> stateModel;
@@ -52,4 +58,9 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 		return observationModel;
 	}
 
+	@Override
+	public void destroy() {
+		// Do nothing		
+	}
+	
 }

@@ -38,12 +38,12 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.ValidationSpecification#getValidators <em>Validators</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.ValidationSpecification#getValidationFolds <em>Validation Folds</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.ValidationSpecification#isValidateEstimates <em>Validate Estimates</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getValidationSpecification()
  * @model

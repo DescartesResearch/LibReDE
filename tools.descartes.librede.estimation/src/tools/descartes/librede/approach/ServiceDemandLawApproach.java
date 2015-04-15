@@ -29,12 +29,15 @@ package tools.descartes.librede.approach;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
@@ -44,11 +47,12 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName="Service Demand Law")
 public class ServiceDemandLawApproach extends AbstractEstimationApproach {
+	
+	public static final Logger log = Logger.getLogger(ServiceDemandLawApproach.class);
 	
 	public static final String NAME = "ServiceDemandLaw";
 	
@@ -60,7 +64,11 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> stateModelBuilder = ConstantStateModel.unconstrainedModelBuilder();
 			for (Service service : workload.getServices()) {
-				stateModelBuilder.addVariable(res, service);
+				if (!service.isBackgroundService()) {
+					stateModelBuilder.addVariable(res, service);
+				} else {
+					log.warn("Background services are not supported by Service Demand Law approach. Service \"" + service.getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
+				}
 			}
 			stateModels.add(stateModelBuilder.build());
 		}
@@ -73,7 +81,7 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
 		for (Resource resource : stateModel.getResources()) {
-			for (Service service : stateModel.getServices()) {
+			for (Service service : stateModel.getUserServices()) {
 				ServiceDemandLaw func = new ServiceDemandLaw(stateModel, cursor, resource, service);
 				observationModel.addOutputFunction(func);
 			}

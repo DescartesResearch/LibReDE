@@ -36,6 +36,15 @@ import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 
+/**
+ * A factory class to create an instance of a specific subclass of estimation algorithms.
+ * 
+ * Examples for such subclasses are {@link IKalmanFilterAlgorithm}, {@link ILeastSquaresRegressionAlgorithm}, or
+ * {@link IConstrainedNonLinearOptimizationAlgorithm}. The factory will automatically choose one of the
+ * available implementations (chooses first working implementation).
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de) *
+ */
 public class EstimationAlgorithmFactory {
 	
 	private static final Logger log = Logger.getLogger(EstimationAlgorithmFactory.class);
@@ -46,6 +55,12 @@ public class EstimationAlgorithmFactory {
 		this.configuration = configuration;
 	}
 	
+	/**
+	 * Automatically creates an instance for a specified subclass of estimation algorithms.
+	 * 
+	 * @param componentClass specifies the subclass of estimation algorithm (e.g., {@link IKalmanFilterAlgorithm})
+	 * @return a newly create instance or null if no working implementation is found.
+	 */
 	public IEstimationAlgorithm createInstance(Class<?> componentClass) {
 		Set<String> candidates = Registry.INSTANCE.getInstances(componentClass);
 

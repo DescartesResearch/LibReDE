@@ -271,6 +271,14 @@ public class ColtVector extends AbstractVector {
 	}
 	
 	@Override
+	public ColtVector columns(int... columns) {
+		if (columns.length != 1 && columns[0] != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+	
+	@Override
 	public ColtVector columns(int start, int end) {
 		if (start != 0 || end != 0) {
 			throw new IndexOutOfBoundsException();

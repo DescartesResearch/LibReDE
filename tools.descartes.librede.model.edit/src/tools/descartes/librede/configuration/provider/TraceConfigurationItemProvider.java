@@ -31,7 +31,6 @@ package tools.descartes.librede.configuration.provider;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.ResourceLocator;
@@ -47,7 +46,6 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.TraceConfiguration;
@@ -84,9 +82,10 @@ public class TraceConfigurationItemProvider
 			super.getPropertyDescriptors(object);
 
 			addMetricPropertyDescriptor(object);
+			addDataSourcePropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
 			addIntervalPropertyDescriptor(object);
-			addDataSourcePropertyDescriptor(object);
+			addLocationPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -108,7 +107,7 @@ public class TraceConfigurationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}
@@ -130,7 +129,7 @@ public class TraceConfigurationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
 				 null,
 				 null));
 	}
@@ -152,7 +151,29 @@ public class TraceConfigurationItemProvider
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Location feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addLocationPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TraceConfiguration_location_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_location_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__LOCATION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
 				 null,
 				 null));
 	}
@@ -228,7 +249,7 @@ public class TraceConfigurationItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((TraceConfiguration)object).getMetric();
+		String label = ((TraceConfiguration)object).getLocation();
 		return label == null || label.length() == 0 ?
 			getString("_UI_TraceConfiguration_type") :
 			getString("_UI_TraceConfiguration_type") + " " + label;
@@ -250,6 +271,7 @@ public class TraceConfigurationItemProvider
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:

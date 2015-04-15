@@ -26,17 +26,15 @@
  */
 package tools.descartes.librede.configuration.editor.util;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
-import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.conversion.Converter;
+import org.eclipse.core.databinding.observable.list.WritableList;
+import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
-import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -45,6 +43,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 public class TimeUnitSpinnerBuilder {
 	
@@ -71,86 +72,39 @@ public class TimeUnitSpinnerBuilder {
 		return spnValue;
 	}
 	
-	public static ComboViewer createTimeUnitControl(FormToolkit toolkit, Composite parent, final Spinner spnValue) {
+	public static ComboViewer createTimeUnitControl(FormToolkit toolkit, AdapterFactory adapterFactory, Composite parent) {
 		final ComboViewer comboUnitViewer = new ComboViewer(parent,
 				SWT.READ_ONLY);
 		Combo comboUnit = comboUnitViewer.getCombo();
 		toolkit.adapt(comboUnit);
 		toolkit.paintBordersFor(comboUnit);
-		comboUnitViewer.setContentProvider(new ArrayContentProvider());
-		comboUnitViewer.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return PrettyPrinter.toCamelCase(element.toString());
-			}
-		});
-		comboUnitViewer.setInput(new TimeUnit[] {
-				TimeUnit.MILLISECONDS, TimeUnit.SECONDS, TimeUnit.MINUTES,
-				TimeUnit.HOURS, TimeUnit.DAYS });
+		comboUnitViewer.setContentProvider(new ObservableListContentProvider());
+		comboUnitViewer.setLabelProvider(new AdapterFactoryLabelProvider(adapterFactory));
+		comboUnitViewer.setInput(new WritableList(Time.INSTANCE.getUnits(), Unit.class));
 		comboUnitViewer.setSelection(new StructuredSelection(
-				TimeUnit.SECONDS));
-		comboUnitViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					
-					private TimeUnit lastUnit = TimeUnit.SECONDS;
-					
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						IStructuredSelection sel = (IStructuredSelection) comboUnitViewer
-								.getSelection();
-						if (!sel.isEmpty()) {
-							TimeUnit newUnit = (TimeUnit) sel.getFirstElement();
-							long newValue = newUnit.convert(spnValue.getSelection(),
-									lastUnit);
-							spnValue.setSelection((int) newValue);
-							lastUnit = newUnit;
-						}
-					}
-				});
-		
+				Time.INSTANCE.getBaseUnit()));
 		return comboUnitViewer;
 	}
 	
-	public static EMFUpdateValueStrategy createTargetToModelStrategy(final ComboViewer unitViewer) {
-		EMFUpdateValueStrategy targetToModelStrategy = new EMFUpdateValueStrategy(
-				UpdateValueStrategy.POLICY_UPDATE);
-		targetToModelStrategy
-				.setConverter(new Converter(int.class, long.class) {
-					@Override
-					public Object convert(Object fromObject) {
-						IStructuredSelection sel = (IStructuredSelection) unitViewer
-								.getSelection();
-						if (!sel.isEmpty()) {
-							TimeUnit unit = (TimeUnit) sel.getFirstElement();
-							return (long) TimeUnit.MILLISECONDS.convert(
-									(Integer) fromObject, unit);
-						}
-						return fromObject;
-					}
-
-				});
-		return targetToModelStrategy;
+	public static EMFUpdateValueStrategy createModelToTargetConverter() {
+		EMFUpdateValueStrategy strategy = new EMFUpdateValueStrategy(EMFUpdateValueStrategy.POLICY_UPDATE);
+		strategy.setConverter(new Converter(Double.class, Integer.class) {
+			@Override
+			public Object convert(Object fromObject) {
+				return ((Double) fromObject).intValue();
+			}
+		});
+		return strategy;
 	}
-		
-	public static EMFUpdateValueStrategy createModelToTargetStrategy(final ComboViewer unitViewer) {
-		EMFUpdateValueStrategy modelToTargetStrategy = new EMFUpdateValueStrategy(
-				UpdateValueStrategy.POLICY_UPDATE);
-		modelToTargetStrategy
-				.setConverter(new Converter(long.class, int.class) {
-					@Override
-					public Object convert(Object fromObject) {
-						IStructuredSelection sel = (IStructuredSelection) unitViewer
-								.getSelection();
-						if (!sel.isEmpty()) {
-							TimeUnit unit = (TimeUnit) sel.getFirstElement();
-							return (int) unit.convert((Long) fromObject,
-									TimeUnit.MILLISECONDS);
-						}
-						return fromObject;
-					}
-
-				});
-		return modelToTargetStrategy;
+	
+	public static EMFUpdateValueStrategy createTargetToModelConverter() {
+		EMFUpdateValueStrategy strategy = new EMFUpdateValueStrategy(EMFUpdateValueStrategy.POLICY_UPDATE);
+		strategy.setConverter(new Converter(Integer.class, Double.class) {
+			@Override
+			public Object convert(Object fromObject) {
+				return ((Integer) fromObject).doubleValue();
+			}
+		});
+		return strategy;
 	}
-
 }

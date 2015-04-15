@@ -158,6 +158,14 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 	
 	@Override
+	public Scalar columns(int...columns) {
+		if (columns.length != 1 || columns[0] != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
+	
+	@Override
 	public Scalar columns(int start, int end) {
 		if (start != 0 || end != 0) {
 			throw new IndexOutOfBoundsException();

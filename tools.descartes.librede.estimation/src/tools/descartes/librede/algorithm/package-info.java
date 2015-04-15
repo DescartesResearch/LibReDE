@@ -24,21 +24,11 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.configuration.editor.util;
-
-public class PrettyPrinter {
-	
-	public static String toCamelCase(String s) {
-		String[] parts = s.split("\\s");
-		StringBuilder res = new StringBuilder(s.length());
-		for (int i = 0; i < parts.length; i++) {
-			if (i > 0) {
-				res.append(" ");
-			}
-			res.append(Character.toUpperCase(parts[i].charAt(0)));
-			res.append(parts[i].substring(1).toLowerCase());
-		}
-		return res.toString();
-	}
-
-}
+/**
+ * This package contains the interface {@link tools.descartes.librede.algorithm.IEstimationAlgorithm} describing an estimation algorithm. 
+ * An estimation algorithm  * is used to solve an estimation problem given the current monitoring data. The estimation problem is
+ * provided as a combination of a state model ({@link tools.descartes.librede.models.state.IStateModel}) and 
+ * an observation model ({@link tools.descartes.librede.models.observation.IObservationModel}). Furthermore it
+ * contains basic solution algorithms implementing that interface.
+ */
+package tools.descartes.librede.algorithm;

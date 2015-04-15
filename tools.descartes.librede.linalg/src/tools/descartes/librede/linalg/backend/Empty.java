@@ -169,6 +169,11 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 	
 	@Override
+	public Matrix columns(int...columns) {
+		return this;
+	}
+	
+	@Override
 	public Matrix columns(int start, int end) {
 		return this;
 	}

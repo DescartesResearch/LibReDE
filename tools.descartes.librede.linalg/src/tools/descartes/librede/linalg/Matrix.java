@@ -121,6 +121,8 @@ public interface Matrix {
 	 */
 	Vector column(int column);
 	
+	Matrix columns(int...columns);
+	
 	Matrix columns(int start, int end);
 
 	/**

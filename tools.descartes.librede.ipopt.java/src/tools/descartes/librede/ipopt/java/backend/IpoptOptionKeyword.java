@@ -43,7 +43,8 @@ public enum IpoptOptionKeyword {
 	WARM_START_INIT_POINT("warm_start_init_point"),
 	CHECK_DERIVATIVES_FOR_NANINF("check_derivatives_for_naninf"),
 	DERIVATIVE_TEST("derivative_test"),
-	DERIVATIVE_TEST_PRINT_ALL("derivative_test_print_all");
+	DERIVATIVE_TEST_PRINT_ALL("derivative_test_print_all"),
+	MAX_ITER("max_iter");
 
 	private String keyword;
 	/*

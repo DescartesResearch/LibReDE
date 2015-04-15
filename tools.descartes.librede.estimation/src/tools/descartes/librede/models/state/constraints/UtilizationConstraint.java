@@ -32,14 +32,16 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
+import tools.descartes.librede.units.RequestRate;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
@@ -47,12 +49,13 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	private Query<Vector> throughputQuery;
+	private IRepositoryCursor cursor;
 	
-	public UtilizationConstraint(Resource resource, IRepositoryCursor repository) {
+	private Query<Vector, RequestRate> throughputQuery;
+	
+	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor) {
 		this.res_i = resource;
-		
-		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
+		this.cursor = cursor;
 	}
 	
 	@Override
@@ -70,9 +73,16 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		Vector D_i = state.slice(stateModel.getStateVariableIndexRange(res_i));
 		Vector X = throughputQuery.execute();
-		return X.dot(D_i);
+		double U_i = 0.0;
+		for (int i = 0; i < X.rows(); i++) {
+			Service curService = (Service)throughputQuery.getEntity(i);
+			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService)) * X.get(i);
+		}
+		for (Service curService : stateModel.getBackgroundServices()) {
+			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService));
+		}
+		return U_i;
 	}
 
 	@Override
@@ -104,6 +114,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(cursor);
 	}
 
 }

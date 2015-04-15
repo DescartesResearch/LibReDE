@@ -26,12 +26,12 @@
  */
 package tools.descartes.librede;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ModelEntity;
@@ -61,12 +61,18 @@ public class ResultTable {
 			entryToColumn = new HashMap<StateVariable, Integer>(stateSize);
 			buffer = new double[stateSize];
 			
-			int i = 0;
+
+			TreeSet<StateVariable> variables = new TreeSet<StateVariable>();			
 			for (Resource res : workload.getResources()) {
 				for (Service cls : workload.getServices()) {
-					entryToColumn.put(new StateVariable(res, cls), i);
-					i++;
+					variables.add(new StateVariable(res, cls));
+					
 				}
+			}
+			int i = 0;
+			for (StateVariable var : variables) {
+				entryToColumn.put(var, i);
+				i++;
 			}
 		}
 		

@@ -29,6 +29,12 @@ package tools.descartes.librede.repository;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 public interface IRepositoryCursor {
 
@@ -36,22 +42,22 @@ public interface IRepositoryCursor {
 	
 	boolean seek(int interval);
 	
-	boolean seek(double newTime);
+	boolean seek(Quantity<Time> newTime);
 
-	double getCurrentIntervalStart();
+	Quantity<Time> getCurrentIntervalStart();
 
-	double getCurrentIntervalLength();
+	Quantity<Time> getCurrentIntervalLength();
 
-	double getCurrentIntervalEnd();
+	Quantity<Time> getCurrentIntervalEnd();
 
-	TimeSeries getValues(IMetric metric, ModelEntity entity);
+	<D extends Dimension> TimeSeries getValues(Metric<D> metric, Unit<D> unit, ModelEntity entity);
 
-	double getAggregatedValue(IMetric metric,
+	<D extends Dimension> double getAggregatedValue(Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, Aggregation func);
 
 	IMonitoringRepository getRepository();
 
-	boolean hasData(IMetric metric,
+	<D extends Dimension> boolean hasData(Metric<D> metric,
 			List<ModelEntity> entities, Aggregation aggregation);
 
 	int getAvailableIntervals();

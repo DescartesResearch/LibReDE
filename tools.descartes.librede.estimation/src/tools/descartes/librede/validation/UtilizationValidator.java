@@ -38,6 +38,7 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
@@ -49,6 +50,9 @@ public class UtilizationValidator implements IValidator {
 	private List<ModelEntity> resources;
 	private List<UtilizationLaw> utilLaw;
 	private MatrixBuilder allErrors;
+	private MatrixBuilder predictedUtilization;
+	private MatrixBuilder observedUtilization;
+	private ConstantStateModel<Unconstrained> stateModel;
 	
 	@Override
 	public void initialize(WorkloadDescription workload, IRepositoryCursor cursor) {
@@ -58,7 +62,7 @@ public class UtilizationValidator implements IValidator {
 				builder.addVariable(res, serv);
 			}
 		}
-		ConstantStateModel<Unconstrained> stateModel = builder.build(); 
+		stateModel = builder.build(); 
 		
 		this.utilLaw = new ArrayList<UtilizationLaw>();
 		this.resources = new ArrayList<ModelEntity>();
@@ -67,24 +71,43 @@ public class UtilizationValidator implements IValidator {
 			resources.add(res);
 		}
 		allErrors = new MatrixBuilder(stateModel.getResources().size());
+		predictedUtilization = new MatrixBuilder(stateModel.getResources().size());
+		observedUtilization = new MatrixBuilder(stateModel.getResources().size());
+	}
+	
+	@Override
+	public IStateModel<?> getStateModel() {
+		return stateModel;
 	}
 	
 	@Override
 	public void predict(Vector state) {
 		double[] relErr = new double[utilLaw.size()];
+		double[] actualUtil = new double[utilLaw.size()];
+		double[] realUtil = new double[utilLaw.size()];
 		int i = 0;
 		for (UtilizationLaw cur : utilLaw) {
-			double real = cur.getObservedOutput();
-			double actual = cur.getCalculatedOutput(state);
-			relErr[i] = Math.abs(actual - real) / real;
+			realUtil[i] = cur.getObservedOutput();
+			actualUtil[i] = cur.getCalculatedOutput(state);
+			relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
 			i++;
 		}
-		allErrors.addRow(relErr);		
+		allErrors.addRow(relErr);
+		predictedUtilization.addRow(actualUtil);
+		observedUtilization.addRow(realUtil);
 	}
 	
 	@Override
 	public Vector getPredictionError() {
 		return LinAlg.mean(allErrors.toMatrix(), 0);
+	}
+	
+	public Vector getPredictedValues() {
+		return LinAlg.mean(predictedUtilization.toMatrix(), 0);
+	}
+	
+	public Vector getObservedValues() {
+		return LinAlg.mean(observedUtilization.toMatrix(), 0);
 	}
 	
 	@Override

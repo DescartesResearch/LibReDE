@@ -10,6 +10,12 @@
 	<artifactId>tools.descartes.librede.releng</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	
+	<parent>
+		<groupId>tools.descartes</groupId>
+		<artifactId>tools.descartes.releng</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
 
 	<organization>
 		<url>https://bitbucket.org/librede/librede</url>
@@ -23,18 +29,7 @@
     	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     	<sonar.jacoco.reportPath>../tools.descartes.librede.releng/target/jacoco.exec</sonar.jacoco.reportPath>
 	</properties>
-	<distributionManagement>
-		<repository>
-			<id>se-uw-nexus</id>
-			<name>Releases</name>
-			<url>https://se4.informatik.uni-wuerzburg.de/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>se-uw-nexus</id>
-			<name>Snapshots</name>
-			<url>https://se4.informatik.uni-wuerzburg.de/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
+	
 	<repositories>
 		<repository>
 			<id>se-uw-nexus</id>
@@ -48,19 +43,17 @@
 			</snapshots>
 		</repository>
 	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
 			</plugin>
 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
 				<configuration>
 					<target>
 						<artifact>

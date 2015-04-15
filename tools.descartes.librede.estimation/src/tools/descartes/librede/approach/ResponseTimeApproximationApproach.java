@@ -29,12 +29,15 @@ package tools.descartes.librede.approach;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
@@ -44,11 +47,12 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Approximation with Response Times")
 public class ResponseTimeApproximationApproach extends AbstractEstimationApproach {
+	
+	private static final Logger log = Logger.getLogger(ResponseTimeApproximation.class);
 	
 	public static final String NAME = "ResponseTimeApproximation";
 	
@@ -59,7 +63,11 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 			for (Service service : workload.getServices()) {
-				builder.addVariable(res, service);
+				if (!service.isBackgroundService()) {
+					builder.addVariable(res, service);
+				} else {
+					log.warn("Background services are not supported by Approximation with Response Times approach. Service \"" + service.getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
+				}
 			}
 			stateModels.add(builder.build());
 		}		
@@ -71,7 +79,7 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		Resource resource = stateModel.getResources().toArray(new Resource[1])[0];
 		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
-		for (Service service : stateModel.getServices()) {
+		for (Service service : stateModel.getUserServices()) {
 			ResponseTimeApproximation func = new ResponseTimeApproximation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
 			observationModel.addOutputFunction(func);
 		}

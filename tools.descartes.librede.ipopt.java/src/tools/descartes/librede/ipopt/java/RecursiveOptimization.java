@@ -132,6 +132,9 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	private Matrix estimationBuffer;
 	
+	// Flag indicating whether this is the first iteration.
+	private boolean initialized = false;
+	
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
 	 */
@@ -148,9 +151,6 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		initOptimizationState(observationModel);
 		
 		allocateNativeMemory();
-		
-		// Set initial state
-		copy(stateModel.getInitialState(), x);	
 		
 		// Determine number of zeros in jacobi an hessian matrices.
 		nele_jac = stateSize * constraintCount;
@@ -173,29 +173,40 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 			throw new IllegalStateException("Method initialize() must be called before calling estimate().");
 		}		
 		
-		setOptimizationBounds();
-		
-		setOptimizationConstraints();
-		
-		Pointer nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
-                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
-                evaljacg, evalh);
-		
-		setOptimizationOptions(nlp);	
-		
-		/* solve the problem */
-		int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, obj, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
-		
-		Vector estimate = zeros(stateSize);		
-		if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED || status == IpoptLibrary.IP_ACCEPTABLE_LEVEL) {
-			estimate = nativeVector(stateSize, x);		
-		} else {
-			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
+		if (!initialized) {
+			// Set initial state
+			Vector initialState = getStateModel().getInitialState();
+			if (!initialState.isEmpty()) {
+				copy(initialState, x);
+				initialized = true;
+			}
 		}
-		estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);
-		  
-		/* free allocated memory */
-		IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
+		
+		if (initialized) {
+			setOptimizationBounds();
+			
+			setOptimizationConstraints();
+			
+			Pointer nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
+	                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
+	                evaljacg, evalh);
+			
+			setOptimizationOptions(nlp);	
+			
+			/* solve the problem */
+			int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, obj, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
+			
+			Vector estimate = zeros(stateSize);		
+			if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED || status == IpoptLibrary.IP_ACCEPTABLE_LEVEL) {
+				estimate = nativeVector(stateSize, x);		
+			} else {
+				System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
+			}
+			estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);
+			  
+			/* free allocated memory */
+			IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
+		}
 	}
 	
 	@Override
@@ -243,7 +254,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 //				IpoptOptionValue.YES.toNativeString());
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundsInfValue);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);		
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.MAX_ITER.toNativeString(), 300);
 	}
 
 	private void setOptimizationConstraints() {

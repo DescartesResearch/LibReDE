@@ -29,7 +29,6 @@
 package tools.descartes.librede.configuration.impl;
 
 import java.util.Collection;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -39,11 +38,15 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 /**
  * <!-- begin-user-doc -->
@@ -51,77 +54,28 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getDataSource <em>Data Source</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getLocation <em>Location</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
 public class TraceConfigurationImpl extends MinimalEObjectImpl.Container implements TraceConfiguration {
 	/**
-	 * The default value of the '{@link #getMetric() <em>Metric</em>}' attribute.
+	 * The cached value of the '{@link #getMetric() <em>Metric</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getMetric()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String METRIC_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getMetric() <em>Metric</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMetric()
-	 * @generated
-	 * @ordered
-	 */
-	protected String metric = METRIC_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getUnit() <em>Unit</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getUnit()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String UNIT_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getUnit() <em>Unit</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getUnit()
-	 * @generated
-	 * @ordered
-	 */
-	protected String unit = UNIT_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getInterval() <em>Interval</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInterval()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final long INTERVAL_EDEFAULT = 0L;
-
-	/**
-	 * The cached value of the '{@link #getInterval() <em>Interval</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInterval()
-	 * @generated
-	 * @ordered
-	 */
-	protected long interval = INTERVAL_EDEFAULT;
+	protected Metric<? extends Dimension> metric;
 
 	/**
 	 * The cached value of the '{@link #getDataSource() <em>Data Source</em>}' reference.
@@ -142,6 +96,46 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected EList<TraceToEntityMapping> mappings;
+
+	/**
+	 * The cached value of the '{@link #getUnit() <em>Unit</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getUnit()
+	 * @generated
+	 * @ordered
+	 */
+	protected Unit<? extends Dimension> unit;
+
+	/**
+	 * The cached value of the '{@link #getInterval() <em>Interval</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInterval()
+	 * @generated
+	 * @ordered
+	 */
+	protected Quantity<Time> interval;
+
+	/**
+	 * The default value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocation()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCATION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocation()
+	 * @generated
+	 * @ordered
+	 */
+	protected String location = LOCATION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -167,7 +161,16 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getMetric() {
+	@SuppressWarnings("unchecked")
+	public Metric<? extends Dimension> getMetric() {
+		if (metric != null && metric.eIsProxy()) {
+			InternalEObject oldMetric = (InternalEObject)metric;
+			metric = (Metric<? extends Dimension>)eResolveProxy(oldMetric);
+			if (metric != oldMetric) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
+			}
+		}
 		return metric;
 	}
 
@@ -176,8 +179,17 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setMetric(String newMetric) {
-		String oldMetric = metric;
+	public Metric<? extends Dimension> basicGetMetric() {
+		return metric;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setMetric(Metric<? extends Dimension> newMetric) {
+		Metric<? extends Dimension> oldMetric = metric;
 		metric = newMetric;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
@@ -188,7 +200,16 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getUnit() {
+	@SuppressWarnings("unchecked")
+	public Unit<? extends Dimension> getUnit() {
+		if (unit != null && unit.eIsProxy()) {
+			InternalEObject oldUnit = (InternalEObject)unit;
+			unit = (Unit<? extends Dimension>)eResolveProxy(oldUnit);
+			if (unit != oldUnit) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
+			}
+		}
 		return unit;
 	}
 
@@ -197,8 +218,17 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setUnit(String newUnit) {
-		String oldUnit = unit;
+	public Unit<? extends Dimension> basicGetUnit() {
+		return unit;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setUnit(Unit<? extends Dimension> newUnit) {
+		Unit<? extends Dimension> oldUnit = unit;
 		unit = newUnit;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__UNIT, oldUnit, unit));
@@ -209,7 +239,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public long getInterval() {
+	public Quantity<Time> getInterval() {
 		return interval;
 	}
 
@@ -218,11 +248,54 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setInterval(long newInterval) {
-		long oldInterval = interval;
+	public NotificationChain basicSetInterval(Quantity<Time> newInterval, NotificationChain msgs) {
+		Quantity<Time> oldInterval = interval;
 		interval = newInterval;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, oldInterval, newInterval);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInterval(Quantity<Time> newInterval) {
+		if (newInterval != interval) {
+			NotificationChain msgs = null;
+			if (interval != null)
+				msgs = ((InternalEObject)interval).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, null, msgs);
+			if (newInterval != null)
+				msgs = ((InternalEObject)newInterval).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, null, msgs);
+			msgs = basicSetInterval(newInterval, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, newInterval, newInterval));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getLocation() {
+		return location;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLocation(String newLocation) {
+		String oldLocation = location;
+		location = newLocation;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL, oldInterval, interval));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__LOCATION, oldLocation, location));
 	}
 
 	/**
@@ -285,6 +358,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return ((InternalEList<?>)getMappings()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				return basicSetInterval(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -298,16 +373,20 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				return getMetric();
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				return getUnit();
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				return getInterval();
+				if (resolve) return getMetric();
+				return basicGetMetric();
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				if (resolve) return getDataSource();
 				return basicGetDataSource();
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return getMappings();
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				if (resolve) return getUnit();
+				return basicGetUnit();
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				return getInterval();
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				return getLocation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -322,13 +401,7 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				setMetric((String)newValue);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				setUnit((String)newValue);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				setInterval((Long)newValue);
+				setMetric((Metric<? extends Dimension>)newValue);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				setDataSource((DataSourceConfiguration)newValue);
@@ -336,6 +409,15 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				getMappings().clear();
 				getMappings().addAll((Collection<? extends TraceToEntityMapping>)newValue);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				setUnit((Unit<? extends Dimension>)newValue);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				setInterval((Quantity<Time>)newValue);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				setLocation((String)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -350,19 +432,22 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				setMetric(METRIC_EDEFAULT);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				setUnit(UNIT_EDEFAULT);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				setInterval(INTERVAL_EDEFAULT);
+				setMetric((Metric<? extends Dimension>)null);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				setDataSource((DataSourceConfiguration)null);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				getMappings().clear();
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				setUnit((Unit<? extends Dimension>)null);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				setInterval((Quantity<Time>)null);
+				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				setLocation(LOCATION_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -377,15 +462,17 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				return METRIC_EDEFAULT == null ? metric != null : !METRIC_EDEFAULT.equals(metric);
-			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
-				return UNIT_EDEFAULT == null ? unit != null : !UNIT_EDEFAULT.equals(unit);
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
-				return interval != INTERVAL_EDEFAULT;
+				return metric != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				return dataSource != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				return mappings != null && !mappings.isEmpty();
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+				return unit != null;
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+				return interval != null;
+			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -400,12 +487,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (metric: ");
-		result.append(metric);
-		result.append(", unit: ");
-		result.append(unit);
-		result.append(", interval: ");
-		result.append(interval);
+		result.append(" (location: ");
+		result.append(location);
 		result.append(')');
 		return result.toString();
 	}

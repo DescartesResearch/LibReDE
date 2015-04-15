@@ -111,6 +111,14 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
+	public Matrix columns(int... columns) {
+		if (columns.length == 1) {
+			return column(columns[0]);
+		}
+		return new ColtMatrix(delegate.viewSelection(null, columns));
+	}
+	
+	@Override
 	public Matrix columns(int start, int end) {
 		if (start == end) {
 			return column(start);

@@ -34,6 +34,12 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
 
 /**
  * This class implements the IMonitoringRepository
@@ -41,14 +47,16 @@ import tools.descartes.librede.configuration.WorkloadDescription;
  * @author Mehran Saliminia
  * 
  */
-public class MemoryObservationRepository implements IMonitoringRepository {
+public class MemoryObservationRepository extends AbstractMonitoringRepository {
+	
+	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
 	
 	private static class DataKey {
 		
-		public final IMetric metric;
+		public final Metric<?> metric;
 		public final ModelEntity entity;
 		
-		public DataKey(IMetric metric, ModelEntity entity) {
+		public DataKey(Metric<?> metric, ModelEntity entity) {
 			this.metric = metric;
 			this.entity = entity;
 		}
@@ -90,67 +98,69 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private static class DataEntry {
 		public TimeSeries data;
-		public double aggregationInterval = 0;
+		public double aggregationIntervalInSeconds = 0;
 	}
 	
 	private Map<DataKey, DataEntry> data = new HashMap<DataKey, DataEntry>();
 	private WorkloadDescription workload;
-	private double currentTime;
+	private Quantity<Time> currentTime;
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
 	}
 	
-	public double getAggregationInterval(IMetric m, ModelEntity entity) {
+	public boolean isAggregated(Metric<? extends Dimension> m, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
-			return -1;
+			return false;
 		}
-		return entry.aggregationInterval;
+		return (entry.aggregationIntervalInSeconds > 0);
 	}
 	
-	public TimeSeries getData(IMetric m, ModelEntity entity) {
+	public TimeSeries select(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
 			return TimeSeries.EMPTY;
 		}
-		return entry.data;
+		return UnitConverter.convertTo(entry.data, m.getDimension().getBaseUnit(), unit);
 	}
 	
-	public void setData(IMetric m, ModelEntity entity, TimeSeries observations) {
-		this.setData(m, entity, observations, 0);
+	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations) {
+		this.setData(m, unit, entity, observations, ZERO_SECONDS);
 	}
 	
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations) {
-		this.setData(m, entity, aggregatedObservations, aggregatedObservations.getAverageTimeIncrement());
+	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries aggregatedObservations, Quantity<Time> aggregationInterval) {
+		this.setData(m, unit, entity, aggregatedObservations, aggregationInterval);
 	}
 	
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval) {
-		this.setData(m, entity, aggregatedObservations, aggregationInterval);
-	}
-	
-	private void setData(IMetric m, ModelEntity entity, TimeSeries observations, double aggregationInterval) {
+	private void setData(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations, Quantity<Time> aggregationInterval) {
 		DataKey key = new DataKey(m, entity);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
 			entry = new DataEntry();
 			data.put(key, entry);
 		}
-		entry.data = observations;
-		entry.aggregationInterval = aggregationInterval;
+		entry.data = UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit());
+		entry.aggregationIntervalInSeconds = aggregationInterval.getUnit().convertTo(aggregationInterval.getValue(), Time.SECONDS);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public boolean containsData(IMetric m,
-			ModelEntity entity, double maximumAggregationInterval) {
-		DataKey key = new DataKey(m, entity);
-		DataEntry entry = data.get(key);
-		if (entry == null) {
-			return false;
+	public boolean contains(Metric<? extends Dimension> m,
+			ModelEntity entity, Quantity<Time> maximumAggregationInterval, boolean includeDerived) {		
+		if (includeDerived) {
+			return getMetricHandler(m, null).contains(this, (Metric)m, entity, maximumAggregationInterval);
+		} else {
+			double requestedIntervalInSeconds = maximumAggregationInterval.getUnit().convertTo(maximumAggregationInterval.getValue(), Time.SECONDS);
+			DataKey key = new DataKey(m, entity);
+			DataEntry entry = data.get(key);
+			if (entry == null) {
+				return false;
+			}
+			return entry.aggregationIntervalInSeconds <= requestedIntervalInSeconds;
 		}
-		return entry.aggregationInterval <= maximumAggregationInterval;
 	}
 	
 	@Override
@@ -164,17 +174,17 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	@Override
-	public IRepositoryCursor getCursor(double startTime, double stepSize) {
+	public IRepositoryCursor getCursor(Quantity<Time> startTime, Quantity<Time> stepSize) {
 		return new AggregationRepositoryCursor(this, startTime, stepSize);
 	}
 	
 	@Override
-	public double getCurrentTime() {
+	public Quantity<Time> getCurrentTime() {
 		return currentTime;
 	}
 	
 	@Override
-	public void setCurrentTime(double currentTime) {
+	public void setCurrentTime(Quantity<Time> currentTime) {
 		this.currentTime = currentTime;
 	}
 	

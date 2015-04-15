@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.approach;
 
-import static tools.descartes.librede.linalg.LinAlg.ones;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +33,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
@@ -46,44 +45,51 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Kalman Filter using Response Times and Utilization")
 public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 
+	/**
+	 * The initial demand is scaled to this utilization level, to avoid bad
+	 * starting points (e.g., demands that would result in a utilization value
+	 * above 100%)
+	 */
+	private static final double INITIAL_UTILIZATION = 0.5;
+
 	@Override
-	protected List<IStateModel<?>> deriveStateModels(
-			WorkloadDescription workload, IRepositoryCursor cursor) {
+	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> b = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
 			for (Service serv : workload.getServices()) {
 				b.addVariable(res, serv);
 			}
 		}
-		b.setInitialState(ones(workload.getResources().size() * workload.getServices().size()).times(0.01));
-		return Arrays.<IStateModel<?>>asList(b.build());
+		b.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
+		return Arrays.<IStateModel<?>> asList(b.build());
 	}
 
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(
-			IStateModel<?> stateModel, IRepositoryCursor cursor) {
+	protected IObservationModel<?, ?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
-		for (Service serv : stateModel.getServices()) {
+		for (Service serv : stateModel.getUserServices()) {
 			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, serv);
 			observationModel.addOutputFunction(func);
-		}	
-		
+		}
+
 		for (Resource res : stateModel.getResources()) {
-			UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
-			observationModel.addOutputFunction(func);
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
+				observationModel.addOutputFunction(func);
+			}
 		}
 		return observationModel;
 	}
 
 	@Override
-	protected IEstimationAlgorithm getEstimationAlgorithm(
-			EstimationAlgorithmFactory factory) {
+	protected IEstimationAlgorithm getEstimationAlgorithm(EstimationAlgorithmFactory factory) {
 		return factory.createInstance(IKalmanFilterAlgorithm.class);
 	}
 }

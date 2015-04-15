@@ -38,45 +38,77 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
 
-@Component(displayName="Simple Approximation")
+/**
+ * The simple approximation algorithm estimates the resource demands by
+ * approximating it with the aggregated result of the direct output of the
+ * observation model.
+ * 
+ * This estimation algorithm only works on observation models consisting of
+ * output functions of the type {@link IDirectOutputFunction}.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
+@Component(displayName = "Simple Approximation")
 public class SimpleApproximation extends AbstractEstimationAlgorithm {
-	
+
+	/*
+	 * The aggregation to be used on the output values in the buffer.
+	 */
 	private Aggregation aggregation;
+
+	/*
+	 * The output of the observation model of the last n intervals. (N x M
+	 * matrix, with N == estimationWindow, M == size of state model)
+	 */
 	private Matrix buffer;
-	
+
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param aggregation
+	 *            The aggregation function to be used to obtain the estimates.
+	 */
 	public SimpleApproximation(Aggregation aggregation) {
 		this.aggregation = aggregation;
 	}
 
 	@Override
 	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
+			IObservationModel<?, ?> observationModel, int estimationWindow)
+			throws InitializationException {
 		super.initialize(stateModel, observationModel, estimationWindow);
-		this.buffer = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
+		
+		// Fill with NaN. NaN values are ignored by the aggregation function.
+		this.buffer = matrix(estimationWindow, stateModel.getStateSize(),
+				Double.NaN);
 	}
-	
+
 	@Override
 	public void update() throws EstimationException {
-		final Vector output = getObservationModel().getObservedOutput();		
-		
-		Vector currentEstimate = vector(output.rows(), new VectorFunction() {			
+		final Vector output = getObservationModel().getObservedOutput();
+
+		// update the buffer with current output of the observation model
+		Vector currentEstimate = vector(output.rows(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
-				return output.get(row) / getCastedObservationModel().getOutputFunction(row).getFactor();
+				return output.get(row)
+						/ getCastedObservationModel().getOutputFunction(row)
+								.getFactor();
 			}
 		});
-		buffer = buffer.circshift(1).setRow(0, currentEstimate);		
+		buffer = buffer.circshift(1).setRow(0, currentEstimate);
 	}
 
 	@Override
 	public Vector estimate() throws EstimationException {
-		switch(aggregation) {
+		switch (aggregation) {
 		case AVERAGE:
 			return mean(buffer, 0);
 		case MAXIMUM:
@@ -86,15 +118,14 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 		case SUM:
 			return sum(buffer, 0);
 		case NONE:
-			return buffer.row(0);				
+			return buffer.row(0);
 		}
 		return empty();
 	}
 
-	@Override
-	public void destroy() {
-	}
-	
+	/**
+	 * Helper function to cast the observation model to the expected type.
+	 */
 	@SuppressWarnings("unchecked")
 	private IObservationModel<IDirectOutputFunction, Vector> getCastedObservationModel() {
 		return (IObservationModel<IDirectOutputFunction, Vector>) getObservationModel();

@@ -45,11 +45,11 @@
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//Service"/>
     <genClasses ecoreClass="librede.ecore#//TraceConfiguration">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/metric"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/unit"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/metric"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//TraceConfiguration/interval"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/dataSource"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/mappings"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference librede.ecore#//TraceConfiguration/unit"/>
     </genClasses>
     <genClasses ecoreClass="librede.ecore#//Parameter">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//Parameter/name"/>
@@ -91,6 +91,50 @@
     <genClasses ecoreClass="librede.ecore#//EstimationAlgorithmConfiguration">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute librede.ecore#//EstimationAlgorithmConfiguration/type"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference librede.ecore#//EstimationAlgorithmConfiguration/parameters"/>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Units" basePackage="tools.descartes.librede" ecorePackage="units.ecore#/">
+    <genClasses image="false" ecoreClass="units.ecore#//Dimension">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference units.ecore#//Dimension/baseUnit"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference units.ecore#//Dimension/units"/>
+    </genClasses>
+    <genClasses ecoreClass="units.ecore#//Unit">
+      <genTypeParameters ecoreTypeParameter="units.ecore#//Unit/D"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute units.ecore#//Unit/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute units.ecore#//Unit/symbol"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute units.ecore#//Unit/baseFactor"/>
+      <genOperations ecoreOperation="units.ecore#//Unit/convertTo">
+        <genParameters ecoreParameter="units.ecore#//Unit/convertTo/value"/>
+        <genParameters ecoreParameter="units.ecore#//Unit/convertTo/targetUnit"/>
+      </genOperations>
+      <genOperations ecoreOperation="units.ecore#//Unit/convertFrom">
+        <genParameters ecoreParameter="units.ecore#//Unit/convertFrom/value"/>
+        <genParameters ecoreParameter="units.ecore#//Unit/convertFrom/sourceUnit"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="units.ecore#//RequestRate"/>
+    <genClasses ecoreClass="units.ecore#//Time"/>
+    <genClasses ecoreClass="units.ecore#//RequestCount"/>
+    <genClasses ecoreClass="units.ecore#//Proportion"/>
+    <genClasses ecoreClass="units.ecore#//UnitsRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference units.ecore#//UnitsRepository/dimensions"/>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Metrics" basePackage="tools.descartes.librede" ecorePackage="metrics.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="metrics.ecore#//Aggregation">
+      <genEnumLiterals ecoreEnumLiteral="metrics.ecore#//Aggregation/NONE"/>
+      <genEnumLiterals ecoreEnumLiteral="metrics.ecore#//Aggregation/AVERAGE"/>
+      <genEnumLiterals ecoreEnumLiteral="metrics.ecore#//Aggregation/MAXIMUM"/>
+      <genEnumLiterals ecoreEnumLiteral="metrics.ecore#//Aggregation/MINIMUM"/>
+      <genEnumLiterals ecoreEnumLiteral="metrics.ecore#//Aggregation/SUM"/>
+    </genEnums>
+    <genClasses ecoreClass="metrics.ecore#//Metric">
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute metrics.ecore#//Metric/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference metrics.ecore#//Metric/dimension"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute metrics.ecore#//Metric/allowedAggregations"/>
+    </genClasses>
+    <genClasses ecoreClass="metrics.ecore#//MetricsRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference metrics.ecore#//MetricsRepository/metrics"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

@@ -26,12 +26,13 @@
  */
 package tools.descartes.librede.algorithm;
 
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
+/**
+ * Marker interface for all implementations of a constrained non-linear optimization solver.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public interface IConstrainedNonLinearOptimizationAlgorithm extends IEstimationAlgorithm  {
 
 }

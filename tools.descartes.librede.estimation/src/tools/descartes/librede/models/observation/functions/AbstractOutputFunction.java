@@ -29,8 +29,6 @@ package tools.descartes.librede.models.observation.functions;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.Query;
@@ -51,7 +49,7 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 		return stateModel;
 	}
 
-	protected boolean checkQueryPrecondition(Query<?> query, List<String> messages) {
+	protected boolean checkQueryPrecondition(Query<?,?> query, List<String> messages) {
 		if (!query.hasData()) {
 			StringBuilder msg = new StringBuilder("FAILED DATA PRECONDITION: ");
 			msg.append("metric = ").append(query.getMetric().toString()).append(" ");

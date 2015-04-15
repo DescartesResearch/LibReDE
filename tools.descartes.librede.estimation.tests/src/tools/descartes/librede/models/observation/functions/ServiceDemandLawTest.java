@@ -38,13 +38,18 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class ServiceDemandLawTest {
+public class ServiceDemandLawTest extends LibredeTest {
 	
 	private final static int SERVICE_IDX = 2;
 	private final static int RESOURCE_IDX = 1;
@@ -62,10 +67,10 @@ public class ServiceDemandLawTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 		
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
-		service = generator.getStateModel().getServices().get(SERVICE_IDX);
+		resource = generator.getStateModel().getResource(RESOURCE_IDX);
+		service = generator.getStateModel().getService(SERVICE_IDX);
 		
 		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
@@ -76,16 +81,16 @@ public class ServiceDemandLawTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
-		Vector r = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forAllServices().average().using(cursor).execute();
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		
 		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
 		double expected = x * state.get(generator.getStateModel().getStateVariableIndex(resource, service));
 		
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
@@ -93,7 +98,7 @@ public class ServiceDemandLawTest {
 	
 	@Test
 	public void testGetFactor() {
-		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
+		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
 		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
 	}
 

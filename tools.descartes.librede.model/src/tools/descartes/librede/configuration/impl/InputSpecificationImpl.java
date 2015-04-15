@@ -49,11 +49,11 @@ import tools.descartes.librede.configuration.TraceConfiguration;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.InputSpecificationImpl#getDataSources <em>Data Sources</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.InputSpecificationImpl#getObservations <em>Observations</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */

@@ -37,11 +37,11 @@ import org.eclipse.emf.common.util.EList;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.DataSourceConfiguration#getType <em>Type</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.DataSourceConfiguration#getParameters <em>Parameters</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getDataSourceConfiguration()
  * @model

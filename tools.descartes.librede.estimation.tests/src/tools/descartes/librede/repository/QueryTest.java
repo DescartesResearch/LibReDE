@@ -46,15 +46,22 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.testutils.LibredeTest;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class QueryTest {
+public class QueryTest extends LibredeTest {
 
 	private MemoryObservationRepository repository;
 	private Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"),
 			WorkloadBuilder.newResource("HardDisk1"), WorkloadBuilder.newResource("HardDisk2") };
 	private Service[] services = new Service[] { WorkloadBuilder.newService("AddToCard"),
-			WorkloadBuilder.newService("Payment") };
+			WorkloadBuilder.newService("Payment"), WorkloadBuilder.newBackgroundService("Cron") };
 	private Matrix utilMeasurements = matrix(row(0.2, 0.3, 0.4), row(0.3, 0.4, 0.5), row(0.4, 0.5, 0.6), row(0.5, 0.6, 0.7), row(0.6, 0.7, 0.8));
 	private Matrix throughputMeasurements = matrix(row(4, 5), row(6, 7), row(8, 9), row(10, 11), row(12, 13));
 	private Matrix rtMeasurements = matrix(row(0.4, 0.5), row(0.6, 0.7), row(0.8, 0.9), row(0.10, 0.11), row(0.12, 0.13));
@@ -99,15 +106,15 @@ public class QueryTest {
 		workload.getResources().addAll(Arrays.asList(resources));
 		workload.getServices().addAll(Arrays.asList(services));
 		repository = new MemoryObservationRepository(workload);
-		repository.setData(StandardMetric.UTILIZATION, resources[0], cpuUtilTable);
-		repository.setData(StandardMetric.UTILIZATION, resources[1], hd1UtilTable);
-		repository.setData(StandardMetric.UTILIZATION, resources[2], hd2UtilTable);
-		repository.setData(StandardMetric.THROUGHPUT, services[0], addServTputTable);
-		repository.setData(StandardMetric.THROUGHPUT, services[1], payServTputTable);
-		repository.setData(StandardMetric.RESPONSE_TIME, services[0], addServRtTable);
-		repository.setData(StandardMetric.RESPONSE_TIME, services[1], payServRtTable);
+		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], cpuUtilTable);
+		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[1], hd1UtilTable);
+		repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[2], hd2UtilTable);
+		repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[0], addServTputTable);
+		repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[1], payServTputTable);
+		repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[0], addServRtTable);
+		repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[1], payServRtTable);
 		
-		repository.setCurrentTime(5);
+		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
 	}
 
 	@After
@@ -154,14 +161,25 @@ public class QueryTest {
 	// }
 	@Test
 	public void testAllQuery() {
-		IRepositoryCursor cursor = repository.getCursor(0, 5);
+		IRepositoryCursor cursor = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
 		assertThat(cursor.next()).isTrue();
 		
-		Query<Vector> respSingle = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forService(services[1]).all().using(cursor);
+		Query<Vector, Time> respSingle = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(services[1]).all().using(cursor);
 		Vector result = respSingle.execute();
 		
 		assertThat(result).isEqualTo(rtMeasurements.column(1), offset(1e-9));
 		
+	}
+	
+	@Test
+	public void testGetBackgroundServiceQuery() {
+		IRepositoryCursor cursor = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(5, Time.SECONDS));
+		assertThat(cursor.next()).isTrue();
+		
+		Query<Scalar, RequestRate> tputSingle = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(services[2]).average().using(cursor);
+		assertThat(tputSingle.hasData()).isTrue();
+		Scalar result = tputSingle.execute();		
+		assertThat(result.getValue()).isEqualTo(1.0, offset(1e-9));
 	}
 
 //	@Test

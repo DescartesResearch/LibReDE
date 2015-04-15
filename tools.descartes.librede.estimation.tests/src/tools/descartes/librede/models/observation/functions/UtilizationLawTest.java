@@ -38,13 +38,18 @@ import org.junit.Test;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class UtilizationLawTest {
+public class UtilizationLawTest extends LibredeTest {
 		
 	private final static int RESOURCE_IDX = 2;
 	
@@ -59,7 +64,7 @@ public class UtilizationLawTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
 		law = new UtilizationLaw(generator.getStateModel(), cursor, resource);
@@ -71,7 +76,7 @@ public class UtilizationLawTest {
 
 	@Test
 	public void testGetIndependentVariables() {
-		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();		
 		Vector expectedVarVector = zeros(state.rows()).set(generator.getStateModel().getStateVariableIndexRange(resource), x);
 		
@@ -80,13 +85,13 @@ public class UtilizationLawTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
 	}
 

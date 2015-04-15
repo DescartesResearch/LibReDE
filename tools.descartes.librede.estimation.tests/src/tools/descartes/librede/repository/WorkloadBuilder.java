@@ -43,5 +43,12 @@ public class WorkloadBuilder {
 		serv.setName(name);
 		return serv;
 	}
+	
+	public static Service newBackgroundService(String name) {
+		Service serv = ConfigurationFactory.eINSTANCE.createService();
+		serv.setName(name);
+		serv.setBackgroundService(true);
+		return serv;
+	}
 
 }

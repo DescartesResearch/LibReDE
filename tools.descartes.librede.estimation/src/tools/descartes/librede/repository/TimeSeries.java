@@ -32,6 +32,7 @@ import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.row;
 import static tools.descartes.librede.linalg.LinAlg.sort;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.LinAlg.vertcat;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
@@ -192,6 +193,10 @@ public class TimeSeries {
 		}
 		ret.setInterpolationMethod(interpolation);
 		return ret;
+	}
+	
+	public TimeSeries append(TimeSeries series) {
+		return new TimeSeries(vertcat(content, series.content));
 	}
 	
 	public double timeWeightedMean(int column, TimeSeries userWeights) {

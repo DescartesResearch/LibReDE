@@ -28,8 +28,10 @@ package tools.descartes.librede.bayesplusplus;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.mean;
+import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
+import static tools.descartes.librede.nativehelper.NativeHelper.nativeMatrix;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
@@ -113,6 +115,8 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Vector observeNoise;
 	
 	private Matrix estimates;
+	
+	private boolean initialized = false;
 
 	/*
 	 * Callback functions from native code. IMPORTANT: References to these
@@ -126,35 +130,34 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Pointer nativeStateModel = null;
 	private Pointer nativeScheme = null;
 	private Pointer stateBuffer;
+	private Pointer stateCovarianceBuffer;
 	
-	private void initNativeKalmanFilter() throws InitializationException {
+	private void initNativeKalmanFilter(Vector initialState) throws EstimationException {
 		nativeScheme = BayesPlusPlusLibrary.create_covariance_scheme(stateSize);
 		if (nativeScheme == null) {
-			throw new InitializationException("Could not create kalman filter: "
+			throw new EstimationException("Could not create kalman filter: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 
-		Vector initialState = getStateModel().getInitialState();
 		toNative(stateBuffer, initialState);
 
-		Pointer covBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
 		Matrix initialCovariance = getInitialStateCovariance(initialState);
-		toNative(covBuffer, initialCovariance);
+		toNative(stateCovarianceBuffer, initialCovariance);
 
-		if (BayesPlusPlusLibrary.init_kalman(nativeScheme, stateBuffer, covBuffer, stateSize) == BayesPlusPlusLibrary.ERROR) {
-			throw new InitializationException("Could not initialize kalman filter: "
+		if (BayesPlusPlusLibrary.init_kalman(nativeScheme, stateBuffer, stateCovarianceBuffer, stateSize) == BayesPlusPlusLibrary.ERROR) {
+			throw new EstimationException("Could not initialize kalman filter: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 	}
 
-	private void initNativeStateModel() throws InitializationException {
+	private void initNativeStateModel() throws EstimationException {
 		fcallback = new FFunction();
 
 		nativeStateModel = BayesPlusPlusLibrary.create_linrz_predict_model(stateSize, stateSize, fcallback);
 		if (nativeStateModel == Pointer.NULL) {
-			throw new InitializationException("Error creating state model: " + BayesPlusPlusLibrary.get_last_error());
+			throw new EstimationException("Error creating state model: " + BayesPlusPlusLibrary.get_last_error());
 		}
-
+		
 		stateNoiseCovariance = vector(stateSize, new VectorFunction() {			
 			@Override
 			public double cell(int row) {
@@ -180,13 +183,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		BayesPlusPlusLibrary.set_G(nativeStateModel, temp, stateSize);
 	}
 
-	private void initNativeObservationModel() throws InitializationException {
+	private void initNativeObservationModel() throws EstimationException {
 		hcallback = new HFunction();
 
 		nativeObservationModel = BayesPlusPlusLibrary.create_linrz_uncorrelated_observe_model(stateSize, outputSize,
 				hcallback);
 		if (nativeObservationModel == null) {
-			throw new InitializationException("Error creating observation model: "
+			throw new EstimationException("Error creating observation model: "
 					+ BayesPlusPlusLibrary.get_last_error());
 		}
 
@@ -221,6 +224,14 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		if (BayesPlusPlusLibrary.update(nativeScheme) == BayesPlusPlusLibrary.ERROR) {
 			throw new EstimationException("Error in update phase: " + BayesPlusPlusLibrary.get_last_error());
 		}
+		
+		// Symmetrize the state covariance matrix to avoid numberical instabilities
+		// See Optimal State Estimation by Dan Simon, page 140
+		BayesPlusPlusLibrary.get_X(nativeScheme, stateCovarianceBuffer);
+		Matrix P = nativeMatrix(stateSize, stateSize, stateCovarianceBuffer);
+		Matrix symP = (P.plus(transpose(P))).times(0.5);
+//		toNative(stateCovarianceBuffer, symP);
+//		BayesPlusPlusLibrary.set_X(nativeScheme, stateCovarianceBuffer, stateSize);
 	}
 
 	private Vector getCurrentEstimate() {		
@@ -270,12 +281,9 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		this.outputSize = observationModel.getOutputSize();
 		
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
+		this.stateCovarianceBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
 		
 		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
-
-		initNativeStateModel();
-		initNativeObservationModel();
-		initNativeKalmanFilter();
 	}
 	
 	/* (non-Javadoc)
@@ -283,14 +291,27 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 */
 	@Override
 	public void update() throws EstimationException {
-		predict();
-
-		observe(getObservationModel().getObservedOutput());
-
-		updateState();
-		
-		Vector cur = getCurrentEstimate();
-		estimates = estimates.circshift(1).setRow(0, cur);
+		if (!initialized) {
+			// First we need to obtain some observations to be able to
+			// determine a good initial state.
+			Vector initialState = getStateModel().getInitialState();
+			if (!initialState.isEmpty()) {
+				// initial state could be determined
+				initNativeStateModel();
+				initNativeObservationModel();
+				initNativeKalmanFilter(initialState);
+				initialized = true;
+			}
+		} else {	
+			predict();
+	
+			observe(getObservationModel().getObservedOutput());
+	
+			updateState();
+			
+			Vector cur = getCurrentEstimate();
+			estimates = estimates.circshift(1).setRow(0, cur);
+		}
 	}
 
 	/*
