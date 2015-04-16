@@ -10,4 +10,4 @@ Import-Package: tools.descartes.librede.linalg.testutil,
  org.mockito,
  org.mockito.invocation,
  org.mockito.stubbing
-Require-Bundle: org.junit;bundle-version="4.11.0"
+Require-Bundle: org.junit
