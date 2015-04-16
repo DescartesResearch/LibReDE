@@ -5,7 +5,7 @@ Bundle-SymbolicName: tools.descartes.librede.ipopt.java
 Bundle-Version: 1.1.0.qualifier
 Bundle-Activator: tools.descartes.librede.ipopt.java.IpoptActivator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: com.sun.jna,
  com.sun.jna.ptr,
  tools.descartes.librede.algorithm,
