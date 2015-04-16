@@ -14,4 +14,4 @@ Import-Package: org.eclipse.emf.common.util,
  tools.descartes.librede.repository,
  tools.descartes.librede.testutils,
  tools.descartes.librede.units
-Require-Bundle: org.junit;bundle-version="4.11.0"
+Require-Bundle: org.junit
