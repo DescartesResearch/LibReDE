@@ -27,12 +27,14 @@
 package tools.descartes.librede.linalg.backend.colt;
 
 import tools.descartes.librede.linalg.AggregationFunction;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Range;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.linalg.backend.AbstractVector;
+import tools.descartes.librede.linalg.backend.IndicesImpl;
+import tools.descartes.librede.linalg.backend.RangeImpl;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -271,27 +273,16 @@ public class ColtVector extends AbstractVector {
 	}
 	
 	@Override
-	public ColtVector columns(int... columns) {
-		if (columns.length != 1 && columns[0] != 0) {
+	public ColtVector columns(Indices columns) {
+		if (columns.length() != 1 && columns.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
 	}
 	
 	@Override
-	public ColtVector columns(int start, int end) {
-		if (start != 0 || end != 0) {
-			throw new IndexOutOfBoundsException();
-		}
-		return this;
-	}
-	
-	@Override
-	public Vector rows(int start, int end) {
-		if (start == end) {
-			return row(start);
-		}
-		return new ColtVector(delegate.viewPart(start, (end - start + 1)));
+	public Vector rows(Indices rows) {
+		return get(rows);
 	}
 
 	@Override
@@ -316,6 +307,20 @@ public class ColtVector extends AbstractVector {
 	public double get(int row) {
 		return delegate.get(row);
 	}
+	
+	public Vector get(Indices rows) {
+		if (rows.length() == 1) {
+			return new Scalar(delegate.get(rows.get(0)));
+		} else {
+			if (rows.isContinuous()) {
+				RangeImpl range = (RangeImpl)rows;
+				DoubleMatrix1D part = delegate.viewPart(range.getStart(), range.getLength());
+				return new ColtVector(part);
+			} else {
+				return new ColtVector(delegate.viewSelection(((IndicesImpl)rows).getIndices()));
+			}
+		}
+	}
 
 	@Override
 	public Vector set(int row, double value) {
@@ -333,30 +338,19 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public Vector set(Range rows, Vector values) {
+	public Vector set(Indices rows, Vector values) {
 		DoubleMatrix1D copy = copyVector();
-		copy.viewPart(rows.getStart(), rows.getLength()).assign(getColtVector(values).delegate);
-		return new ColtVector(copy);
+		if (rows.isContinuous()) {
+			RangeImpl range = (RangeImpl)rows;
+			copy.viewPart(range.getStart(), range.getLength()).assign(getColtVector(values).delegate);
+			return new ColtVector(copy);
+		} else {
+			IndicesImpl indices = (IndicesImpl)rows;
+			copy.viewSelection(indices.getIndices()).assign(getColtVector(values).delegate);
+			return new ColtVector(copy);
+		}			
 	}
 
-	@Override
-	public Vector slice(Range range) {
-		if (range.getLength() == 1) {
-			return new Scalar(delegate.get(range.getStart()));
-		}
-		DoubleMatrix1D part = delegate.viewPart(range.getStart(), range.getEnd() - range.getStart());
-		return new ColtVector(part);
-	}
-	
-	@Override
-	public Vector subset(int...indeces) {
-		if (indeces.length == 1) {
-			return new Scalar(delegate.get(indeces[0]));
-		} else {
-			return new ColtVector(delegate.viewSelection(indeces));
-		}
-	}
-	
 	@Override
 	public Vector row(int row) {
 		return new Scalar(delegate.get(row));

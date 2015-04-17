@@ -108,7 +108,7 @@ public interface Matrix {
 	 */
 	Vector row(int row);
 	
-	Matrix rows(int start, int end);
+	Matrix rows(Indices rows);
 
 	/**
 	 * Returns a column vector.
@@ -121,9 +121,7 @@ public interface Matrix {
 	 */
 	Vector column(int column);
 	
-	Matrix columns(int...columns);
-	
-	Matrix columns(int start, int end);
+	Matrix columns(Indices cols);
 
 	/**
 	 * @return true if matrix is a vector (n x 1), false otherwise.
@@ -165,8 +163,6 @@ public interface Matrix {
 	Matrix abs();
 
 	Matrix transpose();
-
-	Matrix subset(int... rows);
 
 	Matrix sort(int column);
 

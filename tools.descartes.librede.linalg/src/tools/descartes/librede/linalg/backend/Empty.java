@@ -27,8 +27,8 @@
 package tools.descartes.librede.linalg.backend;
 
 import tools.descartes.librede.linalg.AggregationFunction;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Range;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
 
@@ -44,20 +44,10 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Empty set(Range rows, Vector values) {
+	public Empty set(Indices rows, Vector values) {
 		throw new IndexOutOfBoundsException();
 	}
 
-	@Override
-	public Empty slice(Range range) {
-		return this;
-	}
-
-	@Override
-	public Empty subset(int...indeces) {
-		throw new IndexOutOfBoundsException();
-	}
-	
 	@Override
 	public Matrix set(int row, int col, double value) {
 		throw new IndexOutOfBoundsException();
@@ -142,6 +132,11 @@ public final class Empty implements Vector, SquareMatrix {
 	public double get(int row, int col) {
 		throw new IndexOutOfBoundsException();
 	}
+	
+	@Override
+	public Vector get(Indices rows) {
+		throw new IndexOutOfBoundsException();
+	}
 
 	@Override
 	public int rows() {
@@ -155,29 +150,24 @@ public final class Empty implements Vector, SquareMatrix {
 
 	@Override
 	public Vector row(int row) {
-		return this;
+		throw new IndexOutOfBoundsException();
 	}
 	
 	@Override
-	public Vector rows(int start, int end) {
-		return this;
+	public Vector rows(Indices rows) {
+		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
 	public Vector column(int column) {
-		return this;
+		throw new IndexOutOfBoundsException();
 	}
 	
 	@Override
-	public Matrix columns(int...columns) {
-		return this;
+	public Matrix columns(Indices columns) {
+		throw new IndexOutOfBoundsException();
 	}
 	
-	@Override
-	public Matrix columns(int start, int end) {
-		return this;
-	}
-
 	@Override
 	public boolean isVector() {
 		return true;
@@ -220,7 +210,7 @@ public final class Empty implements Vector, SquareMatrix {
 
 	@Override
 	public double get(int row) {
-		return Double.NaN;
+		throw new IndexOutOfBoundsException();
 	}
 
 	@Override

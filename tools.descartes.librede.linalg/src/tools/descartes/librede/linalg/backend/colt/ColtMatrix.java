@@ -30,17 +30,20 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.Arrays;
 
-import tools.descartes.librede.linalg.AggregationFunction;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.MatrixFunction;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.backend.AbstractMatrix;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
+import tools.descartes.librede.linalg.AggregationFunction;
+import tools.descartes.librede.linalg.Indices;
+import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixFunction;
+import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.backend.AbstractMatrix;
+import tools.descartes.librede.linalg.backend.IndicesImpl;
+import tools.descartes.librede.linalg.backend.RangeImpl;
 
 public class ColtMatrix extends AbstractMatrix {
 	
@@ -95,11 +98,16 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public Matrix rows(int start, int end) {
-		if (start == end) {
-			return row(start);
+	public Matrix rows(Indices indices) {
+		if (indices.length() == 1) {
+			return row(indices.get(0));
 		}
-		return new ColtMatrix(delegate.viewPart(start, 0, (end - start + 1), delegate.columns()));
+		if (indices.isContinuous()) {
+			RangeImpl range = (RangeImpl)indices;
+			return new ColtMatrix(delegate.viewPart(range.getStart(), 0, range.getLength(), delegate.columns()));
+		} else {
+			return new ColtMatrix(delegate.viewSelection(((IndicesImpl)indices).getIndices(), null));
+		}
 	}
 
 	@Override
@@ -111,21 +119,18 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public Matrix columns(int... columns) {
-		if (columns.length == 1) {
-			return column(columns[0]);
+	public Matrix columns(Indices columns) {
+		if (columns.length() == 1) {
+			return column(columns.get(0));
 		}
-		return new ColtMatrix(delegate.viewSelection(null, columns));
+		if (columns.isContinuous()) {
+			RangeImpl range = (RangeImpl)columns;
+			return new ColtMatrix(delegate.viewPart(0, range.getStart(), delegate.rows(), range.getLength()));
+		} else {
+			return new ColtMatrix(delegate.viewSelection(null, ((IndicesImpl)columns).getIndices()));
+		}
 	}
 	
-	@Override
-	public Matrix columns(int start, int end) {
-		if (start == end) {
-			return column(start);
-		}
-		return new ColtMatrix(delegate.viewPart(0, start, delegate.rows(), (end - start + 1)));
-	}
-
 	@Override
 	public double[][] toArray2D() {
 		return delegate.toArray();
@@ -315,11 +320,6 @@ public class ColtMatrix extends AbstractMatrix {
 	@Override
 	public ColtMatrix sort(int column) {
 		return new ColtMatrix(delegate.viewSorted(column));
-	}
-	
-	@Override
-	public Matrix subset(int... rows) {
-		return new ColtMatrix(delegate.viewSelection(rows, null));
 	}
 	
 	@Override

@@ -30,15 +30,13 @@ public interface Vector extends Matrix {
 	
 	double get(int row);
 	
+	Vector get(Indices rows);
+	
 	Vector set(int row, double value);
 	
-	Vector set(Range rows, Vector values);
+	Vector set(Indices rows, Vector values);
 	
-	Vector slice(Range range);
-	
-	Vector subset(int...indeces);
-	
-	Vector rows(int start, int end);
+	Vector rows(Indices rows);
 	
 	Vector plus(Matrix a);
 

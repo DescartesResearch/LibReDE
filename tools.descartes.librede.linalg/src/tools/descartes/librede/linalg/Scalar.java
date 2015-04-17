@@ -121,6 +121,14 @@ public class Scalar implements Vector, SquareMatrix {
 		}
 		return value;
 	}
+	
+	@Override
+	public Vector get(Indices rows) {
+		if (rows.length() != 1 || rows.get(0) != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
 
 	@Override
 	public int rows() {
@@ -141,8 +149,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public Scalar rows(int start, int end) {
-		if (start != 0 || end != 0) {
+	public Scalar rows(Indices rows) {
+		if (rows.length() != 1 || rows.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
@@ -158,16 +166,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public Scalar columns(int...columns) {
-		if (columns.length != 1 || columns[0] != 0) {
-			throw new IndexOutOfBoundsException();
-		}
-		return this;
-	}
-	
-	@Override
-	public Scalar columns(int start, int end) {
-		if (start != 0 || end != 0) {
+	public Scalar columns(Indices columns) {
+		if (columns.length() != 1 || columns.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
@@ -236,14 +236,6 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Scalar slice(Range range) {
-		if (range.getStart() != 0 || range.getEnd() != 1) {
-			throw new IndexOutOfBoundsException();
-		}
-		return this;
-	}
-
-	@Override
 	public double dot(Vector b) {
 		if (!b.isScalar()) {
 			throw new IllegalArgumentException(
@@ -285,8 +277,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Scalar set(Range rows, Vector values) {
-		if (rows.getStart() != 0 || rows.getEnd() != 1) {
+	public Scalar set(Indices rows, Vector values) {
+		if (rows.length() != 1 || rows.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		if (values.rows() != 1) {
@@ -294,14 +286,6 @@ public class Scalar implements Vector, SquareMatrix {
 					"Size of values vector must match range specification.");
 		}
 		return new Scalar(values.get(0, 0));
-	}
-	
-	@Override
-	public Scalar subset(int...indeces) {
-		if (indeces.length != 1 || indeces[0] != 0) {
-			throw new IndexOutOfBoundsException();
-		}
-		return this;
 	}
 	
 	public Scalar subset(int start, int end) {

@@ -27,7 +27,9 @@
 package tools.descartes.librede.linalg;
 
 import tools.descartes.librede.linalg.backend.Empty;
+import tools.descartes.librede.linalg.backend.IndicesImpl;
 import tools.descartes.librede.linalg.backend.MatrixFactory;
+import tools.descartes.librede.linalg.backend.RangeImpl;
 import tools.descartes.librede.linalg.backend.colt.ColtMatrixFactory;
 
 /**
@@ -148,7 +150,7 @@ public class LinAlg {
 			});
 		}
 	}
-	
+
 	/**
 	 * Create a new <code>Matrix</code> instance initialized with the given
 	 * value.
@@ -205,8 +207,7 @@ public class LinAlg {
 			int columns = values[0].length;
 			for (int i = 1; i < values.length; i++) {
 				if (values[i].length != columns) {
-					throw new IllegalArgumentException(
-							"Array must be rectangular");
+					throw new IllegalArgumentException("Array must be rectangular");
 				}
 			}
 
@@ -215,13 +216,12 @@ public class LinAlg {
 					return new Scalar(values[0][0]);
 				} else {
 					final double[][] temp = values;
-					return FACTORY.createVector(values.length,
-							new VectorFunction() {
-								@Override
-								public double cell(int row) {
-									return temp[row][0];
-								}
-							});
+					return FACTORY.createVector(values.length, new VectorFunction() {
+						@Override
+						public double cell(int row) {
+							return temp[row][0];
+						}
+					});
 				}
 			} else {
 				if (columns == values.length) {
@@ -317,9 +317,9 @@ public class LinAlg {
 	 * @since 1.0
 	 */
 	public static Vector vertcat(Vector first, Vector... others) {
-		return (Vector)vertcat((Matrix)first, (Matrix[])others);
+		return (Vector) vertcat((Matrix) first, (Matrix[]) others);
 	}
-	
+
 	/**
 	 * Concatenates an array of matrices vertically.
 	 * 
@@ -352,7 +352,7 @@ public class LinAlg {
 	 * @since 1.0
 	 */
 	public static Vector vertcat(Vector[] vectors) {
-		return (Vector)vertcat((Matrix[])vectors);
+		return (Vector) vertcat((Matrix[]) vectors);
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class LinAlg {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Replicates the given <code>Matrix</code> the specified times in vertical
 	 * and/or horizontal direction.
@@ -471,19 +471,21 @@ public class LinAlg {
 	public static double mean(Matrix a) {
 		return a.aggregate(AggregationFunction.SUM) / a.aggregate(AggregationFunction.COUNT);
 	}
-	
+
 	/**
-	 * Arithmetic mean of all elements (except NaN) in <code>Matrix</code> for each row or column.
+	 * Arithmetic mean of all elements (except NaN) in <code>Matrix</code> for
+	 * each row or column.
 	 * 
 	 * @param a
-	 * @param dimension 0 if for each row, 1 if for each column
+	 * @param dimension
+	 *            0 if for each row, 1 if for each column
 	 * @return mean(a) for each row or column
 	 * @since 1.0
 	 */
 	public static Vector mean(Matrix a, int dimension) {
 		Vector sum = a.aggregate(AggregationFunction.SUM, dimension);
 		Vector count = a.aggregate(AggregationFunction.COUNT, dimension);
-		return sum.arrayDividedBy(count) ;
+		return sum.arrayDividedBy(count);
 	}
 
 	/**
@@ -496,12 +498,14 @@ public class LinAlg {
 	public static double sum(Matrix a) {
 		return a.aggregate(AggregationFunction.SUM);
 	}
-	
+
 	/**
-	 * Sum of all elements (except NaN) in <code>Matrix</code> for each row or column..
+	 * Sum of all elements (except NaN) in <code>Matrix</code> for each row or
+	 * column..
 	 * 
 	 * @param a
-	 * @param dimension 0 if for each row, 1 if for each column
+	 * @param dimension
+	 *            0 if for each row, 1 if for each column
 	 * @return sum(a) for each row or column
 	 * @since 1.0
 	 */
@@ -543,17 +547,28 @@ public class LinAlg {
 	}
 
 	/**
-	 * Helper function for creating a <code>Range</code> instance.
+	 * Helper function for creating a continuous <code>Indices</code> instance.
 	 * 
 	 * @param start
 	 *            start of range (inclusive).
 	 * @param end
-	 *            end of range (inclusive).
-	 * @return a <code>Range</code> instance.
+	 *            end of range (exclusive).
+	 * @return a <code>Indices</code> instance.
 	 * @since 1.0
 	 */
-	public static Range range(int start, int end) {
-		return new Range(start, end);
+	public static Indices range(int start, int end) {
+		return new RangeImpl(start, end);
+	}
+
+	/**
+	 * Helper function for creating a <code>Indices</code> instance.
+	 * 
+	 * @param indices
+	 *            list of indices
+	 * @return new <code>Indices</code> instance.
+	 */
+	public static Indices indices(int... indices) {
+		return new IndicesImpl(indices);
 	}
 
 	/**
@@ -600,7 +615,8 @@ public class LinAlg {
 	 * @param init
 	 *            a function f(x,y) := z
 	 * @return new <code>SquareMatrix</code>, or <code>Scalar<code> instance
-	 * @throws IllegalArgumentException if size < 0
+	 * @throws IllegalArgumentException
+	 *             if size < 0
 	 * @since 1.0
 	 */
 	public static SquareMatrix square(int size, MatrixFunction init) {
@@ -728,7 +744,7 @@ public class LinAlg {
 			return FACTORY.createVector(rows, 1);
 		}
 	}
-	
+
 	/**
 	 * Creates a new n x 1 vector filled with the specified values.
 	 * 
@@ -782,12 +798,14 @@ public class LinAlg {
 	public static double min(Matrix v) {
 		return v.aggregate(AggregationFunction.MINIMUM);
 	}
-	
+
 	/**
 	 * Returns the minimum value of a matrix for each row or column.
 	 * 
 	 * @param v
-	 * @param dimension if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
+	 * @param dimension
+	 *            if dimension == 0 -> row-wise, if dimension == 1 ->
+	 *            column-wise
 	 * @return min(v) per row/column
 	 * @since 1.0
 	 */
@@ -805,12 +823,14 @@ public class LinAlg {
 	public static double max(Matrix v) {
 		return v.aggregate(AggregationFunction.MAXIMUM);
 	}
-	
+
 	/**
 	 * Returns the maximum value of a matrix for each row or column.
 	 * 
 	 * @param v
-	 * @param dimension if dimension == 0 -> row-wise, if dimension == 1 -> column-wise
+	 * @param dimension
+	 *            if dimension == 0 -> row-wise, if dimension == 1 ->
+	 *            column-wise
 	 * @return min(v) per row/column
 	 * @since 1.0
 	 */
