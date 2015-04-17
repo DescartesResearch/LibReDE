@@ -578,13 +578,31 @@ public interface ConfigurationPackage extends EPackage {
 	int RESOURCE__SCHEDULING_STRATEGY = MODEL_ENTITY_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Child Resources</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE__CHILD_RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Services</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE__SERVICES = MODEL_ENTITY_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Resource</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int RESOURCE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 2;
+	int RESOURCE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of operations of the '<em>Resource</em>' class.
@@ -614,13 +632,22 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE__BACKGROUND_SERVICE = MODEL_ENTITY_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Resources</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Service</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 1;
+	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of operations of the '<em>Service</em>' class.
@@ -1377,6 +1404,28 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getResource_SchedulingStrategy();
 
 	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Resource#getChildResources <em>Child Resources</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Child Resources</em>'.
+	 * @see tools.descartes.librede.configuration.Resource#getChildResources()
+	 * @see #getResource()
+	 * @generated
+	 */
+	EReference getResource_ChildResources();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Resource#getServices <em>Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Services</em>'.
+	 * @see tools.descartes.librede.configuration.Resource#getServices()
+	 * @see #getResource()
+	 * @generated
+	 */
+	EReference getResource_Services();
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.Service <em>Service</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1396,6 +1445,17 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getService_BackgroundService();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Resources</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getResources()
+	 * @see #getService()
+	 * @generated
+	 */
+	EReference getService_Resources();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
@@ -2047,6 +2107,22 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute RESOURCE__SCHEDULING_STRATEGY = eINSTANCE.getResource_SchedulingStrategy();
 
 		/**
+		 * The meta object literal for the '<em><b>Child Resources</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference RESOURCE__CHILD_RESOURCES = eINSTANCE.getResource_ChildResources();
+
+		/**
+		 * The meta object literal for the '<em><b>Services</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference RESOURCE__SERVICES = eINSTANCE.getResource_Services();
+
+		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ServiceImpl <em>Service</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2063,6 +2139,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute SERVICE__BACKGROUND_SERVICE = eINSTANCE.getService_BackgroundService();
+
+		/**
+		 * The meta object literal for the '<em><b>Resources</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SERVICE__RESOURCES = eINSTANCE.getService_Resources();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.

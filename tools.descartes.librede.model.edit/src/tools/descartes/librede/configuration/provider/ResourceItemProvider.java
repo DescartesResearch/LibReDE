@@ -73,6 +73,8 @@ public class ResourceItemProvider
 
 			addNumberOfServersPropertyDescriptor(object);
 			addSchedulingStrategyPropertyDescriptor(object);
+			addChildResourcesPropertyDescriptor(object);
+			addServicesPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -117,6 +119,50 @@ public class ResourceItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Child Resources feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addChildResourcesPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Resource_childResources_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Resource_childResources_feature", "_UI_Resource_type"),
+				 ConfigurationPackage.Literals.RESOURCE__CHILD_RESOURCES,
+				 true,
+				 false,
+				 true,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Services feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addServicesPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Resource_services_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Resource_services_feature", "_UI_Resource_type"),
+				 ConfigurationPackage.Literals.RESOURCE__SERVICES,
+				 true,
+				 false,
+				 true,
+				 null,
 				 null,
 				 null));
 	}

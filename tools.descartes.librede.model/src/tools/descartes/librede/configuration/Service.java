@@ -28,6 +28,8 @@
  */
 package tools.descartes.librede.configuration;
 
+import org.eclipse.emf.common.util.EList;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -39,6 +41,7 @@ package tools.descartes.librede.configuration;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getService()
@@ -73,5 +76,23 @@ public interface Service extends ModelEntity {
 	 * @generated
 	 */
 	void setBackgroundService(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Resources</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Resource}.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Resource#getServices <em>Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Resources</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Resources</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_Resources()
+	 * @see tools.descartes.librede.configuration.Resource#getServices
+	 * @model opposite="services"
+	 * @generated
+	 */
+	EList<Resource> getResources();
 
 } // Service

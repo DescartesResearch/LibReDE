@@ -28,11 +28,18 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 
 /**
@@ -44,6 +51,7 @@ import tools.descartes.librede.configuration.Service;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#isBackgroundService <em>Background Service</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getResources <em>Resources</em>}</li>
  * </ul>
  *
  * @generated
@@ -67,6 +75,16 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @ordered
 	 */
 	protected boolean backgroundService = BACKGROUND_SERVICE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getResources() <em>Resources</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getResources()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Resource> resources;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -113,11 +131,54 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Resource> getResources() {
+		if (resources == null) {
+			resources = new EObjectWithInverseResolvingEList.ManyInverse<Resource>(Resource.class, this, ConfigurationPackage.SERVICE__RESOURCES, ConfigurationPackage.RESOURCE__SERVICES);
+		}
+		return resources;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__RESOURCES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getResources()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__RESOURCES:
+				return ((InternalEList<?>)getResources()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				return isBackgroundService();
+			case ConfigurationPackage.SERVICE__RESOURCES:
+				return getResources();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -127,11 +188,16 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				setBackgroundService((Boolean)newValue);
+				return;
+			case ConfigurationPackage.SERVICE__RESOURCES:
+				getResources().clear();
+				getResources().addAll((Collection<? extends Resource>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -148,6 +214,9 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				setBackgroundService(BACKGROUND_SERVICE_EDEFAULT);
 				return;
+			case ConfigurationPackage.SERVICE__RESOURCES:
+				getResources().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -162,6 +231,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				return backgroundService != BACKGROUND_SERVICE_EDEFAULT;
+			case ConfigurationPackage.SERVICE__RESOURCES:
+				return resources != null && !resources.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

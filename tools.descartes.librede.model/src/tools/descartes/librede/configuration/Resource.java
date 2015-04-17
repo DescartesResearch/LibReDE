@@ -28,6 +28,8 @@
  */
 package tools.descartes.librede.configuration;
 
+import org.eclipse.emf.common.util.EList;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -40,6 +42,8 @@ package tools.descartes.librede.configuration;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.Resource#getNumberOfServers <em>Number Of Servers</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Resource#getSchedulingStrategy <em>Scheduling Strategy</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Resource#getChildResources <em>Child Resources</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Resource#getServices <em>Services</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource()
@@ -103,5 +107,39 @@ public interface Resource extends ModelEntity {
 	 * @generated
 	 */
 	void setSchedulingStrategy(SchedulingStrategy value);
+
+	/**
+	 * Returns the value of the '<em><b>Child Resources</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Resource}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Child Resources</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Child Resources</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource_ChildResources()
+	 * @model
+	 * @generated
+	 */
+	EList<Resource> getChildResources();
+
+	/**
+	 * Returns the value of the '<em><b>Services</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Services</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Services</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource_Services()
+	 * @see tools.descartes.librede.configuration.Service#getResources
+	 * @model opposite="resources"
+	 * @generated
+	 */
+	EList<Service> getServices();
 
 } // Resource
