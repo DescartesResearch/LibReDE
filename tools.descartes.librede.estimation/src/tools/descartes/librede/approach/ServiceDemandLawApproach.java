@@ -63,7 +63,7 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 		
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> stateModelBuilder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service service : workload.getServices()) {
+			for (Service service : res.getServices()) {
 				if (!service.isBackgroundService()) {
 					stateModelBuilder.addVariable(res, service);
 				} else {

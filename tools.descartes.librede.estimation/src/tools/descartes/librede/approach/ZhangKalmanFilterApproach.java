@@ -63,7 +63,7 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> b = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
+			for (Service serv : res.getServices()) {
 				b.addVariable(res, serv);
 			}
 		}

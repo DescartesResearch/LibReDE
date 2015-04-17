@@ -62,7 +62,7 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 			WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
+			for (Service serv : res.getServices()) {
 				builder.addVariable(res, serv);
 			}
 		}

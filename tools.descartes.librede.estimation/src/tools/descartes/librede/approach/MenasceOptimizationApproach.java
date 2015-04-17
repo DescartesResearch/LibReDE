@@ -67,7 +67,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
 				builder.addConstraint(new UtilizationConstraint(res, cursor));
 			}
-			for (Service service : workload.getServices()) {
+			for (Service service : res.getServices()) {
 				builder.addConstraint(new StateBoundsConstraint(res, service, 0, Double.POSITIVE_INFINITY));
 				builder.addVariable(res, service);
 			}

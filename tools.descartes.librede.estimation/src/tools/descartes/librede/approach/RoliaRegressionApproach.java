@@ -58,7 +58,7 @@ public class RoliaRegressionApproach extends AbstractEstimationApproach {
 		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service serv : workload.getServices()) {
+			for (Service serv : res.getServices()) {
 				builder.addVariable(res, serv);
 			}
 			stateModels.add(builder.build());
