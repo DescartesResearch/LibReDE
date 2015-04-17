@@ -83,7 +83,7 @@ public class WeightedTargetUtilizationInitializerTest extends LibredeTest {
 		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
 		
 		for (int i = 0; i < 4; i++) {
-			double util = initialDemands.slice(range(i * 5, (i + 1) * 5)).dot(throughput);
+			double util = initialDemands.get(range(i * 5, (i + 1) * 5)).dot(throughput);
 			assertThat(util).isEqualTo(0.5, offset(1e-9));
 		}
 	}

@@ -27,6 +27,7 @@
 package tools.descartes.librede.datasource;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
+import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.io.Closeable;
@@ -214,8 +215,8 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			Matrix values = matrix(valuesBuffer);
 			Vector time = vector(timestampBuffer);
 			if (values.rows() > length) {
-				values = values.rows(0, length - 1);
-				time = time.rows(0, length - 1);
+				values = values.rows(range(0, length - 1));
+				time = time.rows(range(0, length - 1));
 			}
 			for (Entry<TraceKey, Integer> trace : traces.entrySet()) {
 				TimeSeries newData = new TimeSeries(time, values.column(trace.getValue()));

@@ -28,6 +28,7 @@ package tools.descartes.librede.models.observation.functions;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
@@ -77,8 +78,12 @@ public class UtilizationLawTest extends LibredeTest {
 	@Test
 	public void testGetIndependentVariables() {
 		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
-		Vector varVector = law.getIndependentVariables();		
-		Vector expectedVarVector = zeros(state.rows()).set(generator.getStateModel().getStateVariableIndexRange(resource), x);
+		Vector varVector = law.getIndependentVariables();
+		int[] idx = new int[generator.getStateModel().getUserServices().size()];
+		for (int i = 0; i < idx.length; i++) {
+			idx[i] = generator.getStateModel().getStateVariableIndex(resource, generator.getStateModel().getUserServices().get(i));
+		}
+		Vector expectedVarVector = zeros(state.rows()).set(indices(idx), x);
 		
 		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}

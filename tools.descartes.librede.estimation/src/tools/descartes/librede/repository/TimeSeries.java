@@ -29,6 +29,7 @@ package tools.descartes.librede.repository;
 import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.horzcat;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
+import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.row;
 import static tools.descartes.librede.linalg.LinAlg.sort;
 import static tools.descartes.librede.linalg.LinAlg.vector;
@@ -123,18 +124,18 @@ public class TimeSeries {
 		if (content.isEmpty()) {
 			return empty();
 		}
-		return content.column(0).rows(offset, offset + length - 1);
+		return content.column(0).rows(range(offset, offset + length - 1));
 	}
 
 	public Vector getData(int column) {
 		if (content.isEmpty()) {
 			return empty();
 		}
-		return content.column(column + 1).rows(offset, offset + length - 1);
+		return content.column(column + 1).rows(range(offset, offset + length - 1));
 	}
 	
 	public Matrix getData() {
-		return content.columns(1, content.columns() - 1);
+		return content.columns(range(1, content.columns() - 1));
 	}
 	
 	public Interpolation getInterpolationMethod() {
@@ -177,7 +178,7 @@ public class TimeSeries {
 			double idx = interpolationSearch(time);
 			Matrix temp = content;
 			if (offset != 0 || length != content.rows()) {
-				temp = content.rows(offset, offset + length - 1);
+				temp = content.rows(range(offset, offset + length - 1));
 			}
 	
 			if (idx > (offset + length - 1)) {

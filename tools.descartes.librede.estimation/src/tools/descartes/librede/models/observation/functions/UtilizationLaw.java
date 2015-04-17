@@ -26,17 +26,15 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.Range;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -69,8 +67,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	private final Query<Vector, RequestRate> throughputQuery;
 	private final Query<Scalar, Ratio> utilizationQuery;
 	
-	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedRange is updated later.
-	private final Range varFocusedRange; // the range of the independent variables which is altered by this output function
+	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedIndices is updated later.
+	private final Indices varFocusedIndices; // the indices of the independent variables which is altered by this output function
 	
 	/**
 	 * Creates a new instance.
@@ -87,14 +85,18 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		
 		this.res_i = resource;
 		
-		variables = zeros(stateModel.getStateSize());;
-		varFocusedRange = stateModel.getStateVariableIndexRange(resource);
+		variables = zeros(stateModel.getStateSize());
+		int[] idx = new int[resource.getServices().size()];
+		for (int i = 0; i < idx.length; i++) {
+			idx[i] = stateModel.getStateVariableIndex(resource, resource.getServices().get(i));
+		}
+		varFocusedIndices = indices(idx);
 		
 		/*
 		 * IMPORTANT: we query the throughput for all services (including background services). For background services
 		 * the repository should by default return 1 as throughput (i.e. constant background work).
 		 */
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getAllServices()).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	
@@ -115,7 +117,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	@Override
 	public Vector getIndependentVariables() {
 		Vector X = throughputQuery.execute();
-		return variables.set(varFocusedRange, X);
+		return variables.set(varFocusedIndices, X);
 	}
 
 	/* (non-Javadoc)

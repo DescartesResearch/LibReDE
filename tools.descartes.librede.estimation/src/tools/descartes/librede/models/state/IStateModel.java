@@ -30,7 +30,7 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.Range;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -48,8 +48,6 @@ public interface IStateModel<C extends IStateConstraint> {
 	List<Service> getBackgroundServices();
 	
 	List<Service> getUserServices();
-
-	Range getStateVariableIndexRange(Resource res);
 	
 	int getStateVariableIndex(Resource res, Service service);
 	
