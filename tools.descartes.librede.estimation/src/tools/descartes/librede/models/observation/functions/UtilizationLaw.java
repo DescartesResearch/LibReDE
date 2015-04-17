@@ -35,6 +35,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -79,18 +80,19 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
-	public UtilizationLaw(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
-			Resource resource) {
+	public UtilizationLaw(final IStateModel<? extends IStateConstraint> stateModel, final IRepositoryCursor repository,
+			final Resource resource) {
 		super(stateModel);
 		
 		this.res_i = resource;
 		
 		variables = zeros(stateModel.getStateSize());
-		int[] idx = new int[resource.getServices().size()];
-		for (int i = 0; i < idx.length; i++) {
-			idx[i] = stateModel.getStateVariableIndex(resource, resource.getServices().get(i));
-		}
-		varFocusedIndices = indices(idx);
+		varFocusedIndices = indices(resource.getServices().size(), new VectorFunction() {
+			@Override
+			public double cell(int row) {
+				return stateModel.getStateVariableIndex(resource, resource.getServices().get(row));
+			}
+		});
 		
 		/*
 		 * IMPORTANT: we query the throughput for all services (including background services). For background services

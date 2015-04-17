@@ -572,6 +572,19 @@ public class LinAlg {
 	}
 
 	/**
+	 * Helper function for creating a <code>Indices</code> instance.
+	 * 
+	 * @param length
+	 *            number of indices
+	 * @param init
+	 *            function for initilization the indices
+	 * @return new <code>Indices</code> instance.
+	 */
+	public static Indices indices(int length, VectorFunction init) {
+		return new IndicesImpl(length, init);
+	}
+
+	/**
 	 * Creates a new <code>Scalar</code> with the given value.
 	 * 
 	 * @param value

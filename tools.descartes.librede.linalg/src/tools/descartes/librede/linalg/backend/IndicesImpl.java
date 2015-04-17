@@ -3,6 +3,7 @@ package tools.descartes.librede.linalg.backend;
 import java.util.Arrays;
 
 import tools.descartes.librede.linalg.Indices;
+import tools.descartes.librede.linalg.VectorFunction;
 
 public class IndicesImpl extends Indices {
 	
@@ -10,6 +11,13 @@ public class IndicesImpl extends Indices {
 	
 	public IndicesImpl(int... indices) {
 		this.indices = indices;
+	}
+	
+	public IndicesImpl(int length, VectorFunction init) {
+		indices = new int[length];
+		for (int i = 0; i < length; i++) {
+			indices[i] = (int) init.cell(i);
+		}
 	}
 	
 	public int[] getIndices() {

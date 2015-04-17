@@ -37,8 +37,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -79,11 +81,13 @@ public class UtilizationLawTest extends LibredeTest {
 	public void testGetIndependentVariables() {
 		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
 		Vector varVector = law.getIndependentVariables();
-		int[] idx = new int[generator.getStateModel().getUserServices().size()];
-		for (int i = 0; i < idx.length; i++) {
-			idx[i] = generator.getStateModel().getStateVariableIndex(resource, generator.getStateModel().getUserServices().get(i));
-		}
-		Vector expectedVarVector = zeros(state.rows()).set(indices(idx), x);
+		Indices idx = indices(generator.getStateModel().getUserServices().size(), new VectorFunction() {			
+			@Override
+			public double cell(int row) {
+				return generator.getStateModel().getStateVariableIndex(resource, generator.getStateModel().getUserServices().get(row));
+			}
+		});
+		Vector expectedVarVector = zeros(state.rows()).set(idx, x);
 		
 		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}
