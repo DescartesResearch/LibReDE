@@ -27,6 +27,7 @@
 package tools.descartes.librede.nnls;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
+import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
@@ -179,7 +180,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 		if (numObservations < MIN_SIZE_OF_ESTIMATION) {
 			return LinAlg.zeros(getStateModel().getStateSize());
 		} else if (numObservations < dependentVariables.rows()) {
-			return nnls(independentVariables.rows(0, numObservations - 1), dependentVariables.rows(0, numObservations - 1));
+			return nnls(independentVariables.rows(range(0, numObservations - 1)), dependentVariables.rows(range(0, numObservations - 1)));
 		} else {
 			return nnls(independentVariables, dependentVariables);
 		}
