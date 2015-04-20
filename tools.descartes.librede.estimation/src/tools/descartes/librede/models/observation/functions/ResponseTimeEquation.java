@@ -179,9 +179,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			Service curService = (Service) throughputQuery.getEntity(i);
 			U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(i);
 		}
-		for (Service curService : getStateModel().getBackgroundServices()) {
-			U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService));
-		}
 		return U_i;
 	}
 

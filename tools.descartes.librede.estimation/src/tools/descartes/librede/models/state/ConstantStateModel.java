@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede.models.state;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
@@ -115,6 +117,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	private final Map<Service, Integer> servicesToIdx;
 	private final List<StateVariable> variables;
 	private final int[][] stateVarIdx;
+	private final List<Indices> resStateVarIndices;
 	private final List<C> constraints;
 	private final IStateInitializer stateInitializer;
 	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
@@ -135,7 +138,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			StateVariable v = variables.get(i);
 			if (!resourcesToIdx.containsKey(v.getResource())) {
 				resources.add(v.getResource());
-				resourcesToIdx.put(v.getResource(), i);
+				resourcesToIdx.put(v.getResource(), resources.size() - 1);
 			}
 			if (!servicesToIdx.containsKey(v.getService())) {
 				if (v.getService().isBackgroundService()) {
@@ -144,7 +147,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 					userServices.add(v.getService());
 				}
 				services.add(v.getService());
-				servicesToIdx.put(v.getService(), i);
+				servicesToIdx.put(v.getService(), services.size() - 1);
 			}
 		}
 
@@ -161,6 +164,23 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			int s = servicesToIdx.get(var.getService());
 			stateVarIdx[r][s] = varIdx;
 			varIdx++;
+		}
+		
+		resStateVarIndices = new ArrayList<>(resources.size());
+		final List<Integer> idx = new ArrayList<>(services.size());
+		for (int i = 0; i < stateVarIdx.length; i++) {
+			for (int j = 0; j < stateVarIdx[i].length; j++) {
+				if (stateVarIdx[i][j] > -1) {
+					idx.add(stateVarIdx[i][j]);
+				}				
+			}
+			resStateVarIndices.add(indices(idx.size(), new VectorFunction() {				
+				@Override
+				public double cell(int row) {
+					return idx.get(row);
+				}
+			}));
+			idx.clear();
 		}
 
 		// initialize state of model		
@@ -190,6 +210,15 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	@Override
 	public Vector getNextState(Vector state) {
 		return state;
+	}
+	
+	@Override
+	public Indices getStateVariableIndices(Resource res) {
+		Integer resIdx = resourcesToIdx.get(res);
+		if (resIdx == null) {
+			throw new NoSuchElementException("There is no defined state variable for this resource.");
+		}
+		return resStateVarIndices.get(resIdx);
 	}
 	
 	@Override

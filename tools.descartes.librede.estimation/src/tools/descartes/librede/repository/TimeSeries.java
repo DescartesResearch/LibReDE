@@ -124,18 +124,18 @@ public class TimeSeries {
 		if (content.isEmpty()) {
 			return empty();
 		}
-		return content.column(0).rows(range(offset, offset + length - 1));
+		return content.column(0).rows(range(offset, offset + length));
 	}
 
 	public Vector getData(int column) {
 		if (content.isEmpty()) {
 			return empty();
 		}
-		return content.column(column + 1).rows(range(offset, offset + length - 1));
+		return content.column(column + 1).rows(range(offset, offset + length));
 	}
 	
 	public Matrix getData() {
-		return content.columns(range(1, content.columns() - 1));
+		return content.columns(range(1, content.columns()));
 	}
 	
 	public Interpolation getInterpolationMethod() {
@@ -178,7 +178,7 @@ public class TimeSeries {
 			double idx = interpolationSearch(time);
 			Matrix temp = content;
 			if (offset != 0 || length != content.rows()) {
-				temp = content.rows(range(offset, offset + length - 1));
+				temp = content.rows(range(offset, offset + length));
 			}
 	
 			if (idx > (offset + length - 1)) {

@@ -39,6 +39,7 @@ import tools.descartes.librede.models.observation.functions.ILinearOutputFunctio
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -52,7 +53,6 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 	private static final int ITERATIONS = 100;
 
 	private ScalarObservationModel<ILinearOutputFunction> observationModel;
-	private ConstantStateModel<Unconstrained> stateModel;
 
 	@Before
 	public void setUp() throws Exception {
@@ -69,10 +69,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
-		stateModel = builder.build();
-		
+		IStateModel<?> stateModel = generator.getStateModel();
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0)));
 
 		LeastSquaresRegression optim = new LeastSquaresRegression();
@@ -111,13 +108,8 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		for (Service serv : workload.getServices()) {
-			builder.addVariable(workload.getResources().get(0), serv);
-		}
-		stateModel = builder.build();
-
-		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
+		IStateModel<?> stateModel = generator.getStateModel();
+		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(generator.getStateModel(), cursor, workload.getResources().get(0)));
 		
 		LeastSquaresRegression optim = new LeastSquaresRegression();
 		optim.initialize(stateModel, observationModel, 10);

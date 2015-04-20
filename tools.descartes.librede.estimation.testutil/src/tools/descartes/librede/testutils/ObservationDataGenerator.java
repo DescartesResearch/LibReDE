@@ -26,18 +26,24 @@
  */
 package tools.descartes.librede.testutils;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.scalar;
 import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -65,6 +71,8 @@ public class ObservationDataGenerator {
 	private double workloadMixVariation = 1.0;
 	
 	private Resource[] resources;
+	private List<Indices> resToServ;
+	private Map<Resource, Integer> resToIdx;
 	private Service[] services;
 	
 	private double time = 1.0;
@@ -76,10 +84,24 @@ public class ObservationDataGenerator {
 	private MemoryObservationRepository repository;
 	
 	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources) {
+		boolean[][] mapping = new boolean[numWorkloadClasses][numResources];
+		for (boolean[] m : mapping) {
+			Arrays.fill(m, true);
+		}
+		init(seed, numWorkloadClasses, numResources, mapping);
+	}
+	
+	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources, boolean[][] mapping) {
+		init(seed, numWorkloadClasses, numResources, mapping);
+	}
+	
+	private void init(long seed, int numWorkloadClasses, int numResources, boolean[][] mapping) {
 		Random randSeed = new Random(seed);
 		randUtil = new Random(randSeed.nextLong());
 		randWheights = new Random(randSeed.nextLong());
 		randDemands = new Random(randSeed.nextLong());
+		
+		model = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
 		
 		services = new Service[numWorkloadClasses];
 		resources = new Resource[numResources];
@@ -87,19 +109,34 @@ public class ObservationDataGenerator {
 			services[i] = ConfigurationFactory.eINSTANCE.createService();
 			services[i].setName("WC" + i);
 		}
+		model.getServices().addAll(Arrays.asList(services));
 		
+		resToServ = new ArrayList<>(numResources);
+		resToIdx = new HashMap<>();
 		for (int i = 0; i < numResources; i++) {
 			resources[i] = ConfigurationFactory.eINSTANCE.createResource();
 			resources[i].setName("R" + i);
-		}
-		
-		model = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
+			resToIdx.put(resources[i], i);
+			
+			final List<Integer> idx = new ArrayList<>(numWorkloadClasses);
+			for (int j = 0; j < numWorkloadClasses; j++) {
+				if (mapping[j][i]) {
+					resources[i].getServices().add(services[j]);
+					idx.add(j);
+				}
+			}
+			resToServ.add(indices(idx.size(), new VectorFunction() {				
+				@Override
+				public double cell(int row) {
+					return idx.get(row);
+				}
+			}));
+		}		
 		model.getResources().addAll(Arrays.asList(resources));
-		model.getServices().addAll(Arrays.asList(services));
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : resources) {
-			for (Service serv : services) {
+			for (Service serv : res.getServices()) {
 				builder.addVariable(res, serv);
 			}
 		}
@@ -141,8 +178,8 @@ public class ObservationDataGenerator {
 	}
 
 	public void setDemands(Vector demands) {
-		if (demands.rows() != services.length * resources.length) {
-			throw new IllegalArgumentException("Size of demands matrix does not match number of resources x services.");
+		if (demands.rows() != stateModel.getStateSize()) {
+			throw new IllegalArgumentException("Size of demands matrix does not match the state size");
 		}
 		this.demands = demands;
 	}
@@ -164,23 +201,21 @@ public class ObservationDataGenerator {
 			}
 		});
 				
-		final Vector relativeWheights = absoluteWheights.times(sum(absoluteWheights));
+		final Vector relativeWheights = absoluteWheights.times(1 / sum(absoluteWheights));
 		
 		Vector weightedTotalDemand = vector(resources.length, new VectorFunction() {			
 			@Override
 			public double cell(int row) {
-				return relativeWheights.dot(demands.slice(range(row * services.length, (row + 1) * services.length)));
+				return relativeWheights.get(resToServ.get(row)).dot(demands.get(stateModel.getStateVariableIndices(resources[row])));
 			}
 		});	
 		
 		int maxIdx = -1;
 		double max = Double.MIN_VALUE;
 		for (int i = 0; i < weightedTotalDemand.rows(); i++) {
-			if (maxIdx < 0) {
-				maxIdx = i;
-			}
 			if (weightedTotalDemand.get(i) > max) {
 				maxIdx = i;
+				max = weightedTotalDemand.get(i);
 			}
 		}
 		final int bottleneckResource = maxIdx;
@@ -199,7 +234,7 @@ public class ObservationDataGenerator {
 			@Override
 			public double cell(int row) {
 				if (row != bottleneckResource) {
-					return throughput.dot(demands.slice(stateModel.getStateVariableIndexRange(resources[row])));
+					return throughput.get(resToServ.get(row)).dot(demands.get(stateModel.getStateVariableIndices(resources[row])));
 				} else {
 					return maxUtil;
 				}
@@ -235,8 +270,9 @@ public class ObservationDataGenerator {
 	
 		for (int i = 0; i < services.length; i++) {
 			double sumRT = 0.0;
-			for (int r = 0; r < resources.length; r++) {
-				sumRT += demands.get(r * services.length + i) / (1 - utilization.get(r));
+			for (Resource resource : services[i].getResources()) {
+				int stateIdx = stateModel.getStateVariableIndex(resource, services[i]);
+				sumRT += demands.get(stateIdx) / (1 - utilization.get(resToIdx.get(resource)));
 			}
 			
 			TimeSeries ts = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i]);

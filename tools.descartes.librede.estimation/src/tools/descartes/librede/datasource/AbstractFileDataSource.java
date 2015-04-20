@@ -215,8 +215,8 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			Matrix values = matrix(valuesBuffer);
 			Vector time = vector(timestampBuffer);
 			if (values.rows() > length) {
-				values = values.rows(range(0, length - 1));
-				time = time.rows(range(0, length - 1));
+				values = values.rows(range(0, length));
+				time = time.rows(range(0, length));
 			}
 			for (Entry<TraceKey, Integer> trace : traces.entrySet()) {
 				TimeSeries newData = new TimeSeries(time, values.column(trace.getValue()));

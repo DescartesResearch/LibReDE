@@ -291,6 +291,15 @@ public class VectorTest {
 		v = a.get(indices(0, 1));
 		assertThat(v).isEqualTo(vector(A[0],  A[1]), offset(1e-9));
 	}
+
+	@Test
+	public void testGetRanges() {
+		Vector v = a.get(range(1, 2));
+		assertThat(v.isScalar()).isTrue();
+		assertThat(((Scalar)v).getValue()).isEqualTo(A[1], offset(1e-9));
+		v = a.get(range(0, 2));
+		assertThat(v).isEqualTo(vector(A[0],  A[1]), offset(1e-9));
+	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testGetIndicesIllegal() {

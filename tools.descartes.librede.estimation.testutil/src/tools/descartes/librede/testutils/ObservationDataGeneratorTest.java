@@ -26,15 +26,24 @@
  */
 package tools.descartes.librede.testutils;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.offset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -140,6 +149,34 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 	}
 	
 	@Test
+	public void testNextObservation4WC4RNonRec() {
+		boolean[][] mapping = new boolean[][] { {true, false, false, false}, {true, true, false, false}, {true, false, true, false}, {false, false, true, true} };
+		
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 4, mapping);
+		
+		assertThat(generator.getStateModel().getStateSize()).isEqualTo(7);
+
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		
+		Query<Vector, Ratio> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(generator.getStateModel().getResources()).average().using(view);
+		Query<Vector, RequestRate> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(view);
+		Query<Vector, Time> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(view);
+		
+		Vector demands = vector(
+				0.25, 
+				0.3, 0.35, 
+				0.4, 0.25, 
+				0.3, 0.35);
+		generator.setDemands(demands);
+		
+		for (int i = 0; i < 10000; i++) {
+			generator.nextObservation();
+			view.next();
+			assertObservation(utilData, tputData, rtData, demands);
+		}
+	}
+	
+	@Test
 	public void testNextObservation4WC1RWithBounds() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
 		generator.setLowerUtilizationBound(0.4);
@@ -183,21 +220,29 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 	}
 	
 	private void assertObservation(Query<Vector, Ratio> utilData, Query<Vector, RequestRate> tputData, Query<Vector, Time> rtData, Vector demands) {		
-		int wclCnt = tputData.getEntities().size();
-		int resCnt =  utilData.getEntities().size();
+		@SuppressWarnings("unchecked")
+		List<Service> services = (List<Service>) tputData.getEntities();
+		@SuppressWarnings("unchecked")
+		List<Resource> resources = (List<Resource>) utilData.getEntities();
 		
-		for (int r = 0; r < resCnt; r++) {
-			double util = demands.slice(range(r * wclCnt, (r + 1) * wclCnt)).dot(tputData.execute());
-			assertEquals(util, utilData.execute().get(r), EPSILON);
-		}
-		
-		for (int i = 0; i < wclCnt; i++) {
-			double sumRT = 0.0;
-			for (int r = 0; r < resCnt; r++) {
-				sumRT += demands.get(r * wclCnt + i) / (1 - demands.slice(range(wclCnt * r, (r + 1) * wclCnt)).dot(tputData.execute()));
+		int stateVar = 0;
+		double[] sumRT = new double[services.size()];
+		for (Resource res : resources) {
+			double util = 0;
+			int temp = stateVar;
+			for (Service serv : res.getServices()) {
+				util += demands.get(temp) * tputData.execute().get(tputData.indexOf(serv));
+				temp++;
 			}
-			assertEquals(sumRT, rtData.execute().get(i), EPSILON);
+			assertThat(util).isEqualTo(utilData.execute().get(utilData.indexOf(res)), offset(EPSILON));
+			
+			for (Service serv : res.getServices()) {
+				int idx = tputData.indexOf(serv);
+				sumRT[idx] += demands.get(stateVar) / (1 - util);
+				stateVar++;
+			}
 		}
+		assertThat(rtData.execute()).isEqualTo(vector(sumRT), offset(EPSILON));
 	}
 	
 
