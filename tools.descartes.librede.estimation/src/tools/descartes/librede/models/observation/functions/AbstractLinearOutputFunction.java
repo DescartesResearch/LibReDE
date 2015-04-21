@@ -40,17 +40,17 @@ public abstract class AbstractLinearOutputFunction extends AbstractOutputFunctio
 	}
 	
 	@Override
-	public double getCalculatedOutput(Vector state) {
-		return getIndependentVariables().dot(state);
+	public double getCalculatedOutput(int historicInterval, Vector state) {
+		return getIndependentVariables(historicInterval).dot(state);
 	}
 
 	@Override
-	public Vector getFirstDerivatives(Vector state) {
-		return getIndependentVariables();
+	public Vector getFirstDerivatives(int historicInterval, Vector state) {
+		return getIndependentVariables(historicInterval);
 	}
 
 	@Override
-	public Matrix getSecondDerivatives(Vector state) {
+	public Matrix getSecondDerivatives(int historicInterval, Vector state) {
 		return zeros(state.rows(), state.rows());
 	}
 

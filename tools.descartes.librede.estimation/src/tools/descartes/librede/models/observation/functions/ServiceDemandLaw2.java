@@ -112,12 +112,12 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput(int)
 	 */
 	@Override
-	public double getObservedOutput() {
-		double C = sumDeparturesQuery.execute().getValue();
-		double B = busyTimeQuery.execute().getValue();
+	public double getObservedOutput(int historicInterval) {
+		double C = sumDeparturesQuery.get(historicInterval).getValue();
+		double B = busyTimeQuery.get(historicInterval).getValue();
 		
 		if (C == 0) {
 			return 0;
@@ -127,10 +127,10 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
+	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor(int)
 	 */
 	@Override
-	public double getFactor() {
+	public double getFactor(int historicInterval) {
 		return 1;
 	}
 

@@ -85,35 +85,35 @@ public class ResponseTimeApproximationTest extends LibredeTest {
 
 	@Test
 	public void testGetFactor() {
-		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
+		assertThat(law.getFactor(0)).isEqualTo(1.0, offset(1e-9));
 	}
 
 	@Test
 	public void testGetObservedOutput() {
 		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law.getObservedOutput(0)).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetIndependentVariables() {
-		assertThat(law.getIndependentVariables()).isEqualTo(zeros(state.rows()).set(stateIdx, 1.0), offset(1e-9));
+		assertThat(law.getIndependentVariables(0)).isEqualTo(zeros(state.rows()).set(stateIdx, 1.0), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(state.get(stateIdx), offset(1e-9));
+		assertThat(law.getCalculatedOutput(0, state)).isEqualTo(state.get(stateIdx), offset(1e-9));
 	}
 
 	@Test
 	public void testGetFirstDerivatives() {
 		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
+		assertThat(law.getFirstDerivatives(0, state)).isEqualTo(diff, offset(1e-4));
 	}
 
 	@Test
 	public void testGetSecondDerivatives() {
 		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
+		assertThat(law.getSecondDerivatives(0, state)).isEqualTo(diff, offset(1e0));
 	}
 
 }

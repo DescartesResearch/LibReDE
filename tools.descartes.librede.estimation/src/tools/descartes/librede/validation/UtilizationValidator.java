@@ -87,8 +87,8 @@ public class UtilizationValidator implements IValidator {
 		double[] realUtil = new double[utilLaw.size()];
 		int i = 0;
 		for (UtilizationLaw cur : utilLaw) {
-			realUtil[i] = cur.getObservedOutput();
-			actualUtil[i] = cur.getCalculatedOutput(state);
+			realUtil[i] = cur.getObservedOutput(0);
+			actualUtil[i] = cur.getCalculatedOutput(0, state);
 			relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
 			i++;
 		}

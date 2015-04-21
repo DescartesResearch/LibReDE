@@ -34,8 +34,8 @@ public interface IOutputFunction {
 	
 	boolean isApplicable(List<String> messages);
 	
-	double getObservedOutput();
+	double getObservedOutput(int historicInterval);
 	
-	double getCalculatedOutput(Vector state);
+	double getCalculatedOutput(int historicInterval, Vector state);
 	
 }

@@ -29,6 +29,6 @@ package tools.descartes.librede.models.observation.functions;
 
 public interface IDirectOutputFunction extends ILinearOutputFunction {
 	
-	double getFactor();
+	double getFactor(int historicInterval);
 
 }

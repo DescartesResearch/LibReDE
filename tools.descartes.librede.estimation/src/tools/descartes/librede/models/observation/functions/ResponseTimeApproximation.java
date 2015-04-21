@@ -95,20 +95,20 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
+	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor(int)
 	 */
 	@Override
-	public double getFactor() {
+	public double getFactor(int historicInterval) {
 		// approximate response times directly with resource demands --> R = 1.0 * D
 		return 1.0;
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput(int)
 	 */
 	@Override
-	public double getObservedOutput() {
-		return individualResponseTimesQuery.execute().getValue();
+	public double getObservedOutput(int historicInterval) {
+		return individualResponseTimesQuery.get(historicInterval).getValue();
 	}
 
 }

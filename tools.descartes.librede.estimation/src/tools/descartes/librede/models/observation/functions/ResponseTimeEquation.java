@@ -117,22 +117,22 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		result = result && checkQueryPrecondition(throughputQuery, messages);
 		return result;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput(int)
 	 */
 	@Override
-	public double getObservedOutput() {
-		return responseTimeQuery.execute().getValue();
+	public double getObservedOutput(int historicInterval) {
+		return responseTimeQuery.get(historicInterval).getValue();
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(tools.descartes.librede.linalg.Vector)
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(int, tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public double getCalculatedOutput(Vector state) {
+	public double getCalculatedOutput(int historicInterval, Vector state) {
 		double rt = 0.0;
-		Vector X = throughputQuery.execute();
+		Vector X = throughputQuery.get(historicInterval);
 		double X_total = sum(X);
 		
 		for (Resource res_i : getStateModel().getResources()) {
@@ -183,10 +183,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getFirstDerivatives(tools.descartes.librede.linalg.Vector)
+	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getFirstDerivatives(int, tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public Vector getFirstDerivatives(final Vector state) {
+	public Vector getFirstDerivatives(final int historicInterval, final Vector state) {
 		return vector(state.rows(), new VectorFunction() {		
 			@Override
 			public double cell(int row) {
@@ -203,11 +203,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				switch(res_i.getSchedulingStrategy()) {
 				case PS:
 				case UNKOWN:
-					return calculateFirstDerivativePS(state, res_i, cls_s);
+					return calculateFirstDerivativePS(historicInterval, state, res_i, cls_s);
 				case IS:
-					return calculateFirstDerivativeIS(state, res_i, cls_s);
+					return calculateFirstDerivativeIS(historicInterval, state, res_i, cls_s);
 				case FCFS:
-					return calculateFirstDerivativeFCFS(state, res_i, cls_s);
+					return calculateFirstDerivativeFCFS(historicInterval, state, res_i, cls_s);
 				default:
 					throw new AssertionError("Unsupported scheduling strategy.");
 				}
@@ -215,21 +215,21 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		});
 	}
 	
-	private double calculateFirstDerivativeIS(Vector state, Resource res_i, Service cls_s) {
+	private double calculateFirstDerivativeIS(int historicInterval, Vector state, Resource res_i, Service cls_s) {
 		// It is just a linear function R = D --> 1 
 		return 1;
 	}
 	
-	private double calculateFirstDerivativeFCFS(Vector state, Resource res_i, Service cls_s) {
-		return calculateFirstDerivativePS(state, res_i, cls_s);
+	private double calculateFirstDerivativeFCFS(int historicInterval, Vector state, Resource res_i, Service cls_s) {
+		return calculateFirstDerivativePS(historicInterval, state, res_i, cls_s);
 	}
 		
-	private double calculateFirstDerivativePS(Vector state, Resource res_i, Service cls_s) {
+	private double calculateFirstDerivativePS(int historicInterval, Vector state, Resource res_i, Service cls_s) {
 		// get resource demands
 		double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 		
 		// get current throughput data
-		Vector X = throughputQuery.execute();
+		Vector X = throughputQuery.get(historicInterval);
 		double X_s = X.get(throughputQuery.indexOf(cls_s));
 		
 		/*
@@ -255,10 +255,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getSecondDerivatives(tools.descartes.librede.linalg.Vector)
+	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getSecondDerivatives(int, tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public Matrix getSecondDerivatives(final Vector state) {
+	public Matrix getSecondDerivatives(final int historicInterval, final Vector state) {
 		return matrix(state.rows(), state.rows(), new MatrixFunction() {			
 			@Override
 			public double cell(int row, int column) {
@@ -279,11 +279,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				switch(res_i.getSchedulingStrategy()) {
 				case PS:
 				case UNKOWN:
-					return calculateSecondDerivativePS(state, res_i, res_j, cls_s, cls_t);
+					return calculateSecondDerivativePS(historicInterval, state, res_i, res_j, cls_s, cls_t);
 				case IS:
-					return calculateSecondDerivativeIS(state, res_i, res_j, cls_s, cls_t);
+					return calculateSecondDerivativeIS(historicInterval, state, res_i, res_j, cls_s, cls_t);
 				case FCFS:
-					return calculateSecondDerivativeFCFS(state, res_i, res_j, cls_s, cls_t);
+					return calculateSecondDerivativeFCFS(historicInterval, state, res_i, res_j, cls_s, cls_t);
 				default:
 					throw new AssertionError("Unsupported scheduling strategy.");
 				}
@@ -291,22 +291,22 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		});
 	}
 	
-	private double calculateSecondDerivativeIS(Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
+	private double calculateSecondDerivativeIS(int historicInterval, Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
 		return 0;	
 	}
 	
-	private double calculateSecondDerivativeFCFS(Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
-		return calculateSecondDerivativePS(state, res_i, res_j, cls_s, cls_t);
+	private double calculateSecondDerivativeFCFS(int historicInterval, Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
+		return calculateSecondDerivativePS(historicInterval, state, res_i, res_j, cls_s, cls_t);
 	}
 	
-	private double calculateSecondDerivativePS(Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
+	private double calculateSecondDerivativePS(int historicInterval, Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
 		// if resources of x_{row} and x_{column} do not match the second derivative is zero
 		if (res_i.equals(res_j)) {
 			// get resource demands
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			
 			// get current throughput data
-			Vector X = throughputQuery.execute();
+			Vector X = throughputQuery.get(historicInterval);
 			double X_s = X.get(throughputQuery.indexOf(cls_s));
 			double X_t = X.get(throughputQuery.indexOf(cls_t));
 			

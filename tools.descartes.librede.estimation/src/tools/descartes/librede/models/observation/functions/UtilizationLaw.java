@@ -117,8 +117,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.ILinearOutputFunction#getIndependentVariables()
 	 */
 	@Override
-	public Vector getIndependentVariables() {
-		Vector X = throughputQuery.execute();
+	public Vector getIndependentVariables(int historicInterval) {
+		Vector X = throughputQuery.get(historicInterval);
 		return variables.set(varFocusedIndices, X);
 	}
 
@@ -126,8 +126,8 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput() {
-		return utilizationQuery.execute().getValue() * this.res_i.getNumberOfServers();
+	public double getObservedOutput(int historicInterval) {
+		return utilizationQuery.get(historicInterval).getValue() * this.res_i.getNumberOfServers();
 	}
 
 }

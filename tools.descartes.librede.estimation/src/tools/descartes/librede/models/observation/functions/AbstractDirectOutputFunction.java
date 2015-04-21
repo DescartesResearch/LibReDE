@@ -47,8 +47,8 @@ public abstract class AbstractDirectOutputFunction extends
 	}
 
 	@Override
-	public Vector getIndependentVariables() {
-		return zeros.set(idx, getFactor());
+	public Vector getIndependentVariables(int historicInterval) {
+		return zeros.set(idx, getFactor(historicInterval));
 	}
 
 }

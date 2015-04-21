@@ -86,12 +86,12 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public Vector getFirstDerivatives(Vector x) {
-		return throughputQuery.execute();
+	public Vector getFirstDerivatives(int historicInterval, Vector x) {
+		return throughputQuery.get(historicInterval);
 	}
 
 	@Override
-	public Matrix getSecondDerivatives(Vector x) {
+	public Matrix getSecondDerivatives(int historicInterval, Vector x) {
 		return zeros(x.rows(), x.rows());
 	}
 	

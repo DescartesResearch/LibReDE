@@ -126,16 +126,16 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput() {
+	public double getObservedOutput(int historicInterval) {
 		/*
 		 * We only get the aggregate utilization of a resource. In order to apportion this utilization between
 		 * services, we assume R ~ D.
 		 */
-		Vector R = avgResponseTimeQuery.execute();
-		Vector X = avgThroughputQuery.execute();
+		Vector R = avgResponseTimeQuery.get(historicInterval);
+		Vector X = avgThroughputQuery.get(historicInterval);
 		double R_r = R.get(avgResponseTimeQuery.indexOf(cls_r));
 		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
-		double U_i = utilizationQuery.execute().getValue();
+		double U_i = utilizationQuery.get(historicInterval).getValue();
 		int p = res_i.getNumberOfServers();
 		
 		return p * U_i * (R_r * X_r) / (R.dot(X));
@@ -145,8 +145,8 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
 	 */
 	@Override
-	public double getFactor() {
-		return avgThroughputQueryCurrentService.execute().getValue();
+	public double getFactor(int historicInterval) {
+		return avgThroughputQueryCurrentService.get(historicInterval).getValue();
 	}
 
 }

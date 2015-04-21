@@ -112,10 +112,10 @@ public abstract class NonlinearOptimization extends AbstractEstimationAlgorithm 
 				Matrix jacobi = null;
 				
 				if (linearConstraints.size() > 0) {
-					jacobi = JacobiMatrixBuilder.calculateOfConstraints(linearConstraints, current);
+					jacobi = JacobiMatrixBuilder.calculateOfConstraints(linearConstraints, 0, current);
 				}
 				if (nonlinearConstraints.size() > 0) {
-					Matrix res = JacobiMatrixBuilder.calculateOfConstraints(nonlinearConstraints, current);
+					Matrix res = JacobiMatrixBuilder.calculateOfConstraints(nonlinearConstraints, 0, current);
 					if (jacobi == null) {
 						jacobi = res;
 					} else {
@@ -178,7 +178,7 @@ public abstract class NonlinearOptimization extends AbstractEstimationAlgorithm 
 				
 				int outputIdx = 0;
 				for (IOutputFunction function : getObservationModel()) {					
-					Matrix dev2 = HessianMatrixBuilder.calculateOfOutputFunction(function, current);
+					Matrix dev2 = HessianMatrixBuilder.calculateOfOutputFunction(function, 0, current);
 					
 					Matrix u = dev2.times(error.get(outputIdx));
 					
@@ -195,7 +195,7 @@ public abstract class NonlinearOptimization extends AbstractEstimationAlgorithm 
 				// add portion for constraints
 
 				for (int i = linearConstraints.size(); i < m; i++) {
-					Matrix dev2 = HessianMatrixBuilder.calculateOfConstraint(nonlinearConstraints.get(i), current);
+					Matrix dev2 = HessianMatrixBuilder.calculateOfConstraint(nonlinearConstraints.get(i), 0, current);
 					
 					lagrange = lagrange.plus(dev2.times(lambdaArr[i]));
 				}

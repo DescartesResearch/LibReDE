@@ -31,8 +31,8 @@ import tools.descartes.librede.linalg.Vector;
 
 public interface IDifferentiableFunction {
 	
-	Vector getFirstDerivatives(Vector x);
+	Vector getFirstDerivatives(int historicInterval, Vector x);
 	
-	Matrix getSecondDerivatives(Vector x);
+	Matrix getSecondDerivatives(int historicInterval, Vector x);
 
 }

@@ -80,7 +80,7 @@ public class UtilizationLawTest extends LibredeTest {
 	@Test
 	public void testGetIndependentVariables() {
 		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
-		Vector varVector = law.getIndependentVariables();
+		Vector varVector = law.getIndependentVariables(0);
 		Indices idx = indices(generator.getStateModel().getUserServices().size(), new VectorFunction() {			
 			@Override
 			public double cell(int row) {
@@ -95,25 +95,25 @@ public class UtilizationLawTest extends LibredeTest {
 	@Test
 	public void testGetObservedOutput() {
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
+		assertThat(law.getObservedOutput(0)).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
+		assertThat(law.getCalculatedOutput(0, state)).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetFirstDerivatives() {
 		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
+		assertThat(law.getFirstDerivatives(0, state)).isEqualTo(diff, offset(1e-4));
 	}
 
 	@Test
 	public void testGetSecondDerivatives() {
 		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e-4));
+		assertThat(law.getSecondDerivatives(0, state)).isEqualTo(diff, offset(1e-4));
 	}
 
 }

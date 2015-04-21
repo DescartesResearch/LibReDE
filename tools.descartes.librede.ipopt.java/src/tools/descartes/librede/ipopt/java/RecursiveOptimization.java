@@ -98,13 +98,13 @@ public class RecursiveOptimization extends NonlinearOptimization {
 			current = nativeVector(stateSize, x);
 			IObservationModel<?, ?> observationModel = getObservationModel();
 		
-			Vector o_real = observationModel.getObservedOutput();
-			Vector o_calc = observationModel.getCalculatedOutput(current);
+			Vector o_real = observationModel.getObservedOutput(0);
+			Vector o_calc = observationModel.getCalculatedOutput(0, current);
 			error = o_real.minus(o_calc);			
 			
 			obj = norm2(error);
 						
-			jacobi = JacobiMatrixBuilder.calculateOfObservationModel(observationModel, current);
+			jacobi = JacobiMatrixBuilder.calculateOfObservationModel(observationModel, 0, current);
 			
 			objGrad = (Vector)transpose(jacobi).multipliedBy(error).times(-2.0);
 		}
