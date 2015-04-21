@@ -40,26 +40,22 @@ public interface IRepositoryCursor {
 
 	boolean next();
 	
-	boolean seek(int interval);
+	void reset();
 	
-	boolean seek(Quantity<Time> newTime);
+	int getLastInterval();
+	
+	Quantity<Time> getIntervalStart(int interval);
 
-	Quantity<Time> getCurrentIntervalStart();
+	Quantity<Time> getIntervalEnd(int interval);
 
-	Quantity<Time> getCurrentIntervalLength();
+	<D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity);
 
-	Quantity<Time> getCurrentIntervalEnd();
-
-	<D extends Dimension> TimeSeries getValues(Metric<D> metric, Unit<D> unit, ModelEntity entity);
-
-	<D extends Dimension> double getAggregatedValue(Metric<D> metric, Unit<D> unit,
+	<D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, Aggregation func);
 
 	IMonitoringRepository getRepository();
 
-	<D extends Dimension> boolean hasData(Metric<D> metric,
+	<D extends Dimension> boolean hasData(int interval, Metric<D> metric,
 			List<ModelEntity> entities, Aggregation aggregation);
-
-	int getAvailableIntervals();
 
 }

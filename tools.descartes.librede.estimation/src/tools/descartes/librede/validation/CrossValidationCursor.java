@@ -43,72 +43,73 @@ import cern.jet.random.sampling.RandomSampler;
 
 public class CrossValidationCursor implements IRepositoryCursor {
 	
-	private int kfold;
+	private final int kfold;
 	
-	private int[] partitions;
+	private final int intervals;
 	
-	private int validationPartition = 0;
+	// this 2d array contains for each partition a list of indices
+	private int[][] partitions;
+	
+	private int[] curFold;
 	
 	private int curIdx = -1;
 	
 	private IRepositoryCursor delegate;
 	
-	private boolean validationMode;
-	
-	public CrossValidationCursor(IRepositoryCursor cursor, int kfold) {
+	public CrossValidationCursor(IRepositoryCursor cursor, int kfold, int intervals) {
 		this.kfold = kfold;
+		this.intervals = intervals;
 		this.delegate = cursor;
 	}
 	
 	public void startTrainingPhase(int validationPartition) {
-		this.validationMode = false;
-		this.validationPartition = validationPartition;
-		delegate.seek(0);
+		int count = intervals - partitions[validationPartition].length;
+		curFold = new int[count];
+		for (int i = 0, pos = 0; i < kfold; i++) {
+			if (i != validationPartition) {
+				System.arraycopy(partitions[i], 0, curFold, pos, partitions[i].length);
+				pos += partitions[i].length;
+			}
+		}
+		Arrays.sort(curFold);
+		delegate.reset();
 		curIdx = -1;
 	}
 	
 	public void startValidationPhase(int validationPartition) {
-		this.validationMode = true;
-		this.validationPartition = validationPartition;
-		delegate.seek(0);
+		curFold = partitions[validationPartition];
+		delegate.reset();
 		curIdx = -1;
 	}
 	
 	@Override
 	public boolean next() {
-		while(delegate.next()) {
+		if (curIdx < curFold.length) {
 			curIdx++;
-			if ((partitions[curIdx] == validationPartition) == validationMode) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public Quantity<Time> getCurrentIntervalStart() {
-		return delegate.getCurrentIntervalStart();
+	public Quantity<Time> getIntervalStart(int interval) {
+		return delegate.getIntervalStart(curFold[interval]);
 	}
 
 	@Override
-	public Quantity<Time> getCurrentIntervalLength() {
-		return delegate.getCurrentIntervalLength();
+	public Quantity<Time> getIntervalEnd(int interval) {
+		return delegate.getIntervalEnd(curFold[interval]);
 	}
 
 	@Override
-	public Quantity<Time> getCurrentIntervalEnd() {
-		return delegate.getCurrentIntervalEnd();
+	public <D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity) {
+		return delegate.getValues(curFold[interval], metric, unit, entity);
 	}
 
 	@Override
-	public <D extends Dimension> TimeSeries getValues(Metric<D> metric, Unit<D> unit, ModelEntity entity) {
-		return delegate.getValues(metric, unit, entity);
-	}
-
-	@Override
-	public <D extends Dimension> double getAggregatedValue(Metric<D> metric, Unit<D> unit, ModelEntity entity,
+	public <D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation func) {
-		return delegate.getAggregatedValue(metric, unit, entity, func);
+		return delegate.getAggregatedValue(curFold[interval], metric, unit, entity, func);
 	}
 
 	@Override
@@ -117,51 +118,50 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public <D extends Dimension> boolean hasData(Metric<D> metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
-		return delegate.hasData(metric, entities, aggregation);
+		return delegate.hasData(curFold[interval], metric, entities, aggregation);
 	}
 	
 	public void initPartitions() {
-		int intervals = delegate.getAvailableIntervals();
-		partitions = new int[intervals];
+		partitions = new int[kfold][];
 		int partitionSize = (int)Math.ceil(intervals / (double)kfold);
-		Arrays.fill(partitions, -1);
 		
+		boolean[] notSelected = new boolean[intervals];
 		for (int i = 0; i < kfold - 1; i++) {
 			int[] subset = new int[intervals - partitionSize * i];
 			for (int p = 0, s = 0; p < intervals; p++) {
-				if (partitions[p] < 0) {
+				if (notSelected[p]) {
 					subset[s] = p;
 					s++;
 				}
 			}
 			long[] samples = new long[partitionSize];
 			RandomSampler.sample(partitionSize, subset.length, partitionSize, 0, samples, 0, null);
+			partitions[i] = new int[samples.length];
 			for (int s = 0; s < samples.length; s++) {
-				partitions[subset[(int)samples[s]]] = i;
+				partitions[i][s] = (int) samples[s];
+				notSelected[subset[(int)samples[s]]] = false;
 			}
 		}
 		
 		for (int i = 0; i < intervals; i++) {
-			if (partitions[i] < 0) {
-				partitions[i] = kfold - 1;
+			if (notSelected[i]) {
+				int[] temp = partitions[kfold];
+				partitions[kfold - 1] = new int[temp.length + 1];
+				System.arraycopy(temp, 0, partitions[kfold - 1], 0, temp.length);
+				partitions[kfold - 1][temp.length] = i;
 			}
 		}
 	}
 
 	@Override
-	public boolean seek(int interval) {
-		return delegate.seek(interval);
+	public void reset() {
+		delegate.reset();
 	}
-	
+
 	@Override
-	public boolean seek(Quantity<Time> newTime) {
-		return delegate.seek(newTime);
-	}
-	
-	@Override
-	public int getAvailableIntervals() {
-		throw new UnsupportedOperationException();
+	public int getLastInterval() {
+		return curIdx;
 	}
 }

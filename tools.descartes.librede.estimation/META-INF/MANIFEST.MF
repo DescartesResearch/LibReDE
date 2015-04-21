@@ -52,6 +52,7 @@ Export-Package: tools.descartes.librede,
    tools.descartes.librede.linalg,
    tools.descartes.librede.models.state"
 Import-Package: cern.jet.random.sampling;version="1.2.0",
+ org.apache.commons.collections.buffer;version="3.2.0",
  org.apache.commons.math3.optim;version="3.2.0",
  org.apache.commons.math3.optim.linear;version="3.2.0",
  org.apache.log4j;version="1.2.15",

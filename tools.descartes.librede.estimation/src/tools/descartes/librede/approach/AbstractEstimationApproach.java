@@ -163,7 +163,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 
 			if (iterative) {
 				while (cursor.next()) {					
-					builder.next(cursor.getCurrentIntervalEnd().getValue(Time.MILLISECONDS));
+					builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
 					
 					for (IEstimationAlgorithm a : algorithms) {
 						a.update();
@@ -182,7 +182,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 					}
 				}
 				
-				builder.next(cursor.getCurrentIntervalEnd().getValue(Time.MILLISECONDS));
+				builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
 				for (IEstimationAlgorithm a : algorithms) {
 					Vector curEstimates = a.estimate();
 					for (int i = 0; i < curEstimates.rows(); i++) {

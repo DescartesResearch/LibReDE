@@ -44,124 +44,18 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	
 	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 	
-	private static class SeriesCacheKey<D extends Dimension> {
-		
-		public final Metric<D> metric;
-		public final Unit<D> unit;
-		public final ModelEntity entity;
-		
-		public SeriesCacheKey(Metric<D> metric, Unit<D> unit, ModelEntity entity) {
-			this.metric = metric;
-			this.unit = unit;
-			this.entity = entity;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((entity == null) ? 0 : entity.hashCode());
-			result = prime * result + ((metric == null) ? 0 : metric.hashCode());
-			result = prime * result + ((unit == null) ? 0 : unit.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			SeriesCacheKey<?> other = (SeriesCacheKey<?>) obj;
-			if (entity == null) {
-				if (other.entity != null)
-					return false;
-			} else if (!entity.equals(other.entity))
-				return false;
-			if (metric == null) {
-				if (other.metric != null)
-					return false;
-			} else if (!metric.equals(other.metric))
-				return false;
-			if (unit == null) {
-				if (other.unit != null)
-					return false;
-			} else if (!unit.equals(other.unit))
-				return false;
-			return true;
-		}		
-	}
-	
-	private static class AggregationCacheKey<D extends Dimension> {
-		
-		public final Metric<D> metric;
-		public final Unit<D> unit;
-		public final ModelEntity entity;
-		public final Aggregation aggregation;
-		
-		public AggregationCacheKey(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation) {
-			this.metric = metric;
-			this.unit = unit;
-			this.entity = entity;
-			this.aggregation = aggregation;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((aggregation == null) ? 0 : aggregation.hashCode());
-			result = prime * result + ((entity == null) ? 0 : entity.hashCode());
-			result = prime * result + ((metric == null) ? 0 : metric.hashCode());
-			result = prime * result + ((unit == null) ? 0 : unit.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			AggregationCacheKey<?> other = (AggregationCacheKey<?>) obj;
-			if (aggregation != other.aggregation)
-				return false;
-			if (entity == null) {
-				if (other.entity != null)
-					return false;
-			} else if (!entity.equals(other.entity))
-				return false;
-			if (metric == null) {
-				if (other.metric != null)
-					return false;
-			} else if (!metric.equals(other.metric))
-				return false;
-			if (unit == null) {
-				if (other.unit != null)
-					return false;
-			} else if (!unit.equals(other.unit))
-				return false;
-			return true;
-		}		
-	
-	}
-	
 	private IMonitoringRepository repository;
 	private Quantity<Time> currentTime;
 	private Quantity<Time> startTime;
 	private Quantity<Time> stepSize;
-	private Map<SeriesCacheKey<?>, TimeSeries> seriesCache = new HashMap<SeriesCacheKey<?>, TimeSeries>();
-	private Map<AggregationCacheKey<?>, Double> aggregationCache = new HashMap<AggregationCacheKey<?>, Double>();
+	private int lastInterval;
 	
 	public AggregationRepositoryCursor(IMonitoringRepository repository, Quantity<Time> startTime, Quantity<Time> stepSize) {
 		this.repository = repository;
 		this.stepSize = stepSize;
 		this.startTime = startTime;
 		this.currentTime = startTime;
+		this.lastInterval = -1;
 	}
 	
 	/* (non-Javadoc)
@@ -172,92 +66,58 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 		Quantity<Time> newTime = currentTime.plus(stepSize);
 		if (newTime.compareTo(repository.getCurrentTime()) <= 0) {
 			currentTime = newTime;
-			seriesCache.clear();
-			aggregationCache.clear();
+			lastInterval++;
 			return true;
 		}
 		return false;
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#seek(int)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#reset()
 	 */
 	@Override
-	public boolean seek(int interval) {
-		Quantity<Time> newCurrentTime = startTime.plus(stepSize.times(interval));
-		if (newCurrentTime.compareTo(repository.getCurrentTime()) <= 0) {
-			currentTime = newCurrentTime;
-			seriesCache.clear();
-			aggregationCache.clear();
-			return true;
-		}
-		return false;
+	public void reset() {
+		this.currentTime = startTime;
+		this.lastInterval = 0;
 	}
 	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#seek(int)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getLastInterval()
+	 */
+	public int getLastInterval() {
+		return lastInterval;
+	}
+
+	/* (non-Javadoc)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalStart(int)
 	 */
 	@Override
-	public boolean seek(Quantity<Time> newCurrentTime) {
-		if (newCurrentTime.compareTo(repository.getCurrentTime()) <= 0) {
-			currentTime = newCurrentTime;
-			seriesCache.clear();
-			aggregationCache.clear();
-			return true;
-		}
-		return false;
+	public Quantity<Time> getIntervalStart(int interval) {
+		return startTime.plus(stepSize.times(interval));
 	}
 	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalStart()
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalEnd(int)
 	 */
 	@Override
-	public Quantity<Time> getCurrentIntervalStart() {
-		return currentTime.minus(stepSize);
+	public Quantity<Time> getIntervalEnd(int interval) {
+		return startTime.plus(stepSize.times(interval + 1));
 	}
 	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalLength()
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getValues(int, tools.descartes.librede.metrics.Metric, tools.descartes.librede.units.Unit, tools.descartes.librede.configuration.ModelEntity)
 	 */
 	@Override
-	public Quantity<Time> getCurrentIntervalLength() {
-		return stepSize;
+	public <D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity) {
+		return repository.select(metric, unit, entity, getIntervalStart(interval), getIntervalEnd(interval));
 	}
 	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getCurrentIntervalEnd()
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#getAggregatedValue(int, tools.descartes.librede.metrics.Metric, tools.descartes.librede.units.Unit, tools.descartes.librede.configuration.ModelEntity, tools.descartes.librede.metrics.Aggregation)
 	 */
 	@Override
-	public Quantity<Time> getCurrentIntervalEnd() {
-		return currentTime;
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getValues(tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity)
-	 */
-	@Override
-	public <D extends Dimension> TimeSeries getValues(Metric<D> metric, Unit<D> unit, ModelEntity entity) {
-		SeriesCacheKey<?> key = new SeriesCacheKey<D>(metric, unit, entity);
-		if (!seriesCache.containsKey(key)) {
-			TimeSeries series = repository.select(metric, unit, entity, getCurrentIntervalStart(), getCurrentIntervalEnd());
-			seriesCache.put(key, series);
-			return series;
-		}
-		return seriesCache.get(key);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#getAggregatedValue(tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity, tools.descartes.librede.repository.Aggregation)
-	 */
-	@Override
-	public <D extends Dimension> double getAggregatedValue(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation func) {
-		AggregationCacheKey<?> key = new AggregationCacheKey<D>(metric, unit, entity, func);
-		if (!aggregationCache.containsKey(key)) {
-			double value = repository.select(metric, unit, entity, getCurrentIntervalStart(), getCurrentIntervalEnd(), func);
-			aggregationCache.put(key, value);
-			return value;
-		}		
-		return aggregationCache.get(key);
+	public <D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation func) {
+		return repository.select(metric, unit, entity, getIntervalStart(interval), getIntervalEnd(interval), func);
 	}
 	
 	/* (non-Javadoc)
@@ -269,10 +129,10 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#hasData(tools.descartes.librede.metrics.Metric, java.util.List, tools.descartes.librede.repository.Aggregation)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#hasData(int, tools.descartes.librede.metrics.Metric, java.util.List, tools.descartes.librede.metrics.Aggregation)
 	 */
 	@Override
-	public <D extends Dimension> boolean hasData(Metric<D> metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		if (metric.isAggregationAllowed(aggregation)) {
 			boolean data = true;
@@ -286,10 +146,5 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 			return data;
 		}
 		return false;
-	}
-	
-	@Override
-	public int getAvailableIntervals() {
-		return (int) ((repository.getCurrentTime().minus(startTime).getValue(Time.SECONDS)) / stepSize.getValue(Time.SECONDS));
 	}
 }

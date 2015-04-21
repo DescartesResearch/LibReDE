@@ -294,7 +294,8 @@ public class Librede {
 			CrossValidationCursor cursor = new CrossValidationCursor(repository.getCursor(
 					conf.getEstimation().getStartTimestamp(), 
 					conf.getEstimation().getStepSize()), 
-					conf.getValidation().getValidationFolds());
+					conf.getValidation().getValidationFolds(),
+					(int)(conf.getEstimation().getEndTimestamp().minus(conf.getEstimation().getStartTimestamp()).getValue(Time.SECONDS) / conf.getEstimation().getStepSize().getValue(Time.SECONDS)));
 			cursor.initPartitions();
 			
 			IEstimationApproach currentApproach;
@@ -351,7 +352,7 @@ public class Librede {
 		while(validatingCursor.next()) {
 			if (log.isDebugEnabled()) {
 				StringBuilder validationData = new StringBuilder();
-				validationData.append(validatingCursor.getCurrentIntervalEnd().getValue(Time.SECONDS)).append(", ");
+				validationData.append(validatingCursor.getIntervalEnd(validatingCursor.getLastInterval()).getValue(Time.SECONDS)).append(", ");
 				validationData.append("U=").append(util.execute()).append(", ");
 				validationData.append("X=").append(tput.execute()).append(", ");
 				validationData.append("T=").append(resp.execute()).append(", ");

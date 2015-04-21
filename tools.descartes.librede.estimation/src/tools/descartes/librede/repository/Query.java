@@ -81,22 +81,27 @@ public final class Query<T extends Vector, D extends Dimension> {
 		return unit;
 	}
 	
-	public T execute() {		
+	public T get(int historicInterval) {
+		final int interval = repositoryCursor.getLastInterval() - historicInterval;
 		if (entities.size() > 1) {
 			Vector result = vector(entities.size(), new VectorFunction() {				
 				@Override
 				public double cell(int row) {
-					return repositoryCursor.getAggregatedValue(metric, unit, entities.get(row), aggregation);
+					return repositoryCursor.getAggregatedValue(interval, metric, unit, entities.get(row), aggregation);
 				}
 			});
 			return (T)result;
 		} else {
 			if (aggregation != Aggregation.NONE) {
-				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, unit, entities.get(0), aggregation));
+				return (T)new Scalar(repositoryCursor.getAggregatedValue(interval, metric, unit, entities.get(0), aggregation));
 			} else {
-				return (T)repositoryCursor.getValues(metric, unit, entities.get(0)).getData(0);
+				return (T)repositoryCursor.getValues(interval, metric, unit, entities.get(0)).getData(0);
 			}			
 		}
+	}
+	
+	public T execute() {		
+		return get(0);
 	}
 	
 	public int indexOf(ModelEntity entity) {
@@ -112,6 +117,6 @@ public final class Query<T extends Vector, D extends Dimension> {
 	}	
 
 	public boolean hasData() {
-		return repositoryCursor.hasData(metric, entities, aggregation);
+		return repositoryCursor.hasData(repositoryCursor.getLastInterval(), metric, entities, aggregation);
 	}
 }
