@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="environment" sequenceNumber="44">
+<?pde version="3.8"?><target name="environment" sequenceNumber="45">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.emf.sdk.feature.group" version="2.10.0.v20140519-0339"/>
 <unit id="org.eclipse.sdk.feature.group" version="4.4.0.v20140606-1558"/>
 <repository location="http://download.eclipse.org/releases/luna"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.fest.util" version="1.2.5.v02"/>
-<unit id="org.fest.assertions.core" version="2.0.0.M10-v02"/>
-<unit id="edu.oswego.cs.dl.util.concurrent" version="1.3.4.v02"/>
-<unit id="cern.colt" version="1.2.0.v02"/>
-<unit id="org.apache.commons.math3" version="3.2.0"/>
-<unit id="com.sun.jna" version="3.0.0"/>
-<repository location="https://se4.informatik.uni-wuerzburg.de/thirdparty/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.apache.commons.collections" version="3.2.0.v2013030210310"/>
@@ -23,6 +14,15 @@
 <unit id="org.kohsuke.args4j" version="2.0.21.v201301150030"/>
 <unit id="org.apache.log4j" version="1.2.15.v201012070815"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.fest.util" version="1.2.5.v02"/>
+<unit id="org.fest.assertions.core" version="2.0.0.M10-v02"/>
+<unit id="edu.oswego.cs.dl.util.concurrent" version="1.3.4.v03"/>
+<unit id="cern.colt" version="1.2.0.v02"/>
+<unit id="org.apache.commons.math3" version="3.2.0"/>
+<unit id="com.sun.jna" version="3.0.0"/>
+<repository location="https://se4.informatik.uni-wuerzburg.de/thirdparty/repository/"/>
 </location>
 </locations>
 </target>
