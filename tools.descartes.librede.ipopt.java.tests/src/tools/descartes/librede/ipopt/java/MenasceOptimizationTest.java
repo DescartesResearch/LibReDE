@@ -79,7 +79,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
-		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0)));
+		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
 		optim.initialize(stateModel, observationModel, 10);
@@ -128,7 +128,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 
 		observationModel = new VectorObservationModel<>();
 		for (Service service : workload.getServices()) {		
-			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, service));
+			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, service, false));
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();

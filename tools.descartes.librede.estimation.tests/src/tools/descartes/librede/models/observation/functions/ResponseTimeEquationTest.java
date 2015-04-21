@@ -67,7 +67,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 		
 		service = generator.getStateModel().getService(SERVICE_IDX);
 		
-		law = new ResponseTimeEquation(generator.getStateModel(), cursor, service);
+		law = new ResponseTimeEquation(generator.getStateModel(), cursor, service, false);
 		state = generator.getDemands();
 		
 		generator.nextObservation();

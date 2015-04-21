@@ -83,7 +83,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();		
-		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0)));
+		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false));
 		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
@@ -126,7 +126,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		
 		observationModel = new VectorObservationModel<>();
 		for (int i = 0; i < 5; i++) {
-			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(i)));
+			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(i), false));
 		}
 		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
 		

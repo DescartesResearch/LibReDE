@@ -68,7 +68,7 @@ public class ResponseTimeValidator implements IValidator {
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
-			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv));
+			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv, false));
 			services.add(srv);
 		}
 		allErrors = new MatrixBuilder(stateModel.getUserServices().size());	

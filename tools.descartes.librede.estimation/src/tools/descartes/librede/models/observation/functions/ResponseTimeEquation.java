@@ -46,6 +46,7 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 
@@ -73,6 +74,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	private Service cls_r;
 	
+	private boolean useObservedUtilization;
+	
+	private Query<Vector, Ratio> utilQuery;
 	private Query<Scalar, Time> responseTimeQuery;
 	private Query<Vector, RequestRate> throughputQuery;
 	
@@ -82,22 +86,27 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @param stateModel - the description of the state
 	 * @param repository - a view of the repository with current measurement data
 	 * @param service - the service for which the response time is calculated
-	 * @param selectedResources - the list of resources which are involved during the processing of the service
+	 * @param useObservedUtilization - a flag whether to use observed utilization values or calculated
 	 * 
 	 * @throws NullPointerException if any parameter is null
 	 * @throws IllegalArgumentException if the list of services or resources is empty
 	 */
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
-			Service service) {
+			Service service, boolean useObservedUtilization) {
 		super(stateModel);
 		
 		cls_r = service;
+		this.useObservedUtilization = useObservedUtilization;
 		
 //		int maxParallel = 1;
 //		for (Resource res : selectedResources) {
 //			maxParallel = Math.max(maxParallel, res.getNumberOfParallelServers());
 //		}
 //		precalculateFactorials(maxParallel);
+		
+		if (useObservedUtilization) {
+			utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(stateModel.getResources()).average().using(repository);
+		}
 		
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
 		/*
@@ -130,7 +139,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(int, tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public double getCalculatedOutput(int historicInterval, Vector state) {
+	public double getCalculatedOutput(final int historicInterval, Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.get(historicInterval);
 		double X_total = sum(X);
@@ -140,13 +149,13 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			case PS:
 			case UNKOWN:
 				// For now we approximate unknown with PS
-				rt += calculateResponseTimePS(state, res_i, X);
+				rt += calculateResponseTimePS(historicInterval, state, res_i, X);
 				break;
 			case IS:
-				rt += calculateResponseTimeIS(state, res_i, X);
+				rt += calculateResponseTimeIS(historicInterval, state, res_i, X);
 				break;
 			case FCFS:
-				rt += calculateResponseTimeFCFS(state, res_i, X);
+				rt += calculateResponseTimeFCFS(historicInterval, state, res_i, X);
 			default:
 				throw new AssertionError("Unsupported scheduling strategy.");
 			}
@@ -154,18 +163,18 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		return rt;
 	}
 	
-	private double calculateResponseTimeFCFS(Vector state, Resource res_i, Vector X) {
+	private double calculateResponseTimeFCFS(int historicInterval, Vector state, Resource res_i, Vector X) {
 		// TODO: Implement FCFS correctly.
-		return calculateResponseTimePS(state, res_i, X);
+		return calculateResponseTimePS(historicInterval, state, res_i, X);
 	}
 	
-	private double calculateResponseTimeIS(Vector state, Resource res_i, Vector X) {
+	private double calculateResponseTimeIS(int historicInterval, Vector state, Resource res_i, Vector X) {
 		return state.get(getStateModel().getStateVariableIndex(res_i, cls_r));		
 	}
 	
-	private double calculateResponseTimePS(Vector state, Resource res_i, Vector X) {
+	private double calculateResponseTimePS(int historicInterval, Vector state, Resource res_i, Vector X) {
 		double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-		double U_i = calculateUtilization(res_i, state, X);
+		double U_i = getUtilization(historicInterval, res_i, state, X);
 
 		int p = res_i.getNumberOfServers();
 //		double P_q = calculateQueueingProbability(p, U_i);
@@ -173,13 +182,17 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		return D_ir / (p - U_i);
 	}
 	
-	private double calculateUtilization(Resource res_i, Vector state, Vector X) {
-		double U_i = 0;
-		for (int i = 0; i < X.rows(); i++) {
-			Service curService = (Service) throughputQuery.getEntity(i);
-			U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(i);
-		}
-		return U_i;
+	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X) {
+		if (useObservedUtilization) {
+			return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
+		} else {
+			double U_i = 0;
+			for (int i = 0; i < X.rows(); i++) {
+				Service curService = (Service) throughputQuery.getEntity(i);
+				U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(i);
+			}
+			return U_i;
+		} 
 	}
 
 	/* (non-Javadoc)
@@ -237,7 +250,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		 *  
 		 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
 		 */
-		double beta = 1 - calculateUtilization(res_i, state, X);
+		double beta = 1 - getUtilization(historicInterval, res_i, state, X);
 		
 		/*
 		 * Calculate derivatives:
@@ -315,7 +328,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 *  
 			 * beta = 1 - \sum_{v = 1}^{R} X_{v} * D_{i,v}
 			 */
-			double beta = 1 - calculateUtilization(res_i, state, X);
+			double beta = 1 - getUtilization(historicInterval, res_i, state, X);
 			
 			/* 
 			 * Calculate 2nd derivatives:
