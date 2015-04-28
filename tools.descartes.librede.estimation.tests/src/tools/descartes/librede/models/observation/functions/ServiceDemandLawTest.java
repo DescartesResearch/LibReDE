@@ -85,7 +85,7 @@ public class ServiceDemandLawTest extends LibredeTest {
 		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		
-		assertThat(law.getObservedOutput(0)).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
+		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
 	}
 
 	@Test
@@ -93,25 +93,25 @@ public class ServiceDemandLawTest extends LibredeTest {
 		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
 		double expected = x * state.get(generator.getStateModel().getStateVariableIndex(resource, service));
 		
-		assertThat(law.getCalculatedOutput(0, state)).isEqualTo(expected, offset(1e-9));
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
 	public void testGetFactor() {
 		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
-		assertThat(law.getFactor(0)).isEqualTo(x, offset(1e-9));
+		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
 	}
 
 	@Test
 	public void testGetFirstDerivatives() {
 		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(0, state)).isEqualTo(diff, offset(1e-4));
+		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
 	}
 
 	@Test
 	public void testGetSecondDerivatives() {
 		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(0, state)).isEqualTo(diff, offset(1e0));
+		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
 	}
 
 }

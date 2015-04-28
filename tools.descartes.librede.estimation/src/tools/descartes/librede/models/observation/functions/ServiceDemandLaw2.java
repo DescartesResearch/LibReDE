@@ -90,8 +90,8 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	 */
 	public ServiceDemandLaw2(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource,
-			Service service) {
-		super(stateModel, resource, service);
+			Service service, int historicInterval) {
+		super(stateModel, resource, service, historicInterval);
 		
 		res_i = resource;
 		cls_r = service;
@@ -112,10 +112,10 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput(int)
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput(int historicInterval) {
+	public double getObservedOutput() {
 		double C = sumDeparturesQuery.get(historicInterval).getValue();
 		double B = busyTimeQuery.get(historicInterval).getValue();
 		
@@ -127,10 +127,10 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor(int)
+	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
 	 */
 	@Override
-	public double getFactor(int historicInterval) {
+	public double getFactor() {
 		return 1;
 	}
 

@@ -30,6 +30,6 @@ import tools.descartes.librede.linalg.Vector;
 
 public interface ILinearOutputFunction extends IOutputFunction {
 	
-	Vector getIndependentVariables(int historicInterval);
+	Vector getIndependentVariables();
 
 }

@@ -65,7 +65,24 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 */
 	public ResponseTimeApproximation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository, Resource resource,
 			Service service, Aggregation aggregation) {
-		super(stateModel, resource, service);
+		this(stateModel, repository, resource, service, aggregation, 0);
+	}
+	
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param stateModel the description of the state
+	 * @param repository the repository with current measurement data
+	 * @param service the service for which the response time is calculated
+	 * @param resource the resource for which the response time is calculated
+	 * @param aggregation specifies whether average, minimum or maximum of the observed response time is used as approximation for the resource demand.
+	 * @param historicInterval specifies the number of intervals this function is behind in the past.
+	 * 
+	 * @throws {@link NullPointerException} if any parameter is null
+	 */
+	public ResponseTimeApproximation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository, Resource resource,
+			Service service, Aggregation aggregation, int historicInterval) {
+		super(stateModel, resource, service, historicInterval);
 		
 		cls_r = service;
 		
@@ -95,19 +112,19 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor(int)
+	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
 	 */
 	@Override
-	public double getFactor(int historicInterval) {
+	public double getFactor() {
 		// approximate response times directly with resource demands --> R = 1.0 * D
 		return 1.0;
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput(int)
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput(int historicInterval) {
+	public double getObservedOutput() {
 		return individualResponseTimesQuery.get(historicInterval).getValue();
 	}
 

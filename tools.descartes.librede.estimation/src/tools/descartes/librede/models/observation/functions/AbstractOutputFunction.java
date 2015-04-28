@@ -36,12 +36,13 @@ import tools.descartes.librede.repository.Query;
 public abstract class AbstractOutputFunction implements IOutputFunction {
 	
 	private final IStateModel<? extends IStateConstraint> stateModel;
+	protected final int historicInterval;
 
-	protected AbstractOutputFunction(IStateModel<? extends IStateConstraint> stateModel) {		
+	protected AbstractOutputFunction(IStateModel<? extends IStateConstraint> stateModel, int historicInterval) {		
 		if (stateModel == null) {
 			throw new NullPointerException();
 		}
-		
+		this.historicInterval = historicInterval;
 		this.stateModel = stateModel;
 	}
 

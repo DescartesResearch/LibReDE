@@ -70,7 +70,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedIndices is updated later.
 	private final Indices varFocusedIndices; // the indices of the independent variables which is altered by this output function
-	
+
 	/**
 	 * Creates a new instance.
 	 * 
@@ -82,7 +82,22 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	public UtilizationLaw(final IStateModel<? extends IStateConstraint> stateModel, final IRepositoryCursor repository,
 			final Resource resource) {
-		super(stateModel);
+		this(stateModel, repository, resource, 0);
+	}
+	
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param stateModel - the description of the state
+	 * @param repository - the repository with current measurement data
+	 * @param resource - the resource for which the utilization is calculated
+	 * @param historicInterval - specifies the number of intervals this function is behind in the past.
+	 * 
+	 * @throws {@link NullPointerException} if any parameter is null
+	 */
+	public UtilizationLaw(final IStateModel<? extends IStateConstraint> stateModel, final IRepositoryCursor repository,
+			final Resource resource, int historicInterval) {
+		super(stateModel, historicInterval);
 		
 		this.res_i = resource;
 		
@@ -117,7 +132,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.ILinearOutputFunction#getIndependentVariables()
 	 */
 	@Override
-	public Vector getIndependentVariables(int historicInterval) {
+	public Vector getIndependentVariables() {
 		Vector X = throughputQuery.get(historicInterval);
 		return variables.set(varFocusedIndices, X);
 	}
@@ -126,7 +141,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput(int historicInterval) {
+	public double getObservedOutput() {
 		return utilizationQuery.get(historicInterval).getValue() * this.res_i.getNumberOfServers();
 	}
 

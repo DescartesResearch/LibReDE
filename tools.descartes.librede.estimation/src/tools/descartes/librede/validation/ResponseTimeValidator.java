@@ -87,8 +87,8 @@ public class ResponseTimeValidator implements IValidator {
 		double[] actual = new double[respEq.size()];
 		int i = 0;
 		for (ResponseTimeEquation cur : respEq) {
-			real[i] = cur.getObservedOutput(0);
-			actual[i] = cur.getCalculatedOutput(0, state);
+			real[i] = cur.getObservedOutput();
+			actual[i] = cur.getCalculatedOutput(state);
 			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
 			i++;
 		}

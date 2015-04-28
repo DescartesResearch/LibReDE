@@ -42,11 +42,11 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public final class JacobiMatrixBuilder {
 	
-	public static Matrix calculateOfObservationModel(IObservationModel<?, ?> observationModel, int historicInterval, Vector x) {
+	public static Matrix calculateOfObservationModel(IObservationModel<?, ?> observationModel, Vector x) {
 		List<Vector> dev = new ArrayList<Vector>();
 		for (IOutputFunction f : observationModel) {
 			if (f instanceof IDifferentiableFunction) {
-				dev.add(((IDifferentiableFunction)f).getFirstDerivatives(historicInterval, x));
+				dev.add(((IDifferentiableFunction)f).getFirstDerivatives(x));
 			} else {
 				throw new IllegalStateException("Output function cannot be derived.");
 			}
@@ -55,12 +55,12 @@ public final class JacobiMatrixBuilder {
 		return transpose(horzcat(dev.toArray(new Vector[dev.size()])));
 	}
 	
-	public static Matrix calculateOfConstraints(List<? extends IStateConstraint> constraints, int historicInterval, Vector x) {
+	public static Matrix calculateOfConstraints(List<? extends IStateConstraint> constraints, Vector x) {
 		List<Vector> dev = new ArrayList<Vector>();
 		
 		for (IStateConstraint c : constraints) {
 			if (c instanceof IDifferentiableFunction) {
-				dev.add(((IDifferentiableFunction)c).getFirstDerivatives(historicInterval, x));
+				dev.add(((IDifferentiableFunction)c).getFirstDerivatives(x));
 			} else {
 				throw new IllegalStateException("Constraint function cannot be derived.");
 			}
@@ -69,11 +69,11 @@ public final class JacobiMatrixBuilder {
 		return vertcat(dev.toArray(new Vector[dev.size()]));		
 	}
 	
-	public static Matrix calculateOfState(IStateModel<?> stateModel, int historicInterval, Vector x) {
+	public static Matrix calculateOfState(IStateModel<?> stateModel, Vector x) {
 		List<Vector> dev = new ArrayList<Vector>();
 		
 		for (IDifferentiableFunction f : stateModel.getStateDerivatives()) {
-			dev.add(f.getFirstDerivatives(historicInterval, x));
+			dev.add(f.getFirstDerivatives(x));
 		}		
 		
 		return vertcat(dev.toArray(new Vector[dev.size()]));		

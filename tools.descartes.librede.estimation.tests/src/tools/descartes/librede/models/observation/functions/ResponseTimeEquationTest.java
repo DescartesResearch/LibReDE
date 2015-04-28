@@ -77,25 +77,25 @@ public class ResponseTimeEquationTest extends LibredeTest {
 	@Test
 	public void testGetObservedOutput() {
 		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getObservedOutput(0)).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
 		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getCalculatedOutput(0, state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
 	public void testGetFirstDerivatives() {
 		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(0, state)).isEqualTo(diff, offset(1e-4));
+		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
 	}
 
 	@Test
 	public void testGetSecondDerivatives() {
 		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(0, state)).isEqualTo(diff, offset(1e0));
+		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
 	}
 
 }

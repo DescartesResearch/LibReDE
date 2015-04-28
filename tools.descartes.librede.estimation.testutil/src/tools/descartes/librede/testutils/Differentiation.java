@@ -52,8 +52,8 @@ public class Differentiation {
 				h[row] = sqrte * (Math.abs(x.get(row)) + 1.0);
 				Vector hVec = vector(h);
 				
-				double x1 = f.getCalculatedOutput(0, x.plus(hVec));
-				double x2 = f.getCalculatedOutput(0, x.minus(hVec));
+				double x1 = f.getCalculatedOutput(x.plus(hVec));
+				double x2 = f.getCalculatedOutput(x.minus(hVec));
 				
 				return (x1 - x2) / (2 * h[row]);
 			}
@@ -79,9 +79,9 @@ public class Differentiation {
 					h[row] = sqrtsqrte * (Math.abs(x.get(row)) + 1.0);
 					Vector hVec = vector(h);
 					
-					double x1 = f.getCalculatedOutput(0, x.plus(hVec));
-					double x2 = f.getCalculatedOutput(0, x);
-					double x3 = f.getCalculatedOutput(0, x.minus(hVec));
+					double x1 = f.getCalculatedOutput(x.plus(hVec));
+					double x2 = f.getCalculatedOutput(x);
+					double x3 = f.getCalculatedOutput(x.minus(hVec));
 					
 					return (x1 - 2 * x2 + x3) / (h[row]*h[row]);
 				} else {
@@ -92,10 +92,10 @@ public class Differentiation {
 					h[column] = sqrtsqrte * (Math.abs(x.get(column)) + 1.0);
 					Vector h2 = vector(h);
 					
-					double x1 = f.getCalculatedOutput(0, x.plus(h1.plus(h2)));
-					double x2 = f.getCalculatedOutput(0, x.plus(h1.minus(h2)));
-					double x3 = f.getCalculatedOutput(0, x.plus(h2.minus(h1)));
-					double x4 = f.getCalculatedOutput(0, x.minus(h1.plus(h2)));
+					double x1 = f.getCalculatedOutput(x.plus(h1.plus(h2)));
+					double x2 = f.getCalculatedOutput(x.plus(h1.minus(h2)));
+					double x3 = f.getCalculatedOutput(x.plus(h2.minus(h1)));
+					double x4 = f.getCalculatedOutput(x.minus(h1.plus(h2)));
 					
 					return (x1 - x2 - x3 + x4) / (4 * h1.get(row) * h2.get(column));
 				}

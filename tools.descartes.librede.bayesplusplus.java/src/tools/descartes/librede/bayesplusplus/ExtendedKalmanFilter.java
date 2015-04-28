@@ -65,9 +65,9 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		public Pointer execute(Pointer x) {
 			Vector currentState = nativeVector(stateSize, x);
 
-			Vector nextObservation = getObservationModel().getCalculatedOutput(0, currentState);
+			Vector nextObservation = getObservationModel().getCalculatedOutput(currentState);
 
-			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(getObservationModel(), 0, currentState);
+			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(getObservationModel(), currentState);
 			toNative(jacobiBuffer, jacobi);
 			BayesPlusPlusLibrary.set_Hx(nativeObservationModel, jacobiBuffer, stateSize, outputSize);
 
@@ -88,7 +88,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 			Vector currentState = nativeVector(stateSize, x);
 
 			Vector nextState = getStateModel().getNextState(currentState);
-			Matrix jacobi = JacobiMatrixBuilder.calculateOfState(getStateModel(), 0, currentState);
+			Matrix jacobi = JacobiMatrixBuilder.calculateOfState(getStateModel(), currentState);
 			toNative(jacobiBuffer, jacobi);
 			BayesPlusPlusLibrary.set_Fx(nativeStateModel, jacobiBuffer, stateSize);
 
@@ -305,7 +305,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		} else {	
 			predict();
 	
-			observe(getObservationModel().getObservedOutput(0));
+			observe(getObservationModel().getObservedOutput());
 	
 			updateState();
 			

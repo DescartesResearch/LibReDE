@@ -73,12 +73,12 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public Vector getFirstDerivatives(int historicInterval, Vector x) {		
+	public Vector getFirstDerivatives(Vector x) {		
 		return null;
 	}
 
 	@Override
-	public Matrix getSecondDerivatives(int historicInterval, Vector x) {
+	public Matrix getSecondDerivatives(Vector x) {
 		return null;
 	}
 

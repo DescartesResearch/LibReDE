@@ -97,12 +97,12 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 
 		@Override
-		public Vector getFirstDerivatives(int historicInterval, Vector x) {
+		public Vector getFirstDerivatives(Vector x) {
 			return firstDev;
 		}
 
 		@Override
-		public Matrix getSecondDerivatives(int historicInterval, Vector x) {
+		public Matrix getSecondDerivatives(Vector x) {
 			return secondDev;
 		}
 		

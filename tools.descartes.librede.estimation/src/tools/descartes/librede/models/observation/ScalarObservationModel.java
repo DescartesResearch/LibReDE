@@ -49,13 +49,13 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
-	public Scalar getObservedOutput(int historicInterval) {
-		return scalar(outputFunction.getObservedOutput(historicInterval));
+	public Scalar getObservedOutput() {
+		return scalar(outputFunction.getObservedOutput());
 	}
 
 	@Override
-	public Scalar getCalculatedOutput(int historicInterval, Vector state) {
-		return scalar(outputFunction.getCalculatedOutput(historicInterval, state));
+	public Scalar getCalculatedOutput(Vector state) {
+		return scalar(outputFunction.getCalculatedOutput(state));
 	}
 	
 	@Override

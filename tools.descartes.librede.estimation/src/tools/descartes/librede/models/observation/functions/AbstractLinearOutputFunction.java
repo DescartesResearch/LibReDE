@@ -35,22 +35,22 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction {
 	
-	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel) {
-		super(stateModel);
+	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel, int historicInterval) {
+		super(stateModel, historicInterval);
 	}
 	
 	@Override
-	public double getCalculatedOutput(int historicInterval, Vector state) {
-		return getIndependentVariables(historicInterval).dot(state);
+	public double getCalculatedOutput(Vector state) {
+		return getIndependentVariables().dot(state);
 	}
 
 	@Override
-	public Vector getFirstDerivatives(int historicInterval, Vector state) {
-		return getIndependentVariables(historicInterval);
+	public Vector getFirstDerivatives(Vector state) {
+		return getIndependentVariables();
 	}
 
 	@Override
-	public Matrix getSecondDerivatives(int historicInterval, Vector state) {
+	public Matrix getSecondDerivatives(Vector state) {
 		return zeros(state.rows(), state.rows());
 	}
 

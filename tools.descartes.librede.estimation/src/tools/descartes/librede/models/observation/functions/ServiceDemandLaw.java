@@ -81,7 +81,6 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	private Query<Vector, RequestRate> avgThroughputQuery;
 	private Query<Scalar, RequestRate> avgThroughputQueryCurrentService;
 	
-	
 	/**
 	 * Creates a new instance.
 	 * 
@@ -95,7 +94,24 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	public ServiceDemandLaw(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource,
 			Service service) {
-		super(stateModel, resource, service);
+		this(stateModel, repository, resource, service, 0);
+	}
+	
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param stateModel - the description of the state
+	 * @param repository - the view of the repository with current measurement data
+	 * @param service - the service for which the utilization is calculated
+	 * @param resource - the resource for which the utilization is calculated
+	 * @param historicInterval - specifies the number of intervals this function is behind in the past.
+	 * 
+	 * @throws {@link NullPointerException} if any parameter is null
+	 */
+	public ServiceDemandLaw(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
+			Resource resource,
+			Service service, int historicInterval) {
+		super(stateModel, resource, service, historicInterval);
 		
 		res_i = resource;
 		cls_r = service;
@@ -126,7 +142,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput(int historicInterval) {
+	public double getObservedOutput() {
 		/*
 		 * We only get the aggregate utilization of a resource. In order to apportion this utilization between
 		 * services, we assume R ~ D.
@@ -145,7 +161,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
 	 */
 	@Override
-	public double getFactor(int historicInterval) {
+	public double getFactor() {
 		return avgThroughputQueryCurrentService.get(historicInterval).getValue();
 	}
 

@@ -93,7 +93,23 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 */
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Service service, boolean useObservedUtilization) {
-		super(stateModel);
+		this(stateModel, repository, service, useObservedUtilization, 0);
+	}
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param stateModel - the description of the state
+	 * @param repository - a view of the repository with current measurement data
+	 * @param service - the service for which the response time is calculated
+	 * @param useObservedUtilization - a flag whether to use observed utilization values or calculated
+	 * @param historicInterval - specifies the number of intervals this function is behind in the past.
+	 * 
+	 * @throws NullPointerException if any parameter is null
+	 * @throws IllegalArgumentException if the list of services or resources is empty
+	 */
+	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
+			Service service, boolean useObservedUtilization, int historicInterval) {
+		super(stateModel, historicInterval);
 		
 		cls_r = service;
 		this.useObservedUtilization = useObservedUtilization;
@@ -128,18 +144,18 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput(int)
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
 	@Override
-	public double getObservedOutput(int historicInterval) {
+	public double getObservedOutput() {
 		return responseTimeQuery.get(historicInterval).getValue();
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(int, tools.descartes.librede.linalg.Vector)
+	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getCalculatedOutput(tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public double getCalculatedOutput(final int historicInterval, Vector state) {
+	public double getCalculatedOutput(Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.get(historicInterval);
 		double X_total = sum(X);
@@ -196,10 +212,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getFirstDerivatives(int, tools.descartes.librede.linalg.Vector)
+	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getFirstDerivatives(tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public Vector getFirstDerivatives(final int historicInterval, final Vector state) {
+	public Vector getFirstDerivatives(final Vector state) {
 		return vector(state.rows(), new VectorFunction() {		
 			@Override
 			public double cell(int row) {
@@ -268,10 +284,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getSecondDerivatives(int, tools.descartes.librede.linalg.Vector)
+	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#getSecondDerivatives(tools.descartes.librede.linalg.Vector)
 	 */
 	@Override
-	public Matrix getSecondDerivatives(final int historicInterval, final Vector state) {
+	public Matrix getSecondDerivatives(final Vector state) {
 		return matrix(state.rows(), state.rows(), new MatrixFunction() {			
 			@Override
 			public double cell(int row, int column) {

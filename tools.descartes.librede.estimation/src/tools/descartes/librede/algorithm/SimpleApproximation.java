@@ -92,7 +92,7 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 
 	@Override
 	public void update() throws EstimationException {
-		final Vector output = getObservationModel().getObservedOutput(0);
+		final Vector output = getObservationModel().getObservedOutput();
 
 		// update the buffer with current output of the observation model
 		Vector currentEstimate = vector(output.rows(), new VectorFunction() {
@@ -100,7 +100,7 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 			public double cell(int row) {
 				return output.get(row)
 						/ getCastedObservationModel().getOutputFunction(row)
-								.getFactor(0);
+								.getFactor();
 			}
 		});
 		buffer = buffer.circshift(1).setRow(0, currentEstimate);

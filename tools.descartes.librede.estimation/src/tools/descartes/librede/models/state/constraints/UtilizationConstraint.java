@@ -45,17 +45,24 @@ import tools.descartes.librede.units.RequestRate;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
 
-	private Resource res_i;
+	private final Resource res_i;
 	
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	private IRepositoryCursor cursor;
+	private final IRepositoryCursor cursor;
 	
 	private Query<Vector, RequestRate> throughputQuery;
 	
+	private final int historicInterval;
+	
 	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor) {
+		this(resource, cursor, 0);
+	}
+	
+	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor, int historicInterval) {
 		this.res_i = resource;
 		this.cursor = cursor;
+		this.historicInterval = historicInterval;
 	}
 	
 	@Override
@@ -73,7 +80,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		Vector X = throughputQuery.execute();
+		Vector X = throughputQuery.get(historicInterval);
 		double U_i = 0.0;
 		for (int i = 0; i < X.rows(); i++) {
 			Service curService = (Service)throughputQuery.getEntity(i);
@@ -86,12 +93,12 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public Vector getFirstDerivatives(int historicInterval, Vector x) {
+	public Vector getFirstDerivatives(Vector x) {
 		return throughputQuery.get(historicInterval);
 	}
 
 	@Override
-	public Matrix getSecondDerivatives(int historicInterval, Vector x) {
+	public Matrix getSecondDerivatives(Vector x) {
 		return zeros(x.rows(), x.rows());
 	}
 	

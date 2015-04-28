@@ -46,8 +46,8 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	private Query<Scalar, RequestCount> queueLengthQuery;
 
 	public  ResponseTimeFCFS(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
-			Resource resource, Service service) {
-		super(stateModel, resource, service);
+			Resource resource, Service service, int historicInterval) {
+		super(stateModel, resource, service, historicInterval);
 		
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
 		queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL).in(RequestCount.REQUESTS).forResource(resource).average().using(repository);
@@ -62,12 +62,12 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	}
 
 	@Override
-	public double getObservedOutput(int historicInterval) {
+	public double getObservedOutput() {
 		return responseTimeQuery.get(historicInterval).getValue();
 	}
 
 	@Override
-	public double getFactor(int historicInterval) {
+	public double getFactor() {
 		return queueLengthQuery.get(historicInterval).plus(1).getValue();
 	}
 

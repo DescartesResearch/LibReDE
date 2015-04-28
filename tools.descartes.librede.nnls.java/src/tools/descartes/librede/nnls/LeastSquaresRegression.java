@@ -170,8 +170,8 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 		
 		numObservations++;
 		
-		dependentVariables = dependentVariables.circshift(1).set(0, outputFunction.getObservedOutput(0));
-		independentVariables = independentVariables.circshift(1).setRow(0, outputFunction.getIndependentVariables(0));
+		dependentVariables = dependentVariables.circshift(1).set(0, outputFunction.getObservedOutput());
+		independentVariables = independentVariables.circshift(1).setRow(0, outputFunction.getIndependentVariables());
 	}
 
 	@Override

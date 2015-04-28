@@ -33,17 +33,17 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public final class HessianMatrixBuilder {
 	
-	public static Matrix calculateOfOutputFunction(IOutputFunction function, int historicInterval, Vector x) {
+	public static Matrix calculateOfOutputFunction(IOutputFunction function, Vector x) {
 		if (function instanceof IDifferentiableFunction) {
-			return ((IDifferentiableFunction)function).getSecondDerivatives(historicInterval, x);
+			return ((IDifferentiableFunction)function).getSecondDerivatives(x);
 		} else {
 			throw new IllegalStateException("Output function cannot be derived.");
 		}
 	}
 	
-	public static Matrix calculateOfConstraint(IStateConstraint constraint, int historicInterval, Vector x) {
+	public static Matrix calculateOfConstraint(IStateConstraint constraint, Vector x) {
 		if (constraint instanceof IDifferentiableFunction) {
-			return ((IDifferentiableFunction)constraint).getSecondDerivatives(historicInterval, x);
+			return ((IDifferentiableFunction)constraint).getSecondDerivatives(x);
 		} else {
 			throw new IllegalStateException("Constraint function cannot be derived.");
 		}
