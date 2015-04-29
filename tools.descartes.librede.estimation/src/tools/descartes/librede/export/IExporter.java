@@ -26,10 +26,11 @@
  */
 package tools.descartes.librede.export;
 
+import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.TimeSeries;
 
 public interface IExporter {
 	
-	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception;
+	public void writeResults(String approach, int fold, StateVariable[] variables, TimeSeries estimates) throws Exception;
 
 }
