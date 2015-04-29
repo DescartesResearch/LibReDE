@@ -117,6 +117,6 @@ public final class Query<T extends Vector, D extends Dimension> {
 	}	
 
 	public boolean hasData() {
-		return repositoryCursor.hasData(repositoryCursor.getLastInterval(), metric, entities, aggregation);
+		return repositoryCursor.hasData(0, metric, entities, aggregation);
 	}
 }
