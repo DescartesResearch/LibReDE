@@ -26,9 +26,15 @@
  */
 package tools.descartes.librede;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +58,7 @@ import tools.descartes.librede.configuration.ExporterConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
@@ -127,6 +134,8 @@ public class Librede {
 	}
 	
 	public static void execute(LibredeConfiguration conf) {
+		completeWorkloadDescription(conf);
+		
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
@@ -154,6 +163,14 @@ public class Librede {
 			} catch (Exception e) {
 				log.error("Error running estimation.", e);
 			}			
+		}
+	}
+	
+	private static void completeWorkloadDescription(LibredeConfiguration conf) {
+		for (Resource res : conf.getWorkloadDescription().getResources()) {
+			if (res.getServices().isEmpty()) {
+				res.getServices().addAll(conf.getWorkloadDescription().getServices());
+			}
 		}
 	}
 	
@@ -278,7 +295,7 @@ public class Librede {
 			
 			List<IValidator> validators = initValidators(conf, validatingCursor);
 			
-			runValidation(validators, validatingCursor, state, estimates);
+			runValidation(conf, validators, validatingCursor, state, estimates);
 				
 			results.add(new ResultTable[] { estimates });
 		}
@@ -325,7 +342,7 @@ public class Librede {
 				
 				cursor.startValidationPhase(i);
 				
-				runValidation(validators, cursor, state, estimates);
+				runValidation(conf, validators, cursor, state, estimates);
 				
 				folds[i] = estimates;
 			}
@@ -345,22 +362,62 @@ public class Librede {
 		return validators;
 	}
 	
-	private static void runValidation(List<IValidator> validators, IRepositoryCursor validatingCursor, Vector demands, ResultTable estimates){		
-		Query<Vector, Ratio> util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(validatingCursor.getRepository().listResources()).average().using(validatingCursor);
-		Query<Vector, RequestRate> tput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(validatingCursor.getRepository().listServices()).average().using(validatingCursor);
-		Query<Vector, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(validatingCursor.getRepository().listServices()).average().using(validatingCursor);
-		while(validatingCursor.next()) {
-			if (log.isDebugEnabled()) {
-				StringBuilder validationData = new StringBuilder();
-				validationData.append(validatingCursor.getIntervalEnd(validatingCursor.getLastInterval()).getValue(Time.SECONDS)).append(", ");
-				validationData.append("U=").append(util.execute()).append(", ");
-				validationData.append("X=").append(tput.execute()).append(", ");
-				validationData.append("T=").append(resp.execute()).append(", ");
-				log.debug(validationData);
+	private static void runValidation(LibredeConfiguration conf, List<IValidator> validators, IRepositoryCursor validatingCursor, Vector demands, ResultTable estimates){		
+		List<Service> sortedServices = new ArrayList<>(validatingCursor.getRepository().listServices());
+		Collections.sort(sortedServices, new Comparator<Service>() {
+			@Override
+			public int compare(Service o1, Service o2) {
+				return o1.getName().compareTo(o2.getName());
 			}
-			for (IValidator validator : validators) {
-				validator.predict(demands);
+		});
+		List<Resource> sortedResources = new ArrayList<>(validatingCursor.getRepository().listResources());
+		Collections.sort(sortedResources, new Comparator<Resource>() {
+			@Override
+			public int compare(Resource o1, Resource o2) {
+				return o1.getName().compareTo(o2.getName());
 			}
+		});
+		
+		Query<Vector, Ratio> util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(sortedResources).average().using(validatingCursor);
+		Query<Vector, RequestRate> tput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(sortedServices).average().using(validatingCursor);
+		Query<Vector, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(sortedServices).average().using(validatingCursor);
+		File output = new File("C:\\Users\\Simon\\Workspaces\\specjent-model\\specjent-model2\\data.csv");
+		try (PrintStream out = new PrintStream(output)) {
+			out.print("#");
+			for (Resource r : sortedResources) {
+				out.print(", ");
+				out.print(r.getName());
+			}
+			for (int i = 0; i < 2; i++) {
+				for (Service s : sortedServices) {
+					out.print(", ");
+					out.print(s.getName());
+				}
+			}
+			out.println();
+			
+			while(validatingCursor.next()) {
+				out.print(util.execute());
+				out.print(", ");
+				out.print(tput.execute());
+				out.print(", ");
+				out.print(resp.execute());
+				out.println();				
+				
+				if (log.isDebugEnabled()) {
+					StringBuilder validationData = new StringBuilder();
+					validationData.append(validatingCursor.getIntervalEnd(validatingCursor.getLastInterval()).getValue(Time.SECONDS)).append(", ");
+					validationData.append("U=").append(util.execute()).append(", ");
+					validationData.append("X=").append(tput.execute()).append(", ");
+					validationData.append("T=").append(resp.execute()).append(", ");
+					log.debug(validationData);
+				}
+				for (IValidator validator : validators) {
+					validator.predict(demands);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		
 		for (IValidator validator : validators) {
@@ -533,7 +590,7 @@ public class Librede {
 				int i = 0;
 				for (ResultTable curFold : folds) {
 					try {
-						exporter.writeResults(curFold.getApproach().getSimpleName(), i, curFold.getEstimates());
+						exporter.writeResults(curFold.getApproach().getSimpleName(), i, curFold.getStateVariables(), curFold.getEstimates());
 					} catch (Exception e) {
 						log.error("Could not export results.", e);
 					}
