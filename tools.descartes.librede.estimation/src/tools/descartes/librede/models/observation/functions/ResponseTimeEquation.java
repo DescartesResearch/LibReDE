@@ -268,19 +268,32 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		 */
 		double beta = 1 - getUtilization(historicInterval, res_i, state, X);
 		
+		
 		/*
-		 * Calculate derivatives:
-		 * 
-		 * \frac{D_{i,r * X_{s}}{beta^{2}} if r != s
-		 * 
-		 * \frac{D_{i,r * X_{s}}{beta^{2}} + \frac{1}{beta} if r == s				 * 			
+		 * When calculating derivatives, we need to distinguish between two cases:
+		 * 1. We use the observed utilization -> it is a linear function with simple derivation
+		 * 2. We use the utilization law to calculate the utilization -> quotient rule needs to be applied
 		 */
-		double dev = (D_ir * X_s) / (beta * beta);				
-		if (cls_r.equals(cls_s)) {
-			return dev + (1 / beta);
+		double dev = 0.0;
+		if (useObservedUtilization) {
+			if (cls_r.equals(cls_s)) {
+				dev += (1 / beta);
+			}
 		} else {
-			return dev;
+			/*
+			 * Calculate derivatives:
+			 * 
+			 * \frac{D_{i,r * X_{s}}{beta^{2}} if r != s
+			 * 
+			 * \frac{D_{i,r * X_{s}}{beta^{2}} + \frac{1}{beta} if r == s				 * 			
+			 */
+			dev += (D_ir * X_s) / (beta * beta);
+			if (cls_r.equals(cls_s)) {
+				dev += (1 / beta);
+			}
 		}
+		return dev;
+
 	}
 
 	/* (non-Javadoc)
@@ -330,7 +343,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	
 	private double calculateSecondDerivativePS(int historicInterval, Vector state, Resource res_i, Resource res_j, Service cls_s, Service cls_t) {
 		// if resources of x_{row} and x_{column} do not match the second derivative is zero
-		if (res_i.equals(res_j)) {
+		// if we use observed utilization it is only a linear function -> second derivative is zero
+		if (!useObservedUtilization && res_i.equals(res_j)) {
 			// get resource demands
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			

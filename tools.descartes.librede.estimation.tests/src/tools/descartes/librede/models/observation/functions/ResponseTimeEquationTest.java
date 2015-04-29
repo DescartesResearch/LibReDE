@@ -31,8 +31,14 @@ import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
@@ -48,6 +54,7 @@ import tools.descartes.librede.testutils.ObservationDataGenerator;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
+@RunWith(Parameterized.class)
 public class ResponseTimeEquationTest extends LibredeTest {
 	
 	private final static int SERVICE_IDX = 2;
@@ -57,6 +64,16 @@ public class ResponseTimeEquationTest extends LibredeTest {
 	private IRepositoryCursor cursor;
 	private Service service;
 	private Vector state;
+	private boolean useObservedUtilization;
+	
+	public ResponseTimeEquationTest(boolean useObservedUtilization) {
+		this.useObservedUtilization = useObservedUtilization;
+	}
+	
+	@Parameters
+	public static Collection<Boolean[]> testData() {
+		return Arrays.asList(new Boolean[][] {{ true }, { false }});
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -67,7 +84,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 		
 		service = generator.getStateModel().getService(SERVICE_IDX);
 		
-		law = new ResponseTimeEquation(generator.getStateModel(), cursor, service, false);
+		law = new ResponseTimeEquation(generator.getStateModel(), cursor, service, useObservedUtilization);
 		state = generator.getDemands();
 		
 		generator.nextObservation();
