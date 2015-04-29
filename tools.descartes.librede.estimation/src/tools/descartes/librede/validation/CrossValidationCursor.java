@@ -65,7 +65,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	public void startTrainingPhase(int validationPartition) {
 		int count = intervals - partitions[validationPartition].length;
 		curFold = new int[count];
-		for (int i = 0, pos = 0; i < kfold; i++) {
+		for (int i = 0, pos = 0; i < kfold; i++) {			
 			if (i != validationPartition) {
 				System.arraycopy(partitions[i], 0, curFold, pos, partitions[i].length);
 				pos += partitions[i].length;
@@ -84,7 +84,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	
 	@Override
 	public boolean next() {
-		if (curIdx < curFold.length) {
+		if (curIdx < (curFold.length - 1)) {
 			curIdx++;
 			return true;
 		}
@@ -127,6 +127,7 @@ public class CrossValidationCursor implements IRepositoryCursor {
 		partitions = new int[kfold][];
 		int partitionSize = (int)Math.ceil(intervals / (double)kfold);
 		
+		int unassigned = intervals;
 		boolean[] notSelected = new boolean[intervals];
 		for (int i = 0; i < kfold - 1; i++) {
 			int[] subset = new int[intervals - partitionSize * i];
@@ -142,15 +143,15 @@ public class CrossValidationCursor implements IRepositoryCursor {
 			for (int s = 0; s < samples.length; s++) {
 				partitions[i][s] = (int) samples[s];
 				notSelected[subset[(int)samples[s]]] = false;
+				unassigned--;
 			}
 		}
 		
-		for (int i = 0; i < intervals; i++) {
+		partitions[kfold - 1] = new int[unassigned];
+		for (int i = 0, p = 0; i < intervals; i++) {
 			if (notSelected[i]) {
-				int[] temp = partitions[kfold];
-				partitions[kfold - 1] = new int[temp.length + 1];
-				System.arraycopy(temp, 0, partitions[kfold - 1], 0, temp.length);
-				partitions[kfold - 1][temp.length] = i;
+				partitions[kfold - 1][p] = i;
+				p++;
 			}
 		}
 	}
