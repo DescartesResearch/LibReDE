@@ -43,40 +43,41 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 public final class JacobiMatrixBuilder {
 	
 	public static Matrix calculateOfObservationModel(IObservationModel<?, ?> observationModel, Vector x) {
-		List<Vector> dev = new ArrayList<Vector>();
-		for (IOutputFunction f : observationModel) {
+		Vector[] dev = new Vector[observationModel.getOutputSize()];
+		for (int i = 0; i < dev.length; i++) {
+			IOutputFunction f = observationModel.getOutputFunction(i);
 			if (f instanceof IDifferentiableFunction) {
-				dev.add(((IDifferentiableFunction)f).getFirstDerivatives(x));
+				dev[i] = ((IDifferentiableFunction)f).getFirstDerivatives(x);
 			} else {
 				throw new IllegalStateException("Output function cannot be derived.");
 			}
 		}
 		
-		return transpose(horzcat(dev.toArray(new Vector[dev.size()])));
+		return transpose(horzcat(dev));
 	}
 	
 	public static Matrix calculateOfConstraints(List<? extends IStateConstraint> constraints, Vector x) {
-		List<Vector> dev = new ArrayList<Vector>();
-		
-		for (IStateConstraint c : constraints) {
+		Vector[] dev = new Vector[constraints.size()];		
+		for (int i = 0; i < dev.length; i++) {
+			IStateConstraint c = constraints.get(i);
 			if (c instanceof IDifferentiableFunction) {
-				dev.add(((IDifferentiableFunction)c).getFirstDerivatives(x));
+				dev[i] = ((IDifferentiableFunction)c).getFirstDerivatives(x);
 			} else {
 				throw new IllegalStateException("Constraint function cannot be derived.");
 			}
 		}		
 		
-		return vertcat(dev.toArray(new Vector[dev.size()]));		
+		return vertcat(dev);		
 	}
 	
 	public static Matrix calculateOfState(IStateModel<?> stateModel, Vector x) {
-		List<Vector> dev = new ArrayList<Vector>();
-		
-		for (IDifferentiableFunction f : stateModel.getStateDerivatives()) {
-			dev.add(f.getFirstDerivatives(x));
+		List<IDifferentiableFunction> functions = stateModel.getStateDerivatives();
+		Vector[] dev = new Vector[functions.size()];		
+		for (int i = 0; i < dev.length; i++) {
+			dev[i] = functions.get(i).getFirstDerivatives(x);
 		}		
 		
-		return vertcat(dev.toArray(new Vector[dev.size()]));		
+		return vertcat(dev);		
 	}
 
 }
