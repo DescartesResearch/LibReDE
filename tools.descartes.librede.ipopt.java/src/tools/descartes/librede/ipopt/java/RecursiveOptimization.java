@@ -151,16 +151,20 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private Matrix jacobi ;
 	private Matrix jacobiConstr;
 	
+	private Pointer nlp;
+	
 	protected Vector solve() {
 		setOptimizationBounds();
 		
 		setOptimizationConstraints();
 		
-		Pointer nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
-                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
-                evaljacg, evalh);
-		
-		setOptimizationOptions(nlp);	
+		if (nlp == null) {
+			nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
+	                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
+	                evaljacg, evalh);
+			
+			setOptimizationOptions(nlp);
+		}			
 		
 		/* solve the problem */
 		int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, objRef, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
@@ -176,9 +180,6 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
 		}
 
-		/* free allocated memory */
-		IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
-		
 		return estimate;
 	}
 	
@@ -390,7 +391,16 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 
 	@Override
 	public void destroy() {
-		
+		if (nlp != null) {
+			/* free allocated memory */
+			IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
+			nlp = null;
+		}
+		g_L = null;
+		g_U = null;
+		x = null;
+		x_L = null;
+		x_U = null;
 	}
 	
 	private class F implements Eval_F_CB {
