@@ -89,12 +89,12 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 		for (Service curService : stateModel.getBackgroundServices()) {
 			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService));
 		}
-		return U_i;
+		return U_i / res_i.getNumberOfServers();
 	}
 
 	@Override
 	public Vector getFirstDerivatives(Vector x) {
-		return throughputQuery.get(historicInterval);
+		return throughputQuery.get(historicInterval).times(1.0 / res_i.getNumberOfServers());
 	}
 
 	@Override
