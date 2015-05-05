@@ -84,7 +84,6 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import tools.descartes.librede.PrettyPrinter;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
@@ -99,6 +98,7 @@ import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.model.util.PrettyPrinter;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetricHandler;
 import tools.descartes.librede.units.Quantity;

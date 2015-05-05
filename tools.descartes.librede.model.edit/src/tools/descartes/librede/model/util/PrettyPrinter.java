@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede;
+package tools.descartes.librede.model.util;
 
 public class PrettyPrinter {
 	

@@ -50,7 +50,6 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IManagedForm;
 
-import tools.descartes.librede.PrettyPrinter;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
@@ -63,6 +62,7 @@ import tools.descartes.librede.configuration.editor.forms.details.FileTraceDetai
 import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.model.util.PrettyPrinter;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMetricHandler;
 import tools.descartes.librede.repository.StandardMetricHelpers;
