@@ -198,5 +198,9 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 			}
 		}
 	}
+	
+	protected int getEstimationWindow() {
+		return estimationWindow;
+	}
 
 }
