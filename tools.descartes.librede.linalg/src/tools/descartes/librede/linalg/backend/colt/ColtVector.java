@@ -198,9 +198,9 @@ public class ColtVector extends AbstractVector {
 		if (a.isScalar()) {
 			return times(((Scalar)a).getValue());
 		} else {
-			ColtVector vector = toColtVector((Vector)a);
+			ColtMatrix vector = toColtMatrix(a);
 			// TODO buffer
-			DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate, null);
+			DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate.viewRow(0), null);
 			return new ColtMatrix(result);
 		}
 	}
