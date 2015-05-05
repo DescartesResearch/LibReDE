@@ -134,7 +134,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	@Override
 	public Vector getIndependentVariables() {
 		Vector X = throughputQuery.get(historicInterval);
-		return variables.set(varFocusedIndices, X);
+		return variables.set(varFocusedIndices, X.times(1.0 / this.res_i.getNumberOfServers()));
 	}
 
 	/* (non-Javadoc)
@@ -142,7 +142,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		return utilizationQuery.get(historicInterval).getValue() * this.res_i.getNumberOfServers();
+		return utilizationQuery.get(historicInterval).getValue();
 	}
 
 }
