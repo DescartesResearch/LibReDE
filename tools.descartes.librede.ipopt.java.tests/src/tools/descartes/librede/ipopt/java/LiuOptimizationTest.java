@@ -74,7 +74,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 5);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
@@ -120,13 +120,15 @@ public class LiuOptimizationTest extends LibredeTest {
 	@Test
 	public void testFiveServicesOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
+		
+		System.in.read();
 
 		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 5);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Service service : workload.getServices()) {

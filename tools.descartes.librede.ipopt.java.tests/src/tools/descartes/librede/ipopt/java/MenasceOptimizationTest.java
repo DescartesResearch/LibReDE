@@ -44,6 +44,7 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
+import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
@@ -70,7 +71,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 1);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
@@ -110,12 +111,13 @@ public class MenasceOptimizationTest extends LibredeTest {
 	public void testFiveServicesOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
 
+		System.in.read();
 		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 1);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Service service : workload.getServices()) {
