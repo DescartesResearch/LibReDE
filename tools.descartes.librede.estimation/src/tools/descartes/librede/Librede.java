@@ -47,6 +47,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.approach.LiuOptimizationApproach;
 import tools.descartes.librede.approach.MenasceOptimizationApproach;
 import tools.descartes.librede.approach.ResponseTimeApproximationApproach;
 import tools.descartes.librede.approach.RoliaRegressionApproach;
@@ -80,6 +81,7 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
+import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
@@ -126,6 +128,7 @@ public class Librede {
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, MenasceOptimizationApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, LiuOptimizationApproach.class);
 		
 		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
@@ -239,8 +242,8 @@ public class Librede {
 		
 		List<ResultTable[]> results = new ArrayList<ResultTable[]>();
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
-			IRepositoryCursor cursor = repository.getCursor(conf.getEstimation().getStartTimestamp(), 
-					conf.getEstimation().getStepSize());
+			IRepositoryCursor cursor = new CachingRepositoryCursor(repository.getCursor(conf.getEstimation().getStartTimestamp(), 
+					conf.getEstimation().getStepSize()), conf.getEstimation().getWindow());
 			
 			IEstimationApproach currentApproach;
 			try {
@@ -282,7 +285,8 @@ public class Librede {
 					repository.getWorkload(), 
 					conf.getEstimation().getWindow(), 
 					conf.getEstimation().isRecursive(), 
-					cursor, algoFactory);
+					new CachingRepositoryCursor(cursor, conf.getEstimation().getWindow()),
+					algoFactory);
 			if (estimates.getEstimates().isEmpty()) {
 				break;
 			}
@@ -334,7 +338,8 @@ public class Librede {
 						repository.getWorkload(), 
 						conf.getEstimation().getWindow(), 
 						conf.getEstimation().isRecursive(), 
-						cursor, algoFactory);
+						new CachingRepositoryCursor(cursor, conf.getEstimation().getWindow()), 
+						algoFactory);
 				if (estimates.getEstimates().isEmpty()) {
 					break;
 				}
