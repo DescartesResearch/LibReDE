@@ -619,7 +619,6 @@ public class ConfigurationEditor
 	 */
 	public ConfigurationEditor() {
 		super();
-		Librede.init();
 		initializeEditingDomain();
 	}
 
