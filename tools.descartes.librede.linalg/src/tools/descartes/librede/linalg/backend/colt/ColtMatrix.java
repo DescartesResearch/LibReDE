@@ -27,6 +27,7 @@
 package tools.descartes.librede.linalg.backend.colt;
 
 import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.*;
 
 import java.util.Arrays;
 
@@ -251,6 +252,11 @@ public class ColtMatrix extends AbstractMatrix {
 			return new ColtMatrix(result);
 		}
 	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		return solve(this, b);
+	}
 
 	@Override
 	public double[] toArray1D() {
@@ -263,22 +269,6 @@ public class ColtMatrix extends AbstractMatrix {
 			}
 		}
 		return ret;
-	}
-
-	protected ColtMatrix toColtMatrix(Matrix a) {
-		if (a instanceof ColtMatrix) {
-			return (ColtMatrix) a;
-		} else {
-			return new ColtMatrix(a.toArray2D());
-		}
-	}
-
-	protected ColtVector toColtVector(Vector a) {
-		if (a instanceof ColtVector) {
-			return (ColtVector) a;
-		} else {
-			return new ColtVector(a.toArray1D());
-		}
 	}
 
 	@Override

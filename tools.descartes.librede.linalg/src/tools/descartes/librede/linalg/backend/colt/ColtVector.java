@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.*;
+
 import tools.descartes.librede.linalg.AggregationFunction;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
@@ -94,7 +96,7 @@ public class ColtVector extends AbstractVector {
 		if (b.rows() != delegate.size()) {
 			throw new IllegalArgumentException("A and B must have the same size.");
 		}
-		return delegate.zDotProduct(getColtVector(b).delegate);
+		return delegate.zDotProduct(toColtVector(b).delegate);
 	}
 
 	@Override
@@ -104,6 +106,11 @@ public class ColtVector extends AbstractVector {
 			result.setQuick(i, delegate.getQuick(i) * a);
 		}
 		return new ColtVector(result);
+	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		return solve(this, b);
 	}
 
 	@Override
@@ -153,7 +160,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);	
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.plus);
+		res.assign(toColtVector((Vector)a).delegate, Functions.plus);
 		return new ColtVector(res);
 	}
 	
@@ -162,7 +169,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.minus);
+		res.assign(toColtVector((Vector)a).delegate, Functions.minus);
 		return new ColtVector(res);
 	}
 
@@ -171,7 +178,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.mult);
+		res.assign(toColtVector((Vector)a).delegate, Functions.mult);
 		return new ColtVector(res);
 	}
 	
@@ -180,7 +187,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.div);
+		res.assign(toColtVector((Vector)a).delegate, Functions.div);
 		return new ColtVector(res);
 	}
 
@@ -191,26 +198,10 @@ public class ColtVector extends AbstractVector {
 		if (a.isScalar()) {
 			return times(((Scalar)a).getValue());
 		} else {
-			ColtVector vector = getColtVector(a);
+			ColtVector vector = toColtVector((Vector)a);
 			// TODO buffer
 			DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate, null);
 			return new ColtMatrix(result);
-		}
-	}
-	
-	private ColtVector getColtVector(Matrix a) {
-		if (a instanceof ColtVector) {
-			return (ColtVector)a;
-		} else {
-			return new ColtVector(a.toArray1D());
-		}
-	}
-	
-	private ColtMatrix getColtMatrix(Matrix a) {
-		if (a instanceof ColtMatrix) {
-			return (ColtMatrix)a;
-		} else {
-			return new ColtMatrix(a.toArray2D());
 		}
 	}
 	
@@ -222,7 +213,7 @@ public class ColtVector extends AbstractVector {
 		
 		DoubleMatrix2D combined = newMatrix(this.rows(), 1 + a.columns());
 		combined.viewPart(0, 0, this.rows(), 1).assign(toArray2D());
-		combined.viewPart(0, 1, a.rows(), a.columns()).assign(getColtMatrix(a).delegate);
+		combined.viewPart(0, 1, a.rows(), a.columns()).assign(toColtMatrix(a).delegate);
 		return new ColtMatrix(combined);
 	}
 	
@@ -233,7 +224,7 @@ public class ColtVector extends AbstractVector {
 		}
 		DoubleMatrix1D combined = newVector(delegate.size() + a.rows());
 		combined.viewPart(0, delegate.size()).assign(delegate);
-		combined.viewPart(delegate.size(), a.rows()).assign(getColtVector(a).delegate);		
+		combined.viewPart(delegate.size(), a.rows()).assign(toColtVector((Vector)a).delegate);		
 		return new ColtVector(combined);
 	}
 	
@@ -342,11 +333,11 @@ public class ColtVector extends AbstractVector {
 		DoubleMatrix1D copy = copyVector();
 		if (rows.isContinuous()) {
 			RangeImpl range = (RangeImpl)rows;
-			copy.viewPart(range.getStart(), range.getLength()).assign(getColtVector(values).delegate);
+			copy.viewPart(range.getStart(), range.getLength()).assign(toColtVector(values).delegate);
 			return new ColtVector(copy);
 		} else {
 			IndicesImpl indices = (IndicesImpl)rows;
-			copy.viewSelection(indices.getIndices()).assign(getColtVector(values).delegate);
+			copy.viewSelection(indices.getIndices()).assign(toColtVector(values).delegate);
 			return new ColtVector(copy);
 		}			
 	}

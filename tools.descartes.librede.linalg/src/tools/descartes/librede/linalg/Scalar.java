@@ -224,6 +224,11 @@ public class Scalar implements Vector, SquareMatrix {
 	public Matrix multipliedBy(Matrix a) {
 		return a.times(value);
 	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		return b.times(1 / value);
+	}
 
 	@Override
 	public double[] toArray1D() {

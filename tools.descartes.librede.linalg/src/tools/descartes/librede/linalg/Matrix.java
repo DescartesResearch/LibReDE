@@ -155,6 +155,8 @@ public interface Matrix {
 	Matrix arrayDividedBy(Matrix a);
 
 	Matrix times(double a);
+	
+	Matrix mldivide(Matrix b);
 
 	double norm1();
 

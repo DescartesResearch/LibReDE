@@ -117,6 +117,14 @@ public final class Empty implements Vector, SquareMatrix {
 	public Empty times(double a) {
 		return this;
 	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		if (b.isEmpty()) {
+			return this;
+		}
+		throw new IllegalArgumentException("Incompatible dimensions.");
+	}
 
 	@Override
 	public Empty abs() {
