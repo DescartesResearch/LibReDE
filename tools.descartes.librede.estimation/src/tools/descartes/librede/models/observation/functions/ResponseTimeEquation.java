@@ -71,8 +71,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 	private static final ErlangCEquation erlangC = new ErlangCEquation();
 
-	private double[] factorials;
-
 	private Service cls_r;
 
 	private boolean useObservedUtilization;
@@ -193,7 +191,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	public double getCalculatedOutput(Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.get(historicInterval);
-		double X_r = X.get(throughputQuery.indexOf(cls_r));
 
 		for (Resource res_i : getStateModel().getResources()) {
 			double U_i = getUtilization(historicInterval, res_i, state, X);
@@ -291,13 +288,13 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				if (cls_r.equals(cls_s)) {
 					dev += 1;
 				}
-				return getFirstDerivationOfQueueingTime(state, res_i, cls_s, X, U_i, dev);
+				return dev + getFirstDerivationOfQueueingTime(state, res_i, cls_s, X, U_i);
 			}		
 		});
 	}
 	
 	private double getFirstDerivationOfQueueingTime(final Vector state, Resource res_i, Service cls_s, Vector X,
-			double U_i, double dev) throws AssertionError {
+			double U_i) throws AssertionError {
 		switch(res_i.getSchedulingStrategy()) {
 		case FCFS:
 			// TODO: implement FCFS
@@ -309,10 +306,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 * linear function with simple derivation 2. We use the
 			 * utilization law to calculate the utilization -> quotient rule
 			 * needs to be applied
-			 */			
-			double P_q = erlangC.calculateValue(res_i.getNumberOfServers(), U_i);
+			 */
+			int k = res_i.getNumberOfServers();
+			double P_q = erlangC.calculateValue(k, U_i);
 			double beta = 1 - U_i;
-			
+			double dev = 0.0;
+
 			/*
 			 * Calculate: (D_ir * \frac{P_q}{1 - U_i})'
 			 */
@@ -321,7 +320,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			}
 			if (!useObservedUtilization) {
 				double X_s = X.get(throughputQuery.indexOf(cls_s));
-				double devP_q = erlangC.calculateFirstDerivative(res_i.getNumberOfServers(), U_i, X_s);
+				/*
+				 * Important: Consider the number of 
+				 * servers for calculating the derivation of U
+				 */
+				double devU = X_s / k;
+				double devP_q = erlangC.calculateFirstDerivative(k, U_i, devU);
 				/*
 				 * U_i and P_q are also functions of the state. Therefore, we need
 				 * to apply the quotient rule. The first addend of the quotient rule
@@ -332,7 +336,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				 * 
 				 */
 				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-				dev += D_ir * deriveQueueingFactor(beta, X_s, P_q, devP_q);
+				dev += D_ir * deriveQueueingFactor(beta, X_s / k, P_q, devP_q);
 			}			
 			return dev;
 		case IS:
@@ -345,8 +349,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	/*
 	 * Calculates: F_q = (\frac{P_q}{beta})' with beta = 1 - U_i
 	 */
-	private double deriveQueueingFactor(double beta, double X_s, double P_q, double devP_q) {
-		return (devP_q / beta +  (P_q * X_s) / (beta * beta));
+	private double deriveQueueingFactor(double beta, double devU, double P_q, double devP_q) {
+		return (devP_q / beta + (P_q * devU) / (beta * beta));
 	}
 
 	/*
@@ -399,26 +403,28 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				double X_t = X.get(throughputQuery.indexOf(cls_t));
 				
 				double U_i = getUtilization(historicInterval, res_i, state, X);
+				int k = res_i.getNumberOfServers();
 
 				switch(res_i.getSchedulingStrategy()) {
 				case FCFS:
 					// TODO: implement FCFS scheduling
 				case PS:
 				case UNKOWN:
-					int p = res_i.getNumberOfServers();
-					double P_q = erlangC.calculateValue(p, U_i);					
-					double devsP_q = erlangC.calculateFirstDerivative(p, U_i, X_s);
-					double devtP_q = erlangC.calculateFirstDerivative(p, U_i, X_t);
-					double devsdevtP_q = erlangC.calculateSecondDerivative(p, U_i, X_s);
+					double P_q = erlangC.calculateValue(k, U_i);
+					double devsU = X_s / k;
+					double devtU = X_t / k;
+					double devsP_q = erlangC.calculateFirstDerivative(k, U_i, devsU);
+					double devtP_q = erlangC.calculateFirstDerivative(k, U_i, devtU);
+					double devsdevtP_q = erlangC.calculateSecondDerivative(k, U_i, devsU);
 					
 					double beta = 1 - U_i;
 					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-					double dev = D_ir * (devsdevtP_q / beta + (devsP_q * X_t  + devtP_q * X_s) / (beta * beta) + (P_q * 2 * X_s * X_t) / (beta * beta * beta));			
+					double dev = D_ir * (devsdevtP_q / beta + (devsP_q * devtU  + devtP_q * devsU) / (beta * beta) + (P_q * 2 * devsU * devtU) / (beta * beta * beta));			
 					if (cls_r.equals(cls_s)) {
-						dev += deriveQueueingFactor(beta, X_t, P_q, devtP_q);
+						dev += deriveQueueingFactor(beta, devtU, P_q, devtP_q);
 					}
 					if (cls_r.equals(cls_t)) {
-						dev += deriveQueueingFactor(beta, X_s, P_q, devsP_q);
+						dev += deriveQueueingFactor(beta, devsU, P_q, devsP_q);
 					}					
 					return dev;
 				case IS:

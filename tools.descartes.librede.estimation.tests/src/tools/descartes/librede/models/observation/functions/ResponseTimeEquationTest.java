@@ -57,7 +57,7 @@ import tools.descartes.librede.units.UnitsFactory;
 @RunWith(Parameterized.class)
 public class ResponseTimeEquationTest extends LibredeTest {
 	
-	private final static int SERVICE_IDX = 2;
+	private final static int SERVICE_IDX = 0;
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeEquation law;
@@ -65,19 +65,21 @@ public class ResponseTimeEquationTest extends LibredeTest {
 	private Service service;
 	private Vector state;
 	private boolean useObservedUtilization;
+	private int numServers;
 	
-	public ResponseTimeEquationTest(boolean useObservedUtilization) {
+	public ResponseTimeEquationTest(boolean useObservedUtilization, int numServers) {
 		this.useObservedUtilization = useObservedUtilization;
+		this.numServers = numServers;
 	}
 	
 	@Parameters
-	public static Collection<Boolean[]> testData() {
-		return Arrays.asList(new Boolean[][] {{ true }, { false }});
+	public static Collection<Object[]> testData() {
+		return Arrays.asList(new Object[][] {{ true, 1 }, { false, 1 }, { true, 2 }, { false, 2 }});
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		generator = new ObservationDataGenerator(42, 5, 4);
+		generator = new ObservationDataGenerator(42, 5, 4, numServers);
 		generator.setRandomDemands();
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
