@@ -25,6 +25,10 @@ public class ErlangCEquationTest extends LibredeTest {
 		assertThat(eqn.calculateValue(2, 0.5)).isEqualTo(1 / 3.0, offset(1e-3));
 		assertThat(eqn.calculateValue(2, 0.75)).isEqualTo(0.642857142857143, offset(1e-3));
 		assertThat(eqn.calculateValue(2, 1)).isEqualTo(1.0, offset(1e-3));
+		
+		assertThat(eqn.calculateFirstDerivative(2, 0.25, 1)).isEqualTo(0.720195188843065, offset(1e-3));
+		assertThat(eqn.calculateFirstDerivative(2, 0.5, 1)).isEqualTo(1.11096532942676, offset(1e-3));
+		assertThat(eqn.calculateFirstDerivative(2, 0.75, 1)).isEqualTo(1.34704232177155, offset(1e-3));
 	}
 	
 	@Test

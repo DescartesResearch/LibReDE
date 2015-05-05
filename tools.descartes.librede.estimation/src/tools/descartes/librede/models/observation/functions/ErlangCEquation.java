@@ -26,14 +26,18 @@ public class ErlangCEquation {
 			// special case
 			return utilization;
 		} else {
-			double[] factors = getFactors(k);
-			double value = 0;
-			double u = utilization;
-			for (int i = 0; i < factors.length; i++) {
-				value += factors[i] * u;
-				u *= utilization;
+			if (utilization >= 1.0) {
+				return 1.0;
+			} else {					
+				double[] factors = getFactors(k);
+				double value = 0;
+				double u = utilization;
+				for (int i = 0; i < factors.length; i++) {
+					value += factors[i] * u;
+					u *= utilization;
+				}
+				return value;
 			}
-			return value;
 		}
 	}
 
@@ -41,14 +45,18 @@ public class ErlangCEquation {
 		if (k == 1) {
 			return utilizationFirstDerivative;		
 		} else {
-			double[] factors = getFactors(k);
-			double u = utilization;
-			double value = factors[0] * utilizationFirstDerivative;
-			for (int i = 1; i < factors.length; i++) {
-				value += (i + 1) * factors[i] * u * utilizationFirstDerivative;
-				u *= utilization;
+			if (utilization >= 1.0) {
+				return 0.0;
+			} else {
+				double[] factors = getFactors(k);
+				double u = utilization;
+				double value = factors[0] * utilizationFirstDerivative;
+				for (int i = 1; i < factors.length; i++) {
+					value += (i + 1) * factors[i] * u * utilizationFirstDerivative;
+					u *= utilization;
+				}
+				return value;
 			}
-			return value;
 		}
 	}
 	
@@ -56,14 +64,18 @@ public class ErlangCEquation {
 		if (k == 1) {
 			return 0.0;
 		} else {
-			double[] factors = getFactors(k);
-			double value = 0.0;
-			double u = 1.0;
-			for (int i = 1; i < factors.length; i++) {
-				value += (i + 1) * factors[i] * (i * u * utilizationFirstDerivative);
-				u *= utilization;
+			if (utilization >= 1.0) {
+				return 0.0;
+			} else {
+				double[] factors = getFactors(k);
+				double value = 0.0;
+				double u = 1.0;
+				for (int i = 1; i < factors.length; i++) {
+					value += (i + 1) * factors[i] * (i * u * utilizationFirstDerivative);
+					u *= utilization;
+				}
+				return value;
 			}
-			return value;
 		}
 	}
 	
