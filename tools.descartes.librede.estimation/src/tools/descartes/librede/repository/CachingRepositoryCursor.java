@@ -76,31 +76,41 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 	 */
 	private static class CacheEntry {
 		private final double[] values;
+		private final boolean[] loaded;
 		public int lastIndex;
 		private final int maxSize;
 		
 		public CacheEntry(int size) {
 			maxSize = size;
 			values = new double[size];
+			loaded = new boolean[size];
 			lastIndex = -1;
 		}
 		
+		public boolean contains(int index) {
+			return loaded[index % maxSize];
+		}
+		
 		public double get(int index) {
-			if (((lastIndex - maxSize) >= index) || index > lastIndex) {
-				// no values available
-				return Double.NaN;
-			}
 			return values[index % maxSize];
 		}
 		
-		public void add(double value) {
-			lastIndex++;
+		public void set(int index, double value) {
 			values[lastIndex % maxSize] = value;
+			loaded[lastIndex % maxSize] = true;
+		}
+		
+		public void moveTo(int index) {
+			for (int i = lastIndex + 1; i <= index; i++) {
+				loaded[i % maxSize] = false;
+			}
+			lastIndex = index;
 		}
 	}
 	
 	private final IRepositoryCursor delegate;
 	private final int cacheSize;
+	private int lastInterval = -1;
 	private final Map<CacheKey<?>, CacheEntry> aggregationCache = new HashMap<CacheKey<?>, CacheEntry>();
 	
 	public CachingRepositoryCursor(IRepositoryCursor delegate, int cacheSize) {
@@ -111,7 +121,7 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 	@Override
 	public boolean next() {
 		if (delegate.next()) {
-			aggregationCache.clear();
+			lastInterval = delegate.getLastInterval();
 			return true;
 		}
 		return false;
@@ -141,16 +151,20 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 	@Override
 	public <D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation func) {
-		CacheEntry entry = getCacheEntry(metric, unit, entity, Aggregation.NONE);
-		if (entry.lastIndex < interval) {
-			// Load everything up to the requested interval into the cache.
-			for (int i = entry.lastIndex + 1; i <= interval; i++) {
-				entry.add(delegate.getAggregatedValue(i, metric, unit, entity, func));
-			}
+		if (interval > lastInterval) {
+			throw new IllegalArgumentException();
 		}
-
-		// check that the requested interval is within the cached range
-		if (interval > (entry.lastIndex - cacheSize)) {
+		
+		// interval is in the cached range?
+		if (interval > (lastInterval - cacheSize)) {
+			CacheEntry entry = getCacheEntry(metric, unit, entity, Aggregation.NONE);
+			// important update cache and invalidate old entries			
+			entry.moveTo(lastInterval);
+			if (!entry.contains(interval)) {
+				double value = delegate.getAggregatedValue(interval, metric, unit, entity, func);
+				entry.set(interval, value);
+				return value;
+			}
 			return entry.get(interval);
 		} else {
 			return delegate.getAggregatedValue(interval, metric, unit, entity, func);
@@ -174,13 +188,14 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 		CacheEntry entry = aggregationCache.get(key);
 		if (entry == null) {
 			entry = new CacheEntry(cacheSize);
+			aggregationCache.put(key, entry);
 		}
 		return entry;
 	}
 
 	@Override
 	public int getLastInterval() {
-		return getLastInterval();
+		return lastInterval;
 	}
 	
 }
