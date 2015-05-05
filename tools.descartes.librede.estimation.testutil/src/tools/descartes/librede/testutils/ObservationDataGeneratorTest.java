@@ -46,6 +46,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.observation.functions.ErlangCEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -58,6 +59,8 @@ import tools.descartes.librede.units.UnitsFactory;
 public class ObservationDataGeneratorTest extends LibredeTest {
 	
 	private static final double EPSILON = 1e-4;
+	
+	private static final ErlangCEquation erlang = new ErlangCEquation();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -89,6 +92,25 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 	@Test
 	public void testNextObservation4WC1R() {
 		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		
+		Query<Vector,Ratio> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(generator.getStateModel().getResources()).average().using(view);
+		Query<Vector, RequestRate> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(view);
+		Query<Vector, Time> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(view);
+		
+		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
+		generator.setDemands(demands);
+		
+		for (int i = 0; i < 10000; i++) {
+			generator.nextObservation();
+			view.next();
+			assertObservation(utilData, tputData, rtData, demands);
+		}
+	}
+	
+	@Test
+	public void testNextObservation4WC1RParallel() {
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 4, 1, 2);
 		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		Query<Vector,Ratio> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(generator.getStateModel().getResources()).average().using(view);
@@ -231,14 +253,14 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 			double util = 0;
 			int temp = stateVar;
 			for (Service serv : res.getServices()) {
-				util += demands.get(temp) * tputData.execute().get(tputData.indexOf(serv));
+				util += demands.get(temp) * tputData.execute().get(tputData.indexOf(serv)) / res.getNumberOfServers();
 				temp++;
 			}
 			assertThat(util).isEqualTo(utilData.execute().get(utilData.indexOf(res)), offset(EPSILON));
 			
 			for (Service serv : res.getServices()) {
 				int idx = tputData.indexOf(serv);
-				sumRT[idx] += demands.get(stateVar) / (1 - util);
+				sumRT[idx] += (demands.get(stateVar) * (erlang.calculateValue(res.getNumberOfServers(), util) + 1 - util)) / (1 - util);
 				stateVar++;
 			}
 		}

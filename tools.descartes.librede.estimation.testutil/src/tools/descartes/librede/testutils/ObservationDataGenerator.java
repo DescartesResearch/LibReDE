@@ -47,6 +47,7 @@ import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.observation.functions.ErlangCEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -69,6 +70,8 @@ public class ObservationDataGenerator {
 	private double lowerUtilizationBound = 0.0;
 	private Vector demands;
 	private double workloadMixVariation = 1.0;
+	private ErlangCEquation erlangC = new ErlangCEquation();
+	private int numServers;
 	
 	private Resource[] resources;
 	private List<Indices> resToServ;
@@ -84,22 +87,31 @@ public class ObservationDataGenerator {
 	private MemoryObservationRepository repository;
 	
 	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources) {
+		this(seed, numWorkloadClasses, numResources, 1);
+	}
+	
+	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources, boolean[][] mapping) {
+		this(seed, numWorkloadClasses, numResources, 1, mapping);
+	}
+	
+	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources, int numServers) {
 		boolean[][] mapping = new boolean[numWorkloadClasses][numResources];
 		for (boolean[] m : mapping) {
 			Arrays.fill(m, true);
 		}
-		init(seed, numWorkloadClasses, numResources, mapping);
+		init(seed, numWorkloadClasses, numResources, numServers, mapping);
 	}
 	
-	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources, boolean[][] mapping) {
-		init(seed, numWorkloadClasses, numResources, mapping);
+	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources, int numServers, boolean[][] mapping) {
+		init(seed, numWorkloadClasses, numResources, numServers, mapping);
 	}
 	
-	private void init(long seed, int numWorkloadClasses, int numResources, boolean[][] mapping) {
+	private void init(long seed, int numWorkloadClasses, int numResources, int numServers, boolean[][] mapping) {
 		Random randSeed = new Random(seed);
 		randUtil = new Random(randSeed.nextLong());
 		randWheights = new Random(randSeed.nextLong());
 		randDemands = new Random(randSeed.nextLong());
+		this.numServers = numServers;
 		
 		model = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
 		
@@ -116,6 +128,7 @@ public class ObservationDataGenerator {
 		for (int i = 0; i < numResources; i++) {
 			resources[i] = ConfigurationFactory.eINSTANCE.createResource();
 			resources[i].setName("R" + i);
+			resources[i].setNumberOfServers(numServers);
 			resToIdx.put(resources[i], i);
 			
 			final List<Integer> idx = new ArrayList<>(numWorkloadClasses);
@@ -222,7 +235,7 @@ public class ObservationDataGenerator {
 		
 		final double maxUtil = randUtil.nextDouble() * (upperUtilizationBound - lowerUtilizationBound) + lowerUtilizationBound;
 		
-		final double totalThroughput = maxUtil / weightedTotalDemand.get(bottleneckResource);		
+		final double totalThroughput = numServers * (maxUtil / weightedTotalDemand.get(bottleneckResource));		
 		final Vector throughput = vector(services.length, new VectorFunction() {
 			@Override
 			public double cell(int row) {
@@ -234,7 +247,7 @@ public class ObservationDataGenerator {
 			@Override
 			public double cell(int row) {
 				if (row != bottleneckResource) {
-					return throughput.get(resToServ.get(row)).dot(demands.get(stateModel.getStateVariableIndices(resources[row])));
+					return throughput.get(resToServ.get(row)).dot(demands.get(stateModel.getStateVariableIndices(resources[row]))) / numServers;
 				} else {
 					return maxUtil;
 				}
@@ -272,7 +285,8 @@ public class ObservationDataGenerator {
 			double sumRT = 0.0;
 			for (Resource resource : services[i].getResources()) {
 				int stateIdx = stateModel.getStateVariableIndex(resource, services[i]);
-				sumRT += demands.get(stateIdx) / (1 - utilization.get(resToIdx.get(resource)));
+				double util = utilization.get(resToIdx.get(resource));
+				sumRT += (demands.get(stateIdx) * (erlangC.calculateValue(numServers, util) + 1 - util)) / (1 - util);
 			}
 			
 			TimeSeries ts = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i]);
