@@ -39,6 +39,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.edit.command.DeleteCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
@@ -216,7 +217,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 			IStructuredSelection selection = (IStructuredSelection) provider
 					.getSelection();
 			if (!selection.isEmpty()) {
-				Command remove = RemoveCommand.create(editingDomain,
+				Command remove = DeleteCommand.create(editingDomain,
 						selection.toList());
 				editingDomain.getCommandStack().execute(remove);
 			}
