@@ -376,15 +376,6 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getQuantity_Dimension() {
-		return (EReference)quantityEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EOperation getQuantity__ConvertTo__Unit() {
 		return quantityEClass.getEOperations().get(0);
 	}
@@ -489,7 +480,6 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		quantityEClass = createEClass(QUANTITY);
 		createEAttribute(quantityEClass, QUANTITY__VALUE);
 		createEReference(quantityEClass, QUANTITY__UNIT);
-		createEReference(quantityEClass, QUANTITY__DIMENSION);
 		createEOperation(quantityEClass, QUANTITY___CONVERT_TO__UNIT);
 		createEOperation(quantityEClass, QUANTITY___GET_VALUE__UNIT);
 		createEOperation(quantityEClass, QUANTITY___PLUS__QUANTITY);
@@ -595,8 +585,6 @@ public class UnitsPackageImpl extends EPackageImpl implements UnitsPackage {
 		g2 = createEGenericType(quantityEClass_D);
 		g1.getETypeArguments().add(g2);
 		initEReference(getQuantity_Unit(), g1, null, "unit", null, 1, 1, Quantity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		g1 = createEGenericType(quantityEClass_D);
-		initEReference(getQuantity_Dimension(), g1, null, "dimension", null, 1, 1, Quantity.class, !IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		op = initEOperation(getQuantity__ConvertTo__Unit(), null, "convertTo", 1, 1, IS_UNIQUE, IS_ORDERED);
 		g1 = createEGenericType(this.getUnit());

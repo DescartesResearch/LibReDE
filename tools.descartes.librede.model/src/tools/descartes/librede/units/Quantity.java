@@ -42,7 +42,6 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link tools.descartes.librede.units.Quantity#getValue <em>Value</em>}</li>
  *   <li>{@link tools.descartes.librede.units.Quantity#getUnit <em>Unit</em>}</li>
- *   <li>{@link tools.descartes.librede.units.Quantity#getDimension <em>Dimension</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.units.UnitsPackage#getQuantity()
@@ -101,21 +100,6 @@ public interface Quantity<D extends Dimension> extends EObject, Comparable<Quant
 	 * @generated
 	 */
 	void setUnit(Unit<D> value);
-
-	/**
-	 * Returns the value of the '<em><b>Dimension</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Dimension</em>' reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Dimension</em>' reference.
-	 * @see tools.descartes.librede.units.UnitsPackage#getQuantity_Dimension()
-	 * @model required="true" changeable="false"
-	 * @generated
-	 */
-	D getDimension();
 
 	/**
 	 * <!-- begin-user-doc -->

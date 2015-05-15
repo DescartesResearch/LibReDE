@@ -52,6 +52,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 import tools.descartes.librede.configuration.provider.LibredeEditPlugin;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
 
 /**
@@ -92,7 +93,6 @@ public class QuantityItemProvider
 
 			addValuePropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
-			addDimensionPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -141,35 +141,13 @@ public class QuantityItemProvider
 				 null) {
 				@Override
 				public Collection<?> getChoiceOfValues(Object object) {
-					Dimension d = ((Quantity<?>)object).getDimension();
-					if (d != null) {
-						return d.getUnits();
+					Unit<?> u = ((Quantity<?>)object).getUnit();
+					if (u!= null) {
+						return u.getDimension().getUnits();
 					}
 					return super.getChoiceOfValues(object);
 				}
 			});
-	}
-
-	/**
-	 * This adds a property descriptor for the Dimension feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addDimensionPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_Quantity_dimension_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Quantity_dimension_feature", "_UI_Quantity_type"),
-				 UnitsPackage.Literals.QUANTITY__DIMENSION,
-				 false,
-				 false,
-				 false,
-				 null,
-				 null,
-				 null));
 	}
 
 	/**

@@ -209,7 +209,6 @@ public class UnitsFactoryImpl extends EFactoryImpl implements UnitsFactory {
 		QuantityImpl<D> quantity = new QuantityImpl<D>();
 		quantity.unit = unit;
 		quantity.value = value;
-		quantity.dimension = unit.getDimension();
 		return quantity;
 	}
 

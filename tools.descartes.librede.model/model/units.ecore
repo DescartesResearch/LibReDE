@@ -109,10 +109,6 @@
         <eTypeArguments eTypeParameter="#//Quantity/D"/>
       </eGenericType>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="dimension" lowerBound="1"
-        changeable="false">
-      <eGenericType eTypeParameter="#//Quantity/D"/>
-    </eStructuralFeatures>
     <eGenericSuperTypes eClassifier="#//Comparable">
       <eTypeArguments eClassifier="#//Quantity">
         <eTypeArguments eTypeParameter="#//Quantity/D"/>

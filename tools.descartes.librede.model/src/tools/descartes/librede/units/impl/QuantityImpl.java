@@ -53,7 +53,6 @@ import tools.descartes.librede.units.UnitsPackage;
  * <ul>
  *   <li>{@link tools.descartes.librede.units.impl.QuantityImpl#getValue <em>Value</em>}</li>
  *   <li>{@link tools.descartes.librede.units.impl.QuantityImpl#getUnit <em>Unit</em>}</li>
- *   <li>{@link tools.descartes.librede.units.impl.QuantityImpl#getDimension <em>Dimension</em>}</li>
  * </ul>
  *
  * @generated
@@ -88,16 +87,6 @@ public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Contai
 	 * @ordered
 	 */
 	protected Unit<D> unit;
-
-	/**
-	 * The cached value of the '{@link #getDimension() <em>Dimension</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDimension()
-	 * @generated
-	 * @ordered
-	 */
-	protected D dimension;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -181,33 +170,6 @@ public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Contai
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	public D getDimension() {
-		if (dimension != null && dimension.eIsProxy()) {
-			InternalEObject oldDimension = (InternalEObject)dimension;
-			dimension = (D)eResolveProxy(oldDimension);
-			if (dimension != oldDimension) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, UnitsPackage.QUANTITY__DIMENSION, oldDimension, dimension));
-			}
-		}
-		return dimension;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public D basicGetDimension() {
-		return dimension;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
 	public Quantity<D> convertTo(Unit<D> targetUnit) {
@@ -263,9 +225,6 @@ public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Contai
 			case UnitsPackage.QUANTITY__UNIT:
 				if (resolve) return getUnit();
 				return basicGetUnit();
-			case UnitsPackage.QUANTITY__DIMENSION:
-				if (resolve) return getDimension();
-				return basicGetDimension();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -319,8 +278,6 @@ public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Contai
 				return value != VALUE_EDEFAULT;
 			case UnitsPackage.QUANTITY__UNIT:
 				return unit != null;
-			case UnitsPackage.QUANTITY__DIMENSION:
-				return dimension != null;
 		}
 		return super.eIsSet(featureID);
 	}
