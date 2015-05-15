@@ -211,9 +211,10 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Dimension getDimension() {
+	@SuppressWarnings("unchecked")
+	public D getDimension() {
 		if (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION) return null;
-		return (Dimension)eInternalContainer();
+		return (D)eInternalContainer();
 	}
 
 	/**
@@ -221,7 +222,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetDimension(Dimension newDimension, NotificationChain msgs) {
+	public NotificationChain basicSetDimension(D newDimension, NotificationChain msgs) {
 		msgs = eBasicSetContainer((InternalEObject)newDimension, UnitsPackage.UNIT__DIMENSION, msgs);
 		return msgs;
 	}
@@ -231,7 +232,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setDimension(Dimension newDimension) {
+	public void setDimension(D newDimension) {
 		if (newDimension != eInternalContainer() || (eContainerFeatureID() != UnitsPackage.UNIT__DIMENSION && newDimension != null)) {
 			if (EcoreUtil.isAncestor(this, newDimension))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
@@ -276,13 +277,14 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case UnitsPackage.UNIT__DIMENSION:
 				if (eInternalContainer() != null)
 					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetDimension((Dimension)otherEnd, msgs);
+				return basicSetDimension((D)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -342,6 +344,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
@@ -349,7 +352,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 				setId((String)newValue);
 				return;
 			case UnitsPackage.UNIT__DIMENSION:
-				setDimension((Dimension)newValue);
+				setDimension((D)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -367,7 +370,7 @@ public class UnitImpl<D extends Dimension> extends MinimalEObjectImpl.Container 
 				setId(ID_EDEFAULT);
 				return;
 			case UnitsPackage.UNIT__DIMENSION:
-				setDimension((Dimension)null);
+				setDimension((D)null);
 				return;
 		}
 		super.eUnset(featureID);

@@ -256,18 +256,18 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		isInited = true;
 
 		// Obtain or create and register interdependencies
-		UnitsPackageImpl theUnitsPackage = (UnitsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) instanceof UnitsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) : UnitsPackage.eINSTANCE);
 		MetricsPackageImpl theMetricsPackage = (MetricsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI) instanceof MetricsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(MetricsPackage.eNS_URI) : MetricsPackage.eINSTANCE);
+		UnitsPackageImpl theUnitsPackage = (UnitsPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) instanceof UnitsPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(UnitsPackage.eNS_URI) : UnitsPackage.eINSTANCE);
 
 		// Create package meta-data objects
 		theConfigurationPackage.createPackageContents();
-		theUnitsPackage.createPackageContents();
 		theMetricsPackage.createPackageContents();
+		theUnitsPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theConfigurationPackage.initializePackageContents();
-		theUnitsPackage.initializePackageContents();
 		theMetricsPackage.initializePackageContents();
+		theUnitsPackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theConfigurationPackage.freeze();

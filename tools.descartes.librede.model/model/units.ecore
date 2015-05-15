@@ -44,7 +44,9 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="baseFactor" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble" changeable="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="dimension" lowerBound="1"
-        eType="#//Dimension" eOpposite="#//Dimension/units"/>
+        eOpposite="#//Dimension/units">
+      <eGenericType eTypeParameter="#//Unit/D"/>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RequestRate" eSuperTypes="#//Dimension"/>
   <eClassifiers xsi:type="ecore:EClass" name="Time" eSuperTypes="#//Dimension"/>
@@ -106,6 +108,10 @@
       <eGenericType eClassifier="#//Unit">
         <eTypeArguments eTypeParameter="#//Quantity/D"/>
       </eGenericType>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dimension" lowerBound="1"
+        changeable="false">
+      <eGenericType eTypeParameter="#//Quantity/D"/>
     </eStructuralFeatures>
     <eGenericSuperTypes eClassifier="#//Comparable">
       <eTypeArguments eClassifier="#//Quantity">

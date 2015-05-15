@@ -136,7 +136,7 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @model opposite="units" required="true" transient="false"
 	 * @generated
 	 */
-	Dimension getDimension();
+	D getDimension();
 
 	/**
 	 * Sets the value of the '{@link tools.descartes.librede.units.Unit#getDimension <em>Dimension</em>}' container reference.
@@ -146,7 +146,7 @@ public interface Unit<D extends Dimension> extends EObject {
 	 * @see #getDimension()
 	 * @generated
 	 */
-	void setDimension(Dimension value);
+	void setDimension(D value);
 
 	/**
 	 * <!-- begin-user-doc -->

@@ -50,7 +50,7 @@ import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 import tools.descartes.librede.configuration.provider.LibredeEditPlugin;
-
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.UnitsPackage;
 
@@ -92,6 +92,7 @@ public class QuantityItemProvider
 
 			addValuePropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
+			addDimensionPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -122,11 +123,11 @@ public class QuantityItemProvider
 	 * This adds a property descriptor for the Unit feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	protected void addUnitPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
+			(new ItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
 				 getString("_UI_Quantity_unit_feature"),
@@ -135,6 +136,37 @@ public class QuantityItemProvider
 				 true,
 				 false,
 				 true,
+				 null,
+				 null,
+				 null) {
+				@Override
+				public Collection<?> getChoiceOfValues(Object object) {
+					Dimension d = ((Quantity<?>)object).getDimension();
+					if (d != null) {
+						return d.getUnits();
+					}
+					return super.getChoiceOfValues(object);
+				}
+			});
+	}
+
+	/**
+	 * This adds a property descriptor for the Dimension feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addDimensionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Quantity_dimension_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Quantity_dimension_feature", "_UI_Quantity_type"),
+				 UnitsPackage.Literals.QUANTITY__DIMENSION,
+				 false,
+				 false,
+				 false,
 				 null,
 				 null,
 				 null));

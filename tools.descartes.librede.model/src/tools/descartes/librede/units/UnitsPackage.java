@@ -499,13 +499,22 @@ public interface UnitsPackage extends EPackage {
 	int QUANTITY__UNIT = COMPARABLE_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Dimension</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int QUANTITY__DIMENSION = COMPARABLE_FEATURE_COUNT + 2;
+
+	/**
 	 * The number of structural features of the '<em>Quantity</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int QUANTITY_FEATURE_COUNT = COMPARABLE_FEATURE_COUNT + 2;
+	int QUANTITY_FEATURE_COUNT = COMPARABLE_FEATURE_COUNT + 3;
 
 	/**
 	 * The operation id for the '<em>Convert To</em>' operation.
@@ -773,6 +782,17 @@ public interface UnitsPackage extends EPackage {
 	EReference getQuantity_Unit();
 
 	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.units.Quantity#getDimension <em>Dimension</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Dimension</em>'.
+	 * @see tools.descartes.librede.units.Quantity#getDimension()
+	 * @see #getQuantity()
+	 * @generated
+	 */
+	EReference getQuantity_Dimension();
+
+	/**
 	 * Returns the meta object for the '{@link tools.descartes.librede.units.Quantity#convertTo(tools.descartes.librede.units.Unit) <em>Convert To</em>}' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1031,6 +1051,14 @@ public interface UnitsPackage extends EPackage {
 		 * @generated
 		 */
 		EReference QUANTITY__UNIT = eINSTANCE.getQuantity_Unit();
+
+		/**
+		 * The meta object literal for the '<em><b>Dimension</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference QUANTITY__DIMENSION = eINSTANCE.getQuantity_Dimension();
 
 		/**
 		 * The meta object literal for the '<em><b>Convert To</b></em>' operation.
