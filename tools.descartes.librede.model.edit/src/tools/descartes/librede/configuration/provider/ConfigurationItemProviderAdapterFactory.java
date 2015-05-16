@@ -513,6 +513,29 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.TraceFilter} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TraceFilterItemProvider traceFilterItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.TraceFilter}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createTraceFilterAdapter() {
+		if (traceFilterItemProvider == null) {
+			traceFilterItemProvider = new TraceFilterItemProvider(this);
+		}
+
+		return traceFilterItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -629,6 +652,7 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (traceToEntityMappingItemProvider != null) traceToEntityMappingItemProvider.dispose();
 		if (modelEntityItemProvider != null) modelEntityItemProvider.dispose();
 		if (estimationAlgorithmConfigurationItemProvider != null) estimationAlgorithmConfigurationItemProvider.dispose();
+		if (traceFilterItemProvider != null) traceFilterItemProvider.dispose();
 	}
 
 }

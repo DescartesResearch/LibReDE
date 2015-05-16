@@ -86,6 +86,7 @@ public class TraceConfigurationItemProvider
 			addUnitPropertyDescriptor(object);
 			addIntervalPropertyDescriptor(object);
 			addLocationPropertyDescriptor(object);
+			addAggregationPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -170,6 +171,28 @@ public class TraceConfigurationItemProvider
 				 getString("_UI_TraceConfiguration_location_feature"),
 				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_location_feature", "_UI_TraceConfiguration_type"),
 				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__LOCATION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Aggregation feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addAggregationPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TraceConfiguration_aggregation_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_aggregation_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__AGGREGATION,
 				 true,
 				 false,
 				 false,
@@ -272,6 +295,7 @@ public class TraceConfigurationItemProvider
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
+			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:

@@ -28,6 +28,7 @@
  */
 package tools.descartes.librede.configuration;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -41,6 +42,7 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.TraceToEntityMapping#getEntity <em>Entity</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceToEntityMapping#getTraceColumn <em>Trace Column</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceToEntityMapping#getFilters <em>Filters</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceToEntityMapping()
@@ -100,5 +102,21 @@ public interface TraceToEntityMapping extends EObject {
 	 * @generated
 	 */
 	void setTraceColumn(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Filters</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.TraceFilter}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Filters</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Filters</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceToEntityMapping_Filters()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<TraceFilter> getFilters();
 
 } // TraceToEntityMapping

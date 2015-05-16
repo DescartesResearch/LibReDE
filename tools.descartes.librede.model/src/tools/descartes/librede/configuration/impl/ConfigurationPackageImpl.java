@@ -53,6 +53,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceFilter;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.ValidationSpecification;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
@@ -201,6 +202,13 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	private EClass estimationAlgorithmConfigurationEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass traceFilterEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -580,6 +588,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getTraceConfiguration_Aggregation() {
+		return (EAttribute)traceConfigurationEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getTraceConfiguration_DataSource() {
 		return (EReference)traceConfigurationEClass.getEStructuralFeatures().get(1);
 	}
@@ -850,6 +867,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getTraceToEntityMapping_Filters() {
+		return (EReference)traceToEntityMappingEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getModelEntity() {
 		return modelEntityEClass;
 	}
@@ -879,6 +905,33 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 */
 	public EReference getEstimationAlgorithmConfiguration_Parameters() {
 		return (EReference)estimationAlgorithmConfigurationEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTraceFilter() {
+		return traceFilterEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getTraceFilter_Value() {
+		return (EAttribute)traceFilterEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getTraceFilter_TraceColumn() {
+		return (EAttribute)traceFilterEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -961,6 +1014,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__UNIT);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__INTERVAL);
 		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__LOCATION);
+		createEAttribute(traceConfigurationEClass, TRACE_CONFIGURATION__AGGREGATION);
 
 		parameterEClass = createEClass(PARAMETER);
 		createEAttribute(parameterEClass, PARAMETER__NAME);
@@ -997,12 +1051,17 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		traceToEntityMappingEClass = createEClass(TRACE_TO_ENTITY_MAPPING);
 		createEReference(traceToEntityMappingEClass, TRACE_TO_ENTITY_MAPPING__ENTITY);
 		createEAttribute(traceToEntityMappingEClass, TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN);
+		createEReference(traceToEntityMappingEClass, TRACE_TO_ENTITY_MAPPING__FILTERS);
 
 		modelEntityEClass = createEClass(MODEL_ENTITY);
 
 		estimationAlgorithmConfigurationEClass = createEClass(ESTIMATION_ALGORITHM_CONFIGURATION);
 		createEAttribute(estimationAlgorithmConfigurationEClass, ESTIMATION_ALGORITHM_CONFIGURATION__TYPE);
 		createEReference(estimationAlgorithmConfigurationEClass, ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS);
+
+		traceFilterEClass = createEClass(TRACE_FILTER);
+		createEAttribute(traceFilterEClass, TRACE_FILTER__VALUE);
+		createEAttribute(traceFilterEClass, TRACE_FILTER__TRACE_COLUMN);
 
 		// Create enums
 		schedulingStrategyEEnum = createEEnum(SCHEDULING_STRATEGY);
@@ -1104,6 +1163,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		g1.getETypeArguments().add(g2);
 		initEReference(getTraceConfiguration_Interval(), g1, null, "interval", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTraceConfiguration_Location(), ecorePackage.getEString(), "location", null, 1, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTraceConfiguration_Aggregation(), theMetricsPackage.getAggregation(), "aggregation", null, 0, 1, TraceConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(parameterEClass, Parameter.class, "Parameter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getParameter_Name(), ecorePackage.getEString(), "name", null, 1, 1, Parameter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1149,12 +1209,17 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(traceToEntityMappingEClass, TraceToEntityMapping.class, "TraceToEntityMapping", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTraceToEntityMapping_Entity(), this.getModelEntity(), null, "entity", null, 1, 1, TraceToEntityMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTraceToEntityMapping_TraceColumn(), ecorePackage.getEInt(), "traceColumn", "1", 0, 1, TraceToEntityMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTraceToEntityMapping_Filters(), this.getTraceFilter(), null, "filters", null, 0, -1, TraceToEntityMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(modelEntityEClass, ModelEntity.class, "ModelEntity", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(estimationAlgorithmConfigurationEClass, EstimationAlgorithmConfiguration.class, "EstimationAlgorithmConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEstimationAlgorithmConfiguration_Type(), ecorePackage.getEString(), "type", null, 1, 1, EstimationAlgorithmConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEstimationAlgorithmConfiguration_Parameters(), this.getParameter(), null, "parameters", null, 0, -1, EstimationAlgorithmConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(traceFilterEClass, TraceFilter.class, "TraceFilter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getTraceFilter_Value(), ecorePackage.getEString(), "value", null, 1, 1, TraceFilter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTraceFilter_TraceColumn(), ecorePackage.getEInt(), "traceColumn", null, 1, 1, TraceFilter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(schedulingStrategyEEnum, SchedulingStrategy.class, "SchedulingStrategy");

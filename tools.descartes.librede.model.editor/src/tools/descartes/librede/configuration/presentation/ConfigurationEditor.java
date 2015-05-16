@@ -674,6 +674,12 @@ public class ConfigurationEditor
 		// Create the editing domain with a special command stack.
 		//
 		editingDomain = new AdapterFactoryEditingDomain(adapterFactory, commandStack, Registry.INSTANCE.createResourceSet());
+		
+		/*
+		 * IMPORTANT:
+		 * See https://www.eclipse.org/forums/index.php/t/521251/
+		 */
+		editingDomain.getResourceSet().eAdapters().add(new AdapterFactoryEditingDomain.EditingDomainProvider(editingDomain));
 	}
 
 	/**

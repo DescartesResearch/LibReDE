@@ -713,13 +713,22 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_CONFIGURATION__LOCATION = 5;
 
 	/**
+	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__AGGREGATION = 6;
+
+	/**
 	 * The number of structural features of the '<em>Trace Configuration</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION_FEATURE_COUNT = 6;
+	int TRACE_CONFIGURATION_FEATURE_COUNT = 7;
 
 	/**
 	 * The number of operations of the '<em>Trace Configuration</em>' class.
@@ -1028,6 +1037,15 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION__LOCATION = TRACE_CONFIGURATION__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FILE_TRACE_CONFIGURATION__AGGREGATION = TRACE_CONFIGURATION__AGGREGATION;
+
+	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1083,13 +1101,22 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN = 1;
 
 	/**
+	 * The feature id for the '<em><b>Filters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_TO_ENTITY_MAPPING__FILTERS = 2;
+
+	/**
 	 * The number of structural features of the '<em>Trace To Entity Mapping</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_TO_ENTITY_MAPPING_FEATURE_COUNT = 2;
+	int TRACE_TO_ENTITY_MAPPING_FEATURE_COUNT = 3;
 
 	/**
 	 * The number of operations of the '<em>Trace To Entity Mapping</em>' class.
@@ -1147,6 +1174,52 @@ public interface ConfigurationPackage extends EPackage {
 	int ESTIMATION_ALGORITHM_CONFIGURATION_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.TraceFilterImpl <em>Trace Filter</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.TraceFilterImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getTraceFilter()
+	 * @generated
+	 */
+	int TRACE_FILTER = 19;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_FILTER__VALUE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Trace Column</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_FILTER__TRACE_COLUMN = 1;
+
+	/**
+	 * The number of structural features of the '<em>Trace Filter</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_FILTER_FEATURE_COUNT = 2;
+
+	/**
+	 * The number of operations of the '<em>Trace Filter</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_FILTER_OPERATION_COUNT = 0;
+
+	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1154,7 +1227,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getSchedulingStrategy()
 	 * @generated
 	 */
-	int SCHEDULING_STRATEGY = 19;
+	int SCHEDULING_STRATEGY = 20;
 
 
 	/**
@@ -1512,6 +1585,17 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getTraceConfiguration_Location();
 
 	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getAggregation <em>Aggregation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Aggregation</em>'.
+	 * @see tools.descartes.librede.configuration.TraceConfiguration#getAggregation()
+	 * @see #getTraceConfiguration()
+	 * @generated
+	 */
+	EAttribute getTraceConfiguration_Aggregation();
+
+	/**
 	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1834,6 +1918,17 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getTraceToEntityMapping_TraceColumn();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.TraceToEntityMapping#getFilters <em>Filters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Filters</em>'.
+	 * @see tools.descartes.librede.configuration.TraceToEntityMapping#getFilters()
+	 * @see #getTraceToEntityMapping()
+	 * @generated
+	 */
+	EReference getTraceToEntityMapping_Filters();
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ModelEntity <em>Model Entity</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1874,6 +1969,38 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getEstimationAlgorithmConfiguration_Parameters();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceFilter <em>Trace Filter</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Trace Filter</em>'.
+	 * @see tools.descartes.librede.configuration.TraceFilter
+	 * @generated
+	 */
+	EClass getTraceFilter();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceFilter#getValue <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see tools.descartes.librede.configuration.TraceFilter#getValue()
+	 * @see #getTraceFilter()
+	 * @generated
+	 */
+	EAttribute getTraceFilter_Value();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceFilter#getTraceColumn <em>Trace Column</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Trace Column</em>'.
+	 * @see tools.descartes.librede.configuration.TraceFilter#getTraceColumn()
+	 * @see #getTraceFilter()
+	 * @generated
+	 */
+	EAttribute getTraceFilter_TraceColumn();
 
 	/**
 	 * Returns the meta object for enum '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
@@ -2191,6 +2318,14 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute TRACE_CONFIGURATION__LOCATION = eINSTANCE.getTraceConfiguration_Location();
 
 		/**
+		 * The meta object literal for the '<em><b>Aggregation</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TRACE_CONFIGURATION__AGGREGATION = eINSTANCE.getTraceConfiguration_Aggregation();
+
+		/**
 		 * The meta object literal for the '<em><b>Data Source</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2447,6 +2582,14 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN = eINSTANCE.getTraceToEntityMapping_TraceColumn();
 
 		/**
+		 * The meta object literal for the '<em><b>Filters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRACE_TO_ENTITY_MAPPING__FILTERS = eINSTANCE.getTraceToEntityMapping_Filters();
+
+		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ModelEntityImpl <em>Model Entity</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2481,6 +2624,32 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ESTIMATION_ALGORITHM_CONFIGURATION__PARAMETERS = eINSTANCE.getEstimationAlgorithmConfiguration_Parameters();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceFilterImpl <em>Trace Filter</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.TraceFilterImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getTraceFilter()
+		 * @generated
+		 */
+		EClass TRACE_FILTER = eINSTANCE.getTraceFilter();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TRACE_FILTER__VALUE = eINSTANCE.getTraceFilter_Value();
+
+		/**
+		 * The meta object literal for the '<em><b>Trace Column</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TRACE_FILTER__TRACE_COLUMN = eINSTANCE.getTraceFilter_TraceColumn();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

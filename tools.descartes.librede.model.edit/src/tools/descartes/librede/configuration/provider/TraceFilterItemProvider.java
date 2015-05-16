@@ -1,32 +1,6 @@
 /**
- * ==============================================
- *  LibReDE : Library for Resource Demand Estimation
- * ==============================================
- *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
- *
- * Project Info:   http://www.descartes-research.net/
- *
- * All rights reserved. This software is made available under the terms of the
- * Eclipse Public License (EPL) v1.0 as published by the Eclipse Foundation
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * This software is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License (EPL)
- * for more details.
- *
- * You should have received a copy of the Eclipse Public License (EPL)
- * along with this software; if not visit http://www.eclipse.org or write to
- * Eclipse Foundation, Inc., 308 SW First Avenue, Suite 110, Portland, 97204 USA
- * Email: license (at) eclipse.org
- *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
  */
-/**
- */
-package tools.descartes.librede.units.provider;
+package tools.descartes.librede.configuration.provider;
 
 
 import java.util.Collection;
@@ -49,18 +23,16 @@ import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
-import tools.descartes.librede.configuration.provider.LibredeEditPlugin;
-import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.Unit;
-import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.TraceFilter;
 
 /**
- * This is the item provider adapter for a {@link tools.descartes.librede.units.Quantity} object.
+ * This is the item provider adapter for a {@link tools.descartes.librede.configuration.TraceFilter} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class QuantityItemProvider 
+public class TraceFilterItemProvider 
 	extends ItemProviderAdapter
 	implements
 		IEditingDomainItemProvider,
@@ -75,7 +47,7 @@ public class QuantityItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public QuantityItemProvider(AdapterFactory adapterFactory) {
+	public TraceFilterItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -91,7 +63,7 @@ public class QuantityItemProvider
 			super.getPropertyDescriptors(object);
 
 			addValuePropertyDescriptor(object);
-			addUnitPropertyDescriptor(object);
+			addTraceColumnPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -107,57 +79,48 @@ public class QuantityItemProvider
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Quantity_value_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Quantity_value_feature", "_UI_Quantity_type"),
-				 UnitsPackage.Literals.QUANTITY__VALUE,
+				 getString("_UI_TraceFilter_value_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceFilter_value_feature", "_UI_TraceFilter_type"),
+				 ConfigurationPackage.Literals.TRACE_FILTER__VALUE,
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.REAL_VALUE_IMAGE,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
 				 null,
 				 null));
 	}
 
 	/**
-	 * This adds a property descriptor for the Unit feature.
+	 * This adds a property descriptor for the Trace Column feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
+	 * @generated
 	 */
-	protected void addUnitPropertyDescriptor(Object object) {
+	protected void addTraceColumnPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
-			(new ItemPropertyDescriptor
+			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Quantity_unit_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Quantity_unit_feature", "_UI_Quantity_type"),
-				 UnitsPackage.Literals.QUANTITY__UNIT,
+				 getString("_UI_TraceFilter_traceColumn_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceFilter_traceColumn_feature", "_UI_TraceFilter_type"),
+				 ConfigurationPackage.Literals.TRACE_FILTER__TRACE_COLUMN,
 				 true,
 				 false,
-				 true,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
 				 null,
-				 null,
-				 null) {
-				@Override
-				public Collection<?> getChoiceOfValues(Object object) {
-					Unit<?> u = ((Quantity<?>)object).getUnit();
-					if (u!= null) {
-						return u.getDimension().getUnits();
-					}
-					return super.getChoiceOfValues(object);
-				}
-			});
+				 null));
 	}
 
 	/**
-	 * This returns Quantity.gif.
+	 * This returns TraceFilter.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/Quantity"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/TraceFilter"));
 	}
 
 	/**
@@ -168,8 +131,10 @@ public class QuantityItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		Quantity<?> quantity = (Quantity<?>)object;
-		return getString("_UI_Quantity_type") + " " + quantity.getValue();
+		String label = ((TraceFilter)object).getValue();
+		return label == null || label.length() == 0 ?
+			getString("_UI_TraceFilter_type") :
+			getString("_UI_TraceFilter_type") + " " + label;
 	}
 	
 
@@ -184,8 +149,9 @@ public class QuantityItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Quantity.class)) {
-			case UnitsPackage.QUANTITY__VALUE:
+		switch (notification.getFeatureID(TraceFilter.class)) {
+			case ConfigurationPackage.TRACE_FILTER__VALUE:
+			case ConfigurationPackage.TRACE_FILTER__TRACE_COLUMN:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

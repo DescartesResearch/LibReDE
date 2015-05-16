@@ -168,6 +168,10 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createEstimationAlgorithmConfigurationAdapter();
 			}
 			@Override
+			public Adapter caseTraceFilter(TraceFilter object) {
+				return createTraceFilterAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -450,6 +454,20 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEstimationAlgorithmConfigurationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.TraceFilter <em>Trace Filter</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.TraceFilter
+	 * @generated
+	 */
+	public Adapter createTraceFilterAdapter() {
 		return null;
 	}
 

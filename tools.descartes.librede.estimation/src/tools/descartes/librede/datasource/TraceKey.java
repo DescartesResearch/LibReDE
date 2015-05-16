@@ -26,7 +26,11 @@
  */
 package tools.descartes.librede.datasource;
 
+import java.util.Collections;
+import java.util.List;
+
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.TraceFilter;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -45,13 +49,19 @@ public class TraceKey {
 	private final Unit<?> unit;
 	private final Quantity<Time> interval;
 	private final ModelEntity entity;
-
+	private final List<TraceFilter> filters;
+	
 	public TraceKey(Metric<?> metric, Unit<?> unit, Quantity<Time> interval, ModelEntity entity) {
+		this(metric, unit, interval, entity, Collections.<TraceFilter>emptyList());
+	}
+
+	public TraceKey(Metric<?> metric, Unit<?> unit, Quantity<Time> interval, ModelEntity entity, List<TraceFilter> filters) {
 		super();
 		this.metric = metric;
 		this.unit = unit;
 		this.interval = interval;
 		this.entity = entity;
+		this.filters = filters;
 	}
 
 	public Metric<?> getMetric() {
@@ -68,6 +78,10 @@ public class TraceKey {
 
 	public ModelEntity getEntity() {
 		return entity;
+	}
+	
+	public List<TraceFilter> getFilters() {
+		return filters;
 	}
 
 	@Override

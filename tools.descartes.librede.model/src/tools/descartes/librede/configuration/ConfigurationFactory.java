@@ -210,6 +210,15 @@ public interface ConfigurationFactory extends EFactory {
 	EstimationAlgorithmConfiguration createEstimationAlgorithmConfiguration();
 
 	/**
+	 * Returns a new object of class '<em>Trace Filter</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Trace Filter</em>'.
+	 * @generated
+	 */
+	TraceFilter createTraceFilter();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

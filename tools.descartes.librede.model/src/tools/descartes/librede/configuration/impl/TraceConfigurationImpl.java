@@ -42,6 +42,7 @@ import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
@@ -62,6 +63,7 @@ import tools.descartes.librede.units.Unit;
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getLocation <em>Location</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getAggregation <em>Aggregation</em>}</li>
  * </ul>
  *
  * @generated
@@ -136,6 +138,26 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected String location = LOCATION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getAggregation() <em>Aggregation</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getAggregation()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Aggregation AGGREGATION_EDEFAULT = Aggregation.NONE;
+
+	/**
+	 * The cached value of the '{@link #getAggregation() <em>Aggregation</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getAggregation()
+	 * @generated
+	 * @ordered
+	 */
+	protected Aggregation aggregation = AGGREGATION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -303,6 +325,27 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Aggregation getAggregation() {
+		return aggregation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setAggregation(Aggregation newAggregation) {
+		Aggregation oldAggregation = aggregation;
+		aggregation = newAggregation == null ? AGGREGATION_EDEFAULT : newAggregation;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION, oldAggregation, aggregation));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public DataSourceConfiguration getDataSource() {
 		if (dataSource != null && dataSource.eIsProxy()) {
 			InternalEObject oldDataSource = (InternalEObject)dataSource;
@@ -387,6 +430,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return getInterval();
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				return getLocation();
+			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
+				return getAggregation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -419,6 +464,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				setLocation((String)newValue);
 				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
+				setAggregation((Aggregation)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -449,6 +497,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				setLocation(LOCATION_EDEFAULT);
 				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
+				setAggregation(AGGREGATION_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -473,6 +524,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return interval != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
+			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
+				return aggregation != AGGREGATION_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -489,6 +542,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (location: ");
 		result.append(location);
+		result.append(", aggregation: ");
+		result.append(aggregation);
 		result.append(')');
 		return result.toString();
 	}
