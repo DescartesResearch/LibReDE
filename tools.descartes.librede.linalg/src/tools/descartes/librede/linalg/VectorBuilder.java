@@ -26,19 +26,16 @@
  */
 package tools.descartes.librede.linalg;
 
-public class VectorBuilder {
+public abstract class VectorBuilder {
 	
-	private double[] values;
-	
-	public VectorBuilder(int rows) {
-		values = new double[rows];
+	public static VectorBuilder create(int maxRows) {
+		return LinAlg.FACTORY.createVectorBuilder(maxRows);
 	}
 
-	public void set(int row, double value) {
-		this.values[row] = value;
-	}
+	public abstract void add(double value);
 	
-	public Vector toVector() {
-		return LinAlg.vector(values);
-	}
+	public abstract void set(int idx, double value);
+	
+	public abstract Vector toVector();
+
 }

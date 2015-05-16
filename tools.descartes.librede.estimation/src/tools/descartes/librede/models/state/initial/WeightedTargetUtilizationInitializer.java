@@ -88,7 +88,7 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 		// the demands to a value
 		// so that the utilization at the beginning is at a configured initial
 		// point (e.g., 50%).
-		VectorBuilder initialState = new VectorBuilder(stateModel.getAllServices().size());
+		VectorBuilder initialState = VectorBuilder.create(stateModel.getAllServices().size());
 		for (Resource res : stateModel.getResources()) {
 			double util = initialDemands.dot(throughput.execute()) / res.getNumberOfServers();
 			Vector curDemands = initialDemands.times(targetUtilization / util);

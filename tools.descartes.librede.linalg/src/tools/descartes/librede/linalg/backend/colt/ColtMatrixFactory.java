@@ -30,6 +30,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.linalg.backend.MatrixFactory;
 import cern.colt.matrix.DoubleMatrix1D;
@@ -92,5 +93,10 @@ public class ColtMatrixFactory implements MatrixFactory {
 	@Override
 	public SquareMatrix createSquareMatrix(int size, MatrixFunction init) {
 		return new ColtSquareMatrix(size, init);
+	}
+	
+	@Override
+	public VectorBuilder createVectorBuilder(int maxRows) {
+		return new ColtVectorBuilder(maxRows);
 	}
 }

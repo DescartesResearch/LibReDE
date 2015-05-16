@@ -30,6 +30,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 
 public interface MatrixFactory {
@@ -51,5 +52,7 @@ public interface MatrixFactory {
 	Vector createVector(int rows, double fill);
 
 	Vector createVector(int rows, VectorFunction init);
+	
+	VectorBuilder createVectorBuilder(int maxRows);
 
 }
