@@ -120,7 +120,7 @@ public class CsvDataSource extends AbstractFileDataSource {
 	}
 
 	@Override
-	protected double parse(File file, String line, double[] values) throws ParseException {
+	protected double parse(File file, String line, String[] values) throws ParseException {
 		if (!initialized) {
 			if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
 				if (timestampFormatPattern.startsWith("[") && timestampFormatPattern.endsWith("]")) {
@@ -150,14 +150,19 @@ public class CsvDataSource extends AbstractFileDataSource {
 			// discarded.
 			for (int i = 0; i < values.length; i++) {
 				if ((i + 1) < fields.length) {
-					values[i] = getNumber(file, fields[i + 1]);
+					values[i] = fields[i + 1];
 				} else {					
-					values[i] = Double.NaN;
+					values[i] = "";
 				}
 			}
 			return timestamp;
 		}
 		throw new AssertionError(); // We should never be here if programmed correctly.
+	}
+	
+	@Override
+	protected double parseNumber(File file, String value) throws ParseException {
+		return getNumber(file, value);
 	}
 
 	private double getTimestamp(File file, String timestamp) {

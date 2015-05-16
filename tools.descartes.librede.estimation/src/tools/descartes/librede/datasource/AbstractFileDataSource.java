@@ -54,9 +54,11 @@ import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceFilter;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -96,7 +98,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		private Quantity<Time> channelCurrentTime = ZERO;
 		private File file;
 		private RandomAccessFile input;
-		private double[][] valuesBuffer;
+		private String[][] valuesBuffer;
 		private byte[] buffer = new byte[BUFFER_SIZE];
 		private double[] timestampBuffer = new double[MAX_BUFFERED_LINES];
 		private Map<TraceKey, Integer> traces = new HashMap<TraceKey, Integer>();
@@ -113,10 +115,15 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		}
 
 		public void addTrace(TraceKey key, int column) {
+			int maxColumn = column;
+			for (TraceFilter filter : key.getFilters()) {
+				maxColumn = Math.max(filter.getTraceColumn(), maxColumn);
+			}
+			
 			// Check that the buffer array is large enough for this number
 			// of columns
-			if ((valuesBuffer == null) || (valuesBuffer[0].length < (column + 1))) {
-				valuesBuffer = new double[MAX_BUFFERED_LINES][column + 1];
+			if ((valuesBuffer == null) || (valuesBuffer[0].length < (maxColumn + 1))) {
+				valuesBuffer = new String[MAX_BUFFERED_LINES][maxColumn + 1];
 			}
 			traces.put(key, column);
 		}
@@ -212,21 +219,46 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		}
 
 		private void notifySelector(int length) {
-			Matrix values = matrix(valuesBuffer);
-			Vector time = vector(timestampBuffer);
-			if (values.rows() > length) {
-				values = values.rows(range(0, length));
-				time = time.rows(range(0, length));
-			}
 			for (Entry<TraceKey, Integer> trace : traces.entrySet()) {
-				TimeSeries newData = new TimeSeries(time, values.column(trace.getValue()));
-				// update current time to the maximum observation timestamp
-				if (channelCurrentTime == null || newData.getEndTime() > channelCurrentTime.getValue(Time.SECONDS)) {
-					channelCurrentTime = UnitsFactory.eINSTANCE.createQuantity(newData.getEndTime(), Time.SECONDS);
+				TimeSeries newData = getNewData(trace.getKey(), trace.getValue(), length);
+				if (!newData.isEmpty()) {
+					// update current time to the maximum observation timestamp
+					if (channelCurrentTime == null || newData.getEndTime() > channelCurrentTime.getValue(Time.SECONDS)) {
+						channelCurrentTime = UnitsFactory.eINSTANCE.createQuantity(newData.getEndTime(), Time.SECONDS);
+					}
+					TraceEvent event = new TraceEvent(trace.getKey(), newData, channelCurrentTime);
+					notifyListeners(event);
 				}
-				TraceEvent event = new TraceEvent(trace.getKey(), newData, channelCurrentTime);
-				notifyListeners(event);
 			}
+		}
+
+		private TimeSeries getNewData(TraceKey key, int column, int length) {
+			VectorBuilder timestamps = VectorBuilder.create(length);
+			VectorBuilder values = VectorBuilder.create(length);
+			List<TraceFilter> filters = key.getFilters();
+			for (int i = 0; i < length; i++) {
+				if (applyFilters(filters, valuesBuffer[i])) {
+					try {
+						double value = parseNumber(file, valuesBuffer[i][column]);
+						timestamps.add(timestampBuffer[i]);
+						values.add(value);
+					} catch (ParseException e) {
+						// The error should be logged by the
+						// implementation of the parse
+						// function.
+					}
+				}
+			}
+			return new TimeSeries(timestamps.toVector(), values.toVector());
+		}
+
+		private boolean applyFilters(List<TraceFilter> filters, String[] line) {
+			for (TraceFilter f : filters) {
+				if (!line[f.getTraceColumn()].equals(f.getValue())) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		@Override
@@ -396,7 +428,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			}
 			for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
 				TraceKey k = new TraceKey(fileTrace.getMetric(), fileTrace.getUnit(), fileTrace.getInterval(),
-						mapping.getEntity());
+						mapping.getEntity(), mapping.getFilters());
 				channel.addTrace(k, mapping.getTraceColumn() - 1);
 				keys.add(k);
 			}
@@ -405,7 +437,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			throw new FileNotFoundException(inputFile.toString());
 		}
 	}
-	
+
 	public void load() {
 		parser.start();
 		parser.poll();
@@ -431,7 +463,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 * @param line
 	 *            the content of the line
 	 * @param values
-	 *            the numerical values parsed from this line. This array may be
+	 *            the column values parsed from this line. This array may be
 	 *            larger or smaller than the actual number of columns in this
 	 *            line. If large the additional columns can be ignored. If
 	 *            smaller, the array needs to be filled up with NaN values.
@@ -439,5 +471,16 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 * @throws ParseException
 	 *             if the line cannot be parsed correctly
 	 */
-	protected abstract double parse(File file, String line, double[] values) throws ParseException;
+	protected abstract double parse(File file, String line, String[] values) throws ParseException;
+
+	/**
+	 * Parses a floating-point number from a string.
+	 * 
+	 * @param value
+	 *            the floating point number in String representation.
+	 * @return a double value
+	 * @throws ParseException
+	 *             if the number cannot be parsed correctly
+	 */
+	protected abstract double parseNumber(File file, String value) throws ParseException;
 }
