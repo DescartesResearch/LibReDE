@@ -60,6 +60,7 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.FileTraceDetailsPage;
 import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.model.util.PrettyPrinter;
@@ -135,6 +136,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 				series.setDataSource(model.getInput().getDataSources().get(0));
 				series.setMetric(StandardMetrics.RESPONSE_TIME);
 				series.setUnit(Time.INSTANCE.getBaseUnit());
+				series.setAggregation(Aggregation.NONE);
 				Quantity<Time> interval = UnitsFactory.eINSTANCE.createQuantity();
 				interval.setUnit(Time.SECONDS);
 				interval.setValue(0);				
@@ -181,6 +183,13 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 				Command cmd = SetCommand.create(domain, trace,
 						ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL, interval);
 				domain.getCommandStack().execute(cmd);
+			}
+			if (trace.getAggregation() == null) {
+				if (trace.getInterval().getValue() > 0) {
+					trace.setAggregation(Aggregation.AVERAGE);
+				} else {
+					trace.setAggregation(Aggregation.NONE);
+				}
 			}
 		}
 	}

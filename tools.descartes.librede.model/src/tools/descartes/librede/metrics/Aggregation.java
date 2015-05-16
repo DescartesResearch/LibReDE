@@ -82,7 +82,7 @@ public enum Aggregation implements Enumerator {
 	 * @generated
 	 * @ordered
 	 */
-	MINIMUM(3, "MINIMUM", ""),
+	MINIMUM(3, "MINIMUM", "MINIMUM"),
 
 	/**
 	 * The '<em><b>SUM</b></em>' literal object.
@@ -92,7 +92,15 @@ public enum Aggregation implements Enumerator {
 	 * @generated
 	 * @ordered
 	 */
-	SUM(4, "SUM", "SUM");
+	SUM(4, "SUM", "SUM"), /**
+	 * The '<em><b>CUMULATIVE SUM</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #CUMULATIVE_SUM_VALUE
+	 * @generated
+	 * @ordered
+	 */
+	CUMULATIVE_SUM(5, "CUMULATIVE_SUM", "CUMULATIVE_SUM");
 
 	/**
 	 * The '<em><b>NONE</b></em>' literal value.
@@ -148,7 +156,7 @@ public enum Aggregation implements Enumerator {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @see #MINIMUM
-	 * @model literal=""
+	 * @model
 	 * @generated
 	 * @ordered
 	 */
@@ -170,6 +178,21 @@ public enum Aggregation implements Enumerator {
 	public static final int SUM_VALUE = 4;
 
 	/**
+	 * The '<em><b>CUMULATIVE SUM</b></em>' literal value.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of '<em><b>CUMULATIVE SUM</b></em>' literal object isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @see #CUMULATIVE_SUM
+	 * @model
+	 * @generated
+	 * @ordered
+	 */
+	public static final int CUMULATIVE_SUM_VALUE = 5;
+
+	/**
 	 * An array of all the '<em><b>Aggregation</b></em>' enumerators.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -182,6 +205,7 @@ public enum Aggregation implements Enumerator {
 			MAXIMUM,
 			MINIMUM,
 			SUM,
+			CUMULATIVE_SUM,
 		};
 
 	/**
@@ -243,6 +267,7 @@ public enum Aggregation implements Enumerator {
 			case MAXIMUM_VALUE: return MAXIMUM;
 			case MINIMUM_VALUE: return MINIMUM;
 			case SUM_VALUE: return SUM;
+			case CUMULATIVE_SUM_VALUE: return CUMULATIVE_SUM;
 		}
 		return null;
 	}

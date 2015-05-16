@@ -95,6 +95,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
 import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -117,6 +118,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 	private ComboViewer comboMetricViewer;
 	private ComboViewer comboIntervalUnitViewer;
 	private ComboViewer comboUnitViewer;
+	private ComboViewer comboAggregationViewer;
 	private Table mappingTable;
 	private TableViewer mappingTableViewer;
 	private ComboViewer comboDataSourceViewer;
@@ -222,6 +224,9 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		
 		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.READ_ONLY);
 		comboUnitViewer = createComboBoxViewer(composite, toolkit, new WritableList());
+		
+		Label lblAggregation = toolkit.createLabel(composite, "Aggregation:", SWT.READ_ONLY);
+		comboAggregationViewer = createComboBoxViewer(composite, toolkit, new WritableList(Aggregation.VALUES, Aggregation.class));
 		
 		Label lblInterval = toolkit.createLabel(composite, "Interval:",
 				SWT.NONE);
@@ -334,7 +339,14 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 						EMFEditProperties
 								.value(domain,
 										ConfigurationPackage.Literals.TRACE_CONFIGURATION__UNIT)
-								.observe(input));
+								.observe(input));		
+		detailBindingContext
+			.bindValue(
+					ViewerProperties.singleSelection().observe(comboAggregationViewer),
+					EMFEditProperties
+							.value(domain,
+									ConfigurationPackage.Literals.TRACE_CONFIGURATION__AGGREGATION)
+							.observe(input));
 		detailBindingContext
 				.bindValue(
 						WidgetProperties.selection().observe(spnIntervalValue),

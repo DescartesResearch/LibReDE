@@ -332,6 +332,7 @@ public class MetricsPackageImpl extends EPackageImpl implements MetricsPackage {
 		addEEnumLiteral(aggregationEEnum, Aggregation.MAXIMUM);
 		addEEnumLiteral(aggregationEEnum, Aggregation.MINIMUM);
 		addEEnumLiteral(aggregationEEnum, Aggregation.SUM);
+		addEEnumLiteral(aggregationEEnum, Aggregation.CUMULATIVE_SUM);
 
 		// Create resource
 		createResource(eNS_URI);

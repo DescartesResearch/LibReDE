@@ -24,8 +24,9 @@
     <eLiterals name="NONE" literal="NONE"/>
     <eLiterals name="AVERAGE" value="1" literal="AVERAGE"/>
     <eLiterals name="MAXIMUM" value="2"/>
-    <eLiterals name="MINIMUM" value="3" literal=""/>
+    <eLiterals name="MINIMUM" value="3" literal="MINIMUM"/>
     <eLiterals name="SUM" value="4"/>
+    <eLiterals name="CUMULATIVE_SUM" value="5"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="MetricsRepository">
     <eStructuralFeatures xsi:type="ecore:EReference" name="metrics" upperBound="-1"
