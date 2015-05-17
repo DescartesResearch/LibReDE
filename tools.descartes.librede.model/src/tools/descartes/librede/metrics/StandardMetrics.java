@@ -38,17 +38,17 @@ import tools.descartes.librede.units.Time;
 public interface StandardMetrics {
 	public static final Metric<RequestRate> ARRIVAL_RATE = MetricsFactory.eINSTANCE.createMetric("ARRIVAL_RATE", "arrival rate", RequestRate.INSTANCE, Aggregation.AVERAGE);
 	
-	public static final Metric<RequestCount> ARRIVALS = MetricsFactory.eINSTANCE.createMetric("ARRIVALS", "arrivals", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.SUM, Aggregation.MINIMUM, Aggregation.MAXIMUM);
+	public static final Metric<RequestCount> ARRIVALS = MetricsFactory.eINSTANCE.createMetric("ARRIVALS", "arrivals", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.SUM, Aggregation.CUMULATIVE_SUM, Aggregation.MINIMUM, Aggregation.MAXIMUM);
 	
-	public static final Metric<Time> BUSY_TIME = MetricsFactory.eINSTANCE.createMetric("BUSY_TIME", "busy time", Time.INSTANCE, Aggregation.SUM);
+	public static final Metric<Time> BUSY_TIME = MetricsFactory.eINSTANCE.createMetric("BUSY_TIME", "busy time", Time.INSTANCE, Aggregation.SUM, Aggregation.CUMULATIVE_SUM);
 	
-	public static final Metric<RequestCount> DEPARTURES = MetricsFactory.eINSTANCE.createMetric("DEPARTURES", "departures", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.SUM, Aggregation.MINIMUM, Aggregation.MAXIMUM);
+	public static final Metric<RequestCount> DEPARTURES = MetricsFactory.eINSTANCE.createMetric("DEPARTURES", "departures", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.SUM, Aggregation.CUMULATIVE_SUM, Aggregation.MINIMUM, Aggregation.MAXIMUM);
 	
-	public static final Metric<Time> IDLE_TIME = MetricsFactory.eINSTANCE.createMetric("IDLE_TIME", "idle time", Time.INSTANCE, Aggregation.SUM);
+	public static final Metric<Time> IDLE_TIME = MetricsFactory.eINSTANCE.createMetric("IDLE_TIME", "idle time", Time.INSTANCE, Aggregation.SUM, Aggregation.CUMULATIVE_SUM);
 	
 	public static final Metric<RequestCount> QUEUE_LENGTH_SEEN_ON_ARRIVAL = MetricsFactory.eINSTANCE.createMetric("QUEUE_LENGTH_SEEN_ON_ARRIVAL", "queue length seen on arrival", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 	
-	public static final Metric<Time> RESPONSE_TIME = MetricsFactory.eINSTANCE.createMetric("RESPONSE_TIME", "response time", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.MAXIMUM, Aggregation.MINIMUM);
+	public static final Metric<Time> RESPONSE_TIME = MetricsFactory.eINSTANCE.createMetric("RESPONSE_TIME", "response time", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.CUMULATIVE_SUM, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 	
 	public static final Metric<RequestRate> THROUGHPUT = MetricsFactory.eINSTANCE.createMetric("THROUGHPUT", "throughput", RequestRate.INSTANCE, Aggregation.AVERAGE);
 	

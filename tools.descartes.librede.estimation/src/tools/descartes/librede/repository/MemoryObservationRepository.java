@@ -34,6 +34,7 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
@@ -55,20 +56,21 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		
 		public final Metric<?> metric;
 		public final ModelEntity entity;
+		public final Aggregation aggregation;
 		
-		public DataKey(Metric<?> metric, ModelEntity entity) {
+		public DataKey(Metric<?> metric, ModelEntity entity, Aggregation aggregation) {
 			this.metric = metric;
 			this.entity = entity;
+			this.aggregation = aggregation;
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result
-					+ ((entity == null) ? 0 : entity.hashCode());
-			result = prime * result
-					+ ((metric == null) ? 0 : metric.hashCode());
+			result = prime * result + ((aggregation == null) ? 0 : aggregation.hashCode());
+			result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+			result = prime * result + ((metric == null) ? 0 : metric.hashCode());
 			return result;
 		}
 
@@ -81,6 +83,8 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 			if (getClass() != obj.getClass())
 				return false;
 			DataKey other = (DataKey) obj;
+			if (aggregation != other.aggregation)
+				return false;
 			if (entity == null) {
 				if (other.entity != null)
 					return false;
@@ -92,8 +96,7 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 			} else if (!metric.equals(other.metric))
 				return false;
 			return true;
-		}
-		
+		}		
 	}
 	
 	private static class DataEntry {
@@ -109,17 +112,8 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 		this.workload = workload;
 	}
 	
-	public boolean isAggregated(Metric<? extends Dimension> m, ModelEntity entity) {
-		DataKey key = new DataKey(m, entity);
-		DataEntry entry = data.get(key);
-		if (entry == null) {
-			return false;
-		}
-		return (entry.aggregationIntervalInSeconds > 0);
-	}
-	
-	public TimeSeries select(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity) {
-		DataKey key = new DataKey(m, entity);
+	public TimeSeries select(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation) {
+		DataKey key = new DataKey(m, entity, aggregation);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
 			return TimeSeries.EMPTY;
@@ -128,15 +122,15 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	}
 	
 	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations) {
-		this.setData(m, unit, entity, observations, ZERO_SECONDS);
+		this.setData(m, unit, entity, observations, Aggregation.NONE, ZERO_SECONDS);
 	}
 	
-	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries aggregatedObservations, Quantity<Time> aggregationInterval) {
-		this.setData(m, unit, entity, aggregatedObservations, aggregationInterval);
+	public void insert(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
+		this.setData(m, unit, entity, aggregatedObservations, aggregation, aggregationInterval);
 	}
 	
-	private void setData(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations, Quantity<Time> aggregationInterval) {
-		DataKey key = new DataKey(m, entity);
+	private void setData(Metric<? extends Dimension> m, Unit<? extends Dimension> unit, ModelEntity entity, TimeSeries observations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
+		DataKey key = new DataKey(m, entity, aggregation);
 		DataEntry entry = data.get(key);
 		if (entry == null) {
 			entry = new DataEntry();
@@ -149,12 +143,12 @@ public class MemoryObservationRepository extends AbstractMonitoringRepository {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public boolean contains(Metric<? extends Dimension> m,
-			ModelEntity entity, Quantity<Time> maximumAggregationInterval, boolean includeDerived) {		
+			ModelEntity entity, Aggregation aggregation, Quantity<Time> maximumAggregationInterval, boolean includeDerived) {		
 		if (includeDerived) {
-			return getMetricHandler(m, null).contains(this, (Metric)m, entity, maximumAggregationInterval);
+			return getMetricHandler(m, null).contains(this, (Metric)m, entity, aggregation, maximumAggregationInterval);
 		} else {
 			double requestedIntervalInSeconds = maximumAggregationInterval.getUnit().convertTo(maximumAggregationInterval.getValue(), Time.SECONDS);
-			DataKey key = new DataKey(m, entity);
+			DataKey key = new DataKey(m, entity, aggregation);
 			DataEntry entry = data.get(key);
 			if (entry == null) {
 				return false;

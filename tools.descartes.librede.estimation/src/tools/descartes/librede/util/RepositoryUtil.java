@@ -73,7 +73,7 @@ public class RepositoryUtil {
 		for (TraceConfiguration trace : configuration.getInput().getObservations()) {
 			if (trace.getMappings().size() >= 1) {
 				TimeSeries series = repository.select(trace.getMetric(), trace.getUnit(), trace.getMappings().get(0)
-						.getEntity());
+						.getEntity(), trace.getAggregation());
 				maxStart = Math.max(series.getStartTime(), maxStart);
 				minEnd = Math.min(series.getEndTime(), minEnd);
 			}

@@ -77,6 +77,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
@@ -209,7 +210,7 @@ public class Librede {
 			TraceEvent curEvent = null;
 			while ((curEvent = selector.poll()) != null) {
 				TraceKey key = curEvent.getKey();
-				TimeSeries ts = repo.select(key.getMetric(),key.getUnit(), key.getEntity());
+				TimeSeries ts = repo.select(key.getMetric(),key.getUnit(), key.getEntity(), key.getAggregation());
 				if (ts == null) {
 					ts = curEvent.getData();
 				} else {
@@ -218,8 +219,8 @@ public class Librede {
 				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
 				ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
 				
-				if (curEvent.getKey().getInterval().getValue() > 0) {
-					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts, key.getInterval());
+				if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
+					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts, key.getAggregation(), key.getInterval());
 				} else {
 					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts);
 				}
@@ -479,9 +480,9 @@ public class Librede {
 		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
 	
-		MatrixBuilder meanEstimates = new MatrixBuilder(variables.length);
+		MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
 		for (ResultTable[] folds : results) {
-			MatrixBuilder lastEstimates = new MatrixBuilder(variables.length);
+			MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
 			for (ResultTable curFold : folds) {
 				lastEstimates.addRow(curFold.getLastEstimates());
 			}
@@ -492,7 +493,7 @@ public class Librede {
 				for (ResultTable curFold : folds) {
 					Vector vec = curFold.getValidationErrors(validator);
 					if (errors == null) {
-						errors = new MatrixBuilder(vec.rows());
+						errors = MatrixBuilder.create(vec.rows());
 						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
 					}
 					errors.addRow(vec);
@@ -500,7 +501,7 @@ public class Librede {
 				
 				Vector mean = LinAlg.mean(errors.toMatrix(), 0);
 				if (!meanErrors.containsKey(validator)) {
-					meanErrors.put(validator, new MatrixBuilder(mean.rows()));
+					meanErrors.put(validator, MatrixBuilder.create(mean.rows()));
 				}
 				meanErrors.get(validator).addRow(mean);
 			}

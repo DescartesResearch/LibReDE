@@ -54,22 +54,22 @@ public abstract class AbstractMonitoringRepository implements IMonitoringReposit
 		}
 		
 		@Override
-		public TimeSeries select(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Quantity<Time> start,
+		public TimeSeries select(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
 				Quantity<Time> end) {
-			TimeSeries series = repository.select(metric, unit, entity);
+			TimeSeries series = repository.select(metric, unit, entity, aggregation);
 			return series.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS));
 		}
 
 		@Override
-		public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Quantity<Time> start,
-				Quantity<Time> end, Aggregation func) {
+		public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
+				Quantity<Time> end) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public boolean contains(IMonitoringRepository repository, Metric<D> metric, ModelEntity entity,
-				Quantity<Time> aggregationInterval) {
-			return repository.contains(metric, entity, aggregationInterval, false);
+				Aggregation aggregation, Quantity<Time> aggregationInterval) {
+			return repository.contains(metric, entity, aggregation, aggregationInterval, false);
 		}
 		
 	}
@@ -78,19 +78,19 @@ public abstract class AbstractMonitoringRepository implements IMonitoringReposit
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public  TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end) {
-		return getMetricHandler(metric, unit).select(this, (Metric)metric, (Unit)unit, entity, start, end);
+	public  TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
+		return getMetricHandler(metric, unit).select(this, (Metric)metric, (Unit)unit, entity, aggregation, start, end);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public double select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end, Aggregation func) {
-		return getMetricHandler(metric, unit).aggregate(this, (Metric)metric, (Unit)unit, entity, start, end, func);
+	public double aggregate(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity,  Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
+		return getMetricHandler(metric, unit).aggregate(this, (Metric)metric, (Unit)unit, entity, aggregation, start, end);
 	}
 	
 	@Override
-	public boolean contains(Metric<? extends Dimension> metric, ModelEntity entity, Quantity<Time> maximumAggregationInterval) {
-		return contains(metric, entity, maximumAggregationInterval, true);
+	public boolean contains(Metric<? extends Dimension> metric, ModelEntity entity, Aggregation aggregation, Quantity<Time> maximumAggregationInterval) {
+		return contains(metric, entity, aggregation, maximumAggregationInterval, true);
 	}
 	
 	private void checkTypes(IMetricHandler<?> handler, Metric<? extends Dimension> metric, Unit<? extends Dimension> unit) {

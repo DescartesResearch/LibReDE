@@ -33,6 +33,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Quantity;
@@ -49,7 +50,7 @@ public class DataSourceSelectorTest extends LibredeTest {
 			IDataSource ds1 = mock(IDataSource.class);
 			
 			selector.add(ds1);
-			selector.dataAvailable(ds1, new TraceEvent(new TraceKey(null, null, t1, null), null, t1));
+			selector.dataAvailable(ds1, new TraceEvent(new TraceKey(null, null, t1, null, Aggregation.AVERAGE), null, t1));
 			
 			assertThat(selector.getLatestObservationTime()).isNotNull();
 			assertThat(selector.getLatestObservationTime().getValue(Time.SECONDS)).isEqualTo(t1.getValue(Time.SECONDS));
@@ -70,16 +71,16 @@ public class DataSourceSelectorTest extends LibredeTest {
 			selector.add(ds2);
 			// ds1 -> t1
 			// ds2 -> t2
-			selector.dataAvailable(ds1, new TraceEvent(new TraceKey(StandardMetrics.ARRIVALS, null, t2, null), null, t1));
-			selector.dataAvailable(ds2, new TraceEvent(new TraceKey(StandardMetrics.RESPONSE_TIME, null, t2, null), null, t2));
+			selector.dataAvailable(ds1, new TraceEvent(new TraceKey(StandardMetrics.ARRIVALS, null, t2, null, Aggregation.AVERAGE), null, t1));
+			selector.dataAvailable(ds2, new TraceEvent(new TraceKey(StandardMetrics.RESPONSE_TIME, null, t2, null, Aggregation.AVERAGE), null, t2));
 			
 			assertThat(selector.getLatestObservationTime()).isNotNull();
 			assertThat(selector.getLatestObservationTime().getValue(Time.SECONDS)).isEqualTo(t2.getValue(Time.SECONDS));
 			
 			// ds1 -> t3
 			// ds1 -> t3
-			selector.dataAvailable(ds1, new TraceEvent(new TraceKey(StandardMetrics.ARRIVALS, null, t2, null), null, t3));
-			selector.dataAvailable(ds2, new TraceEvent(new TraceKey(StandardMetrics.RESPONSE_TIME, null, t2, null), null, t3));
+			selector.dataAvailable(ds1, new TraceEvent(new TraceKey(StandardMetrics.ARRIVALS, null, t2, null, Aggregation.AVERAGE), null, t3));
+			selector.dataAvailable(ds2, new TraceEvent(new TraceKey(StandardMetrics.RESPONSE_TIME, null, t2, null, Aggregation.AVERAGE), null, t3));
 			assertThat(selector.getLatestObservationTime()).isNotNull();
 			assertThat(selector.getLatestObservationTime().getValue(Time.SECONDS)).isEqualTo(t3.getValue(Time.SECONDS));		
 		}

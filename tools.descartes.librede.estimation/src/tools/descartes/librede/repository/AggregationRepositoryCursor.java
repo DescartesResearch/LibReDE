@@ -109,7 +109,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 */
 	@Override
 	public <D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity) {
-		return repository.select(metric, unit, entity, getIntervalStart(interval), getIntervalEnd(interval));
+		return repository.select(metric, unit, entity, Aggregation.NONE, getIntervalStart(interval), getIntervalEnd(interval));
 	}
 	
 	/* (non-Javadoc)
@@ -117,7 +117,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	 */
 	@Override
 	public <D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation func) {
-		return repository.select(metric, unit, entity, getIntervalStart(interval), getIntervalEnd(interval), func);
+		return repository.aggregate(metric, unit, entity, func, getIntervalStart(interval), getIntervalEnd(interval));
 	}
 	
 	/* (non-Javadoc)
@@ -138,9 +138,9 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 			boolean data = true;
 			for (ModelEntity e : entities) {
 				if (aggregation == Aggregation.NONE) {
-					data = data && repository.contains(metric, e, ZERO_SECONDS);
+					data = data && repository.contains(metric, e, Aggregation.NONE, ZERO_SECONDS);
 				} else {
-					data = data && repository.contains(metric, e, stepSize);
+					data = data && repository.contains(metric, e, aggregation, stepSize);
 				}
 			}
 			return data;

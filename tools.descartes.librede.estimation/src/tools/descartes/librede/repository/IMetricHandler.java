@@ -38,10 +38,10 @@ public interface IMetricHandler<D extends Dimension> {
 	
 	public Metric<D> getMetric();
 	
-	public TimeSeries select(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end);
+	public TimeSeries select(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 
-	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end, Aggregation func);
+	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 	
-	public boolean contains(IMonitoringRepository repository, Metric<D> metric, ModelEntity entity, Quantity<Time> aggregationInterval);
+	public boolean contains(IMonitoringRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation, Quantity<Time> aggregationInterval);
 	
 }

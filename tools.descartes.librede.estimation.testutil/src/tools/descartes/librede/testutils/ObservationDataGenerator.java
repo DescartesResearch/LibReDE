@@ -27,7 +27,6 @@
 package tools.descartes.librede.testutils;
 
 import static tools.descartes.librede.linalg.LinAlg.indices;
-import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.scalar;
 import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
@@ -46,6 +45,7 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.observation.functions.ErlangCEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
@@ -54,14 +54,16 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
 public class ObservationDataGenerator {
+	
+	private static final Quantity<Time> ONE_SECOND = UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS);
 	
 	private Random randUtil;
 	private Random randWheights;
@@ -256,7 +258,7 @@ public class ObservationDataGenerator {
 		
 
 		for (int i = 0; i < services.length; i++) {
-			TimeSeries ts = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[i]);
+			TimeSeries ts = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[i], Aggregation.AVERAGE);
 			if (ts.isEmpty()) {
 				ts = new TimeSeries(scalar(time), scalar(throughput.get(i)));
 				ts.setStartTime(0);
@@ -264,13 +266,13 @@ public class ObservationDataGenerator {
 				ts = ts.addSample(time, throughput.get(i));
 			}
 			ts.setEndTime(time);
-			repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[i], ts);	
+			repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[i], ts, Aggregation.AVERAGE, ONE_SECOND);	
 		}
 		
 		
 
 		for (int i = 0; i < resources.length; i++) {
-			TimeSeries ts = repository.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[i]);
+			TimeSeries ts = repository.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[i], Aggregation.AVERAGE);
 			if (ts.isEmpty()) {
 				ts = new TimeSeries(scalar(time), scalar(utilization.get(i)));
 				ts.setStartTime(0);
@@ -278,7 +280,7 @@ public class ObservationDataGenerator {
 				ts = ts.addSample(time, utilization.get(i));
 			}
 			ts.setEndTime(time);
-			repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[i], ts);	
+			repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[i], ts, Aggregation.AVERAGE, ONE_SECOND);	
 		}
 	
 		for (int i = 0; i < services.length; i++) {
@@ -289,7 +291,7 @@ public class ObservationDataGenerator {
 				sumRT += (demands.get(stateIdx) * (erlangC.calculateValue(numServers, util) + 1 - util)) / (1 - util);
 			}
 			
-			TimeSeries ts = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i]);
+			TimeSeries ts = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], Aggregation.AVERAGE);
 			if (time == 1.0) {
 				ts = new TimeSeries(scalar(time), scalar(sumRT));
 				ts.setStartTime(0);
@@ -297,7 +299,7 @@ public class ObservationDataGenerator {
 				ts = ts.addSample(time, sumRT);
 			}
 			ts.setEndTime(time);
-			repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], ts);	
+			repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], ts, Aggregation.AVERAGE, ONE_SECOND);	
 		}
 		
 		repository.setCurrentTime(UnitsFactory.eINSTANCE.createQuantity(time, Time.SECONDS));

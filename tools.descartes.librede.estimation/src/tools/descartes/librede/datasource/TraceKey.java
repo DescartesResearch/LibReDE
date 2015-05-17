@@ -31,6 +31,7 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.TraceFilter;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -38,8 +39,8 @@ import tools.descartes.librede.units.Unit;
 
 /**
  * This class is a data structure to identify a trace from a data source
- * uniquely by its metric, unit, interval and model entity (resource or
- * service).
+ * uniquely by its metric, unit, interval, model entity (resource or
+ * service) and aggregation.
  * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
@@ -49,18 +50,20 @@ public class TraceKey {
 	private final Unit<?> unit;
 	private final Quantity<Time> interval;
 	private final ModelEntity entity;
+	private final Aggregation aggregation;
 	private final List<TraceFilter> filters;
 	
-	public TraceKey(Metric<?> metric, Unit<?> unit, Quantity<Time> interval, ModelEntity entity) {
-		this(metric, unit, interval, entity, Collections.<TraceFilter>emptyList());
+	public TraceKey(Metric<?> metric, Unit<?> unit, Quantity<Time> interval, ModelEntity entity, Aggregation aggregation) {
+		this(metric, unit, interval, entity, aggregation, Collections.<TraceFilter>emptyList());
 	}
 
-	public TraceKey(Metric<?> metric, Unit<?> unit, Quantity<Time> interval, ModelEntity entity, List<TraceFilter> filters) {
+	public TraceKey(Metric<?> metric, Unit<?> unit, Quantity<Time> interval, ModelEntity entity, Aggregation aggregation, List<TraceFilter> filters) {
 		super();
 		this.metric = metric;
 		this.unit = unit;
 		this.interval = interval;
 		this.entity = entity;
+		this.aggregation = aggregation;
 		this.filters = filters;
 	}
 
@@ -80,6 +83,10 @@ public class TraceKey {
 		return entity;
 	}
 	
+	public Aggregation getAggregation() {
+		return aggregation;
+	}
+	
 	public List<TraceFilter> getFilters() {
 		return filters;
 	}
@@ -88,6 +95,7 @@ public class TraceKey {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((aggregation == null) ? 0 : aggregation.hashCode());
 		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
 		result = prime * result + ((interval == null) ? 0 : interval.hashCode());
 		result = prime * result + ((metric == null) ? 0 : metric.hashCode());
@@ -104,6 +112,8 @@ public class TraceKey {
 		if (getClass() != obj.getClass())
 			return false;
 		TraceKey other = (TraceKey) obj;
+		if (aggregation != other.aggregation)
+			return false;
 		if (entity == null) {
 			if (other.entity != null)
 				return false;
@@ -126,5 +136,7 @@ public class TraceKey {
 			return false;
 		return true;
 	}
+
+
 
 }

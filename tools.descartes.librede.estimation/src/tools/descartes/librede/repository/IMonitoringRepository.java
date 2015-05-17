@@ -42,19 +42,17 @@ import tools.descartes.librede.units.Unit;
 
 public interface IMonitoringRepository {
 	
-	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end);
+	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 
-	public double select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Quantity<Time> start, Quantity<Time> end, Aggregation func);
+	public double aggregate(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 	
-	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity);
+	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation);
 	
-	public boolean isAggregated(Metric<? extends Dimension> m, ModelEntity entity);
+	public boolean contains(Metric<? extends Dimension> responseTime,
+			ModelEntity entity, Aggregation aggregation, Quantity<Time> maximumAggregationInterval);
 
 	public boolean contains(Metric<? extends Dimension> responseTime,
-			ModelEntity entity, Quantity<Time> maximumAggregationInterval);
-
-	public boolean contains(Metric<? extends Dimension> responseTime,
-			ModelEntity entity, Quantity<Time> maximumAggregationInterval, boolean includeDerived);
+			ModelEntity entity, Aggregation aggregation, Quantity<Time> maximumAggregationInterval, boolean includeDerived);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();

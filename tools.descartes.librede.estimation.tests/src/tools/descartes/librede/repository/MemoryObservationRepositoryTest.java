@@ -37,6 +37,7 @@ import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Ratio;
@@ -94,14 +95,14 @@ public class MemoryObservationRepositoryTest extends LibredeTest {
 	@Test
 	public void testSetAndGetData() {
 		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
-		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0]).getData(0).rows()).isEqualTo(5);
+		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(5);
 		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0]).getData(0).rows()).isEqualTo(6);
+		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(6);
 	}
 	
 	@Test
 	public void testGetDataEmpty() {
-		TimeSeries ts = repo.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, resources[0]);
+		TimeSeries ts = repo.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, resources[0], Aggregation.AVERAGE);
 		assertThat(ts).isNotNull();
 		assertThat(ts.isEmpty()).isTrue();
 	}
