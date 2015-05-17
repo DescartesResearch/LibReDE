@@ -26,8 +26,14 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
+
+import cern.colt.Sorting;
+import cern.colt.function.IntComparator;
+import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
@@ -79,6 +85,54 @@ public class ColtHelper {
 
 		DoubleMatrix2D x = ALG.solve(aMat.delegate, bMat.delegate);		
 		return wrap(x);
+	}
+	
+	public static Indices sort(final DoubleMatrix1D vector) {
+		int[] indices = new int[vector.size()];
+		for (int i = 0; i < indices.length; i++) {
+			indices[i] = i;
+		}
+		
+		IntComparator comp = new IntComparator() {			
+			@Override
+			public int compare(int idx1, int idx2) {
+				return compareDouble(vector.getQuick(idx1), vector.getQuick(idx2));
+			}
+		};
+		Sorting.mergeSort(indices, 0, indices.length, comp);
+		return indices(indices);
+	}
+	
+	public static Indices sort(final DoubleMatrix2D vector, final int column) {
+		int[] indices = new int[vector.size()];
+		for (int i = 0; i < indices.length; i++) {
+			indices[i] = i;
+		}
+		
+		IntComparator comp = new IntComparator() {			
+			@Override
+			public int compare(int idx1, int idx2) {
+				return compareDouble(vector.getQuick(idx1, column), vector.getQuick(idx2, column));
+			}
+		};
+		Sorting.mergeSort(indices, 0, indices.length, comp);
+		return indices(indices);
+	}
+	
+	private static final int compareDouble(double a, double b) {
+		if (a != a) { // a == NaN
+			return (b != b) ? 0 : 1; // move NaN to the back
+		}
+		if (b != b) { // b == NaN
+			return -1;
+		}
+		if (a < b) {
+			return -1;
+		}
+		if (a > b) {
+			return 1;
+		}
+		return 0;
 	}
 
 }

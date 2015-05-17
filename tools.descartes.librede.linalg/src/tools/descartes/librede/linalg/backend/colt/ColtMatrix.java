@@ -308,8 +308,8 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public ColtMatrix sort(int column) {
-		return new ColtMatrix(delegate.viewSorted(column));
+	public Indices sort(int column) {
+		return ColtHelper.sort(delegate, column);
 	}
 	
 	@Override

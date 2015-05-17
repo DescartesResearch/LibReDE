@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.linalg;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
+
 import tools.descartes.librede.linalg.backend.colt.ColtVector;
 
 
@@ -250,11 +252,11 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Scalar sort(int column) {
+	public Indices sort(int column) {
 		if (column != 0) {
 			throw new IndexOutOfBoundsException();
 		}
-		return this;
+		return indices(0);
 	}
 
 	@Override

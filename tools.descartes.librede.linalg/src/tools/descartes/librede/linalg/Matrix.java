@@ -166,7 +166,7 @@ public interface Matrix {
 
 	Matrix transpose();
 
-	Matrix sort(int column);
+	Indices sort(int column);
 
 	Matrix insertRow(int row, Vector values);
 	

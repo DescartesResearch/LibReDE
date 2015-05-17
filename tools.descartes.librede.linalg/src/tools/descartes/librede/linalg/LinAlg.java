@@ -707,10 +707,10 @@ public class LinAlg {
 	 * @param a
 	 * @param column
 	 *            index of the column which values are to be sorted.
-	 * @return sorted instance of the same matrix.
+	 * @return row indices in sorted order.
 	 * @since 1.0
 	 */
-	public static Matrix sort(Matrix a, int column) {
+	public static Indices sort(Matrix a, int column) {
 		return a.sort(column);
 	}
 

@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.linalg.backend;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
+
 import tools.descartes.librede.linalg.AggregationFunction;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
@@ -168,12 +170,12 @@ public final class Empty implements Vector, SquareMatrix {
 
 	@Override
 	public Vector column(int column) {
-		throw new IndexOutOfBoundsException();
+		return EMPTY;
 	}
 	
 	@Override
 	public Matrix columns(Indices columns) {
-		throw new IndexOutOfBoundsException();
+		return EMPTY;
 	}
 	
 	@Override
@@ -202,8 +204,8 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Empty sort(int column) {
-		return this;
+	public Indices sort(int column) {
+		return indices();
 	}
 
 	@Override

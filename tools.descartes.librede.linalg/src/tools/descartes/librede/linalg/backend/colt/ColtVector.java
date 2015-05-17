@@ -286,12 +286,12 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public ColtVector sort(int column) {
+	public Indices sort(int column) {
 		if (column != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		return new ColtVector(delegate.viewSorted());
+		return ColtHelper.sort(delegate);
 	}
 
 	@Override
