@@ -27,6 +27,7 @@
 package tools.descartes.librede.linalg.backend.colt;
 
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
@@ -98,5 +99,10 @@ public class ColtMatrixFactory implements MatrixFactory {
 	@Override
 	public VectorBuilder createVectorBuilder(int maxRows) {
 		return new ColtVectorBuilder(maxRows);
+	}
+	
+	@Override
+	public MatrixBuilder createMatrixBuilder(int maxRows, int columns) {
+		return new ColtMatrixBuilder(maxRows, columns);
 	}
 }

@@ -70,9 +70,9 @@ public class UtilizationValidator implements IValidator {
 			utilLaw.add(new UtilizationLaw(stateModel, cursor, res));
 			resources.add(res);
 		}
-		allErrors = new MatrixBuilder(stateModel.getResources().size());
-		predictedUtilization = new MatrixBuilder(stateModel.getResources().size());
-		observedUtilization = new MatrixBuilder(stateModel.getResources().size());
+		allErrors = MatrixBuilder.create(stateModel.getResources().size());
+		predictedUtilization = MatrixBuilder.create(stateModel.getResources().size());
+		observedUtilization = MatrixBuilder.create(stateModel.getResources().size());
 	}
 	
 	@Override

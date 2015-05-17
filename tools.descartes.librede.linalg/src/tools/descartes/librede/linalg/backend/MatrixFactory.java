@@ -27,6 +27,7 @@
 package tools.descartes.librede.linalg.backend;
 
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
@@ -40,6 +41,8 @@ public interface MatrixFactory {
 	Matrix createMatrix(int rows, int columns, double fill);
 
 	Matrix createMatrix(int rows, int columns, MatrixFunction init);
+	
+	MatrixBuilder createMatrixBuilder(int maxRows, int columns);
 	
 	SquareMatrix createSquareMatrix(double[][] values);
 

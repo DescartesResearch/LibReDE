@@ -28,13 +28,17 @@ package tools.descartes.librede.linalg;
 
 public abstract class VectorBuilder {
 	
-	public static VectorBuilder create(int maxRows) {
-		return LinAlg.FACTORY.createVectorBuilder(maxRows);
+	private static final int DEFAULT_SIZE = 10;
+	
+	public static VectorBuilder create() {
+		return LinAlg.FACTORY.createVectorBuilder(DEFAULT_SIZE);
+	}	
+	
+	public static VectorBuilder create(int capacity) {
+		return LinAlg.FACTORY.createVectorBuilder(capacity);
 	}
 
 	public abstract void add(double value);
-	
-	public abstract void set(int idx, double value);
 	
 	public abstract Vector toVector();
 

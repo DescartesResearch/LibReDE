@@ -71,9 +71,9 @@ public class ResponseTimeValidator implements IValidator {
 			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv, false));
 			services.add(srv);
 		}
-		allErrors = new MatrixBuilder(stateModel.getUserServices().size());	
-		predictedRespTimes = new MatrixBuilder(stateModel.getUserServices().size());	
-		observedRespTimes = new MatrixBuilder(stateModel.getUserServices().size());	
+		allErrors = MatrixBuilder.create(stateModel.getUserServices().size());	
+		predictedRespTimes = MatrixBuilder.create(stateModel.getUserServices().size());	
+		observedRespTimes = MatrixBuilder.create(stateModel.getUserServices().size());	
 	}
 	
 	@Override

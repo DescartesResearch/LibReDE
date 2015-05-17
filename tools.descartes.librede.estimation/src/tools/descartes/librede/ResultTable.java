@@ -40,6 +40,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.validation.IValidator;
@@ -49,15 +50,15 @@ public class ResultTable {
 	public static class Builder {
 		private final Class<? extends IEstimationApproach> approach;
 		private MatrixBuilder estimateBuilder;		
-		private MatrixBuilder timestampBuilder;
+		private VectorBuilder timestampBuilder;
 		private double[] buffer;
 		private Map<StateVariable, Integer> entryToColumn;
 		
 		private Builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
 			int stateSize = workload.getResources().size() * workload.getServices().size();
 			this.approach = approach;
-			estimateBuilder = new MatrixBuilder(stateSize);		
-			timestampBuilder = new MatrixBuilder(1);
+			estimateBuilder = MatrixBuilder.create(stateSize);		
+			timestampBuilder = VectorBuilder.create();
 			entryToColumn = new HashMap<StateVariable, Integer>(stateSize);
 			buffer = new double[stateSize];
 			
@@ -77,7 +78,7 @@ public class ResultTable {
 		}
 		
 		public void next(double timestamp) {
-			timestampBuilder.addRow(timestamp);
+			timestampBuilder.add(timestamp);
 			Arrays.fill(buffer, 0);
 		}
 		
@@ -94,7 +95,7 @@ public class ResultTable {
 			for (Map.Entry<StateVariable, Integer> e : entryToColumn.entrySet()) {
 				columnToEntry[e.getValue()] = e.getKey();
 			}
-			TimeSeries estimates = new TimeSeries((Vector)timestampBuilder.toMatrix(), estimateBuilder.toMatrix());
+			TimeSeries estimates = new TimeSeries(timestampBuilder.toVector(), estimateBuilder.toMatrix());
 			
 			return new ResultTable(approach, columnToEntry, estimates);
 		}
