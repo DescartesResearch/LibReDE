@@ -135,15 +135,18 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, List<ModelEntity> entities,
 			Aggregation aggregation) {
 		if (metric.isAggregationAllowed(aggregation)) {
-			boolean data = true;
 			for (ModelEntity e : entities) {
-				if (aggregation == Aggregation.NONE) {
-					data = data && repository.contains(metric, e, Aggregation.NONE, ZERO_SECONDS);
-				} else {
-					data = data && repository.contains(metric, e, aggregation, stepSize);
+				if (!repository.exists(metric, e, aggregation)) {
+					return false;
+				}
+				Quantity<Time> length = repository.getAggregationInterval(metric, e, aggregation);
+				if (aggregation != Aggregation.NONE) {
+					if (length.getValue(Time.SECONDS) > stepSize.getValue(Time.SECONDS)) {
+						return false;
+					}
 				}
 			}
-			return data;
+			return true;
 		}
 		return false;
 	}

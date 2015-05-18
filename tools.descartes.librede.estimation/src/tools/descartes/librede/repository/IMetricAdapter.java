@@ -28,20 +28,15 @@ package tools.descartes.librede.repository;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.units.Dimension;
-import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.Unit;
 
-public interface IMetricHandler<D extends Dimension> {
+public interface IMetricAdapter<D extends Dimension> {
 	
-	public Metric<D> getMetric();
+	void registerDefaultHandlers(IMonitoringRepository repository, ModelEntity entity);	
 	
-	public TimeSeries select(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
-
-	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
+	void registerHandlers(IMonitoringRepository repository, ModelEntity entity, Aggregation aggregation);
 	
-	public boolean contains(IMonitoringRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation, Quantity<Time> aggregationInterval);
+	Interpolation getInterpolation();
 	
 }

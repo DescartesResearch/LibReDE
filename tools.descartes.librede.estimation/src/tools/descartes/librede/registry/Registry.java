@@ -42,7 +42,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsFactory;
 import tools.descartes.librede.metrics.MetricsRepository;
-import tools.descartes.librede.repository.IMetricHandler;
+import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsRepository;
@@ -63,7 +63,7 @@ public class Registry {
 	
 	private MetricsRepository metrics = MetricsFactory.eINSTANCE.createMetricsRepository();
 	
-	private Map<Metric<?>, IMetricHandler> metricHandlers = new HashMap<Metric<?>, IMetricHandler>();
+	private Map<Metric<?>, IMetricAdapter<?>> metricHandlers = new HashMap<>();
 	
 	private Map<String, Class<?>> instances = new HashMap<String, Class<?>>();	
 	
@@ -95,7 +95,7 @@ public class Registry {
 		};
 	}
 	
-	public void registerMetric(Metric<?> metric, IMetricHandler handler) {
+	public <D extends Dimension> void registerMetric(Metric<D> metric, IMetricAdapter<D> handler) {
 		if (metric == null) {
 			throw new NullPointerException();
 		}
@@ -111,8 +111,9 @@ public class Registry {
 		return metrics;
 	}
 	
-	public IMetricHandler getMetricHandler(Metric<?> metric) {
-		return metricHandlers.get(metric);
+	@SuppressWarnings("unchecked") // When registering we enforce the same generic type argument
+	public <D extends Dimension> IMetricAdapter<D> getMetricHandler(Metric<D> metric) {
+		return (IMetricAdapter<D>)metricHandlers.get(metric);
 	}
 	
 	public void registerDimension(Dimension dimension) {

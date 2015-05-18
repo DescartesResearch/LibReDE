@@ -30,6 +30,7 @@ import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Time;
 
 public class RepositoryUtil {
 
@@ -72,10 +73,10 @@ public class RepositoryUtil {
 		double minEnd = Double.MAX_VALUE;
 		for (TraceConfiguration trace : configuration.getInput().getObservations()) {
 			if (trace.getMappings().size() >= 1) {
-				TimeSeries series = repository.select(trace.getMetric(), trace.getUnit(), trace.getMappings().get(0)
-						.getEntity(), trace.getAggregation());
-				maxStart = Math.max(series.getStartTime(), maxStart);
-				minEnd = Math.min(series.getEndTime(), minEnd);
+				maxStart = Math.max(repository.getMonitoringStartTime(trace.getMetric(), trace.getMappings().get(0)
+						.getEntity(), trace.getAggregation()).getValue(Time.SECONDS), maxStart);
+				minEnd = Math.min(repository.getMonitoringEndTime(trace.getMetric(), trace.getMappings().get(0)
+						.getEntity(), trace.getAggregation()).getValue(Time.SECONDS), minEnd);
 			}
 		}
 		return (new RepositoryUtil()).new Range(maxStart, minEnd);

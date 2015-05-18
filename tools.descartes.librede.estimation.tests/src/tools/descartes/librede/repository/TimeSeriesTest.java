@@ -254,6 +254,30 @@ public class TimeSeriesTest {
 		TimeSeries r = TimeSeries.EMPTY.subset(1, 5);
 		assertThat(r.isEmpty()).isTrue();
 		
+		// Test complete series as subset
+		r = ts2.subset(Double.NaN, Double.NaN);
+		assertThat(r).isNotNull();
+		assertThat(r.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
+		assertThat(r.getTime()).isEqualTo(ts2.getTime(), offset(1e-9));
+		assertThat(r.getStartTime()).isEqualTo(ts2.getStartTime(), offset(1e-9));
+		assertThat(r.getEndTime()).isEqualTo(ts2.getEndTime(), offset(1e-9));
+		
+		// Test complete series as subset
+		r = ts2.subset(2, Double.NaN);
+		assertThat(r).isNotNull();
+		assertThat(r.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
+		assertThat(r.getTime()).isEqualTo(vector(3, 4, 5), offset(1e-9));
+		assertThat(r.getStartTime()).isEqualTo(2, offset(1e-9));
+		assertThat(r.getEndTime()).isEqualTo(ts2.getEndTime(), offset(1e-9));
+		
+		// Test complete series as subset
+		r = ts2.subset(Double.NaN, 4);
+		assertThat(r).isNotNull();
+		assertThat(r.getInterpolationMethod()).isEqualTo(Interpolation.LINEAR);
+		assertThat(r.getTime()).isEqualTo(vector(1, 2, 3, 4), offset(1e-9));
+		assertThat(r.getStartTime()).isEqualTo(ts1.getStartTime(), offset(1e-9));
+		assertThat(r.getEndTime()).isEqualTo(4, offset(1e-9));
+		
 		// Test in the middle of the range
 		r = ts2.subset(2, 4);
 		assertThat(r).isNotNull();

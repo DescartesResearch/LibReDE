@@ -48,7 +48,7 @@ public interface StandardMetrics {
 	
 	public static final Metric<RequestCount> QUEUE_LENGTH_SEEN_ON_ARRIVAL = MetricsFactory.eINSTANCE.createMetric("QUEUE_LENGTH_SEEN_ON_ARRIVAL", "queue length seen on arrival", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 	
-	public static final Metric<Time> RESPONSE_TIME = MetricsFactory.eINSTANCE.createMetric("RESPONSE_TIME", "response time", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.CUMULATIVE_SUM, Aggregation.MAXIMUM, Aggregation.MINIMUM);
+	public static final Metric<Time> RESPONSE_TIME = MetricsFactory.eINSTANCE.createMetric("RESPONSE_TIME", "response time", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.CUMULATIVE_SUM, Aggregation.SUM, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 	
 	public static final Metric<RequestRate> THROUGHPUT = MetricsFactory.eINSTANCE.createMetric("THROUGHPUT", "throughput", RequestRate.INSTANCE, Aggregation.AVERAGE);
 	

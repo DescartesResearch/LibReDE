@@ -65,7 +65,7 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.model.util.PrettyPrinter;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetricHandler;
+import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;

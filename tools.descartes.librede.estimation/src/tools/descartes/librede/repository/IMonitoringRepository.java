@@ -42,17 +42,25 @@ import tools.descartes.librede.units.Unit;
 
 public interface IMonitoringRepository {
 	
-	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
-
-	public double aggregate(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
+	public <D extends Dimension> TimeSeries select(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation);
 	
-	public TimeSeries select(Metric<? extends Dimension> metric, Unit<? extends Dimension> unit, ModelEntity entity, Aggregation aggregation);
-	
-	public boolean contains(Metric<? extends Dimension> responseTime,
-			ModelEntity entity, Aggregation aggregation, Quantity<Time> maximumAggregationInterval);
+	public <D extends Dimension> TimeSeries select(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 
-	public boolean contains(Metric<? extends Dimension> responseTime,
-			ModelEntity entity, Aggregation aggregation, Quantity<Time> maximumAggregationInterval, boolean includeDerived);
+	public <D extends Dimension> double aggregate(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
+	
+	public <D extends Dimension> boolean exists(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> void addMetricDerivationHandler(Metric<D> metric, ModelEntity entity, Aggregation aggregation, IMetricDerivationHandler<D> handler);
+
+	public <D extends Dimension> void addMetricAggregationHandler(Metric<D> metric, ModelEntity entity, Aggregation aggregation, IMetricAggregationHandler<D> handler);
+	
+	public <D extends Dimension> Quantity<Time> getAggregationInterval(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> Quantity<Time> getMonitoringStartTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> Quantity<Time> getMonitoringEndTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> boolean isDerived(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();

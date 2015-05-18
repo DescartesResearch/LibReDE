@@ -78,6 +78,7 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
@@ -90,10 +91,12 @@ import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.validation.CrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
@@ -210,7 +213,13 @@ public class Librede {
 			TraceEvent curEvent = null;
 			while ((curEvent = selector.poll()) != null) {
 				TraceKey key = curEvent.getKey();
-				TimeSeries ts = repo.select(key.getMetric(),key.getUnit(), key.getEntity(), key.getAggregation());
+				@SuppressWarnings("unchecked")
+				Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
+				@SuppressWarnings("unchecked")
+				Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
+				
+
+				TimeSeries ts = repo.select(metric, unit, key.getEntity(), key.getAggregation());
 				if (ts == null) {
 					ts = curEvent.getData();
 				} else {
@@ -220,9 +229,9 @@ public class Librede {
 				ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
 				
 				if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
-					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts, key.getAggregation(), key.getInterval());
+					repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
 				} else {
-					repo.insert(key.getMetric(), key.getUnit(), key.getEntity(), ts);
+					repo.insert(metric, unit, key.getEntity(), ts);
 				}
 			}
 		} catch (IOException e1) {

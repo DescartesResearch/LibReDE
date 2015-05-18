@@ -338,13 +338,17 @@ public class TimeSeries {
 		}
 		if (isEmpty() || startTime == endTime) {
 			return EMPTY;
-		}		
+		}
+		if ((startTime != startTime) && (endTime != endTime)) {
+			// Both are NaN therefor skip subset
+			return this;
+		}
 		if ((startTime < this.startTime) || (endTime > this.endTime)) {
 			throw new IllegalArgumentException("Requested subset [" + startTime + ", " + endTime + ") is not contained by this series time range [" + this.startTime + ", " + this.endTime + ").");
 		}
 		
-		double idx1 = interpolationSearch(startTime);
-		double idx2 = interpolationSearch(endTime);
+		double idx1 = (startTime != startTime) ? offset - 1 : interpolationSearch(startTime);
+		double idx2 = (endTime != endTime) ? length - 1 : interpolationSearch(endTime);
 		
 		TimeSeries ret;
 		if (idx1 < 0 && idx2 < 0) {
@@ -355,8 +359,8 @@ public class TimeSeries {
 			ret = new TimeSeries(timestamps, values, start, (end - start + 1));
 		}
 		ret.setInterpolationMethod(interpolation);
-		ret.startTime = startTime;
-		ret.endTime = endTime;
+		ret.startTime = (startTime != startTime) ? this.startTime : startTime;
+		ret.endTime = (endTime != endTime) ? this.endTime : endTime;
 		return ret;
 	}
 
