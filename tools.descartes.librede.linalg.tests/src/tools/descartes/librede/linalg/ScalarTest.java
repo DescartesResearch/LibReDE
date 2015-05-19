@@ -117,7 +117,7 @@ public class ScalarTest {
 	
 	@Test
 	public void testSum() {
-		assertThat(sum(a)).isEqualTo(A, offset(1e-9));
+		assertThat(sum(a).get(0)).isEqualTo(A, offset(1e-9));
 	}
 
 	@Test

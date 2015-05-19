@@ -174,9 +174,7 @@ public interface Matrix {
 	
 	Matrix circshift(int rows);
 	
-	double aggregate(AggregationFunction func);
-	
-	Vector aggregate(AggregationFunction func, int dimension);
+	Vector aggregate(AggregationFunction func, double initialValue);
 
 	/*
 	 * Conversion functions

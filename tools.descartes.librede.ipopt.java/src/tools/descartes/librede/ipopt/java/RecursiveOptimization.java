@@ -330,7 +330,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	@Override
 	public Vector estimate() throws EstimationException {
-		return mean(estimationBuffer, 0);
+		return mean(estimationBuffer);
 	}
 
 	public void updateObjectiveFunction() {

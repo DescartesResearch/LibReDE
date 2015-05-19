@@ -27,10 +27,12 @@
 package tools.descartes.librede.linalg.backend;
 
 import static tools.descartes.librede.linalg.LinAlg.indices;
+import static tools.descartes.librede.linalg.LinAlg.scalar;
 
 import tools.descartes.librede.linalg.AggregationFunction;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
 
@@ -275,13 +277,7 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public double aggregate(AggregationFunction func) {
-		return Double.NaN;
+	public Scalar aggregate(AggregationFunction func, double initialValue) {
+		return scalar(initialValue);
 	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		return this;
-	}
-
 }

@@ -41,6 +41,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 
 public class TimeSeries {
@@ -315,16 +316,23 @@ public class TimeSeries {
 	
 	public TimeSeries diff() {
 		if (timestamps.rows() > 1) {
-			int length = timestamps.rows() - 1;
 			double[] buffer = new double[values.columns()];
-			MatrixBuilder diff = MatrixBuilder.create(timestamps.rows() - 1, values.columns());
-			for (int i = 1; i < length + 1; i++) {
-				for (int j = 0; j < buffer.length; j++) {
-					buffer[j] = values.get(i, j) - values.get(i - 1, j);
+			int entries = (offset > 0) ? length : (length - 1);
+			TimeSeries diffSeries = TimeSeries.EMPTY;
+			if (entries > 0) {
+				MatrixBuilder diff = MatrixBuilder.create(entries, values.columns());
+				VectorBuilder ts = VectorBuilder.create(entries);
+				for (int i = offset; i < (offset + length); i++) {
+					if (i > 0) {					
+						for (int j = 0; j < buffer.length; j++) {
+							buffer[j] = values.get(i, j) - values.get(i - 1, j);
+						}
+						ts.add(timestamps.get(i));
+						diff.addRow(buffer);
+					}
 				}
-				diff.addRow(buffer);
-			}
-			TimeSeries diffSeries = new TimeSeries(timestamps.rows(range(1, length + 1)), diff.toMatrix(), offset + 1, length);
+				diffSeries = new TimeSeries(ts.toVector(), diff.toMatrix(), 0, entries);
+			}			
 			diffSeries.startTime = startTime;
 			diffSeries.endTime = endTime;
 			return diffSeries;

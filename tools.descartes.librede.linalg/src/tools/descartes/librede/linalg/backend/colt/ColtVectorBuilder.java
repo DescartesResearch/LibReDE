@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.LinAlg.empty;
+
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import tools.descartes.librede.linalg.Vector;
@@ -54,6 +56,9 @@ public class ColtVectorBuilder extends VectorBuilder {
 	
 	@Override
 	public Vector toVector() {
+		if (last == 0) {
+			return empty();
+		}
 		if (last < capacity) {
 			return new ColtVector(values.viewPart(0, last));
 		}

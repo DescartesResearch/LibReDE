@@ -31,10 +31,16 @@ public enum AggregationFunction {
 	COUNT {
 		@Override
 		public double apply(double x, double y) {
-			if (Double.isNaN(y)) {
+			return x + 1;
+		}
+	},
+	NANCOUNT {
+		@Override
+		public double apply(double x, double y) {
+			if (y != y) {
 				return x;
 			}
-			if (Double.isNaN(x)) {
+			if (x != x) {
 				return 1;
 			}
 			return x + 1;
@@ -72,16 +78,23 @@ public enum AggregationFunction {
 
 		@Override
 		public double apply(double x, double y) {
-			if (Double.isNaN(y)) {
+			return x + y;
+		}
+		
+	},
+	NANSUM {
+		@Override
+		public double apply(double x, double y) {
+			if (y != y) {
 				return x;
 			}
-			if (Double.isNaN(x)) {
+			if (x != x) {
 				return y;
 			}
 			return x + y;
 		}
-		
 	};
+	
 	
 	
 	public abstract double apply(double x, double y);

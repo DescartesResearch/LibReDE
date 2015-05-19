@@ -67,13 +67,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public double aggregate(AggregationFunction func) {
-		return func.apply(Double.NaN, value);
-	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		return new Scalar(aggregate(func));
+	public Vector aggregate(AggregationFunction func, double initialValue) {
+		return new Scalar(func.apply(initialValue, value));
 	}
 
 	@Override

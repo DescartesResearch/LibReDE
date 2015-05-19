@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.LinAlg.scalar;
 import static tools.descartes.librede.linalg.backend.colt.ColtHelper.*;
 
 import tools.descartes.librede.linalg.AggregationFunction;
@@ -123,21 +124,13 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public double aggregate(AggregationFunction func) {
+	public Scalar aggregate(AggregationFunction func, double initialValue) {
 		int n = delegate.size();
-		double aggr = Double.NaN;
+		double aggr = initialValue;
 		for (int i = 0; i < n; i++) {
 			aggr = func.apply(aggr, delegate.getQuick(i));
 		}
-		return aggr;
-	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		if (dimension > 0) {
-			throw new IllegalArgumentException();
-		}
-		return new Scalar(aggregate(func));
+		return scalar(aggr);
 	}
 	
 	@Override

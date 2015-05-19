@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.backend.colt.ColtHelper.*;
 
@@ -100,9 +101,6 @@ public class ColtMatrix extends AbstractMatrix {
 	
 	@Override
 	public Matrix rows(Indices indices) {
-		if (indices.length() == 1) {
-			return row(indices.get(0));
-		}
 		if (indices.isContinuous()) {
 			RangeImpl range = (RangeImpl)indices;
 			return new ColtMatrix(delegate.viewPart(range.getStart(), 0, range.getLength(), delegate.columns()));
@@ -369,37 +367,20 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public double aggregate(AggregationFunction func) {
+	public Vector aggregate(AggregationFunction func, double initialValue) {
 		int n = delegate.rows();
 		int m = delegate.columns();
-		double aggr = Double.NaN;
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				aggr = func.apply(aggr, delegate.getQuick(i, j));
-			}
-		}
-		return aggr;
-	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		if (dimension < 0 || dimension > 1) {
-			throw new IllegalArgumentException();
-		}
-		int n = delegate.rows();
-		int m = delegate.columns();
-		double[] aggr = new double[(dimension == 0) ? m : n];
-		Arrays.fill(aggr, Double.NaN);
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				if (dimension == 1) {
-					aggr[i] = func.apply(aggr[i], delegate.getQuick(i, j));
-				} else {
+		if (n > 0) {
+			double[] aggr = new double[m];
+			Arrays.fill(aggr, initialValue);
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m; j++) {
 					aggr[j] = func.apply(aggr[j], delegate.getQuick(i, j));
 				}
 			}
+			return vector(aggr);
 		}
-		return vector(aggr);
+		return empty();
 	}
 	
 	protected DoubleMatrix1D newVector(int size) {

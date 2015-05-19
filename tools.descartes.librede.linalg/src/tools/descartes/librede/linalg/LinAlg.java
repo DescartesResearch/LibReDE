@@ -462,30 +462,25 @@ public class LinAlg {
 	}
 
 	/**
+	 * Arithmetic mean of all elements (including NaN) in <code>Matrix</code>.
+	 * 
+	 * @param a
+	 * @return mean(a)
+	 * @since 1.0
+	 */
+	public static Vector mean(Matrix a) {
+		return sum(a).arrayDividedBy(a.aggregate(AggregationFunction.COUNT, 0));
+	}
+
+	/**
 	 * Arithmetic mean of all elements (except NaN) in <code>Matrix</code>.
 	 * 
 	 * @param a
 	 * @return mean(a)
 	 * @since 1.0
 	 */
-	public static double mean(Matrix a) {
-		return a.aggregate(AggregationFunction.SUM) / a.aggregate(AggregationFunction.COUNT);
-	}
-
-	/**
-	 * Arithmetic mean of all elements (except NaN) in <code>Matrix</code> for
-	 * each row or column.
-	 * 
-	 * @param a
-	 * @param dimension
-	 *            0 if for each row, 1 if for each column
-	 * @return mean(a) for each row or column
-	 * @since 1.0
-	 */
-	public static Vector mean(Matrix a, int dimension) {
-		Vector sum = a.aggregate(AggregationFunction.SUM, dimension);
-		Vector count = a.aggregate(AggregationFunction.COUNT, dimension);
-		return sum.arrayDividedBy(count);
+	public static Vector nanmean(Matrix a) {
+		return nansum(a).arrayDividedBy(a.aggregate(AggregationFunction.COUNT, 0));
 	}
 
 	/**
@@ -495,22 +490,19 @@ public class LinAlg {
 	 * @return sum(a)
 	 * @since 1.0
 	 */
-	public static double sum(Matrix a) {
-		return a.aggregate(AggregationFunction.SUM);
+	public static Vector nansum(Matrix a) {
+		return a.aggregate(AggregationFunction.NANSUM, 0);
 	}
 
 	/**
-	 * Sum of all elements (except NaN) in <code>Matrix</code> for each row or
-	 * column..
+	 * Sum of all elements in <code>Matrix</code>.
 	 * 
 	 * @param a
-	 * @param dimension
-	 *            0 if for each row, 1 if for each column
-	 * @return sum(a) for each row or column
+	 * @return sum(a)
 	 * @since 1.0
 	 */
-	public static Vector sum(Matrix a, int dimension) {
-		return a.aggregate(AggregationFunction.SUM, dimension);
+	public static Vector sum(Matrix a) {
+		return a.aggregate(AggregationFunction.SUM, 0);
 	}
 
 	/**
@@ -808,22 +800,8 @@ public class LinAlg {
 	 * @return min(v)
 	 * @since 1.0
 	 */
-	public static double min(Matrix v) {
-		return v.aggregate(AggregationFunction.MINIMUM);
-	}
-
-	/**
-	 * Returns the minimum value of a matrix for each row or column.
-	 * 
-	 * @param v
-	 * @param dimension
-	 *            if dimension == 0 -> row-wise, if dimension == 1 ->
-	 *            column-wise
-	 * @return min(v) per row/column
-	 * @since 1.0
-	 */
-	public static Vector min(Matrix v, int dimension) {
-		return v.aggregate(AggregationFunction.MINIMUM, dimension);
+	public static Vector min(Matrix v) {
+		return v.aggregate(AggregationFunction.MINIMUM,Double.NaN);
 	}
 
 	/**
@@ -833,21 +811,7 @@ public class LinAlg {
 	 * @return max(v)
 	 * @since 1.0
 	 */
-	public static double max(Matrix v) {
-		return v.aggregate(AggregationFunction.MAXIMUM);
-	}
-
-	/**
-	 * Returns the maximum value of a matrix for each row or column.
-	 * 
-	 * @param v
-	 * @param dimension
-	 *            if dimension == 0 -> row-wise, if dimension == 1 ->
-	 *            column-wise
-	 * @return min(v) per row/column
-	 * @since 1.0
-	 */
-	public static Vector max(Matrix v, int dimension) {
-		return v.aggregate(AggregationFunction.MAXIMUM, dimension);
+	public static Vector max(Matrix v) {
+		return v.aggregate(AggregationFunction.MAXIMUM, Double.NaN);
 	}
 }

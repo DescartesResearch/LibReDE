@@ -118,7 +118,7 @@ public class VectorTest {
 	
 	@Test
 	public void testSum() {
-		assertThat(sum(a)).isEqualTo(A[0] + A[1] + A[2], offset(1e-9));
+		assertThat(sum(a).get(0)).isEqualTo(A[0] + A[1] + A[2], offset(1e-9));
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 	}
 	
@@ -133,7 +133,7 @@ public class VectorTest {
 	
 	@Test
 	public void testNorm1() {
-		assertThat(norm1(a)).isEqualTo(sum(abs(a)), offset(1e-9));
+		assertThat(norm1(a)).isEqualTo(sum(abs(a)).get(0), offset(1e-9));
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 	}
 	

@@ -99,15 +99,15 @@ public class UtilizationValidator implements IValidator {
 	
 	@Override
 	public Vector getPredictionError() {
-		return LinAlg.mean(allErrors.toMatrix(), 0);
+		return LinAlg.mean(allErrors.toMatrix());
 	}
 	
 	public Vector getPredictedValues() {
-		return LinAlg.mean(predictedUtilization.toMatrix(), 0);
+		return LinAlg.mean(predictedUtilization.toMatrix());
 	}
 	
 	public Vector getObservedValues() {
-		return LinAlg.mean(observedUtilization.toMatrix(), 0);
+		return LinAlg.mean(observedUtilization.toMatrix());
 	}
 	
 	@Override

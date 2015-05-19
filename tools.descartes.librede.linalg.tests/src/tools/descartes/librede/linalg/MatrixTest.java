@@ -247,8 +247,8 @@ public class MatrixTest {
 	
 	@Test
 	public void testSum() {
-		double c = sum(a);
-		assertThat(c).isEqualTo(A[0][0] + A[0][1] + A[0][2] + A[1][0] + A[1][1] + A[1][2], offset(1e-9));
+		Vector c = sum(a);
+		assertThat(c).isEqualTo(vector(A[0][0] + A[1][0], A[0][1] + A[1][1], A[0][2] + A[1][2]), offset(1e-9));
 		assertThat(a).isEqualTo(matrix(A), offset(1e-9));
 	}
 	

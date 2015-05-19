@@ -323,7 +323,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 */
 	@Override
 	public Vector estimate() throws EstimationException {
-		return mean(estimates, 0);
+		return mean(estimates);
 	}
 	
 	/*

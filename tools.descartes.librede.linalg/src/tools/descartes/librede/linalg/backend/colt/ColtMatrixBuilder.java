@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.LinAlg.empty;
+
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import tools.descartes.librede.linalg.Matrix;
@@ -74,6 +76,9 @@ public class ColtMatrixBuilder extends MatrixBuilder {
 
 	@Override
 	public Matrix toMatrix() {
+		if (last == 0) {
+			return empty();
+		}		
 		if (matrix.columns() > 1) {
 			if (last == capacity) {
 				return new ColtMatrix(matrix);

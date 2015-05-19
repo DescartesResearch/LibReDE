@@ -71,7 +71,7 @@ public class TargetUtilizationInitializer implements IStateInitializer {
 	@Override
 	public Vector getInitialValue(final IStateModel<?> stateModel) {
 		Query<Vector, RequestRate> throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(cursor);
-		double totalThroughput = sum(throughput.execute());
+		double totalThroughput = sum(throughput.execute()).get(0);
 		final double initialDemand = targetUtilization / totalThroughput;
 		return vector(stateModel.getStateSize(), new VectorFunction() {
 			@Override

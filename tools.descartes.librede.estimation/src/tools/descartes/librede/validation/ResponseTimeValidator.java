@@ -98,7 +98,7 @@ public class ResponseTimeValidator implements IValidator {
 	}
 	
 	public Vector getPredictionError() {
-		return LinAlg.mean(allErrors.toMatrix(), 0);
+		return LinAlg.mean(allErrors.toMatrix());
 	}
 	
 	@Override
@@ -108,11 +108,11 @@ public class ResponseTimeValidator implements IValidator {
 	
 	@Override
 	public Vector getObservedValues() {
-		return LinAlg.mean(observedRespTimes.toMatrix(), 0);
+		return LinAlg.mean(observedRespTimes.toMatrix());
 	}
 	
 	@Override
 	public Vector getPredictedValues() {
-		return LinAlg.mean(predictedRespTimes.toMatrix(), 0);
+		return LinAlg.mean(predictedRespTimes.toMatrix());
 	}
 }

@@ -216,7 +216,7 @@ public class ObservationDataGenerator {
 			}
 		});
 				
-		final Vector relativeWheights = absoluteWheights.times(1 / sum(absoluteWheights));
+		final Vector relativeWheights = absoluteWheights.times(1 / sum(absoluteWheights).get(0));
 		
 		Vector weightedTotalDemand = vector(resources.length, new VectorFunction() {			
 			@Override
