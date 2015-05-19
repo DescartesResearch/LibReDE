@@ -249,7 +249,11 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 					}
 				}
 			}
-			return new TimeSeries(timestamps.toVector(), values.toVector());
+			Vector ts = timestamps.toVector();
+			if (ts.isEmpty()) {
+				return TimeSeries.EMPTY;
+			}
+			return new TimeSeries(ts, values.toVector());
 		}
 
 		private boolean applyFilters(List<TraceFilter> filters, String[] line) {

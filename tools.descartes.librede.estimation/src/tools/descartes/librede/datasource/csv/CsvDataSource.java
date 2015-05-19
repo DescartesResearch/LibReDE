@@ -150,7 +150,7 @@ public class CsvDataSource extends AbstractFileDataSource {
 			// discarded.
 			for (int i = 0; i < values.length; i++) {
 				if ((i + 1) < fields.length) {
-					values[i] = fields[i + 1];
+					values[i] = fields[i + 1].trim();
 				} else {					
 					values[i] = "";
 				}
