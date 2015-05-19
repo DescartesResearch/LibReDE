@@ -60,8 +60,6 @@ public interface IMonitoringRepository {
 	
 	public <D extends Dimension> Quantity<Time> getMonitoringEndTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 	
-	public <D extends Dimension> boolean isDerived(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
-	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	

@@ -36,6 +36,7 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
@@ -106,29 +107,17 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}		
 	}
 	
-	private static class DataEntry<D extends Dimension> {
+	private abstract static class DataEntry<D extends Dimension> {
 
 		public IMetricAggregationHandler<D> aggregationHandler = null;
 		
-		public TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
-			return TimeSeries.EMPTY;
-		}
+		public abstract TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 		
-		public Quantity<Time> getAggregationInterval(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
-			return aggregationHandler.getAggregationInterval(repository, metric, entity, aggregation);
-		}
+		public abstract Quantity<Time> getAggregationInterval(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 		
-		public Quantity<Time> getStartTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
-			return aggregationHandler.getStartTime(repository, metric, entity, aggregation);
-		}
+		public abstract Quantity<Time> getStartTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 		
-		public Quantity<Time> getEndTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
-			return aggregationHandler.getEndTime(repository, metric, entity, aggregation);
-		}
-		
-		public boolean isDerived() {
-			return true;
-		}
+		public abstract Quantity<Time> getEndTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 	}
 	
 	private static class TimeSeriesDataEntry<D extends Dimension> extends DataEntry<D> {
@@ -146,7 +135,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 
 		@Override
 		public TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
-			return data.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS));
+			return UnitConverter.convertTo(data.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS)), unit.getDimension().getBaseUnit(), unit);
 		}
 
 		@Override
@@ -166,11 +155,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				Aggregation aggregation) {
 			return endTime;
 		}
-		
-		@Override
-		public boolean isDerived() {
-			return false;
-		}
 	}
 	
 	private static class DerivedDataEntry<D extends Dimension> extends DataEntry<D> {
@@ -179,7 +163,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		@Override
 		public TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 			if (derivationHandler != null) {
-				derivationHandler.derive(repository, metric, unit, entity, aggregation, start, end);
+				return derivationHandler.derive(repository, metric, unit, entity, aggregation, start, end);
 			}
 			return TimeSeries.EMPTY;
 		}
@@ -187,19 +171,28 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		@Override
 		public Quantity<Time> getAggregationInterval(MemoryObservationRepository repository, Metric<D> metric,
 				ModelEntity entity, Aggregation aggregation) {
-			return derivationHandler.getAggregationInterval(repository, metric, entity, aggregation);
+			if (derivationHandler != null) {
+				return derivationHandler.getAggregationInterval(repository, metric, entity, aggregation);
+			}
+			return aggregationHandler.getAggregationInterval(repository, metric, entity, aggregation);
 		}
 
 		@Override
 		public Quantity<Time> getStartTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity,
 				Aggregation aggregation) {
-			return derivationHandler.getStartTime(repository, metric, entity, aggregation);
+			if (derivationHandler != null) {
+				return derivationHandler.getStartTime(repository, metric, entity, aggregation);
+			}
+			return aggregationHandler.getAggregationInterval(repository, metric, entity, aggregation);
 		}
 
 		@Override
 		public Quantity<Time> getEndTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity,
 				Aggregation aggregation) {
-			return derivationHandler.getEndTime(repository, metric, entity, aggregation);
+			if (derivationHandler != null) {
+				return derivationHandler.getEndTime(repository, metric, entity, aggregation);
+			}
+			return aggregationHandler.getAggregationInterval(repository, metric, entity, aggregation);
 		}
 	}
 	
@@ -289,6 +282,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (entry == null) {
 			return Double.NaN;
 		}
+		if (entry.aggregationHandler == null) {
+			throw new IllegalStateException("No aggregation handler for " + metric.getName() + " and " + aggregation.getLiteral() + " is available.");
+		}
 		return entry.aggregationHandler.aggregate(this, metric, unit, entity, aggregation, start, end);
 	}
 
@@ -333,22 +329,18 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		boolean newEntry = (entry == null);
 		
 		if (newEntry) {
-			entry = new DataEntry<D>();
+			entry = new DerivedDataEntry<D>();
 			data.put(new DataKey<D>(metric, entity, aggregation), entry);
 		}
-		entry.aggregationHandler = handler;
+		if (entry.aggregationHandler == null) {
+			entry.aggregationHandler = handler;
+		}
 
 		if (newEntry) {
 			// This is the first time we add data for this metric, entity and aggregation combination
 			// Install all aggregation and derivation handlers
 			Registry.INSTANCE.getMetricHandler(metric).registerHandlers(this, entity, aggregation);
 		}		
-	}
-	
-	@Override
-	public <D extends Dimension> boolean isDerived(Metric<D> metric, ModelEntity entity,
-			Aggregation aggregation) {
-		return getEntry(metric, entity, aggregation).isDerived();
 	}
 	
 	@Override
@@ -370,6 +362,32 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			Aggregation aggregation) {
 		DataEntry<D> entry = getEntry(metric, entity, aggregation);
 		return (entry == null) ? ZERO_SECONDS : entry.getEndTime(this, metric, entity, aggregation);
+	}
+	
+	public void printSummary() {
+		for (Map.Entry<DataKey<?>, DataEntry<?>> entry : data.entrySet()) {
+			StringBuilder s = new StringBuilder();
+			s.append(entry.getKey().entity.getName()).append(", ");
+			s.append(entry.getKey().metric.getName()).append(", ");
+			s.append(entry.getKey().aggregation.getLiteral()).append(": ");
+			
+			if (entry.getValue() instanceof TimeSeriesDataEntry) {
+				s.append(((TimeSeriesDataEntry<?>)entry.getValue()).data.samples());
+				s.append(" samples with mean=");
+				s.append(LinAlg.nanmean(((TimeSeriesDataEntry<?>)entry.getValue()).data.getData(0)));
+				s.append(" [");
+				s.append(((TimeSeriesDataEntry<?>)entry.getValue()).startTime.getValue(Time.SECONDS));
+				s.append(":");
+				s.append(((TimeSeriesDataEntry<?>)entry.getValue()).endTime.getValue(Time.SECONDS));
+				s.append("]");
+			} else if (entry.getValue() instanceof DerivedDataEntry) {
+				if (((DerivedDataEntry<?>)entry.getValue()).derivationHandler != null) {
+					s.append("-> ");
+					s.append(((DerivedDataEntry<?>)entry.getValue()).derivationHandler.getClass());
+				}
+			}			
+			log.info(s.toString());
+		}
 	}
 
 	@SuppressWarnings("unchecked")

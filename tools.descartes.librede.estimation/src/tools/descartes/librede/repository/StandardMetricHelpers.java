@@ -250,7 +250,7 @@ public class StandardMetricHelpers {
 					log.trace("Calculate " + aggregation.getLiteral() + " of " + metric.getName() + " for entity " + entity + " from " + Aggregation.SUM.getLiteral() + ".");
 				}
 				double sumRt = repository.aggregate(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-				double requests = repository.aggregate(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, Aggregation.AVERAGE, start, end);
+				double requests = repository.aggregate(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, Aggregation.SUM, start, end);
 				return Time.SECONDS.convertTo(sumRt / requests, unit);
 			}
 			throw new IllegalArgumentException();
@@ -542,9 +542,7 @@ public class StandardMetricHelpers {
 			}
 			
 			if (aggregation == Aggregation.SUM) {
-				if (!repository.isDerived(StandardMetrics.ARRIVALS, entity, aggregation)) {
-					repository.addMetricAggregationHandler(StandardMetrics.ARRIVALS, entity, Aggregation.SUM, new DefaultAggregationHandler<RequestCount>(StandardMetrics.ARRIVALS, Aggregation.SUM));
-				}
+				repository.addMetricAggregationHandler(StandardMetrics.ARRIVALS, entity, Aggregation.SUM, new DefaultAggregationHandler<RequestCount>(StandardMetrics.ARRIVALS, Aggregation.SUM));
 				repository.addMetricAggregationHandler(StandardMetrics.ARRIVAL_RATE, entity, Aggregation.AVERAGE, new RequestRateAggregationHandler(StandardMetrics.ARRIVALS));
 			}
 			
@@ -582,9 +580,7 @@ public class StandardMetricHelpers {
 			}
 			
 			if (aggregation == Aggregation.SUM) {
-				if (!repository.isDerived(StandardMetrics.DEPARTURES, entity, aggregation)) {
-					repository.addMetricAggregationHandler(StandardMetrics.DEPARTURES, entity, Aggregation.SUM, new DefaultAggregationHandler<RequestCount>(StandardMetrics.DEPARTURES, Aggregation.SUM));
-				}
+				repository.addMetricAggregationHandler(StandardMetrics.DEPARTURES, entity, Aggregation.SUM, new DefaultAggregationHandler<RequestCount>(StandardMetrics.DEPARTURES, Aggregation.SUM));
 				repository.addMetricAggregationHandler(StandardMetrics.THROUGHPUT, entity, Aggregation.AVERAGE, new RequestRateAggregationHandler(StandardMetrics.DEPARTURES));
 				
 				if (repository.exists(StandardMetrics.RESPONSE_TIME, entity, Aggregation.SUM)) {
@@ -613,9 +609,7 @@ public class StandardMetricHelpers {
 		@Override
 		public void registerHandlers(IMonitoringRepository repository, ModelEntity entity,
 				Aggregation aggregation) {
-			if (!repository.isDerived(StandardMetrics.ARRIVAL_RATE, entity, aggregation)) {
-				repository.addMetricAggregationHandler(StandardMetrics.ARRIVAL_RATE, entity, Aggregation.AVERAGE, new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE));	
-			}
+			repository.addMetricAggregationHandler(StandardMetrics.ARRIVAL_RATE, entity, Aggregation.AVERAGE, new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE));	
 		}
 
 		@Override
@@ -635,9 +629,7 @@ public class StandardMetricHelpers {
 		@Override
 		public void registerHandlers(IMonitoringRepository repository, ModelEntity entity,
 				Aggregation aggregation) {
-			if (!repository.isDerived(StandardMetrics.THROUGHPUT, entity, aggregation)) {
-				repository.addMetricAggregationHandler(StandardMetrics.THROUGHPUT, entity, Aggregation.AVERAGE, new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.THROUGHPUT));
-			}
+			repository.addMetricAggregationHandler(StandardMetrics.THROUGHPUT, entity, Aggregation.AVERAGE, new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.THROUGHPUT));
 			
 			if (repository.exists(StandardMetrics.RESPONSE_TIME, entity, Aggregation.AVERAGE)) {
 				repository.addMetricAggregationHandler(StandardMetrics.RESPONSE_TIME, entity, Aggregation.AVERAGE, new ThroughputWeightedAggregationHandler<Time>(StandardMetrics.RESPONSE_TIME));
@@ -690,6 +682,7 @@ public class StandardMetricHelpers {
 			}
 			
 			if (aggregation == Aggregation.SUM) {
+				repository.addMetricAggregationHandler(StandardMetrics.RESPONSE_TIME, entity, Aggregation.SUM, new DefaultAggregationHandler<Time>(StandardMetrics.RESPONSE_TIME, Aggregation.SUM) );
 				if (repository.exists(StandardMetrics.DEPARTURES, entity, Aggregation.SUM)) {
 					repository.addMetricAggregationHandler(StandardMetrics.RESPONSE_TIME, entity, Aggregation.AVERAGE, new AverageResponseTimeAggregationHandler());
 				}
