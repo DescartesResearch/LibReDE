@@ -148,6 +148,8 @@ public class Librede {
 
 		loadRepository(conf, repo);
 		
+		repo.printSummary();
+		
 		if (!conf.getValidation().isValidateEstimates()) {
 			
 			try {
@@ -495,7 +497,7 @@ public class Librede {
 			for (ResultTable curFold : folds) {
 				lastEstimates.addRow(curFold.getLastEstimates());
 			}
-			meanEstimates.addRow(LinAlg.mean(lastEstimates.toMatrix(), 0));
+			meanEstimates.addRow(LinAlg.mean(lastEstimates.toMatrix()));
 
 			for (Class<? extends IValidator> validator : validators) {
 				MatrixBuilder errors = null; 
@@ -508,7 +510,7 @@ public class Librede {
 					errors.addRow(vec);
 				}
 				
-				Vector mean = LinAlg.mean(errors.toMatrix(), 0);
+				Vector mean = LinAlg.mean(errors.toMatrix());
 				if (!meanErrors.containsKey(validator)) {
 					meanErrors.put(validator, MatrixBuilder.create(mean.rows()));
 				}
