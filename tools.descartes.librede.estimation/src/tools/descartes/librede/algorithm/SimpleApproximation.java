@@ -98,9 +98,12 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 		Vector currentEstimate = vector(output.rows(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
-				return output.get(row)
-						/ getCastedObservationModel().getOutputFunction(row)
-								.getFactor();
+				double factor = getCastedObservationModel().getOutputFunction(row)
+						.getFactor();
+				if (factor != 0) {
+					return  output.get(row) / factor;
+				}
+				return 0.0;
 			}
 		});
 		buffer = buffer.circshift(1).setRow(0, currentEstimate);
@@ -110,13 +113,13 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 	public Vector estimate() throws EstimationException {
 		switch (aggregation) {
 		case AVERAGE:
-			return mean(buffer, 0);
+			return mean(buffer);
 		case MAXIMUM:
-			return max(buffer, 0);
+			return max(buffer);
 		case MINIMUM:
-			return min(buffer, 0);
+			return min(buffer);
 		case SUM:
-			return sum(buffer, 0);
+			return sum(buffer);
 		case NONE:
 			return buffer.row(0);
 		}

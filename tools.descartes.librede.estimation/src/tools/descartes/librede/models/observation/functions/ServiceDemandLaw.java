@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
+import static tools.descartes.librede.linalg.LinAlg.nansum;
+
 import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
@@ -154,7 +156,12 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		double U_i = utilizationQuery.get(historicInterval).getValue();
 		int p = res_i.getNumberOfServers();
 		
-		return p * U_i * (R_r * X_r) / (R.dot(X));
+		if (X_r == 0) {
+			// no request observed --> zero utilization due to that class
+			return 0.0;
+		} else {
+			return p * U_i * (R_r * X_r) / nansum(R.arrayMultipliedBy(X)).get(0);
+		}
 	}
 
 	/* (non-Javadoc)
