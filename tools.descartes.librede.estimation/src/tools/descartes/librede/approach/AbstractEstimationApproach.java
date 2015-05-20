@@ -28,6 +28,7 @@ package tools.descartes.librede.approach;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -87,6 +88,13 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 			throw new IllegalStateException();
 		}
 		List<IStateModel<?>> stateModels = deriveStateModels(workload, cursor);
+		for(Iterator<IStateModel<?>> it = stateModels.iterator(); it.hasNext();) {
+			if(it.next().getStateSize() == 0) {
+				log.info("Prune empty state model.");
+				it.remove();
+			}
+		}
+		
 		algorithms = new ArrayList<IEstimationAlgorithm>(
 				stateModels.size());		
 		
