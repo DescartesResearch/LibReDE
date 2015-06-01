@@ -125,7 +125,9 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		return individualResponseTimesQuery.get(historicInterval).getValue();
+		double rt = individualResponseTimesQuery.get(historicInterval).getValue();
+		// We did not observe q request --> demand is zero
+		return (rt != rt) ? 0.0 : rt;
 	}
 
 }
