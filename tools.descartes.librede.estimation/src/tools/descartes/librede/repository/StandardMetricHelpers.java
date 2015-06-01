@@ -251,6 +251,10 @@ public class StandardMetricHelpers {
 				}
 				double sumRt = repository.aggregate(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
 				double requests = repository.aggregate(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, Aggregation.SUM, start, end);
+				if (requests == 0.0) {
+					// no requests -> no mean response time
+					return Double.NaN;
+				}
 				return Time.SECONDS.convertTo(sumRt / requests, unit);
 			}
 			throw new IllegalArgumentException();
