@@ -148,8 +148,6 @@ public class Librede {
 
 		loadRepository(conf, repo);
 		
-		repo.printSummary();
-		
 		if (!conf.getValidation().isValidateEstimates()) {
 			
 			try {

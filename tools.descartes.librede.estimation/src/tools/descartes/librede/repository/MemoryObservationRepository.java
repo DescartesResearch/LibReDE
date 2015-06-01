@@ -222,6 +222,15 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		data.put(new DataKey<D>(m, entity, aggregation),  entry);
 		
+		log.info("Data" + ((oldEntry== null) ? "" : "(replaced)") + ": " + entity.getName() 
+			+ ":" + m.getName() 
+			+ ":" + aggregation.getLiteral() 
+			+ " <- ["
+			+ "length=" + observations.samples() + ", "
+			+ "mean=" + LinAlg.nanmean(observations.getData(0)).get(0) + ", "
+			+ "start=" + observations.getStartTime() +"s, "
+			+ "end=" + observations.getEndTime() + "s]");
+		
 		if (oldEntry == null) {
 			// This is the first time we add data for this metric, entity and aggregation combination
 			// Install all aggregation and derivation handlers
@@ -297,10 +306,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	@Override
 	public <D extends Dimension> void addMetricDerivationHandler(Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation, IMetricDerivationHandler<D> handler) {
-		if (log.isDebugEnabled()) {
-			log.debug("Add derivation handler for " + metric.getName() + "(" + aggregation.getLiteral() + ") of entity " + entity.getName());
-		}
-		
 		DataEntry<D> oldEntry = getEntry(metric, entity, aggregation);
 		
 		DerivedDataEntry<D> entry = new DerivedDataEntry<>();
@@ -309,6 +314,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			entry.aggregationHandler = oldEntry.aggregationHandler;
 		}
 		data.put(new DataKey<D>(metric, entity, aggregation),  entry);
+		
+		log.info("Derivation" + ((oldEntry == null) ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
 		
 		if (oldEntry == null) {
 			// This is the first time we add data for this metric, entity and aggregation combination
@@ -321,9 +328,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	@Override
 	public <D extends Dimension> void addMetricAggregationHandler(Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation, IMetricAggregationHandler<D> handler) {
-		if (log.isDebugEnabled()) {
-			log.debug("Add aggregation handler for " + metric.getName() + "(" + aggregation.getLiteral() + ") of entity " + entity.getName());
-		}
+		log.info("Aggregation: " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
 		
 		DataEntry<D> entry = getEntry(metric, entity, aggregation);
 		boolean newEntry = (entry == null);
@@ -335,6 +340,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (entry.aggregationHandler == null) {
 			entry.aggregationHandler = handler;
 		}
+		
+		log.info("Aggregation" + (newEntry ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
 
 		if (newEntry) {
 			// This is the first time we add data for this metric, entity and aggregation combination
@@ -364,32 +371,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return (entry == null) ? ZERO_SECONDS : entry.getEndTime(this, metric, entity, aggregation);
 	}
 	
-	public void printSummary() {
-		for (Map.Entry<DataKey<?>, DataEntry<?>> entry : data.entrySet()) {
-			StringBuilder s = new StringBuilder();
-			s.append(entry.getKey().entity.getName()).append(", ");
-			s.append(entry.getKey().metric.getName()).append(", ");
-			s.append(entry.getKey().aggregation.getLiteral()).append(": ");
-			
-			if (entry.getValue() instanceof TimeSeriesDataEntry) {
-				s.append(((TimeSeriesDataEntry<?>)entry.getValue()).data.samples());
-				s.append(" samples with mean=");
-				s.append(LinAlg.nanmean(((TimeSeriesDataEntry<?>)entry.getValue()).data.getData(0)));
-				s.append(" [");
-				s.append(((TimeSeriesDataEntry<?>)entry.getValue()).startTime.getValue(Time.SECONDS));
-				s.append(":");
-				s.append(((TimeSeriesDataEntry<?>)entry.getValue()).endTime.getValue(Time.SECONDS));
-				s.append("]");
-			} else if (entry.getValue() instanceof DerivedDataEntry) {
-				if (((DerivedDataEntry<?>)entry.getValue()).derivationHandler != null) {
-					s.append("-> ");
-					s.append(((DerivedDataEntry<?>)entry.getValue()).derivationHandler.getClass());
-				}
-			}			
-			log.info(s.toString());
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	private <D extends Dimension> DataEntry<D> getEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 		DataKey<D> key = new DataKey<>(metric, entity, aggregation);
