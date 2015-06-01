@@ -480,7 +480,7 @@ public class LinAlg {
 	 * @since 1.0
 	 */
 	public static Vector nanmean(Matrix a) {
-		return nansum(a).arrayDividedBy(a.aggregate(AggregationFunction.COUNT, 0));
+		return nansum(a).arrayDividedBy(a.aggregate(AggregationFunction.NANCOUNT, 0));
 	}
 
 	/**
