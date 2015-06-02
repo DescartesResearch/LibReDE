@@ -26,21 +26,19 @@
  */
 package tools.descartes.librede.nnls.tests;
 
+import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
@@ -86,9 +84,9 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 
 			Vector estimates = optim.estimate();
 
-			//assertThat(estimates).isEqualTo(demands, offset(0.001));
-			
-			System.out.println(estimates);
+			if (i > 1) {
+				assertThat(estimates).isEqualTo(demands, offset(0.001));
+			}
 		}
 
 		System.out.println("Duration: " + (System.nanoTime() - start) / 1000000);
@@ -101,7 +99,8 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 	public void testFiveServicesOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
 
-		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
+		// IMPORTANT: test with zero demand!
+		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.0);
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
@@ -124,9 +123,9 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 
 			Vector estimates = optim.estimate();
 			
-//			assertThat(estimates).isEqualTo(demands, offset(0.001));
-			
-//			System.out.println(i + ": " + estimates);
+			if (i > 5) {
+				assertThat(estimates).isEqualTo(demands, offset(0.001));
+			}
 		}
 
 		System.out.println("Duration: " + (System.nanoTime() - start) / 1000000);
