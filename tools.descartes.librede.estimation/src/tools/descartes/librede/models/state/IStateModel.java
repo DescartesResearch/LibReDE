@@ -49,6 +49,8 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	List<Service> getUserServices();
 	
+	boolean containsStateVariable(Resource res, Service service);
+	
 	int getStateVariableIndex(Resource res, Service service);	
 	
 	Indices getStateVariableIndices(Resource res);

@@ -222,6 +222,16 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 	
 	@Override
+	public boolean containsStateVariable(Resource res, Service service) {
+		Integer resIdx = resourcesToIdx.get(res);
+		Integer serviceIdx = servicesToIdx.get(service);
+		if (resIdx == null || serviceIdx == null) {
+			return false;
+		}
+		return stateVarIdx[resIdx][serviceIdx] >= 0;
+	}
+	
+	@Override
 	public int getStateVariableIndex(Resource res, Service service) {
 		Integer resIdx = resourcesToIdx.get(res);
 		Integer serviceIdx = servicesToIdx.get(service);

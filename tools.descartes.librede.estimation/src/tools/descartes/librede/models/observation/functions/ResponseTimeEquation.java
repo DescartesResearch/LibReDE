@@ -192,7 +192,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		double rt = 0.0;
 		Vector X = throughputQuery.get(historicInterval);
 
-		for (Resource res_i : getStateModel().getResources()) {
+		for (Resource res_i : cls_r.getResources()) {
 			double U_i = getUtilization(historicInterval, res_i, state, X);
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			int p = res_i.getNumberOfServers();
@@ -250,9 +250,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 * Calculate the utilization using the utilization law.
 			 */
 			double U_i = 0;
-			for (int i = 0; i < X.rows(); i++) {
-				Service curService = (Service) throughputQuery.getEntity(i);
-				U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(i);
+			for (Service curService : res_i.getServices()) {
+				int idx = throughputQuery.indexOf(curService);
+				U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
 			}
 			return U_i / res_i.getNumberOfServers();
 		}
@@ -281,8 +281,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 
 				// get current throughput data
 				Vector X = throughputQuery.get(historicInterval);
-				double U_i = getUtilization(historicInterval, res_i, state, X);		
-
+				double U_i = getUtilization(historicInterval, res_i, state, X);
 
 				double dev = 0.0;
 				if (cls_r.equals(cls_s)) {
@@ -319,24 +318,28 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				dev += P_q / beta;
 			}
 			if (!useObservedUtilization) {
-				double X_s = X.get(throughputQuery.indexOf(cls_s));
-				/*
-				 * Important: Consider the number of 
-				 * servers for calculating the derivation of U
-				 */
-				double devU = X_s / k;
-				double devP_q = erlangC.calculateFirstDerivative(k, U_i, devU);
-				/*
-				 * U_i and P_q are also functions of the state. Therefore, we need
-				 * to apply the quotient rule. The first addend of the quotient rule
-				 * has already been calculated above.
-				 * 
-				 * u = D_ir
-				 * v = \frac{P_q}{1 - U_i}
-				 * 
-				 */
-				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-				dev += D_ir * deriveQueueingFactor(beta, X_s / k, P_q, devP_q);
+				// In case of non-rectangular state models we may hit this case
+				// Then D_ir == 0 --> we can skip this part
+				if (getStateModel().containsStateVariable(res_i, cls_r)) {
+					double X_s = X.get(throughputQuery.indexOf(cls_s));
+					/*
+					 * Important: Consider the number of 
+					 * servers for calculating the derivation of U
+					 */
+					double devU = X_s / k;
+					double devP_q = erlangC.calculateFirstDerivative(k, U_i, devU);
+					/*
+					 * U_i and P_q are also functions of the state. Therefore, we need
+					 * to apply the quotient rule. The first addend of the quotient rule
+					 * has already been calculated above.
+					 * 
+					 * u = D_ir
+					 * v = \frac{P_q}{1 - U_i}
+					 * 
+					 */
+					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+					dev += D_ir * deriveQueueingFactor(beta, devU, P_q, devP_q);
+				}
 			}			
 			return dev;
 		case IS:
@@ -383,9 +386,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				// derivative is zero
 				// if we use observed utilization it is only a linear function -> second
 				// derivative is zero
-				if (!useObservedUtilization && res_i.equals(res_j)) {
-
-		
+				if (!useObservedUtilization && res_i.equals(res_j)) {		
 					return getSecondDerivationOfWaitingTime(state, res_i, cls_s, cls_t);
 				}
 				return 0.0;
@@ -418,8 +419,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 					double devsdevtP_q = erlangC.calculateSecondDerivative(k, U_i, devsU);
 					
 					double beta = 1 - U_i;
-					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-					double dev = D_ir * (devsdevtP_q / beta + (devsP_q * devtU  + devtP_q * devsU) / (beta * beta) + (P_q * 2 * devsU * devtU) / (beta * beta * beta));			
+					double dev = 0.0;
+					if (getStateModel().containsStateVariable(res_i, cls_r)) {
+						double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+						dev = D_ir * (devsdevtP_q / beta + (devsP_q * devtU  + devtP_q * devsU) / (beta * beta) + (P_q * 2 * devsU * devtU) / (beta * beta * beta));
+					}
 					if (cls_r.equals(cls_s)) {
 						dev += deriveQueueingFactor(beta, devtU, P_q, devtP_q);
 					}
