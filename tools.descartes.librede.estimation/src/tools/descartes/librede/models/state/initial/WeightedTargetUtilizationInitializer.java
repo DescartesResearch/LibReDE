@@ -72,11 +72,13 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 		
 		Vector initialDemands = respTime.execute();
 		for (int i = 0; i < initialDemands.rows(); i++) {
-			if (Double.isNaN(initialDemands.get(i))) {
-				// not enough observations yet to initialized the state
-				return empty();
+			double d = initialDemands.get(i);
+			if (d != d) {
+				// NaN
+				initialDemands = initialDemands.set(i, 0.0);
 			}
 		}
+
 		if (resourceCount > 1) {
 			// If we have several resources, then distribute the demands evenly
 			// between the resources

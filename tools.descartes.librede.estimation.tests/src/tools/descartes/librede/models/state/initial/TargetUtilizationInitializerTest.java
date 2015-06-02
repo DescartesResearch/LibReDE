@@ -29,6 +29,7 @@ package tools.descartes.librede.models.state.initial;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.LinAlg.range;
+import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -89,6 +90,28 @@ public class TargetUtilizationInitializerTest extends LibredeTest {
 			double util = initialDemands.get(range(i * 5, (i + 1) * 5)).dot(throughput);
 			assertThat(util).isEqualTo(0.5, offset(1e-9));
 		}
+	}
+	
+	@Test
+	public void testInitializerWithZero() {
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 2, 1);
+		generator.setDemands(vector(0.25, 0.0));
+		generator.setLowerUtilizationBound(lowerUtil);
+		generator.setUpperUtilizationBound(upperUtil);
+		
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		generator.nextObservation();
+		cursor.next();
+		
+		TargetUtilizationInitializer initializer = new TargetUtilizationInitializer(0.5, cursor);
+		Vector initialDemands = initializer.getInitialValue(generator.getStateModel());
+		for (int i = 1; i < initialDemands.rows(); i++) {
+			assertThat(initialDemands.get(i)).isEqualTo(initialDemands.get(i - 1), offset(1e-9));
+		}
+		
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		double util = initialDemands.dot(throughput);
+		assertThat(util).isEqualTo(0.5, offset(1e-9));
 	}
 
 }
