@@ -62,8 +62,8 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
+import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
-import tools.descartes.librede.models.state.constraints.StateBoundsConstraint;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
@@ -95,7 +95,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	 */
 	private List<IStateConstraint> nonlinearConstraints = new ArrayList<IStateConstraint>();
 	private List<ILinearStateConstraint> linearConstraints = new ArrayList<ILinearStateConstraint>();
-	private List<StateBoundsConstraint> boundsConstraints = new ArrayList<StateBoundsConstraint>();
+	private List<IStateBoundsConstraint> boundsConstraints = new ArrayList<IStateBoundsConstraint>();
 	
 	/*
 	 * Callback functions which are called from native code of IPOPT during optimization
@@ -199,8 +199,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		boundsConstraints.clear();
 		
 		for (IStateConstraint c : constraints) {
-			if (c instanceof StateBoundsConstraint) {
-				boundsConstraints.add((StateBoundsConstraint)c);
+			if (c instanceof IStateBoundsConstraint) {
+				boundsConstraints.add((IStateBoundsConstraint)c);
 			} else if (c instanceof ILinearStateConstraint) {
 				linearConstraints.add((ILinearStateConstraint)c);
 			} else {
@@ -229,12 +229,12 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private void setOptimizationBounds() {
 		/* set the values for the variable bounds to default value */
 		for (int i = 0; i < stateSize; i++) {
-			NativeHelper.setDoubleArray(x_L, i, 0);
+			NativeHelper.setDoubleArray(x_L, i, lowerBoundsInfValue);
 			NativeHelper.setDoubleArray(x_U, i, upperBoundsInfValue);
 		}
 		
-		for (StateBoundsConstraint c : boundsConstraints) {
-			StateVariable var = c.getStateVariable();
+		for (IStateBoundsConstraint c : boundsConstraints) {
+			StateVariable var = c.getStateVariable();			
 			NativeHelper.setDoubleArray(x_L, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getLowerBound());
 			NativeHelper.setDoubleArray(x_U, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getUpperBound());
 		}

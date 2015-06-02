@@ -45,7 +45,8 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
-import tools.descartes.librede.models.state.constraints.StateBoundsConstraint;
+import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
+import tools.descartes.librede.models.state.constraints.ConstantStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
@@ -68,7 +69,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 				builder.addConstraint(new UtilizationConstraint(res, cursor));
 			}
 			for (Service service : res.getServices()) {
-				builder.addConstraint(new StateBoundsConstraint(res, service, 0, Double.POSITIVE_INFINITY));
+				builder.addConstraint(new NoRequestsBoundsConstraint(res, service, cursor, 0, Double.POSITIVE_INFINITY));
 				builder.addVariable(res, service);
 			}
 		}

@@ -82,12 +82,9 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 		}
 		Vector X = throughputQuery.get(historicInterval);
 		double U_i = 0.0;
-		for (int i = 0; i < X.rows(); i++) {
-			Service curService = (Service)throughputQuery.getEntity(i);
-			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService)) * X.get(i);
-		}
-		for (Service curService : stateModel.getBackgroundServices()) {
-			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService));
+		for (Service curService : res_i.getServices()) {
+			int idx = throughputQuery.indexOf(curService);
+			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService)) * X.get(idx);
 		}
 		return U_i / res_i.getNumberOfServers();
 	}

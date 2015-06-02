@@ -36,7 +36,7 @@ import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.StateVariable;
 
-public class StateBoundsConstraint implements ILinearStateConstraint, IDifferentiableFunction {
+public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, IDifferentiableFunction {
 
 	// the state variable to which the bounds apply to
 	private final StateVariable variable;
@@ -44,7 +44,7 @@ public class StateBoundsConstraint implements ILinearStateConstraint, IDifferent
 	private final double upper;
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	public StateBoundsConstraint(Resource resource, Service service, double lowerBound, double upperBound) {
+	public ConstantStateBoundsConstraint(Resource resource, Service service, double lowerBound, double upperBound) {
 		this.variable = new StateVariable(resource, service);
 		this.lower = lowerBound;
 		this.upper = upperBound;

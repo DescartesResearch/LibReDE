@@ -44,7 +44,8 @@ import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
-import tools.descartes.librede.models.state.constraints.StateBoundsConstraint;
+import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
+import tools.descartes.librede.models.state.constraints.ConstantStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
@@ -79,7 +80,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
-		builder.addConstraint(new StateBoundsConstraint(workload.getResources().get(0), workload.getServices().get(0), 0, 1));
+		builder.addConstraint(new NoRequestsBoundsConstraint(workload.getResources().get(0), workload.getServices().get(0), cursor, 0, 1));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
@@ -135,7 +136,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
 		for (int i = 0; i < 5; i++) {
-			builder.addConstraint(new StateBoundsConstraint(workload.getResources().get(0), workload.getServices().get(i), 0, 1));
+			builder.addConstraint(new NoRequestsBoundsConstraint(workload.getResources().get(0), workload.getServices().get(i), cursor, 0, 1));
 		}		
 		stateModel = builder.build();
 		
