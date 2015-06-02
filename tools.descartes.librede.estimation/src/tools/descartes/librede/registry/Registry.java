@@ -113,7 +113,11 @@ public class Registry {
 	
 	@SuppressWarnings("unchecked") // When registering we enforce the same generic type argument
 	public <D extends Dimension> IMetricAdapter<D> getMetricHandler(Metric<D> metric) {
-		return (IMetricAdapter<D>)metricHandlers.get(metric);
+		IMetricAdapter<D> handler = (IMetricAdapter<D>)metricHandlers.get(metric);
+		if (handler == null) {
+			throw new IllegalStateException("No metric handler found for metric " + metric.getName());
+		}
+		return handler;
 	}
 	
 	public void registerDimension(Dimension dimension) {
