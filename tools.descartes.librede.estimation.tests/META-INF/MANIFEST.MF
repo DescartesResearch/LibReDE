@@ -11,6 +11,8 @@ Import-Package: org.fest.assertions.api,
  tools.descartes.librede.configuration,
  tools.descartes.librede.linalg,
  tools.descartes.librede.linalg.testutil,
+ tools.descartes.librede.models.state.constraints,
+ tools.descartes.librede.repository,
  tools.descartes.librede.testutils,
  tools.descartes.librede.units
 Require-Bundle: org.junit
