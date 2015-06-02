@@ -28,6 +28,7 @@ package tools.descartes.librede.models.observation.functions;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
@@ -51,10 +52,10 @@ import tools.descartes.librede.testutils.ObservationDataGenerator;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
-public class ResponseTimeApproximationTest extends LibredeTest {
+public class ResponseTimeApproximationNaNTest extends LibredeTest {
 	
-	private final static int SERVICE_IDX = 2;
-	private final static int RESOURCE_IDX = 1;
+	private final static int SERVICE_IDX = 1;
+	private final static int RESOURCE_IDX = 0;
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeApproximation law;
@@ -67,8 +68,8 @@ public class ResponseTimeApproximationTest extends LibredeTest {
 
 	@Before
 	public void setUp() throws Exception {
-		generator = new ObservationDataGenerator(42, 5, 4);
-		generator.setRandomDemands();
+		generator = new ObservationDataGenerator(42, 2, 1);
+		generator.setDemands(vector(0.25, 0));
 
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
@@ -82,16 +83,20 @@ public class ResponseTimeApproximationTest extends LibredeTest {
 		generator.nextObservation();
 		cursor.next();
 	}
+	
+	@Test
+	public void testGetFactor() {
+		assertThat(law.getFactor()).isZero();
+	}
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law.getObservedOutput()).isZero();
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(state.get(stateIdx), offset(1e-9));
+		assertThat(law.getCalculatedOutput(state)).isZero();
 	}
 
 	@Test

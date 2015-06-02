@@ -29,10 +29,11 @@ package tools.descartes.librede.algorithm;
 import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.max;
-import static tools.descartes.librede.linalg.LinAlg.mean;
 import static tools.descartes.librede.linalg.LinAlg.min;
-import static tools.descartes.librede.linalg.LinAlg.sum;
+import static tools.descartes.librede.linalg.LinAlg.nanmean;
+import static tools.descartes.librede.linalg.LinAlg.nansum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Matrix;
@@ -103,7 +104,11 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 				if (factor != 0) {
 					return  output.get(row) / factor;
 				}
-				return 0.0;
+				// If the factor is equals to 0.0, this usually
+				// means we did not observe any requests in this interval
+				// therefore ignore this estimate in the following so that
+				// the aggregation is not distorted towards zero.
+				return Double.NaN;
 			}
 		});
 		buffer = buffer.circshift(1).setRow(0, currentEstimate);
@@ -111,19 +116,35 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 
 	@Override
 	public Vector estimate() throws EstimationException {
+		Vector estimate = empty();
 		switch (aggregation) {
 		case AVERAGE:
-			return mean(buffer);
+			estimate = nanmean(buffer);
+			break;
 		case MAXIMUM:
-			return max(buffer);
+			estimate = max(buffer);
+			break;
 		case MINIMUM:
-			return min(buffer);
+			estimate = min(buffer);
+			break;
 		case SUM:
-			return sum(buffer);
+			estimate = nansum(buffer);
+			break;
 		case NONE:
-			return buffer.row(0);
+			estimate = buffer.row(0);
+			break;
+		default:
+			throw new IllegalStateException();	
 		}
-		return empty();
+
+		for (int i = 0; i < estimate.rows(); i++) {
+			double value = estimate.get(i);
+			if (value != value) {
+				// NaN --> no observations therefore assume zero as resource demand.
+				estimate = estimate.set(i, 0.0);
+			}
+		}
+		return estimate;
 	}
 
 	/**
