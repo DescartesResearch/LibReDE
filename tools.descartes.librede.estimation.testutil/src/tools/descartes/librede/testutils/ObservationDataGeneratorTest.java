@@ -69,6 +69,25 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 	@After
 	public void tearDown() throws Exception {
 	}
+	
+	@Test
+	public void testNextObservation2WC1RZeroDemand() {
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 2, 1);
+		IRepositoryCursor view = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		
+		Query<Vector, Ratio> utilData = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(generator.getStateModel().getResources()).average().using(view);
+		Query<Vector, RequestRate> tputData = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(view);
+		Query<Vector, Time> rtData = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(view);
+		
+		Vector demands = vector(0.25, 0.0);
+		generator.setDemands(demands);
+		
+		for (int i = 0; i < 10000; i++) {
+			generator.nextObservation();
+			view.next();
+			assertObservation(utilData, tputData, rtData, demands);
+		}
+	}
 
 	@Test
 	public void testNextObservation1WC1R() {
@@ -248,12 +267,15 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		List<Resource> resources = (List<Resource>) utilData.getEntities();
 		
 		int stateVar = 0;
+		double[] sumD = new double[services.size()]; // sum of all demands of service
 		double[] sumRT = new double[services.size()];
 		for (Resource res : resources) {
 			double util = 0;
-			int temp = stateVar;
+			int temp = stateVar;			
 			for (Service serv : res.getServices()) {
-				util += demands.get(temp) * tputData.execute().get(tputData.indexOf(serv)) / res.getNumberOfServers();
+				int idx = tputData.indexOf(serv);
+				sumD[idx] += demands.get(temp);
+				util += demands.get(temp) * tputData.execute().get(idx) / res.getNumberOfServers();
 				temp++;
 			}
 			assertThat(util).isEqualTo(utilData.execute().get(utilData.indexOf(res)), offset(EPSILON));
@@ -264,8 +286,18 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 				stateVar++;
 			}
 		}
-		assertThat(rtData.execute()).isEqualTo(vector(sumRT), offset(EPSILON));
+		Vector act = rtData.execute();
+		Vector tput = tputData.execute();
+		for (int i = 0; i < act.rows(); i++) {
+			if (sumD[i] > 0.0) {
+				assertThat(act.get(i)).isEqualTo(sumRT[i], offset(EPSILON));
+			} else {
+				// if no request are observed for a service, the *average* response time should be NaN
+				// indicating that no value was observed.
+				assertThat(act.get(i)).isNaN();
+				assertThat(tput.get(i)).isZero();
+			}
+			
+		}		
 	}
-	
-
 }

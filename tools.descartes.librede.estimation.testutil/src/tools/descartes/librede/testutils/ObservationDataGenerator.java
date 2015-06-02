@@ -208,11 +208,27 @@ public class ObservationDataGenerator {
 		});
 	}
 	
-	public void nextObservation() {		
+	public void nextObservation() {
+		final Vector totalDemands = vector(services.length, new VectorFunction() {
+			@Override
+			public double cell(int row) {
+				Service s = services[row];
+				double sumD = 0.0;
+				for (Resource r : s.getResources()) {
+					sumD += demands.get(stateModel.getStateVariableIndex(r, s));
+				}				
+				return sumD;
+			}
+		});		
+		
 		Vector absoluteWheights = vector(services.length, new VectorFunction() {			
 			@Override 
 			public double cell(int row) {
-				return 1.0 - randWheights.nextDouble() * workloadMixVariation;
+				if (totalDemands.get(row) == 0.0) {
+					return 0.0;
+				} else {
+					return 1.0 - randWheights.nextDouble() * workloadMixVariation;
+				}
 			}
 		});
 				
