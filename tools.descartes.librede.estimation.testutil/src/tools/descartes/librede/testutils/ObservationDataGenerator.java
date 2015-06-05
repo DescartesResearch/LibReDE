@@ -72,7 +72,7 @@ public class ObservationDataGenerator {
 	private double lowerUtilizationBound = 0.0;
 	private Vector demands;
 	private double workloadMixVariation = 1.0;
-	private ErlangCEquation erlangC = new ErlangCEquation();
+	private ErlangCEquation erlangC;
 	private int numServers;
 	
 	private Resource[] resources;
@@ -114,6 +114,7 @@ public class ObservationDataGenerator {
 		randWheights = new Random(randSeed.nextLong());
 		randDemands = new Random(randSeed.nextLong());
 		this.numServers = numServers;
+		erlangC = new ErlangCEquation(numServers);
 		
 		model = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
 		
@@ -304,7 +305,7 @@ public class ObservationDataGenerator {
 			for (Resource resource : services[i].getResources()) {
 				int stateIdx = stateModel.getStateVariableIndex(resource, services[i]);
 				double util = utilization.get(resToIdx.get(resource));
-				sumRT += (demands.get(stateIdx) * (erlangC.calculateValue(numServers, util) + 1 - util)) / (1 - util);
+				sumRT += (demands.get(stateIdx) * (erlangC.calculateValue(util) + 1 - util)) / (1 - util);
 			}
 			
 			TimeSeries ts = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], Aggregation.AVERAGE);

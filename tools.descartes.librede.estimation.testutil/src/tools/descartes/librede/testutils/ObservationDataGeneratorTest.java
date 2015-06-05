@@ -30,13 +30,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +46,6 @@ import tools.descartes.librede.models.observation.functions.ErlangCEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
@@ -60,10 +55,12 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 	
 	private static final double EPSILON = 1e-4;
 	
-	private static final ErlangCEquation erlang = new ErlangCEquation();
+	private ErlangCEquation[] erlangC = new ErlangCEquation[3];
 	
 	@Before
 	public void setUp() throws Exception {
+		erlangC[1] = new ErlangCEquation(1);
+		erlangC[2] = new ErlangCEquation(2);
 	}
 
 	@After
@@ -282,7 +279,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 			
 			for (Service serv : res.getServices()) {
 				int idx = tputData.indexOf(serv);
-				sumRT[idx] += (demands.get(stateVar) * (erlang.calculateValue(res.getNumberOfServers(), util) + 1 - util)) / (1 - util);
+				sumRT[idx] += (demands.get(stateVar) * (erlangC[res.getNumberOfServers()].calculateValue(util) + 1 - util)) / (1 - util);
 				stateVar++;
 			}
 		}
