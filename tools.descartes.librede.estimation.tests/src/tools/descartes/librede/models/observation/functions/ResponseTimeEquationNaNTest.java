@@ -28,6 +28,7 @@ package tools.descartes.librede.models.observation.functions;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
@@ -36,6 +37,7 @@ import java.util.Collection;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -57,19 +59,19 @@ import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
 @RunWith(Parameterized.class)
-public class ResponseTimeEquationTest extends LibredeTest {
-	
-	private final static int SERVICE_IDX = 0;
-	
+public class ResponseTimeEquationNaNTest extends LibredeTest {
+
 	private ObservationDataGenerator generator;
-	private ResponseTimeEquation law;
+	private ResponseTimeEquation law1;
+	private ResponseTimeEquation law2;
 	private IRepositoryCursor cursor;
-	private Service service;
+	private Service service1;
+	private Service service2;
 	private Vector state;
 	private boolean useObservedUtilization;
 	private int numServers;
 	
-	public ResponseTimeEquationTest(boolean useObservedUtilization, int numServers) {
+	public ResponseTimeEquationNaNTest(boolean useObservedUtilization, int numServers) {
 		this.useObservedUtilization = useObservedUtilization;
 		this.numServers = numServers;
 	}
@@ -81,14 +83,16 @@ public class ResponseTimeEquationTest extends LibredeTest {
 
 	@Before
 	public void setUp() throws Exception {
-		generator = new ObservationDataGenerator(42, 5, 4, numServers);
-		generator.setRandomDemands();
+		generator = new ObservationDataGenerator(42, 2, 2, numServers);
+		generator.setDemands(vector(0.25, 0.0, 0.0, 0.0));
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		service = generator.getStateModel().getService(SERVICE_IDX);
+		service1 = generator.getStateModel().getService(0);
+		service2 = generator.getStateModel().getService(1);
 		
-		law = new ResponseTimeEquation(generator.getStateModel(), cursor, service, useObservedUtilization);
+		law1 = new ResponseTimeEquation(generator.getStateModel(), cursor, service1, useObservedUtilization);
+		law2 = new ResponseTimeEquation(generator.getStateModel(), cursor, service2, useObservedUtilization);
 		state = generator.getDemands();
 		
 		generator.nextObservation();
@@ -97,23 +101,26 @@ public class ResponseTimeEquationTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service1).average().using(cursor);
+		assertThat(law1.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law2.getObservedOutput()).isZero();
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service1).average().using(cursor);
+		assertThat(law1.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law2.getCalculatedOutput(state)).isZero();
 	}
 
 	@Test
 	public void testDifferentiation() {
-		Vector diff1 = Differentiation.diff1(law, state);
-		Matrix diff2 = Differentiation.diff2(law, state);
+		Vector diff1 = Differentiation.diff1(law1, state);
+		Matrix diff2 = Differentiation.diff2(law1, state);
 		
-		DerivativeStructure s = law.value(DifferentiationUtils.createDerivativeStructures(state, 2));
+		DerivativeStructure s = law1.value(DifferentiationUtils.createDerivativeStructures(state, 2));
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
+
 }

@@ -8,6 +8,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: com.sun.jna,
  com.sun.jna.ptr,
+ org.apache.commons.math3.analysis.differentiation;version="3.2.0",
  tools.descartes.librede.algorithm,
  tools.descartes.librede.configuration,
  tools.descartes.librede.exceptions,

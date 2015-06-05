@@ -26,14 +26,19 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
+import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
+
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
+
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
-public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction {
+public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction, MultivariateDifferentiableFunction {
 	
 	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel, int historicInterval) {
 		super(stateModel, historicInterval);
@@ -53,5 +58,21 @@ public abstract class AbstractLinearOutputFunction extends AbstractOutputFunctio
 	public Matrix getSecondDerivatives(Vector state) {
 		return zeros(state.rows(), state.rows());
 	}
-
+	
+	@Override
+	public double value(double[] x) {
+		return getCalculatedOutput(vector(x));
+	}
+	
+	@Override
+	public DerivativeStructure value(DerivativeStructure[] x) {
+		if (x.length > 0) {
+			// Important: there is a bug in commons math resulting in ArrayIndexOutOfBoundsException if x.length==1
+			if (x.length == 1) {
+				return x[0].multiply(getIndependentVariables().get(0));
+			}
+			return x[0].linearCombination(getIndependentVariables().toArray1D(), x);
+		}
+		throw new IllegalArgumentException();
+	}
 }

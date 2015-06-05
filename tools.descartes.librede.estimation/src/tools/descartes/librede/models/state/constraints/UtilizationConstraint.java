@@ -26,34 +26,30 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
+import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
+
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.units.RequestRate;
 
-public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
+public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction, MultivariateDifferentiableFunction {
 
 	private final Resource res_i;
 	
-	private IStateModel<? extends IStateConstraint> stateModel;
-	
 	private final IRepositoryCursor cursor;
 	
-	private Query<Vector, RequestRate> throughputQuery;
-	
 	private final int historicInterval;
+	
+	private UtilizationLaw utilLaw;
 	
 	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor) {
 		this(resource, cursor, 0);
@@ -77,48 +73,52 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 
 	@Override
 	public double getValue(Vector state) {
-		if (stateModel == null) {
+		if (utilLaw == null) {
 			throw new IllegalStateException();
 		}
-		Vector X = throughputQuery.get(historicInterval);
-		double U_i = 0.0;
-		for (Service curService : res_i.getServices()) {
-			int idx = throughputQuery.indexOf(curService);
-			U_i += state.get(stateModel.getStateVariableIndex(res_i, curService)) * X.get(idx);
-		}
-		return U_i / res_i.getNumberOfServers();
+		return utilLaw.getCalculatedOutput(state);
 	}
 
 	@Override
 	public Vector getFirstDerivatives(Vector x) {
-		return throughputQuery.get(historicInterval).times(1.0 / res_i.getNumberOfServers());
+		return utilLaw.getFirstDerivatives(x);
 	}
 
 	@Override
 	public Matrix getSecondDerivatives(Vector x) {
-		return zeros(x.rows(), x.rows());
+		return utilLaw.getSecondDerivatives(x);
 	}
 	
 	@Override
 	public boolean isApplicable(List<String> messages) {
-		if (!throughputQuery.hasData()) {
-			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
-			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
-			msg.append("entities = { ");
-			for(ModelEntity entity : throughputQuery.getEntities()) {
-				msg.append(entity.getName()).append(" ");
-			}
-			msg.append(" } ");
-			messages.add(msg.toString());
-			return false;
-		}
+		//TODO: check for throughput data availability
+//		if (!throughputQuery.hasData()) {
+//			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
+//			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
+//			msg.append("entities = { ");
+//			for(ModelEntity entity : throughputQuery.getEntities()) {
+//				msg.append(entity.getName()).append(" ");
+//			}
+//			msg.append(" } ");
+//			messages.add(msg.toString());
+//			return false;
+//		}
 		return true;
 	}
 
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
-		this.stateModel = model;
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(cursor);
+		this.utilLaw = new UtilizationLaw(model, cursor, res_i, historicInterval);
+	}
+
+	@Override
+	public double value(double[] state) {
+		return getValue(vector(state));
+	}
+
+	@Override
+	public DerivativeStructure value(DerivativeStructure[] state) {
+		return utilLaw.value(state);
 	}
 
 }

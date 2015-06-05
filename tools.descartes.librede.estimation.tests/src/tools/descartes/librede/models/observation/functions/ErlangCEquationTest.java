@@ -29,6 +29,7 @@ package tools.descartes.librede.models.observation.functions;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Test;
 
 import tools.descartes.librede.testutils.LibredeTest;
@@ -37,34 +38,44 @@ public class ErlangCEquationTest extends LibredeTest {
 
 	@Test
 	public void testOneServer() {
-		ErlangCEquation eqn = new ErlangCEquation();
-		assertThat(eqn.calculateValue(1, 0)).isEqualTo(0.0, offset(1e-9));
-		assertThat(eqn.calculateValue(1, 0.5)).isEqualTo(0.5, offset(1e-9));
-		assertThat(eqn.calculateValue(1, 1)).isEqualTo(1.0, offset(1e-9));
+		ErlangCEquation eqn = new ErlangCEquation(1);
+		assertThat(eqn.calculateValue(0)).isEqualTo(0.0, offset(1e-9));
+		assertThat(eqn.calculateValue(0.5)).isEqualTo(0.5, offset(1e-9));
+		assertThat(eqn.calculateValue(1)).isEqualTo(1.0, offset(1e-9));
 	}
 	
 	@Test
 	public void testTwoServers() {
-		ErlangCEquation eqn = new ErlangCEquation();
-		assertThat(eqn.calculateValue(2, 0)).isEqualTo(0.0, offset(1e-3));
-		assertThat(eqn.calculateValue(2, 0.25)).isEqualTo(0.1, offset(1e-3));
-		assertThat(eqn.calculateValue(2, 0.5)).isEqualTo(1 / 3.0, offset(1e-3));
-		assertThat(eqn.calculateValue(2, 0.75)).isEqualTo(0.642857142857143, offset(1e-3));
-		assertThat(eqn.calculateValue(2, 1)).isEqualTo(1.0, offset(1e-3));
+		ErlangCEquation eqn = new ErlangCEquation(2);
+		assertThat(eqn.calculateValue(0)).isEqualTo(0.0, offset(1e-3));
+		assertThat(eqn.calculateValue(0.25)).isEqualTo(0.1, offset(1e-3));
+		assertThat(eqn.calculateValue(0.5)).isEqualTo(1 / 3.0, offset(1e-3));
+		assertThat(eqn.calculateValue(0.75)).isEqualTo(0.642857142857143, offset(1e-3));
+		assertThat(eqn.calculateValue(1)).isEqualTo(1.0, offset(1e-3));
 		
-		assertThat(eqn.calculateFirstDerivative(2, 0.25, 1)).isEqualTo(0.720195188843065, offset(1e-3));
-		assertThat(eqn.calculateFirstDerivative(2, 0.5, 1)).isEqualTo(1.11096532942676, offset(1e-3));
-		assertThat(eqn.calculateFirstDerivative(2, 0.75, 1)).isEqualTo(1.34704232177155, offset(1e-3));
+		assertThat(eqn.calculateFirstDerivative(0.25, 1)).isEqualTo(0.720195188843065, offset(1e-3));
+		assertThat(eqn.calculateFirstDerivative(0.5, 1)).isEqualTo(1.11096532942676, offset(1e-3));
+		assertThat(eqn.calculateFirstDerivative(0.75, 1)).isEqualTo(1.34704232177155, offset(1e-3));
+		
+		assertThat(eqn.value(new DerivativeStructure(1, 0, 0.0)).getPartialDerivative(0)).isEqualTo(0.0, offset(1e-3));
+		assertThat(eqn.value(new DerivativeStructure(1, 0, 0.25)).getPartialDerivative(0)).isEqualTo(0.1, offset(1e-3));
+		assertThat(eqn.value(new DerivativeStructure(1, 0, 0.5)).getPartialDerivative(0)).isEqualTo(1 / 3.0, offset(1e-3));
+		assertThat(eqn.value(new DerivativeStructure(1, 0, 0.75)).getPartialDerivative(0)).isEqualTo(0.642857142857143, offset(1e-3));
+		assertThat(eqn.value(new DerivativeStructure(1, 0, 1.0)).getPartialDerivative(0)).isEqualTo(1.0, offset(1e-3));
+		
+		assertThat(eqn.value(new DerivativeStructure(1, 1, 0.25, 1)).getPartialDerivative(1)).isEqualTo(0.720195188843065, offset(1e-3));
+		assertThat(eqn.value(new DerivativeStructure(1, 1, 0.5, 1)).getPartialDerivative(1)).isEqualTo(1.11096532942676, offset(1e-3));
+		assertThat(eqn.value(new DerivativeStructure(1, 1, 0.75, 1)).getPartialDerivative(1)).isEqualTo(1.34704232177155, offset(1e-3));
 	}
 	
 	@Test
 	public void testFifteenServers() {
-		ErlangCEquation eqn = new ErlangCEquation();
-		assertThat(eqn.calculateValue(15, 0)).isEqualTo(0.0, offset(1e-3));
-		assertThat(eqn.calculateValue(15, 0.25)).isEqualTo(9.77920896491434e-06, offset(1e-3));
-		assertThat(eqn.calculateValue(15, 0.5)).isEqualTo(0.0112924361348896, offset(1e-3));
-		assertThat(eqn.calculateValue(15, 0.75)).isEqualTo(0.217989042733931, offset(1e-3));
-		assertThat(eqn.calculateValue(15, 1)).isEqualTo(1.0, offset(1e-2));
+		ErlangCEquation eqn = new ErlangCEquation(15);
+		assertThat(eqn.calculateValue(0)).isEqualTo(0.0, offset(1e-3));
+		assertThat(eqn.calculateValue(0.25)).isEqualTo(9.77920896491434e-06, offset(1e-3));
+		assertThat(eqn.calculateValue(0.5)).isEqualTo(0.0112924361348896, offset(1e-3));
+		assertThat(eqn.calculateValue(0.75)).isEqualTo(0.217989042733931, offset(1e-3));
+		assertThat(eqn.calculateValue(1)).isEqualTo(1.0, offset(1e-2));
 	}
 	
 }

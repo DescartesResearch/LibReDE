@@ -31,6 +31,9 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.List;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
+
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
@@ -67,9 +70,9 @@ import tools.descartes.librede.units.Time;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  * @version 1.0
  */
-public class ResponseTimeEquation extends AbstractOutputFunction implements IDifferentiableFunction {
+public class ResponseTimeEquation extends AbstractOutputFunction implements IDifferentiableFunction, MultivariateDifferentiableFunction {
 
-	private static final ErlangCEquation erlangC = new ErlangCEquation();
+	private final ErlangCEquation[] erlangC;
 
 	private Service cls_r;
 
@@ -130,16 +133,20 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		cls_r = service;
 		this.useObservedUtilization = useObservedUtilization;
 
-		// int maxParallel = 1;
-		// for (Resource res : selectedResources) {
-		// maxParallel = Math.max(maxParallel,
-		// res.getNumberOfParallelServers());
-		// }
-		// precalculateFactorials(maxParallel);
-
 		if (useObservedUtilization) {
 			utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE)
 					.forResources(stateModel.getResources()).average().using(repository);
+		}
+		
+		int maxParallel = 1;
+		for (Resource res : cls_r.getResources()) {
+			maxParallel = Math.max(maxParallel, res.getNumberOfServers());
+		}
+		erlangC = new ErlangCEquation[maxParallel + 1];
+		for (Resource res : cls_r.getResources()) {
+			if (erlangC[res.getNumberOfServers()] == null) {
+				erlangC[res.getNumberOfServers()] = new ErlangCEquation(res.getNumberOfServers());
+			}
 		}
 
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service)
@@ -177,7 +184,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	 */
 	@Override
 	public double getObservedOutput() {
-		return responseTimeQuery.get(historicInterval).getValue();
+		double rt = responseTimeQuery.get(historicInterval).getValue();
+		return (rt != rt) ? 0.0 : rt;
 	}
 
 	/*
@@ -191,12 +199,16 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 	public double getCalculatedOutput(Vector state) {
 		double rt = 0.0;
 		Vector X = throughputQuery.get(historicInterval);
+		if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
+			// no request observed in this interval
+			return 0.0;
+		}		
 
 		for (Resource res_i : cls_r.getResources()) {
 			double U_i = getUtilization(historicInterval, res_i, state, X);
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			int p = res_i.getNumberOfServers();
-			double busyProp = erlangC.calculateValue(p, U_i);
+			double busyProp = erlangC[p].calculateValue(U_i);
 
 			rt += D_ir + calculateQueueingTime(state, res_i, U_i, busyProp);
 		}
@@ -238,8 +250,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			return 0.0;
 		default:
 			throw new AssertionError("Unsupported scheduling strategy.");	
-		}
-		
+		}		
 	}
 
 	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X) {
@@ -307,7 +318,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 * needs to be applied
 			 */
 			int k = res_i.getNumberOfServers();
-			double P_q = erlangC.calculateValue(k, U_i);
+			double P_q = erlangC[k].calculateValue(U_i);
 			double beta = 1 - U_i;
 			double dev = 0.0;
 
@@ -327,7 +338,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 					 * servers for calculating the derivation of U
 					 */
 					double devU = X_s / k;
-					double devP_q = erlangC.calculateFirstDerivative(k, U_i, devU);
+					double devP_q = erlangC[k].calculateFirstDerivative(U_i, devU);
 					/*
 					 * U_i and P_q are also functions of the state. Therefore, we need
 					 * to apply the quotient rule. The first addend of the quotient rule
@@ -411,12 +422,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 					// TODO: implement FCFS scheduling
 				case PS:
 				case UNKOWN:
-					double P_q = erlangC.calculateValue(k, U_i);
+					double P_q = erlangC[k].calculateValue(U_i);
 					double devsU = X_s / k;
 					double devtU = X_t / k;
-					double devsP_q = erlangC.calculateFirstDerivative(k, U_i, devsU);
-					double devtP_q = erlangC.calculateFirstDerivative(k, U_i, devtU);
-					double devsdevtP_q = erlangC.calculateSecondDerivative(k, U_i, devsU);
+					double devsP_q = erlangC[k].calculateFirstDerivative(U_i, devsU);
+					double devtP_q = erlangC[k].calculateFirstDerivative(U_i, devtU);
+					double devsdevtP_q = erlangC[k].calculateSecondDerivative(U_i, devsU);
 					
 					double beta = 1 - U_i;
 					double dev = 0.0;
@@ -438,5 +449,96 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				}
 			}
 		});
+	}
+
+	@Override
+	public double value(double[] x) {
+		return getCalculatedOutput(vector(x));
+	}
+
+	@Override
+	public DerivativeStructure value(DerivativeStructure[] state) {
+		Vector X = throughputQuery.get(historicInterval);
+		if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
+			// no request observed in this interval
+			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
+		}		
+
+		DerivativeStructure rt = null;
+		for (Resource res_i : cls_r.getResources()) {
+			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X);
+			DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, cls_r)];
+			int p = res_i.getNumberOfServers();
+			DerivativeStructure busyProp = erlangC[p].value(U_i);
+
+			if (rt == null) {
+				rt = D_ir.add(calculateQueueingTime(state, res_i, U_i, busyProp));
+			} else {
+				rt = rt.add(D_ir).add(calculateQueueingTime(state, res_i, U_i, busyProp));
+			}
+		}		
+		return rt;
+	}
+	
+	private DerivativeStructure getUtilization(int historicInterval, Resource res_i, DerivativeStructure[] state, Vector X) {
+		if (useObservedUtilization) {
+			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)));
+		} else {
+			/*
+			 * Calculate the utilization using the utilization law.
+			 */
+			// sorted according to state variable ordering
+			double[] tput = new double[state.length];
+			for (Service curService : res_i.getServices()) {
+				int idx = throughputQuery.indexOf(curService);
+				tput[getStateModel().getStateVariableIndex(res_i, curService)] = X.get(idx);
+			}
+			// Important: if tput.length == 1, commons math crashes with a ArrayIndexOutOfBoundsException
+			DerivativeStructure U_i;
+			if (tput.length == 1) {
+				U_i = state[0].multiply(tput[0]);
+			} else {
+				U_i = state[0].linearCombination(tput, state);
+			}
+			return U_i.divide(res_i.getNumberOfServers());
+		}
+	}
+	
+	/**
+	 * @param state
+	 * @param res_i - the resource i
+	 * @param U_i - the utilization of resource i
+	 * @param P_q - the probability that all servers are occupied when a new job arrives.
+	 * @return
+	 */
+	private DerivativeStructure calculateQueueingTime(DerivativeStructure[] state, Resource res_i, DerivativeStructure U_i,  DerivativeStructure P_q) {
+		switch(res_i.getSchedulingStrategy()) {
+		case FCFS:
+			// TODO: implement FCFS
+		case PS:
+		case UNKOWN:
+			/*
+			 * The mean queue length of a single-class, multi-server queue is
+			 * 
+			 * E[T_q] = \frac{1}{\lambda} * \frac{U_i}{1 - U_i} * P_q
+			 * 
+			 * (see Harchol-Balter, "Performance Modeling and Design of Computer Systems", p. 262)
+			 * 
+			 * For PS scheduling (in contrast to FCFS) this also holds for multi-class queues.
+			 * 
+			 * This formula can be reformulated to
+			 * 
+			 *  E[T_q] = \frac{D_ir}{1 - U_i} * P_q
+			 */
+			DerivativeStructure D_ir =  state[getStateModel().getStateVariableIndex(res_i, cls_r)];
+			return (D_ir.multiply(P_q)).divide(U_i.multiply(-1).add(1));
+		case IS:
+			/*
+			 * Infinite server: a job will never be forced to wait for service
+			 */
+			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
+		default:
+			throw new AssertionError("Unsupported scheduling strategy.");	
+		}		
 	}
 }
