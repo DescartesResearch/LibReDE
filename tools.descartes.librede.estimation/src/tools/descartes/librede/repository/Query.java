@@ -116,12 +116,25 @@ public final class Query<T extends Vector, D extends Dimension> {
 		return Collections.unmodifiableList(entities);
 	}
 	
+	public boolean isExecutable() {
+		for (ModelEntity entity : entities) {
+			if (repositoryCursor.getRepository().exists(metric, entity, aggregation)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public boolean hasData() {
 		return hasData(0);
 	}
 
 	public boolean hasData(int historicInterval) {
 		final int interval = repositoryCursor.getLastInterval() - historicInterval;
+		if (interval < 0) {
+			return false;
+		}
+		
 		for (ModelEntity entity : entities) {
 			if (!repositoryCursor.hasData(interval, metric, entity, aggregation)) {
 				return false;

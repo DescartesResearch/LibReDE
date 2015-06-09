@@ -177,7 +177,7 @@ public class QueryTest extends LibredeTest {
 		assertThat(cursor.next()).isTrue();
 		
 		Query<Scalar, RequestRate> tputSingle = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(services[2]).average().using(cursor);
-		assertThat(tputSingle.hasData()).isTrue();
+		assertThat(tputSingle.isExecutable()).isTrue();
 		Scalar result = tputSingle.execute();		
 		assertThat(result.getValue()).isEqualTo(1.0, offset(1e-9));
 	}
