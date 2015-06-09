@@ -93,8 +93,11 @@ public class CachingRepositoryCursorTest {
 		
 		assertThat(cursor.getAggregatedValue(0, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).isEqualTo(5.0);
 		
+		
+		// Check that the underlying cursor is only called once, i.e., the cache is used the other times.
 		verify(mockedCursor, times(1)).getAggregatedValue(0, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE);
 		
+		// Add an additional entry
 		when(mockedCursor.getLastInterval()).thenReturn(1);
 		when(mockedCursor.getAggregatedValue(1, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).thenReturn(6.0);
 		
@@ -102,7 +105,26 @@ public class CachingRepositoryCursorTest {
 		
 		assertThat(cursor.getAggregatedValue(0, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).isEqualTo(5.0);
 		assertThat(cursor.getAggregatedValue(1, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).isEqualTo(6.0);
-
+	}
+	
+	@Test
+	public void testGetAggregatedValueMultipleIntervals() {
+		Service service = ConfigurationFactory.eINSTANCE.createService();
+		IRepositoryCursor mockedCursor = mock(IRepositoryCursor.class);
+		when(mockedCursor.next()).thenReturn(true);
+		when(mockedCursor.getLastInterval()).thenReturn(2);
+		when(mockedCursor.getAggregatedValue(0, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).thenReturn(1.0);
+		when(mockedCursor.getAggregatedValue(1, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).thenReturn(2.0);
+		when(mockedCursor.getAggregatedValue(2, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).thenReturn(3.0);
+		
+		CachingRepositoryCursor cursor = new CachingRepositoryCursor(mockedCursor, 5);
+		cursor.next();	
+		cursor.next();
+		cursor.next();
+		
+		assertThat(cursor.getAggregatedValue(0, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).isEqualTo(1.0);		
+		assertThat(cursor.getAggregatedValue(1, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).isEqualTo(2.0);
+		assertThat(cursor.getAggregatedValue(2, StandardMetrics.RESPONSE_TIME, Time.SECONDS, service, Aggregation.AVERAGE)).isEqualTo(3.0);
 	}
 
 }

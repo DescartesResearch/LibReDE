@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
@@ -122,8 +124,8 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 		}
 		
 		public void set(int index, double value) {
-			values[lastIndex % maxSize] = value;
-			loaded[lastIndex % maxSize] = true;
+			values[index % maxSize] = value;
+			loaded[index % maxSize] = true;
 		}
 		
 		public void moveTo(int index) {
@@ -133,6 +135,8 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 			lastIndex = index;
 		}
 	}
+	
+	private static final Logger log = Logger.getLogger(CachingRepositoryCursor.class);
 	
 	private final IRepositoryCursor delegate;
 	private final int cacheSize;
@@ -183,15 +187,22 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 		
 		// interval is in the cached range?
 		if (interval > (lastInterval - cacheSize)) {
-			CacheEntry entry = getCacheEntry(metric, unit, entity, Aggregation.NONE);
+			CacheEntry entry = getCacheEntry(metric, unit, entity, func);
 			// important update cache and invalidate old entries			
 			entry.moveTo(lastInterval);
 			if (!entry.contains(interval)) {
 				double value = delegate.getAggregatedValue(interval, metric, unit, entity, func);
 				entry.set(interval, value);
+				if (log.isTraceEnabled()) {
+					log.trace("Set cache entry (interval=" + interval + ", metric=" + metric.getName() + ", unit=" + unit.toString() + ", entity=" + entity.getName() + ", func=" + func.getName() + ", value=" + value + ")");
+				}
 				return value;
 			}
-			return entry.get(interval);
+			double value = entry.get(interval);
+			if (log.isTraceEnabled()) {
+				log.trace("Get cache entry (interval=" + interval + ", metric=" + metric.getName() + ", unit=" + unit.toString() + ", entity=" + entity.getName() + ", func=" + func.getName() + ", value=" + value + ")");
+			}
+			return value;
 		} else {
 			return delegate.getAggregatedValue(interval, metric, unit, entity, func);
 		}
@@ -210,7 +221,7 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 
 	private <D extends Dimension> CacheEntry getCacheEntry(Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation func) {
-		CacheKey<?> key = new CacheKey<D>(metric, unit, entity, Aggregation.NONE);
+		CacheKey<?> key = new CacheKey<D>(metric, unit, entity, func);
 		CacheEntry entry = aggregationCache.get(key);
 		if (entry == null) {
 			entry = new CacheEntry(cacheSize);
