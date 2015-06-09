@@ -33,6 +33,7 @@ import static tools.descartes.librede.linalg.LinAlg.zeros;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,6 +43,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
@@ -105,15 +107,15 @@ public class UtilizationLawTest extends LibredeTest {
 	}
 
 	@Test
-	public void testGetFirstDerivatives() {
-		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
-	}
-
-	@Test
-	public void testGetSecondDerivatives() {
-		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e-4));
+	public void testGetDerivatives() {
+		Vector diff1 = Differentiation.diff1(law, state);
+		Matrix diff2 = Differentiation.diff2(law, state);
+		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff1, offset(1e-4));
+		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff2, offset(1e-4));
+		
+		DerivativeStructure s = law.value(DifferentiationUtils.createDerivativeStructures(state, 2));
+		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
+		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
 
 }

@@ -29,6 +29,7 @@ package tools.descartes.librede.models.observation.functions;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
+import org.apache.commons.math3.analysis.differentiation.DSCompiler;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
 
@@ -67,11 +68,21 @@ public abstract class AbstractLinearOutputFunction extends AbstractOutputFunctio
 	@Override
 	public DerivativeStructure value(DerivativeStructure[] x) {
 		if (x.length > 0) {
-			// Important: there is a bug in commons math resulting in ArrayIndexOutOfBoundsException if x.length==1
-			if (x.length == 1) {
-				return x[0].multiply(getIndependentVariables().get(0));
+			// Important: linear combination in MathArray (used by DerivativeStructure) seems to be buggy in version 3.2
+			// Therefore we calculate it manually (this implementation is optimized for speed not accuracy)
+			DSCompiler c = DSCompiler.getCompiler(x.length, x[0].getOrder());
+			Vector factors = getIndependentVariables();
+			double[] derivatives = new double[c.getSize()];
+			int[] orders = new int[x.length];
+			double value = 0.0;
+			for (int i = 0; i < x.length; i++) {
+				orders[i]++;
+				value += x[i].getValue() * factors.get(i);
+				derivatives[c.getPartialDerivativeIndex(orders)] = factors.get(i);
+				orders[i]--;
 			}
-			return x[0].linearCombination(getIndependentVariables().toArray1D(), x);
+			derivatives[0] = value;
+			return new DerivativeStructure(x.length, x[0].getOrder(), derivatives);
 		}
 		throw new IllegalArgumentException();
 	}
