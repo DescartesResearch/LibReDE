@@ -41,6 +41,7 @@ import java.util.List;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
+import org.apache.log4j.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
@@ -74,6 +75,8 @@ import tools.descartes.librede.registry.ParameterDefinition;
 
 @Component(displayName="Non-linear Constrained Optimization")
 public class RecursiveOptimization extends AbstractEstimationAlgorithm {
+	
+	private static final Logger log = Logger.getLogger(RecursiveOptimization.class);
 	
 	@ParameterDefinition(name = "SolutionTolerance", label = "Solution Tolerance", defaultValue = "1e-7")
 	private double solutionTolerance = 1e-7;
@@ -331,19 +334,23 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private DerivativeStructure calcObjectiveFunction(DerivativeStructure[] state) {
 		IObservationModel<?, ?> observationModel = getObservationModel();
 		int outputSize = observationModel.getOutputSize();
-		
-		
-		Vector o_real = observationModel.getObservedOutput();
 
 		// obj = sum((h_real - h_calc(x)) .^ 2)
 		DerivativeStructure obj = null;
 		for (int i = 0; i < outputSize; i++) {
 			IOutputFunction func = observationModel.getOutputFunction(i);
-			if (func instanceof MultivariateDifferentiableFunction) {
-				DerivativeStructure o_calc = ((MultivariateDifferentiableFunction)func).value(state);
-				DerivativeStructure summand = o_calc.subtract(o_real.get(i)).pow(2);
-				obj = (obj == null) ? summand : obj.add(summand);
-			}			
+			if (func.hasData()) {
+				double o_real = func.getObservedOutput();
+				if (func instanceof MultivariateDifferentiableFunction) {
+					DerivativeStructure o_calc = ((MultivariateDifferentiableFunction)func).value(state);
+					DerivativeStructure summand = o_calc.subtract(o_real).pow(2);
+					obj = (obj == null) ? summand : obj.add(summand);
+				}
+			}
+		}
+		if (obj == null) {
+			log.warn("No input data available for estimation.");
+			obj = new DerivativeStructure(state.length, state[0].getOrder());
 		}
 		return obj;
 	}
