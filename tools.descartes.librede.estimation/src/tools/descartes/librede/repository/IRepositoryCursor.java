@@ -56,6 +56,6 @@ public interface IRepositoryCursor {
 	IMonitoringRepository getRepository();
 
 	<D extends Dimension> boolean hasData(int interval, Metric<D> metric,
-			List<ModelEntity> entities, Aggregation aggregation);
+			ModelEntity entity, Aggregation aggregation);
 
 }

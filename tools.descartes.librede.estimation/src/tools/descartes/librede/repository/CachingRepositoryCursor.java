@@ -214,9 +214,9 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation) {
-		return delegate.hasData(interval , metric, entities, aggregation);
+		return delegate.hasData(interval , metric, entity, aggregation);
 	}
 
 	private <D extends Dimension> CacheEntry getCacheEntry(Metric<D> metric, Unit<D> unit, ModelEntity entity,

@@ -114,9 +114,19 @@ public final class Query<T extends Vector, D extends Dimension> {
 	
 	public List<? extends ModelEntity> getEntities() {
 		return Collections.unmodifiableList(entities);
-	}	
-
+	}
+	
 	public boolean hasData() {
-		return repositoryCursor.hasData(0, metric, entities, aggregation);
+		return hasData(0);
+	}
+
+	public boolean hasData(int historicInterval) {
+		final int interval = repositoryCursor.getLastInterval() - historicInterval;
+		for (ModelEntity entity : entities) {
+			if (!repositoryCursor.hasData(interval, metric, entity, aggregation)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

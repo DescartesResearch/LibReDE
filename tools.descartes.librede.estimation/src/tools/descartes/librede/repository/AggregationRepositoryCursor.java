@@ -129,21 +129,20 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.repository.IRepositoryCursor#hasData(int, tools.descartes.librede.metrics.Metric, java.util.List, tools.descartes.librede.metrics.Aggregation)
+	 * @see tools.descartes.librede.repository.IRepositoryCursor#hasData(int, tools.descartes.librede.metrics.Metric, tools.descartes.librede.configuration.ModelEntity, tools.descartes.librede.metrics.Aggregation)
 	 */
 	@Override
-	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation) {
+		
 		if (metric.isAggregationAllowed(aggregation)) {
-			for (ModelEntity e : entities) {
-				if (!repository.exists(metric, e, aggregation)) {
+			if (!repository.exists(metric, entity, aggregation)) {
+				return false;
+			}
+			Quantity<Time> length = repository.getAggregationInterval(metric, entity, aggregation);
+			if (aggregation != Aggregation.NONE) {
+				if (length.getValue(Time.SECONDS) > stepSize.getValue(Time.SECONDS)) {
 					return false;
-				}
-				Quantity<Time> length = repository.getAggregationInterval(metric, e, aggregation);
-				if (aggregation != Aggregation.NONE) {
-					if (length.getValue(Time.SECONDS) > stepSize.getValue(Time.SECONDS)) {
-						return false;
-					}
 				}
 			}
 			return true;
