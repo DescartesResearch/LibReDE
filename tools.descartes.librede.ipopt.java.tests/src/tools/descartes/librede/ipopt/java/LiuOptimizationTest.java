@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
@@ -119,35 +120,42 @@ public class LiuOptimizationTest extends LibredeTest {
 	}
 	
 	@Test
-	public void testFiveServicesOneResource() throws Exception {
-		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
+	public void testFiveServicesTwoResources() throws Exception {
+		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 2);
 
 		// IMPORTANT: test with zero demand!
-		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.0);
-		generator.setDemands(demands);
+//		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.0);
+//		generator.setDemands(demands);
+		generator.setRandomDemands();
 		generator.setUpperUtilizationBound(0.9);
+		Vector demands = generator.getDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 5);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
-		for (Service service : workload.getServices()) {
-			builder.addVariable(workload.getResources().get(0), service);
+		for (Resource resource : workload.getResources()) {
+			for (Service service : resource.getServices()) {
+				builder.addVariable(resource, service);
+			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
-		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
-		for (int i = 0; i < 5; i++) {
-			builder.addConstraint(new NoRequestsBoundsConstraint(workload.getResources().get(0), workload.getServices().get(i), cursor, 0, 1));
-		}		
+		for (Resource resource : workload.getResources()) {
+			for (Service service : resource.getServices()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
+			}	
+		}
 		stateModel = builder.build();
 		
 
 		observationModel = new VectorObservationModel<>();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 3; i++) {
 			for (Service service : workload.getServices()) {		
 				observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, service, true, i));
 			}
-			observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0), i));
+			for (Resource res : workload.getResources()) {				
+				observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, res, i));
+			}
 		}
 		
 		for (int i = 0; i < 6; i++) {
