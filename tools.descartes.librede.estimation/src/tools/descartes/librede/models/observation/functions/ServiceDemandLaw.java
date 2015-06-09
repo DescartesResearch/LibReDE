@@ -171,5 +171,11 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	public double getFactor() {
 		return avgThroughputQueryCurrentService.get(historicInterval).getValue();
 	}
+	
+	@Override
+	public boolean hasData() {
+		return avgResponseTimeQuery.hasData(historicInterval) && avgThroughputQuery.hasData(historicInterval);
+	}
+	
 
 }

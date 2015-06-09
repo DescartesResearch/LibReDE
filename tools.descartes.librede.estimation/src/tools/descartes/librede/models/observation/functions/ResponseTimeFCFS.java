@@ -70,5 +70,10 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	public double getFactor() {
 		return queueLengthQuery.get(historicInterval).plus(1).getValue();
 	}
+	
+	@Override
+	public boolean hasData() {
+		return responseTimeQuery.hasData(historicInterval) && queueLengthQuery.hasData(historicInterval);
+	}
 
 }

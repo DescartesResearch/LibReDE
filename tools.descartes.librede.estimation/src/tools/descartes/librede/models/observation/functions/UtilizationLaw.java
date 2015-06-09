@@ -144,5 +144,9 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	public double getObservedOutput() {
 		return utilizationQuery.get(historicInterval).getValue();
 	}
-
+	
+	@Override
+	public boolean hasData() {
+		return throughputQuery.hasData(historicInterval) && utilizationQuery.hasData(historicInterval);
+	}
 }

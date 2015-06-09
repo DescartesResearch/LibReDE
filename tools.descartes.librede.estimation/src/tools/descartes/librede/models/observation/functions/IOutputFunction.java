@@ -34,6 +34,8 @@ public interface IOutputFunction {
 	
 	boolean isApplicable(List<String> messages);
 	
+	boolean hasData();
+	
 	double getObservedOutput();
 	
 	double getCalculatedOutput(Vector state);

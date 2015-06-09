@@ -134,4 +134,8 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 		return 1;
 	}
 
+	@Override
+	public boolean hasData() {
+		return sumDeparturesQuery.hasData(historicInterval) && busyTimeQuery.hasData(historicInterval);
+	}
 }

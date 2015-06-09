@@ -172,6 +172,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		boolean result = true;
 		result = result && checkQueryPrecondition(responseTimeQuery, messages);
 		result = result && checkQueryPrecondition(throughputQuery, messages);
+		if (useObservedUtilization) {
+			result = result && checkQueryPrecondition(utilQuery, messages);
+		}
 		return result;
 	}
 
@@ -540,5 +543,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		default:
 			throw new AssertionError("Unsupported scheduling strategy.");	
 		}		
+	}
+	
+	@Override
+	public boolean hasData() {
+		boolean ret = responseTimeQuery.hasData(historicInterval) && throughputQuery.hasData(historicInterval);
+		if (useObservedUtilization) {
+			ret = ret && utilQuery.hasData(historicInterval);
+		}
+		return ret;
 	}
 }

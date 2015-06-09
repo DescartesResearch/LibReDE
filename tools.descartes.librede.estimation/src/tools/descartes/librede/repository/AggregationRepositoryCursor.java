@@ -136,16 +136,13 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 			Aggregation aggregation) {
 		
 		if (metric.isAggregationAllowed(aggregation)) {
-			if (!repository.exists(metric, entity, aggregation)) {
-				return false;
-			}
-			Quantity<Time> length = repository.getAggregationInterval(metric, entity, aggregation);
-			if (aggregation != Aggregation.NONE) {
-				if (length.getValue(Time.SECONDS) > stepSize.getValue(Time.SECONDS)) {
-					return false;
-				}
-			}
-			return true;
+			Quantity<Time> start = repository.getMonitoringStartTime(metric, entity, aggregation);
+			Quantity<Time> end = repository.getMonitoringEndTime(metric, entity, aggregation);
+			
+			Quantity<Time> intervalStart = getIntervalStart(interval);
+			Quantity<Time> intervalEnd = getIntervalEnd(interval);
+			
+			return (start.compareTo(intervalStart) <= 0) && (end.compareTo(intervalEnd) >= 0);
 		}
 		return false;
 	}

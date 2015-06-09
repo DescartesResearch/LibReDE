@@ -136,5 +136,10 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		// therefore, we approximate the demand with zero
 		return (rt != rt) ? 0.0 : rt;
 	}
+	
+	@Override
+	public boolean hasData() {
+		return individualResponseTimesQuery.hasData(historicInterval);
+	}
 
 }
