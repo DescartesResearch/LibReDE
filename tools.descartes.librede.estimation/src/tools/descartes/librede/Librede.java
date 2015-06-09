@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
@@ -107,6 +108,8 @@ public class Librede {
 	private static final Logger log = Logger.getLogger(Librede.class);	
 	
 	public static void init() {
+		BasicConfigurator.configure();
+		
 		Registry.INSTANCE.registerDimension(Time.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestCount.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestRate.INSTANCE);
