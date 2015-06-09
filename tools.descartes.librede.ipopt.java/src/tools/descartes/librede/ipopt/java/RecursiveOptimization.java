@@ -262,10 +262,10 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 //		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.CHECK_DERIVATIVES_FOR_NANINF.toNativeString(), 
 //				IpoptOptionValue.YES.toNativeString());
 //		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "output_file", "ipopt.out");
-		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST.toNativeString(), 
-				IpoptOptionValue.SECOND_ORDER.toNativeString());
-		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST_PRINT_ALL.toNativeString(), 
-				IpoptOptionValue.YES.toNativeString());
+//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST.toNativeString(), 
+//				IpoptOptionValue.SECOND_ORDER.toNativeString());
+//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST_PRINT_ALL.toNativeString(), 
+//				IpoptOptionValue.YES.toNativeString());
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundsInfValue);
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);
@@ -327,16 +327,16 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	public Vector estimate() throws EstimationException {
 		return nanmean(estimationBuffer);
 	}
-
-	public void updateObjectiveFunction(Vector x) {
+	
+	private DerivativeStructure calcObjectiveFunction(DerivativeStructure[] state) {
 		IObservationModel<?, ?> observationModel = getObservationModel();
 		int outputSize = observationModel.getOutputSize();
 		
-		DerivativeStructure[] state = DifferentiationUtils.createDerivativeStructures(x, 2);
+		
 		Vector o_real = observationModel.getObservedOutput();
 
 		// obj = sum((h_real - h_calc(x)) .^ 2)
-		obj = null;
+		DerivativeStructure obj = null;
 		for (int i = 0; i < outputSize; i++) {
 			IOutputFunction func = observationModel.getOutputFunction(i);
 			if (func instanceof MultivariateDifferentiableFunction) {
@@ -344,8 +344,14 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 				DerivativeStructure summand = o_calc.subtract(o_real.get(i)).pow(2);
 				obj = (obj == null) ? summand : obj.add(summand);
 			}			
-		}		
-//		System.out.println(current + "; " + error + "; " + obj + "; " + objGrad);
+		}
+		return obj;
+	}
+
+	public void updateObjectiveFunction(Vector x) {
+		DerivativeStructure[] state = DifferentiationUtils.createDerivativeStructures(x, 2);
+	
+		obj = calcObjectiveFunction(state);
 		
 		int i = 0;
 		for (; i < linearConstraints.size(); i++) {
