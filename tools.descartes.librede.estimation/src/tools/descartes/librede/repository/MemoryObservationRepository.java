@@ -183,7 +183,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			if (derivationHandler != null) {
 				return derivationHandler.getStartTime(repository, metric, entity, aggregation);
 			}
-			return aggregationHandler.getAggregationInterval(repository, metric, entity, aggregation);
+			return aggregationHandler.getStartTime(repository, metric, entity, aggregation);
 		}
 
 		@Override
@@ -192,7 +192,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			if (derivationHandler != null) {
 				return derivationHandler.getEndTime(repository, metric, entity, aggregation);
 			}
-			return aggregationHandler.getAggregationInterval(repository, metric, entity, aggregation);
+			return aggregationHandler.getEndTime(repository, metric, entity, aggregation);
 		}
 	}
 	

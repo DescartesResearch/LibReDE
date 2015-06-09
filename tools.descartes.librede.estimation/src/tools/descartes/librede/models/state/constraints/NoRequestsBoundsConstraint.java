@@ -86,7 +86,7 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 
 	@Override
 	public boolean isApplicable(List<String> messages) {
-		if (!throughputQuery.hasData()) {
+		if (!throughputQuery.isExecutable()) {
 			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
 			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
 			msg.append("entities = { ");

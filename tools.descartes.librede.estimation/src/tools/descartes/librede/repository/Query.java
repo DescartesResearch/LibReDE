@@ -118,7 +118,7 @@ public final class Query<T extends Vector, D extends Dimension> {
 	
 	public boolean isExecutable() {
 		for (ModelEntity entity : entities) {
-			if (repositoryCursor.getRepository().exists(metric, entity, aggregation)) {
+			if (!repositoryCursor.getRepository().exists(metric, entity, aggregation)) {
 				return false;
 			}
 		}
