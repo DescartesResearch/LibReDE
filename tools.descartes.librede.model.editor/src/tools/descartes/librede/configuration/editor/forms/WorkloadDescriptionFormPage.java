@@ -26,38 +26,28 @@
  */
 package tools.descartes.librede.configuration.editor.forms;
 
-import java.io.ObjectInputStream.GetField;
+import java.util.Arrays;
 
-import org.eclipse.core.databinding.property.value.IValueProperty;
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.internal.runtime.DataArea;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
-import org.eclipse.emf.databinding.FeaturePath;
-import org.eclipse.emf.databinding.edit.EMFEditProperties;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
-import org.eclipse.jface.databinding.viewers.CellEditorProperties;
-import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
-import org.eclipse.jface.databinding.viewers.ObservableMapCellLabelProvider;
-import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
-import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.viewers.CellEditor.LayoutData;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnViewerEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.databinding.viewers.ViewerProperties;
+import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -65,17 +55,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.TableWrapData;
-import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
@@ -88,18 +74,28 @@ import tools.descartes.librede.configuration.presentation.ConfigurationEditor;
 import tools.descartes.librede.configuration.presentation.LibredeEditorPlugin;
 
 public class WorkloadDescriptionFormPage extends AbstractEstimationConfigurationFormPage {
+	
+	private static class DisableOnEmptySelection extends UpdateValueStrategy {
+		@Override
+		public Object convert(Object value) {
+			return value != null;
+		}
+	}
 
-	private Table tblResources;
-	private Table tblClasses;
+	private Tree treeResources;
+	private Tree treeClasses;
 	private Composite resourcesComposite;
 	private Button btnNewResource;
 	private Button btnRemoveResource;
 	private Button btnNewClass;
+	private Button btnNewSubService;
+	private Button btnNewCallService;
+	private Button btnAddServiceMapping;
 	private Button btnRemoveClass;
 	private Section sctnResources;
 	private Section sctnServices;
-	private TableViewer tblViewerResources;
-	private TableViewer tblViewerServices;
+	private TreeViewer treeViewerResources;
+	private TreeViewer treeViewerServices;
 	
 	private EMFDataBindingContext bindingContext = new EMFDataBindingContext();
 	private Section sctnImport;
@@ -136,16 +132,16 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		form.getToolBarManager().add(new RunEstimationAction(getModel()));
 		form.getToolBarManager().update(true);
 		
-		TableWrapLayout tableWrapLayout = new TableWrapLayout();
-		tableWrapLayout.numColumns = 2;
-		tableWrapLayout.makeColumnsEqualWidth = true;
-		tableWrapLayout.bottomMargin = 12;
-		tableWrapLayout.topMargin = 12;
-		tableWrapLayout.leftMargin = 6;
-		tableWrapLayout.rightMargin = 6;
-		tableWrapLayout.verticalSpacing = 17;
-		tableWrapLayout.horizontalSpacing = 20;
-		managedForm.getForm().getBody().setLayout(tableWrapLayout);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 2;
+		gridLayout.makeColumnsEqualWidth = true;
+		gridLayout.marginBottom = 12;
+		gridLayout.marginTop = 12;
+		gridLayout.marginLeft = 6;
+		gridLayout.marginRight = 6;
+		gridLayout.verticalSpacing = 17;
+		gridLayout.horizontalSpacing = 20;
+		managedForm.getForm().getBody().setLayout(gridLayout);
 		
 		createServicesSection(managedForm);
 		
@@ -160,8 +156,8 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 
 	private void createResourcesSection(IManagedForm managedForm) {
 		sctnResources = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR | Section.DESCRIPTION);
-		TableWrapData twd_sctnResources = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB, 1, 1);
-		sctnResources.setLayoutData(twd_sctnResources);
+		GridData gd_sctnResources = new GridData(GridData.FILL_BOTH);
+		sctnResources.setLayoutData(gd_sctnResources);
 		managedForm.getToolkit().paintBordersFor(sctnResources);
 		sctnResources.setText("Resources");
 		sctnResources.descriptionVerticalSpacing = 10;
@@ -177,20 +173,24 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		
 		GridData gd_tableComposite_1 = new GridData(GridData.FILL_BOTH);
 		gd_tableComposite_1.heightHint = 200;
+		gd_tableComposite_1.grabExcessVerticalSpace = true;
 		gd_tableComposite_1.widthHint = 50;
-		gd_tableComposite_1.verticalSpan = 2;
+		gd_tableComposite_1.verticalSpan = 3;
 		tableComposite.setLayoutData(gd_tableComposite_1);
 		
-		tblViewerResources = new TableViewer(tableComposite, SWT.BORDER | SWT.FULL_SELECTION);
-		tblResources = tblViewerResources.getTable();
-		tblResources.setHeaderVisible(true);
-		tblResources.setLinesVisible(true);
+		treeViewerResources = new TreeViewer(tableComposite, SWT.BORDER | SWT.FULL_SELECTION);
+		treeResources = treeViewerResources.getTree();
+		treeResources.setHeaderVisible(true);
+		treeResources.setLinesVisible(true);
 		
-		initTableFromEMF(tableComposite, tblViewerResources, 
+		initTreeFromEMF(tableComposite, treeViewerResources, 
 				Resource.class,
 				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME, ConfigurationPackage.Literals.RESOURCE__NUMBER_OF_SERVERS, ConfigurationPackage.Literals.RESOURCE__SCHEDULING_STRATEGY },
-				new String[] { "Name", "Number of Servers", "Scheduling Strategy"});
-		
+				new String[] { "Name", "Number of Servers", "Scheduling Strategy"}, new int[] { 10, 0, 0});
+		/*
+		 * IMPORTANT: filter out resources below service entries (redundant)
+		 */
+		treeViewerResources.addFilter(new ClassesViewerFilter(Service.class, Resource.class));
 				
 		btnNewResource = new Button(resourcesComposite, SWT.NONE);
 		GridData gd_btnNewResource = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -204,18 +204,38 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 			}
 		});
 		
+		btnAddServiceMapping = new Button(resourcesComposite, SWT.NONE);
+		GridData gd_btnAddServiceMapping = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gd_btnAddServiceMapping.widthHint = 90;
+		btnAddServiceMapping.setLayoutData(gd_btnAddServiceMapping);
+		btnAddServiceMapping.setText("Add Mapping");
+		btnAddServiceMapping.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleAddMappedService();
+			}
+		});
+		
 		btnRemoveResource = new Button(resourcesComposite, SWT.NONE);
 		GridData gd_btnRemoveResource = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd_btnRemoveResource.widthHint = 90;
 		btnRemoveResource.setLayoutData(gd_btnRemoveResource);
 		btnRemoveResource.setText("Remove");
-		btnRemoveResource.addSelectionListener(new RemoveSelectionSelectionListener(tblViewerResources));
+		btnRemoveResource.addSelectionListener(new RemoveSelectionSelectionListener(treeViewerResources));
+		
+		bindingContext.bindValue(WidgetProperties.enabled().observe(btnRemoveResource), ViewerProperties.singleSelection().observe(treeViewerResources)
+		, null, new UpdateValueStrategy() {
+			@Override
+			public Object convert(Object value) {
+				return value != null;
+			}
+		});
 	}
 
 	private void createServicesSection(IManagedForm managedForm) {
 		sctnServices = managedForm.getToolkit().createSection(managedForm.getForm().getBody(), Section.TWISTIE | Section.TITLE_BAR | Section.DESCRIPTION);
-		TableWrapData twd_sctnServices = new TableWrapData(TableWrapData.FILL_GRAB, TableWrapData.FILL_GRAB, 1, 1);
-		sctnServices.setLayoutData(twd_sctnServices);
+		GridData gd_sctnServices = new GridData(GridData.FILL_BOTH);
+		sctnServices.setLayoutData(gd_sctnServices);
 		managedForm.getToolkit().paintBordersFor(sctnServices);
 		sctnServices.descriptionVerticalSpacing = 10;
 		sctnServices.setDescription("Services (or workload classes) are groups of requests with similar resource demand behaviors.");
@@ -232,18 +252,18 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		GridData gd_tableComposite_1_1 = new GridData(GridData.FILL_BOTH);
 		gd_tableComposite_1_1.heightHint = 200;
 		gd_tableComposite_1_1.widthHint = 50;
-		gd_tableComposite_1_1.verticalSpan = 2;
+		gd_tableComposite_1_1.verticalSpan = 4;
 		tableComposite_1.setLayoutData(gd_tableComposite_1_1);
 		
-		tblViewerServices = new TableViewer(tableComposite_1, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
-		tblClasses = tblViewerServices.getTable();
-		tblClasses.setHeaderVisible(true);
-		tblClasses.setLinesVisible(true);
+		treeViewerServices = new TreeViewer(tableComposite_1, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
+		treeClasses = treeViewerServices.getTree();
+		treeClasses.setHeaderVisible(true);
+		treeClasses.setLinesVisible(true);
 		
-		initTableFromEMF(tableComposite_1, tblViewerServices, 
+		initTreeFromEMF(tableComposite_1, treeViewerServices, 
 				Service.class, 
 				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME, ConfigurationPackage.Literals.SERVICE__BACKGROUND_SERVICE },
-				new String[] { "Name", "Background Service" });
+				new String[] { "Name", "Background Service" }, new int[] { 10, 0 });
 		
 		btnNewClass = new Button(wclComposite, SWT.NONE);
 		GridData gd_btnNewClass = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -257,31 +277,56 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 			}
 		});
 		
+		btnNewSubService = new Button(wclComposite, SWT.NONE);
+		GridData gd_btnNewSubService = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gd_btnNewSubService.widthHint = 90;
+		btnNewSubService.setLayoutData(gd_btnNewSubService);
+		btnNewSubService.setText("Add Child");
+		btnNewSubService.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleAddSubService();
+			}
+		});
+		
+		btnNewCallService = new Button(wclComposite, SWT.NONE);
+		GridData gd_btnNewCallService = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gd_btnNewCallService.widthHint = 90;
+		btnNewCallService.setLayoutData(gd_btnNewSubService);
+		btnNewCallService.setText("Add Call");
+		btnNewCallService.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleAddCalledService();
+			}
+		});
+		
 		btnRemoveClass = new Button(wclComposite, SWT.NONE);
 		GridData gd_btnRemoveClass = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd_btnRemoveClass.widthHint = 90;
 		btnRemoveClass.setLayoutData(gd_btnRemoveClass);
 		btnRemoveClass.setText("Remove");
-		btnRemoveClass.addSelectionListener(new RemoveSelectionSelectionListener(tblViewerServices));
+		btnRemoveClass.addSelectionListener(new RemoveSelectionSelectionListener(treeViewerServices));
+		
+		bindingContext.bindValue(WidgetProperties.enabled().observe(btnRemoveClass), ViewerProperties.singleSelection().observe(treeViewerServices), null, new DisableOnEmptySelection());
 	}
 	
-
-	private void initTableFromEMF(Composite tableComposite, TableViewer tableViewer, Class<?> objectType, EStructuralFeature[] attributes, String[] headers) {
-		TableColumnLayout colLayout = new TableColumnLayout();
-		tableComposite.setLayout(colLayout);
+	private void initTreeFromEMF(Composite treeComposite, TreeViewer treeViewer, Class<?> objectType, EStructuralFeature[] attributes, String[] headers, int[] weights) {
+		TreeColumnLayout colLayout = new TreeColumnLayout();
+		treeComposite.setLayout(colLayout);
 		
 		for (int i = 0; i < headers.length; i++) {
 			// Create column
-			TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-			TableColumn tableColumn = tableViewerColumn.getColumn();
-			colLayout.setColumnData(tableColumn, new ColumnWeightData(10, 50, true));
+			TreeViewerColumn tableViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
+			TreeColumn tableColumn = tableViewerColumn.getColumn();
+			colLayout.setColumnData(tableColumn, new ColumnWeightData(weights[i], 130, true));
 			tableColumn.setText(headers[i]);
-			tableViewerColumn.setEditingSupport(EObjectEditingSupport.create(tableViewer, getEditingDomain(), attributes[i]));
+			tableViewerColumn.setEditingSupport(EObjectEditingSupport.create(treeViewer, getEditingDomain(), attributes[i]));
 		}
-		tableViewer.setContentProvider(new AdapterFactoryContentProvider(getAdapterFactory()));
-		tableViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
-		tableViewer.addFilter(new ClassesViewerFilter(objectType));
-		tableViewer.setInput(getModel().getWorkloadDescription());
+		treeViewer.setContentProvider(new AdapterFactoryContentProvider(getAdapterFactory()));
+		treeViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
+		treeViewer.addFilter(new ClassesViewerFilter(WorkloadDescription.class, objectType));
+		treeViewer.setInput(getModel().getWorkloadDescription());
 	}
 
 	private void handleAddResource() {
@@ -305,6 +350,54 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		getEditingDomain().getCommandStack().execute(cmd);
 	}
 	
+	private void handleAddSubService() {
+		Service service = ConfigurationFactory.eINSTANCE.createService();
+		service.setName("New Service");
+		
+		ISelection sel = treeViewerServices.getSelection();	
+		if (sel instanceof IStructuredSelection) {
+			if (!sel.isEmpty()) {
+				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
+				Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__SUB_SERVICES, service);
+				getEditingDomain().getCommandStack().execute(cmd);
+			}
+		}		
+	}
+	
+	private void handleAddCalledService() {		
+		ISelection sel = treeViewerServices.getSelection();	
+		if (sel instanceof IStructuredSelection) {			
+			if (!sel.isEmpty()) {
+				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
+				ElementListSelectionDialog dialog = createServiceSelectionDialog();
+				if (dialog.open() == ElementListSelectionDialog.OK) {
+					Object[] res = dialog.getResult();
+					if (res != null && res.length > 0) {					
+						Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES, Arrays.asList(res));
+						getEditingDomain().getCommandStack().execute(cmd);
+					}
+				}
+			}
+		}		
+	}
+	
+	private void handleAddMappedService() {
+		ISelection sel = treeViewerResources.getSelection();	
+		if (sel instanceof IStructuredSelection) {			
+			if (!sel.isEmpty()) {
+				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
+				ElementListSelectionDialog dialog = createServiceSelectionDialog();
+				if (dialog.open() == ElementListSelectionDialog.OK) {
+					Object[] res = dialog.getResult();
+					if (res != null && res.length > 0) {					
+						Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.RESOURCE__SERVICES, Arrays.asList(res));
+						getEditingDomain().getCommandStack().execute(cmd);
+					}
+				}
+			}
+		}
+	}
+	
 	private void handleAddService() {
 		Service service = ConfigurationFactory.eINSTANCE.createService();
 		service.setName("New Service");
@@ -324,5 +417,16 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 					service);	
 		}
 		getEditingDomain().getCommandStack().execute(cmd);
+	}
+	
+	private ElementListSelectionDialog createServiceSelectionDialog() {
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getEditorSite().getShell(), new AdapterFactoryLabelProvider(getAdapterFactory()));
+		dialog.setHelpAvailable(false);
+		dialog.setIgnoreCase(true);
+		dialog.setTitle("Services");
+		dialog.setMessage("Enter service name prefix or pattern (*, ?):");
+		dialog.setMultipleSelection(true);
+		dialog.setElements(getModel().getWorkloadDescription().getServices().toArray());
+		return dialog;
 	}
 }

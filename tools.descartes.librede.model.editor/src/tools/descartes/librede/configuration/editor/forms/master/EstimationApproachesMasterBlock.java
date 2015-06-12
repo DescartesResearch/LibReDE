@@ -53,6 +53,7 @@ import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.configuration.EstimationSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.ParametersDetailsPage;
@@ -114,7 +115,7 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 			}
 		}
 		tableAlgorithmsViewer.setInput(model.getEstimation());
-		tableAlgorithmsViewer.addFilter(new ClassesViewerFilter(EstimationAlgorithmConfiguration.class));
+		tableAlgorithmsViewer.addFilter(new ClassesViewerFilter(EstimationSpecification.class, EstimationAlgorithmConfiguration.class));
 		tableAlgorithmsViewer.addSelectionChangedListener(this);
 		
 		return tableAlgorithms;

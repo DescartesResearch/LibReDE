@@ -52,6 +52,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.ParametersDetailsPage;
@@ -93,7 +94,7 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		tableSourcesViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		
 		tableSourcesViewer.setInput(model.getInput());
-		tableSourcesViewer.addFilter(new ClassesViewerFilter(DataSourceConfiguration.class));
+		tableSourcesViewer.addFilter(new ClassesViewerFilter(InputSpecification.class, DataSourceConfiguration.class));
 		tableSourcesViewer.addSelectionChangedListener(this);
 		
 		return tableSources;

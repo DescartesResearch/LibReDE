@@ -49,6 +49,7 @@ import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -57,6 +58,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.editor.FormPage;
 
 import tools.descartes.librede.configuration.LibredeConfiguration;
@@ -66,18 +68,18 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 
 	public static abstract class EObjectEditingSupport extends
 			EditingSupport {
-		protected TableViewer viewer;
+		protected ColumnViewer viewer;
 		protected EStructuralFeature attribute;
 		protected AdapterFactoryEditingDomain domain;
 
-		public EObjectEditingSupport(TableViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+		public EObjectEditingSupport(ColumnViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			super(viewer);
 			this.attribute = attribute;
 			this.domain = domain;
 			this.viewer = viewer;
 		}
 		
-		public static EObjectEditingSupport create(TableViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+		public static EObjectEditingSupport create(ColumnViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			if (attribute instanceof EReference || attribute.getEType() instanceof EEnum) {
 				return new ChoiceEObjectEditingSupport(viewer, domain, attribute);
 			}
@@ -89,7 +91,10 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 
 		@Override
 		protected boolean canEdit(Object element) {
-			return true;
+			if (element instanceof EObject) {
+				return ((EObject)element).eClass().getEAllAttributes().contains(attribute);
+			}
+			return false;
 		}
 		
 		@Override
@@ -108,7 +113,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		
 		private ComboBoxViewerCellEditor cellEditor;
 		
-		public ChoiceEObjectEditingSupport(TableViewer viewer,
+		public ChoiceEObjectEditingSupport(ColumnViewer viewer,
 				AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			super(viewer, domain, attribute);
 		}
@@ -116,7 +121,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		@Override
 		protected CellEditor getCellEditor(Object element) {			
 			if (cellEditor == null) {
-				ComboBoxViewerCellEditor comboBoxEditor = new ComboBoxViewerCellEditor(viewer.getTable());
+				ComboBoxViewerCellEditor comboBoxEditor = new ComboBoxViewerCellEditor((Composite)viewer.getControl());
 				comboBoxEditor.setContentProvider(new ArrayContentProvider());
 				comboBoxEditor.setLabelProvider(new AdapterFactoryLabelProvider(domain.getAdapterFactory()));
 				cellEditor = comboBoxEditor;
@@ -145,7 +150,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 	
 		private TextCellEditor cellEditor;
 
-		public TextEObjectEditingSupport(TableViewer viewer,
+		public TextEObjectEditingSupport(ColumnViewer viewer,
 				AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			super(viewer, domain, attribute);
 		}
@@ -153,7 +158,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		@Override
 		protected CellEditor getCellEditor(Object element) {
 			if (cellEditor == null) {
-				cellEditor = new TextCellEditor(viewer.getTable());
+				cellEditor = new TextCellEditor((Composite)viewer.getControl());
 			}
 			return cellEditor;
 		}
@@ -175,7 +180,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		
 		private CheckboxCellEditor cellEditor;
 		
-		public BooleanEObjectEditingSupport(TableViewer viewer, AdapterFactoryEditingDomain domain,
+		public BooleanEObjectEditingSupport(ColumnViewer viewer, AdapterFactoryEditingDomain domain,
 				EStructuralFeature attribute) {
 			super(viewer, domain, attribute);
 		}

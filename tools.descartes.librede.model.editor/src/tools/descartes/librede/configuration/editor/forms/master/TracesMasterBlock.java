@@ -53,6 +53,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.TraceConfiguration;
@@ -110,7 +111,7 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		tableTracesViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		
 		tableTracesViewer.setInput(model.getInput());
-		tableTracesViewer.addFilter(new ClassesViewerFilter(TraceConfiguration.class));
+		tableTracesViewer.addFilter(new ClassesViewerFilter(InputSpecification.class, TraceConfiguration.class));
 		tableTracesViewer.addSelectionChangedListener(this);
 		
 		return tableTraces;
