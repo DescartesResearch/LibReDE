@@ -36,6 +36,8 @@ import org.eclipse.emf.ecore.EClass;
 
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
@@ -52,6 +54,8 @@ import tools.descartes.librede.configuration.Service;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#isBackgroundService <em>Background Service</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getResources <em>Resources</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getSubServices <em>Sub Services</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getCalledServices <em>Called Services</em>}</li>
  * </ul>
  *
  * @generated
@@ -85,6 +89,26 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @ordered
 	 */
 	protected EList<Resource> resources;
+
+	/**
+	 * The cached value of the '{@link #getSubServices() <em>Sub Services</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSubServices()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Service> subServices;
+
+	/**
+	 * The cached value of the '{@link #getCalledServices() <em>Called Services</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCalledServices()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Service> calledServices;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -143,6 +167,30 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Service> getSubServices() {
+		if (subServices == null) {
+			subServices = new EObjectContainmentEList<Service>(Service.class, this, ConfigurationPackage.SERVICE__SUB_SERVICES);
+		}
+		return subServices;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Service> getCalledServices() {
+		if (calledServices == null) {
+			calledServices = new EObjectResolvingEList<Service>(Service.class, this, ConfigurationPackage.SERVICE__CALLED_SERVICES);
+		}
+		return calledServices;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
@@ -163,6 +211,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__RESOURCES:
 				return ((InternalEList<?>)getResources()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.SERVICE__SUB_SERVICES:
+				return ((InternalEList<?>)getSubServices()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -179,6 +229,10 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return isBackgroundService();
 			case ConfigurationPackage.SERVICE__RESOURCES:
 				return getResources();
+			case ConfigurationPackage.SERVICE__SUB_SERVICES:
+				return getSubServices();
+			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
+				return getCalledServices();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -199,6 +253,14 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				getResources().clear();
 				getResources().addAll((Collection<? extends Resource>)newValue);
 				return;
+			case ConfigurationPackage.SERVICE__SUB_SERVICES:
+				getSubServices().clear();
+				getSubServices().addAll((Collection<? extends Service>)newValue);
+				return;
+			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
+				getCalledServices().clear();
+				getCalledServices().addAll((Collection<? extends Service>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -217,6 +279,12 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__RESOURCES:
 				getResources().clear();
 				return;
+			case ConfigurationPackage.SERVICE__SUB_SERVICES:
+				getSubServices().clear();
+				return;
+			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
+				getCalledServices().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -233,6 +301,10 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return backgroundService != BACKGROUND_SERVICE_EDEFAULT;
 			case ConfigurationPackage.SERVICE__RESOURCES:
 				return resources != null && !resources.isEmpty();
+			case ConfigurationPackage.SERVICE__SUB_SERVICES:
+				return subServices != null && !subServices.isEmpty();
+			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
+				return calledServices != null && !calledServices.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

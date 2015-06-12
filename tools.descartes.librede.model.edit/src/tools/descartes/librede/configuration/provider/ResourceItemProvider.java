@@ -34,11 +34,15 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
+import org.eclipse.emf.edit.provider.DelegatingWrapperItemProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Resource;
 
@@ -50,6 +54,23 @@ import tools.descartes.librede.configuration.Resource;
  */
 public class ResourceItemProvider 
 	extends ModelEntityItemProvider {
+	
+	private class MappedServiceItemProvider extends DelegatingWrapperItemProvider {
+
+		public MappedServiceItemProvider(Object value, Object owner, EStructuralFeature feature, int index,
+				AdapterFactory adapterFactory) {
+			super(value, owner, feature, index, adapterFactory);
+		}
+		
+		@Override
+		public String getColumnText(Object object, int columnIndex) {
+			if (columnIndex == 0) {
+				return super.getColumnText(object, columnIndex);
+			}
+			return "";			
+		}
+	}
+	
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -73,8 +94,6 @@ public class ResourceItemProvider
 
 			addNumberOfServersPropertyDescriptor(object);
 			addSchedulingStrategyPropertyDescriptor(object);
-			addChildResourcesPropertyDescriptor(object);
-			addServicesPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -124,47 +143,34 @@ public class ResourceItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Child Resources feature.
+	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
+	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
+	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addChildResourcesPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_Resource_childResources_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Resource_childResources_feature", "_UI_Resource_type"),
-				 ConfigurationPackage.Literals.RESOURCE__CHILD_RESOURCES,
-				 true,
-				 false,
-				 true,
-				 null,
-				 null,
-				 null));
+	@Override
+	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
+		if (childrenFeatures == null) {
+			super.getChildrenFeatures(object);
+			childrenFeatures.add(ConfigurationPackage.Literals.RESOURCE__CHILD_RESOURCES);
+			childrenFeatures.add(ConfigurationPackage.Literals.RESOURCE__SERVICES);
+		}
+		return childrenFeatures;
 	}
 
 	/**
-	 * This adds a property descriptor for the Services feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addServicesPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_Resource_services_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Resource_services_feature", "_UI_Resource_type"),
-				 ConfigurationPackage.Literals.RESOURCE__SERVICES,
-				 true,
-				 false,
-				 true,
-				 null,
-				 null,
-				 null));
+	@Override
+	protected EStructuralFeature getChildFeature(Object object, Object child) {
+		// Check the type of the specified child object and return the proper feature to use for
+		// adding (see {@link AddCommand}) it as a child.
+
+		return super.getChildFeature(object, child);
 	}
 
 	/**
@@ -207,6 +213,10 @@ public class ResourceItemProvider
 			case ConfigurationPackage.RESOURCE__SCHEDULING_STRATEGY:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
+			case ConfigurationPackage.RESOURCE__CHILD_RESOURCES:
+			case ConfigurationPackage.RESOURCE__SERVICES:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
+				return;
 		}
 		super.notifyChanged(notification);
 	}
@@ -221,6 +231,16 @@ public class ResourceItemProvider
 	@Override
 	protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.RESOURCE__CHILD_RESOURCES,
+				 ConfigurationFactory.eINSTANCE.createResource()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.RESOURCE__SERVICES,
+				 ConfigurationFactory.eINSTANCE.createService()));
 	}
 
 	@Override
@@ -242,6 +262,19 @@ public class ResourceItemProvider
 			return ((Resource)object).getSchedulingStrategy().toString();
 		}
 		return super.getColumnText(object, columnIndex);
+	}
+	
+	@Override
+	protected boolean isWrappingNeeded(Object object) {
+		return true;
+	}
+	
+	@Override
+	protected Object createWrapper(EObject object, EStructuralFeature feature, Object value, int index) {
+		if (feature == ConfigurationPackage.Literals.RESOURCE__SERVICES) {
+			return new MappedServiceItemProvider(value, object, feature, index, adapterFactory);
+		}
+		return super.createWrapper(object, feature, value, index);
 	}
 	
 }

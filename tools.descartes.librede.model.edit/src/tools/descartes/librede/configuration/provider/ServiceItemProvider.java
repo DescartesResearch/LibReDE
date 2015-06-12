@@ -34,11 +34,15 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
+import org.eclipse.emf.edit.provider.DelegatingWrapperItemProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Service;
 
@@ -50,6 +54,48 @@ import tools.descartes.librede.configuration.Service;
  */
 public class ServiceItemProvider 
 	extends ModelEntityItemProvider {
+	
+	private class CalledServiceItemProvider extends DelegatingWrapperItemProvider {
+
+		public CalledServiceItemProvider(Object value, Object owner, EStructuralFeature feature, int index,
+				AdapterFactory adapterFactory) {
+			super(value, owner, feature, index, adapterFactory);
+		}
+		
+		@Override
+		public Object getColumnImage(Object object, int columnIndex) {
+			if (columnIndex == 0) {
+				return overlayImage(object, getResourceLocator().getImage("full/obj16/CalledService"));
+			}
+			return super.getColumnImage(object, columnIndex);
+		}
+		
+		
+		@Override
+		public String getColumnText(Object object, int columnIndex) {
+			if (columnIndex == 0) {
+				return super.getColumnText(object, columnIndex);
+			}
+			return "";			
+		}
+	}
+	
+	private class UsedResourceItemProvider extends DelegatingWrapperItemProvider {
+
+		public UsedResourceItemProvider(Object value, Object owner, EStructuralFeature feature, int index,
+				AdapterFactory adapterFactory) {
+			super(value, owner, feature, index, adapterFactory);
+		}
+		
+		@Override
+		public String getColumnText(Object object, int columnIndex) {
+			if (columnIndex == 0) {
+				return super.getColumnText(object, columnIndex);
+			}
+			return "";			
+		}
+	}
+	
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -72,7 +118,6 @@ public class ServiceItemProvider
 			super.getPropertyDescriptors(object);
 
 			addBackgroundServicePropertyDescriptor(object);
-			addResourcesPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -100,25 +145,35 @@ public class ServiceItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Resources feature.
+	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
+	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
+	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addResourcesPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_Service_resources_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Service_resources_feature", "_UI_Service_type"),
-				 ConfigurationPackage.Literals.SERVICE__RESOURCES,
-				 true,
-				 false,
-				 true,
-				 null,
-				 null,
-				 null));
+	@Override
+	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
+		if (childrenFeatures == null) {
+			super.getChildrenFeatures(object);
+			childrenFeatures.add(ConfigurationPackage.Literals.SERVICE__RESOURCES);
+			childrenFeatures.add(ConfigurationPackage.Literals.SERVICE__SUB_SERVICES);
+			childrenFeatures.add(ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES);
+		}
+		return childrenFeatures;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EStructuralFeature getChildFeature(Object object, Object child) {
+		// Check the type of the specified child object and return the proper feature to use for
+		// adding (see {@link AddCommand}) it as a child.
+
+		return super.getChildFeature(object, child);
 	}
 
 	/**
@@ -162,6 +217,11 @@ public class ServiceItemProvider
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
+			case ConfigurationPackage.SERVICE__RESOURCES:
+			case ConfigurationPackage.SERVICE__SUB_SERVICES:
+			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
+				return;
 		}
 		super.notifyChanged(notification);
 	}
@@ -176,6 +236,44 @@ public class ServiceItemProvider
 	@Override
 	protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.SERVICE__RESOURCES,
+				 ConfigurationFactory.eINSTANCE.createResource()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.SERVICE__SUB_SERVICES,
+				 ConfigurationFactory.eINSTANCE.createService()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES,
+				 ConfigurationFactory.eINSTANCE.createService()));
+	}
+
+	/**
+	 * This returns the label text for {@link org.eclipse.emf.edit.command.CreateChildCommand}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String getCreateChildText(Object owner, Object feature, Object child, Collection<?> selection) {
+		Object childFeature = feature;
+		Object childObject = child;
+
+		boolean qualify =
+			childFeature == ConfigurationPackage.Literals.SERVICE__SUB_SERVICES ||
+			childFeature == ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES;
+
+		if (qualify) {
+			return getString
+				("_UI_CreateChild_text2",
+				 new Object[] { getTypeText(childObject), getFeatureText(childFeature), getTypeText(owner) });
+		}
+		return super.getCreateChildText(owner, feature, child, selection);
 	}
 
 	@Override
@@ -195,5 +293,22 @@ public class ServiceItemProvider
 		}
 		return super.getColumnText(object, columnIndex);
 	}
-
+	
+	@Override
+	protected boolean isWrappingNeeded(Object object) {
+		return true;
+	}
+	
+	@Override
+	protected Object createWrapper(EObject object, EStructuralFeature feature, Object value, int index) {
+		/*
+		 * Add a wrapper to change the column texts and image 
+		 */
+		if (feature == ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES) {
+			return new CalledServiceItemProvider(value, object, feature, index, adapterFactory);
+		} else if (feature == ConfigurationPackage.Literals.SERVICE__RESOURCES) {
+			return new UsedResourceItemProvider(value, object, feature, index, adapterFactory);
+		}
+		return super.createWrapper(object, feature, value, index);
+	}
 }

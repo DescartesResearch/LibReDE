@@ -55,6 +55,10 @@
         defaultValueLiteral="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="resources" upperBound="-1"
         eType="#//Resource" eOpposite="#//Resource/services"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="subServices" upperBound="-1"
+        eType="#//Service" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="calledServices" upperBound="-1"
+        eType="#//Service"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="SchedulingStrategy">
     <eLiterals name="FCFS"/>

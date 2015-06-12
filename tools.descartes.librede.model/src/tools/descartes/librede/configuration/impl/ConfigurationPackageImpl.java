@@ -543,6 +543,24 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getService_SubServices() {
+		return (EReference)serviceEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getService_CalledServices() {
+		return (EReference)serviceEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTraceConfiguration() {
 		return traceConfigurationEClass;
 	}
@@ -1006,6 +1024,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		serviceEClass = createEClass(SERVICE);
 		createEAttribute(serviceEClass, SERVICE__BACKGROUND_SERVICE);
 		createEReference(serviceEClass, SERVICE__RESOURCES);
+		createEReference(serviceEClass, SERVICE__SUB_SERVICES);
+		createEReference(serviceEClass, SERVICE__CALLED_SERVICES);
 
 		traceConfigurationEClass = createEClass(TRACE_CONFIGURATION);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
@@ -1142,6 +1162,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(serviceEClass, Service.class, "Service", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getService_BackgroundService(), ecorePackage.getEBoolean(), "backgroundService", "false", 0, 1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getService_Resources(), this.getResource(), this.getResource_Services(), "resources", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getService_SubServices(), this.getService(), null, "subServices", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getService_CalledServices(), this.getService(), null, "calledServices", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		EGenericType g1 = createEGenericType(theMetricsPackage.getMetric());

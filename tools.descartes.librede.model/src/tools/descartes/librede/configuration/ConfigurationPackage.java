@@ -641,13 +641,31 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE__RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Sub Services</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__SUB_SERVICES = MODEL_ENTITY_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Called Services</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__CALLED_SERVICES = MODEL_ENTITY_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Service</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 2;
+	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of operations of the '<em>Service</em>' class.
@@ -1531,6 +1549,28 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getService_Resources();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.Service#getSubServices <em>Sub Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Sub Services</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getSubServices()
+	 * @see #getService()
+	 * @generated
+	 */
+	EReference getService_SubServices();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getCalledServices <em>Called Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Called Services</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getCalledServices()
+	 * @see #getService()
+	 * @generated
+	 */
+	EReference getService_CalledServices();
+
+	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2274,6 +2314,22 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference SERVICE__RESOURCES = eINSTANCE.getService_Resources();
+
+		/**
+		 * The meta object literal for the '<em><b>Sub Services</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SERVICE__SUB_SERVICES = eINSTANCE.getService_SubServices();
+
+		/**
+		 * The meta object literal for the '<em><b>Called Services</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SERVICE__CALLED_SERVICES = eINSTANCE.getService_CalledServices();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.

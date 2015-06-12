@@ -42,6 +42,8 @@ import org.eclipse.emf.common.util.EList;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getSubServices <em>Sub Services</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getCalledServices <em>Called Services</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getService()
@@ -94,5 +96,37 @@ public interface Service extends ModelEntity {
 	 * @generated
 	 */
 	EList<Resource> getResources();
+
+	/**
+	 * Returns the value of the '<em><b>Sub Services</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Sub Services</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Sub Services</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_SubServices()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Service> getSubServices();
+
+	/**
+	 * Returns the value of the '<em><b>Called Services</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Called Services</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Called Services</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_CalledServices()
+	 * @model
+	 * @generated
+	 */
+	EList<Service> getCalledServices();
 
 } // Service
