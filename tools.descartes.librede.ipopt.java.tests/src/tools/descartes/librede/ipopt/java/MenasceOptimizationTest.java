@@ -116,7 +116,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 	
 	@Test
 	public void testFiveServicesOneResource() throws Exception {
-		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 2, 2);
+		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
 
 		// IMPORTANT: test with zero demand!
 		//Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.0);
