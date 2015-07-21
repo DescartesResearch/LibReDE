@@ -53,4 +53,8 @@ public interface StandardMetrics {
 	public static final Metric<RequestRate> THROUGHPUT = MetricsFactory.eINSTANCE.createMetric("THROUGHPUT", "throughput", RequestRate.INSTANCE, Aggregation.AVERAGE);
 	
 	public static final Metric<Ratio> UTILIZATION = MetricsFactory.eINSTANCE.createMetric("UTILIZATION", "utilization", Ratio.INSTANCE, Aggregation.AVERAGE);
+	
+	public static final Metric<RequestCount> VISITS = MetricsFactory.eINSTANCE.createMetric("VISITS", "visits", RequestCount.INSTANCE, Aggregation.NONE, Aggregation.SUM, Aggregation.CUMULATIVE_SUM, Aggregation.MINIMUM, Aggregation.MAXIMUM);
+	
+	public static final Metric<Time> RESIDENCE_TIME = MetricsFactory.eINSTANCE.createMetric("RESIDENCE_TIME", "residence time", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.CUMULATIVE_SUM, Aggregation.SUM, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 }
