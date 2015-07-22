@@ -139,11 +139,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		}
 		
 		int maxParallel = 1;
-		for (Resource res : cls_r.getResources()) {
+		for (Resource res : cls_r.getAccessedResources()) {
 			maxParallel = Math.max(maxParallel, res.getNumberOfServers());
 		}
 		erlangC = new ErlangCEquation[maxParallel + 1];
-		for (Resource res : cls_r.getResources()) {
+		for (Resource res : cls_r.getAccessedResources()) {
 			if (erlangC[res.getNumberOfServers()] == null) {
 				erlangC[res.getNumberOfServers()] = new ErlangCEquation(res.getNumberOfServers());
 			}
@@ -207,7 +207,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			return 0.0;
 		}		
 
-		for (Resource res_i : cls_r.getResources()) {
+		for (Resource res_i : cls_r.getAccessedResources()) {
 			double U_i = getUtilization(historicInterval, res_i, state, X);
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			int p = res_i.getNumberOfServers();
@@ -468,7 +468,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 		}		
 
 		DerivativeStructure rt = null;
-		for (Resource res_i : cls_r.getResources()) {
+		for (Resource res_i : cls_r.getAccessedResources()) {
 			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X);
 			DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, cls_r)];
 			int p = res_i.getNumberOfServers();

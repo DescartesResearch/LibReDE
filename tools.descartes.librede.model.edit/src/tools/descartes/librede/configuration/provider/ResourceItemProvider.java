@@ -241,6 +241,11 @@ public class ResourceItemProvider
 			(createChildParameter
 				(ConfigurationPackage.Literals.RESOURCE__SERVICES,
 				 ConfigurationFactory.eINSTANCE.createService()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.RESOURCE__SERVICES,
+				 ConfigurationFactory.eINSTANCE.createCompositeService()));
 	}
 
 	@Override

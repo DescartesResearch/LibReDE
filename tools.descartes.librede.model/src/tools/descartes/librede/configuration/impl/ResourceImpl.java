@@ -30,15 +30,11 @@ package tools.descartes.librede.configuration.impl;
 
 import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
-import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
-import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.SchedulingStrategy;
@@ -201,38 +197,9 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 	 */
 	public EList<Service> getServices() {
 		if (services == null) {
-			services = new EObjectWithInverseResolvingEList.ManyInverse<Service>(Service.class, this, ConfigurationPackage.RESOURCE__SERVICES, ConfigurationPackage.SERVICE__RESOURCES);
+			services = new EObjectResolvingEList<Service>(Service.class, this, ConfigurationPackage.RESOURCE__SERVICES);
 		}
 		return services;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case ConfigurationPackage.RESOURCE__SERVICES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getServices()).basicAdd(otherEnd, msgs);
-		}
-		return super.eInverseAdd(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case ConfigurationPackage.RESOURCE__SERVICES:
-				return ((InternalEList<?>)getServices()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**

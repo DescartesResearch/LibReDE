@@ -536,6 +536,75 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ResourceDemand} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ResourceDemandItemProvider resourceDemandItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ResourceDemand}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createResourceDemandAdapter() {
+		if (resourceDemandItemProvider == null) {
+			resourceDemandItemProvider = new ResourceDemandItemProvider(this);
+		}
+
+		return resourceDemandItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ExternalCall} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ExternalCallItemProvider externalCallItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ExternalCall}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createExternalCallAdapter() {
+		if (externalCallItemProvider == null) {
+			externalCallItemProvider = new ExternalCallItemProvider(this);
+		}
+
+		return externalCallItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.CompositeService} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected CompositeServiceItemProvider compositeServiceItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.CompositeService}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createCompositeServiceAdapter() {
+		if (compositeServiceItemProvider == null) {
+			compositeServiceItemProvider = new CompositeServiceItemProvider(this);
+		}
+
+		return compositeServiceItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -653,6 +722,9 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (modelEntityItemProvider != null) modelEntityItemProvider.dispose();
 		if (estimationAlgorithmConfigurationItemProvider != null) estimationAlgorithmConfigurationItemProvider.dispose();
 		if (traceFilterItemProvider != null) traceFilterItemProvider.dispose();
+		if (resourceDemandItemProvider != null) resourceDemandItemProvider.dispose();
+		if (externalCallItemProvider != null) externalCallItemProvider.dispose();
+		if (compositeServiceItemProvider != null) compositeServiceItemProvider.dispose();
 	}
 
 }

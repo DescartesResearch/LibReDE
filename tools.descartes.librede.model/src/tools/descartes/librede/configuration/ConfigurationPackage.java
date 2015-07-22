@@ -632,31 +632,22 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE__BACKGROUND_SERVICE = MODEL_ENTITY_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Resources</b></em>' reference list.
+	 * The feature id for the '<em><b>Tasks</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE__RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 1;
+	int SERVICE__TASKS = MODEL_ENTITY_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Sub Services</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Accessed Resources</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE__SUB_SERVICES = MODEL_ENTITY_FEATURE_COUNT + 2;
-
-	/**
-	 * The feature id for the '<em><b>Called Services</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int SERVICE__CALLED_SERVICES = MODEL_ENTITY_FEATURE_COUNT + 3;
+	int SERVICE__ACCESSED_RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Service</em>' class.
@@ -665,7 +656,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 4;
+	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of operations of the '<em>Service</em>' class.
@@ -1238,6 +1229,208 @@ public interface ConfigurationPackage extends EPackage {
 	int TRACE_FILTER_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.TaskImpl <em>Task</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.TaskImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getTask()
+	 * @generated
+	 */
+	int TASK = 23;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TASK__NAME = MODEL_ENTITY__NAME;
+
+	/**
+	 * The number of structural features of the '<em>Task</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TASK_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of operations of the '<em>Task</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TASK_OPERATION_COUNT = MODEL_ENTITY_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ResourceDemandImpl <em>Resource Demand</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.ResourceDemandImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getResourceDemand()
+	 * @generated
+	 */
+	int RESOURCE_DEMAND = 20;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_DEMAND__NAME = TASK__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Resource</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_DEMAND__RESOURCE = TASK_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Resource Demand</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_DEMAND_FEATURE_COUNT = TASK_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Resource Demand</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_DEMAND_OPERATION_COUNT = TASK_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ExternalCallImpl <em>External Call</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.ExternalCallImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getExternalCall()
+	 * @generated
+	 */
+	int EXTERNAL_CALL = 21;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXTERNAL_CALL__NAME = TASK__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Called Service</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXTERNAL_CALL__CALLED_SERVICE = TASK_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>External Call</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXTERNAL_CALL_FEATURE_COUNT = TASK_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>External Call</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXTERNAL_CALL_OPERATION_COUNT = TASK_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.CompositeServiceImpl <em>Composite Service</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.CompositeServiceImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getCompositeService()
+	 * @generated
+	 */
+	int COMPOSITE_SERVICE = 22;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__NAME = SERVICE__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Background Service</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__BACKGROUND_SERVICE = SERVICE__BACKGROUND_SERVICE;
+
+	/**
+	 * The feature id for the '<em><b>Tasks</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__TASKS = SERVICE__TASKS;
+
+	/**
+	 * The feature id for the '<em><b>Accessed Resources</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__ACCESSED_RESOURCES = SERVICE__ACCESSED_RESOURCES;
+
+	/**
+	 * The feature id for the '<em><b>Sub Services</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__SUB_SERVICES = SERVICE_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Composite Service</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE_FEATURE_COUNT = SERVICE_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Composite Service</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE_OPERATION_COUNT = SERVICE_OPERATION_COUNT + 0;
+
+	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1245,7 +1438,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getSchedulingStrategy()
 	 * @generated
 	 */
-	int SCHEDULING_STRATEGY = 20;
+	int SCHEDULING_STRATEGY = 24;
 
 
 	/**
@@ -1538,37 +1731,26 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getService_BackgroundService();
 
 	/**
-	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}'.
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.Service#getTasks <em>Tasks</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Resources</em>'.
-	 * @see tools.descartes.librede.configuration.Service#getResources()
+	 * @return the meta object for the containment reference list '<em>Tasks</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getTasks()
 	 * @see #getService()
 	 * @generated
 	 */
-	EReference getService_Resources();
+	EReference getService_Tasks();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.Service#getSubServices <em>Sub Services</em>}'.
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getAccessedResources <em>Accessed Resources</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Sub Services</em>'.
-	 * @see tools.descartes.librede.configuration.Service#getSubServices()
+	 * @return the meta object for the reference list '<em>Accessed Resources</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getAccessedResources()
 	 * @see #getService()
 	 * @generated
 	 */
-	EReference getService_SubServices();
-
-	/**
-	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getCalledServices <em>Called Services</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Called Services</em>'.
-	 * @see tools.descartes.librede.configuration.Service#getCalledServices()
-	 * @see #getService()
-	 * @generated
-	 */
-	EReference getService_CalledServices();
+	EReference getService_AccessedResources();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
@@ -2043,6 +2225,79 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getTraceFilter_TraceColumn();
 
 	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ResourceDemand <em>Resource Demand</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Resource Demand</em>'.
+	 * @see tools.descartes.librede.configuration.ResourceDemand
+	 * @generated
+	 */
+	EClass getResourceDemand();
+
+	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.ResourceDemand#getResource <em>Resource</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Resource</em>'.
+	 * @see tools.descartes.librede.configuration.ResourceDemand#getResource()
+	 * @see #getResourceDemand()
+	 * @generated
+	 */
+	EReference getResourceDemand_Resource();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ExternalCall <em>External Call</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>External Call</em>'.
+	 * @see tools.descartes.librede.configuration.ExternalCall
+	 * @generated
+	 */
+	EClass getExternalCall();
+
+	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.ExternalCall#getCalledService <em>Called Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Called Service</em>'.
+	 * @see tools.descartes.librede.configuration.ExternalCall#getCalledService()
+	 * @see #getExternalCall()
+	 * @generated
+	 */
+	EReference getExternalCall_CalledService();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.CompositeService <em>Composite Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Composite Service</em>'.
+	 * @see tools.descartes.librede.configuration.CompositeService
+	 * @generated
+	 */
+	EClass getCompositeService();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.CompositeService#getSubServices <em>Sub Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Sub Services</em>'.
+	 * @see tools.descartes.librede.configuration.CompositeService#getSubServices()
+	 * @see #getCompositeService()
+	 * @generated
+	 */
+	EReference getCompositeService_SubServices();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.Task <em>Task</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Task</em>'.
+	 * @see tools.descartes.librede.configuration.Task
+	 * @generated
+	 */
+	EClass getTask();
+
+	/**
 	 * Returns the meta object for enum '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2308,28 +2563,20 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute SERVICE__BACKGROUND_SERVICE = eINSTANCE.getService_BackgroundService();
 
 		/**
-		 * The meta object literal for the '<em><b>Resources</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Tasks</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference SERVICE__RESOURCES = eINSTANCE.getService_Resources();
+		EReference SERVICE__TASKS = eINSTANCE.getService_Tasks();
 
 		/**
-		 * The meta object literal for the '<em><b>Sub Services</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Accessed Resources</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference SERVICE__SUB_SERVICES = eINSTANCE.getService_SubServices();
-
-		/**
-		 * The meta object literal for the '<em><b>Called Services</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference SERVICE__CALLED_SERVICES = eINSTANCE.getService_CalledServices();
+		EReference SERVICE__ACCESSED_RESOURCES = eINSTANCE.getService_AccessedResources();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.
@@ -2706,6 +2953,70 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute TRACE_FILTER__TRACE_COLUMN = eINSTANCE.getTraceFilter_TraceColumn();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ResourceDemandImpl <em>Resource Demand</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.ResourceDemandImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getResourceDemand()
+		 * @generated
+		 */
+		EClass RESOURCE_DEMAND = eINSTANCE.getResourceDemand();
+
+		/**
+		 * The meta object literal for the '<em><b>Resource</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference RESOURCE_DEMAND__RESOURCE = eINSTANCE.getResourceDemand_Resource();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ExternalCallImpl <em>External Call</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.ExternalCallImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getExternalCall()
+		 * @generated
+		 */
+		EClass EXTERNAL_CALL = eINSTANCE.getExternalCall();
+
+		/**
+		 * The meta object literal for the '<em><b>Called Service</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXTERNAL_CALL__CALLED_SERVICE = eINSTANCE.getExternalCall_CalledService();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.CompositeServiceImpl <em>Composite Service</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.CompositeServiceImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getCompositeService()
+		 * @generated
+		 */
+		EClass COMPOSITE_SERVICE = eINSTANCE.getCompositeService();
+
+		/**
+		 * The meta object literal for the '<em><b>Sub Services</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference COMPOSITE_SERVICE__SUB_SERVICES = eINSTANCE.getCompositeService_SubServices();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TaskImpl <em>Task</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.TaskImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getTask()
+		 * @generated
+		 */
+		EClass TASK = eINSTANCE.getTask();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

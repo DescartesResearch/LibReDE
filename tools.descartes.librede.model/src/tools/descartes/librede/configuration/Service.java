@@ -30,7 +30,6 @@ package tools.descartes.librede.configuration;
 
 import org.eclipse.emf.common.util.EList;
 
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Service</b></em>'.
@@ -41,9 +40,8 @@ import org.eclipse.emf.common.util.EList;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.Service#getSubServices <em>Sub Services</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.Service#getCalledServices <em>Called Services</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getTasks <em>Tasks</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getAccessedResources <em>Accessed Resources</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getService()
@@ -80,53 +78,35 @@ public interface Service extends ModelEntity {
 	void setBackgroundService(boolean value);
 
 	/**
-	 * Returns the value of the '<em><b>Resources</b></em>' reference list.
-	 * The list contents are of type {@link tools.descartes.librede.configuration.Resource}.
-	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Resource#getServices <em>Services</em>}'.
+	 * Returns the value of the '<em><b>Tasks</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Task}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Resources</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Tasks</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Resources</em>' reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_Resources()
-	 * @see tools.descartes.librede.configuration.Resource#getServices
-	 * @model opposite="services"
-	 * @generated
-	 */
-	EList<Resource> getResources();
-
-	/**
-	 * Returns the value of the '<em><b>Sub Services</b></em>' containment reference list.
-	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Sub Services</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Sub Services</em>' containment reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_SubServices()
+	 * @return the value of the '<em>Tasks</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_Tasks()
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<Service> getSubServices();
+	EList<Task> getTasks();
 
 	/**
-	 * Returns the value of the '<em><b>Called Services</b></em>' reference list.
-	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
+	 * Returns the value of the '<em><b>Accessed Resources</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Resource}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Called Services</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Accessed Resources</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Called Services</em>' reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_CalledServices()
-	 * @model
+	 * @return the value of the '<em>Accessed Resources</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_AccessedResources()
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
 	 * @generated
 	 */
-	EList<Service> getCalledServices();
+	EList<Resource> getAccessedResources();
 
 } // Service

@@ -1,30 +1,4 @@
 /**
- * ==============================================
- *  LibReDE : Library for Resource Demand Estimation
- * ==============================================
- *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
- *
- * Project Info:   http://www.descartes-research.net/
- *
- * All rights reserved. This software is made available under the terms of the
- * Eclipse Public License (EPL) v1.0 as published by the Eclipse Foundation
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * This software is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License (EPL)
- * for more details.
- *
- * You should have received a copy of the Eclipse Public License (EPL)
- * along with this software; if not visit http://www.eclipse.org or write to
- * Eclipse Foundation, Inc., 308 SW First Avenue, Suite 110, Portland, 97204 USA
- * Email: license (at) eclipse.org
- *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- */
-/**
  */
 package tools.descartes.librede.configuration.provider;
 
@@ -34,39 +8,30 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.ResourceLocator;
+
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
+
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
-import org.eclipse.emf.edit.provider.IItemPropertySource;
-import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
-import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
-import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
+import tools.descartes.librede.configuration.CompositeService;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.WorkloadDescription;
 
 /**
- * This is the item provider adapter for a {@link tools.descartes.librede.configuration.WorkloadDescription} object.
+ * This is the item provider adapter for a {@link tools.descartes.librede.configuration.CompositeService} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class WorkloadDescriptionItemProvider 
-	extends ItemProviderAdapter
-	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
+public class CompositeServiceItemProvider extends ServiceItemProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public WorkloadDescriptionItemProvider(AdapterFactory adapterFactory) {
+	public CompositeServiceItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -97,8 +62,7 @@ public class WorkloadDescriptionItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__RESOURCES);
-			childrenFeatures.add(ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__SERVICES);
+			childrenFeatures.add(ConfigurationPackage.Literals.COMPOSITE_SERVICE__SUB_SERVICES);
 		}
 		return childrenFeatures;
 	}
@@ -117,14 +81,14 @@ public class WorkloadDescriptionItemProvider
 	}
 
 	/**
-	 * This returns WorkloadDescription.gif.
+	 * This returns CompositeService.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/WorkloadDescription"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/CompositeService"));
 	}
 
 	/**
@@ -135,7 +99,10 @@ public class WorkloadDescriptionItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		return getString("_UI_WorkloadDescription_type");
+		String label = ((CompositeService)object).getName();
+		return label == null || label.length() == 0 ?
+			getString("_UI_CompositeService_type") :
+			getString("_UI_CompositeService_type") + " " + label;
 	}
 	
 
@@ -150,9 +117,8 @@ public class WorkloadDescriptionItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(WorkloadDescription.class)) {
-			case ConfigurationPackage.WORKLOAD_DESCRIPTION__RESOURCES:
-			case ConfigurationPackage.WORKLOAD_DESCRIPTION__SERVICES:
+		switch (notification.getFeatureID(CompositeService.class)) {
+			case ConfigurationPackage.COMPOSITE_SERVICE__SUB_SERVICES:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -172,29 +138,13 @@ public class WorkloadDescriptionItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__RESOURCES,
-				 ConfigurationFactory.eINSTANCE.createResource()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__SERVICES,
+				(ConfigurationPackage.Literals.COMPOSITE_SERVICE__SUB_SERVICES,
 				 ConfigurationFactory.eINSTANCE.createService()));
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.WORKLOAD_DESCRIPTION__SERVICES,
+				(ConfigurationPackage.Literals.COMPOSITE_SERVICE__SUB_SERVICES,
 				 ConfigurationFactory.eINSTANCE.createCompositeService()));
-	}
-
-	/**
-	 * Return the resource locator for this item provider's resources.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public ResourceLocator getResourceLocator() {
-		return LibredeEditPlugin.INSTANCE;
 	}
 
 }

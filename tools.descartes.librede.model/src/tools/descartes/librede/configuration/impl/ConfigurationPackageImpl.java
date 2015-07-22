@@ -35,6 +35,7 @@ import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
+import tools.descartes.librede.configuration.CompositeService;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
@@ -42,6 +43,7 @@ import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.EstimationSpecification;
 import tools.descartes.librede.configuration.ExporterConfiguration;
+import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.InputSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
@@ -50,8 +52,10 @@ import tools.descartes.librede.configuration.NamedElement;
 import tools.descartes.librede.configuration.OutputSpecification;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.Task;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceFilter;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
@@ -209,6 +213,34 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * @generated
 	 */
 	private EClass traceFilterEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass resourceDemandEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass externalCallEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass compositeServiceEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass taskEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -534,7 +566,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getService_Resources() {
+	public EReference getService_Tasks() {
 		return (EReference)serviceEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -543,17 +575,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getService_SubServices() {
+	public EReference getService_AccessedResources() {
 		return (EReference)serviceEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getService_CalledServices() {
-		return (EReference)serviceEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -957,6 +980,69 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getResourceDemand() {
+		return resourceDemandEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getResourceDemand_Resource() {
+		return (EReference)resourceDemandEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getExternalCall() {
+		return externalCallEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getExternalCall_CalledService() {
+		return (EReference)externalCallEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getCompositeService() {
+		return compositeServiceEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCompositeService_SubServices() {
+		return (EReference)compositeServiceEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTask() {
+		return taskEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EEnum getSchedulingStrategy() {
 		return schedulingStrategyEEnum;
 	}
@@ -1023,9 +1109,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		serviceEClass = createEClass(SERVICE);
 		createEAttribute(serviceEClass, SERVICE__BACKGROUND_SERVICE);
-		createEReference(serviceEClass, SERVICE__RESOURCES);
-		createEReference(serviceEClass, SERVICE__SUB_SERVICES);
-		createEReference(serviceEClass, SERVICE__CALLED_SERVICES);
+		createEReference(serviceEClass, SERVICE__TASKS);
+		createEReference(serviceEClass, SERVICE__ACCESSED_RESOURCES);
 
 		traceConfigurationEClass = createEClass(TRACE_CONFIGURATION);
 		createEReference(traceConfigurationEClass, TRACE_CONFIGURATION__METRIC);
@@ -1083,6 +1168,17 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEAttribute(traceFilterEClass, TRACE_FILTER__VALUE);
 		createEAttribute(traceFilterEClass, TRACE_FILTER__TRACE_COLUMN);
 
+		resourceDemandEClass = createEClass(RESOURCE_DEMAND);
+		createEReference(resourceDemandEClass, RESOURCE_DEMAND__RESOURCE);
+
+		externalCallEClass = createEClass(EXTERNAL_CALL);
+		createEReference(externalCallEClass, EXTERNAL_CALL__CALLED_SERVICE);
+
+		compositeServiceEClass = createEClass(COMPOSITE_SERVICE);
+		createEReference(compositeServiceEClass, COMPOSITE_SERVICE__SUB_SERVICES);
+
+		taskEClass = createEClass(TASK);
+
 		// Create enums
 		schedulingStrategyEEnum = createEEnum(SCHEDULING_STRATEGY);
 	}
@@ -1125,6 +1221,10 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		exporterConfigurationEClass.getESuperTypes().add(this.getNamedElement());
 		fileTraceConfigurationEClass.getESuperTypes().add(this.getTraceConfiguration());
 		modelEntityEClass.getESuperTypes().add(this.getNamedElement());
+		resourceDemandEClass.getESuperTypes().add(this.getTask());
+		externalCallEClass.getESuperTypes().add(this.getTask());
+		compositeServiceEClass.getESuperTypes().add(this.getService());
+		taskEClass.getESuperTypes().add(this.getModelEntity());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(libredeConfigurationEClass, LibredeConfiguration.class, "LibredeConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1157,13 +1257,12 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEAttribute(getResource_NumberOfServers(), ecorePackage.getEInt(), "numberOfServers", "1", 0, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getResource_SchedulingStrategy(), this.getSchedulingStrategy(), "schedulingStrategy", "Unkown", 0, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getResource_ChildResources(), this.getResource(), null, "childResources", null, 0, -1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getResource_Services(), this.getService(), this.getService_Resources(), "services", null, 0, -1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getResource_Services(), this.getService(), null, "services", null, 0, -1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(serviceEClass, Service.class, "Service", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getService_BackgroundService(), ecorePackage.getEBoolean(), "backgroundService", "false", 0, 1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getService_Resources(), this.getResource(), this.getResource_Services(), "resources", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getService_SubServices(), this.getService(), null, "subServices", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getService_CalledServices(), this.getService(), null, "calledServices", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getService_Tasks(), this.getTask(), null, "tasks", null, 0, -1, Service.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getService_AccessedResources(), this.getResource(), null, "accessedResources", null, 0, -1, Service.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		EGenericType g1 = createEGenericType(theMetricsPackage.getMetric());
@@ -1242,6 +1341,17 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(traceFilterEClass, TraceFilter.class, "TraceFilter", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTraceFilter_Value(), ecorePackage.getEString(), "value", null, 1, 1, TraceFilter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTraceFilter_TraceColumn(), ecorePackage.getEInt(), "traceColumn", null, 1, 1, TraceFilter.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(resourceDemandEClass, ResourceDemand.class, "ResourceDemand", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getResourceDemand_Resource(), this.getResource(), null, "resource", null, 1, 1, ResourceDemand.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(externalCallEClass, ExternalCall.class, "ExternalCall", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getExternalCall_CalledService(), this.getService(), null, "calledService", null, 1, 1, ExternalCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(compositeServiceEClass, CompositeService.class, "CompositeService", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCompositeService_SubServices(), this.getService(), null, "subServices", null, 0, -1, CompositeService.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(taskEClass, Task.class, "Task", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Initialize enums and add enum literals
 		initEEnum(schedulingStrategyEEnum, SchedulingStrategy.class, "SchedulingStrategy");

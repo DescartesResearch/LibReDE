@@ -100,6 +100,9 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 			case ConfigurationPackage.MODEL_ENTITY: return createModelEntity();
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION: return createEstimationAlgorithmConfiguration();
 			case ConfigurationPackage.TRACE_FILTER: return createTraceFilter();
+			case ConfigurationPackage.RESOURCE_DEMAND: return createResourceDemand();
+			case ConfigurationPackage.EXTERNAL_CALL: return createExternalCall();
+			case ConfigurationPackage.COMPOSITE_SERVICE: return createCompositeService();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -323,6 +326,36 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public TraceFilter createTraceFilter() {
 		TraceFilterImpl traceFilter = new TraceFilterImpl();
 		return traceFilter;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ResourceDemand createResourceDemand() {
+		ResourceDemandImpl resourceDemand = new ResourceDemandImpl();
+		return resourceDemand;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExternalCall createExternalCall() {
+		ExternalCallImpl externalCall = new ExternalCallImpl();
+		return externalCall;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public CompositeService createCompositeService() {
+		CompositeServiceImpl compositeService = new CompositeServiceImpl();
+		return compositeService;
 	}
 
 	/**

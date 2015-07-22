@@ -35,26 +35,37 @@ import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.DeleteCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
+import org.eclipse.jface.action.AbstractAction;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
@@ -81,6 +92,24 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 			return value != null;
 		}
 	}
+	
+	private class RemoveAction extends Action {
+		
+		public RemoveAction() {
+			super("Remove");
+		}
+
+		@Override
+		public void run() {
+			IStructuredSelection selection = (IStructuredSelection) treeViewerServices.getSelection();
+			if (!selection.isEmpty()) {
+				Command remove = DeleteCommand.create(getEditingDomain(),
+						selection.toList());
+				getEditingDomain().getCommandStack().execute(remove);
+			}
+		}
+		
+	}
 
 	private Tree treeResources;
 	private Tree treeClasses;
@@ -88,14 +117,14 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 	private Button btnNewResource;
 	private Button btnRemoveResource;
 	private Button btnNewClass;
-	private Button btnNewSubService;
-	private Button btnNewCallService;
 	private Button btnAddServiceMapping;
 	private Button btnRemoveClass;
 	private Section sctnResources;
 	private Section sctnServices;
 	private TreeViewer treeViewerResources;
 	private TreeViewer treeViewerServices;
+	
+	private MenuManager treeViewerServicesContextMenu;
 	
 	private EMFDataBindingContext bindingContext = new EMFDataBindingContext();
 	private Section sctnImport;
@@ -277,30 +306,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 			}
 		});
 		
-		btnNewSubService = new Button(wclComposite, SWT.NONE);
-		GridData gd_btnNewSubService = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gd_btnNewSubService.widthHint = 90;
-		btnNewSubService.setLayoutData(gd_btnNewSubService);
-		btnNewSubService.setText("Add Child");
-		btnNewSubService.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleAddSubService();
-			}
-		});
-		
-		btnNewCallService = new Button(wclComposite, SWT.NONE);
-		GridData gd_btnNewCallService = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gd_btnNewCallService.widthHint = 90;
-		btnNewCallService.setLayoutData(gd_btnNewSubService);
-		btnNewCallService.setText("Add Call");
-		btnNewCallService.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleAddCalledService();
-			}
-		});
-		
 		btnRemoveClass = new Button(wclComposite, SWT.NONE);
 		GridData gd_btnRemoveClass = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd_btnRemoveClass.widthHint = 90;
@@ -309,6 +314,18 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		btnRemoveClass.addSelectionListener(new RemoveSelectionSelectionListener(treeViewerServices));
 		
 		bindingContext.bindValue(WidgetProperties.enabled().observe(btnRemoveClass), ViewerProperties.singleSelection().observe(treeViewerServices), null, new DisableOnEmptySelection());
+		
+		// Add a context menu to the viewer
+		treeViewerServicesContextMenu = new MenuManager();
+		treeViewerServicesContextMenu.setRemoveAllWhenShown(true);
+		treeViewerServicesContextMenu.addMenuListener(new IMenuListener() {			
+			@Override
+			public void menuAboutToShow(IMenuManager manager) {
+				fillServicesContextMenu(manager);			
+			}
+		});
+		Menu contextMenu = treeViewerServicesContextMenu.createContextMenu(treeViewerServices.getControl());
+		treeViewerServices.getControl().setMenu(contextMenu);
 	}
 	
 	private void initTreeFromEMF(Composite treeComposite, TreeViewer treeViewer, Class<?> objectType, EStructuralFeature[] attributes, String[] headers, int[] weights) {
@@ -327,6 +344,10 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		treeViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
 		treeViewer.addFilter(new ClassesViewerFilter(WorkloadDescription.class, objectType));
 		treeViewer.setInput(getModel().getWorkloadDescription());
+	}
+	
+	private void fillServicesContextMenu(IMenuManager menu) {
+		menu.add(new RemoveAction());
 	}
 
 	private void handleAddResource() {
@@ -350,36 +371,36 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		getEditingDomain().getCommandStack().execute(cmd);
 	}
 	
-	private void handleAddSubService() {
-		Service service = ConfigurationFactory.eINSTANCE.createService();
-		service.setName("New Service");
-		
-		ISelection sel = treeViewerServices.getSelection();	
-		if (sel instanceof IStructuredSelection) {
-			if (!sel.isEmpty()) {
-				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
-				Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__SUB_SERVICES, service);
-				getEditingDomain().getCommandStack().execute(cmd);
-			}
-		}		
-	}
+//	private void handleAddSubService() {
+//		Service service = ConfigurationFactory.eINSTANCE.createService();
+//		service.setName("New Service");
+//		
+//		ISelection sel = treeViewerServices.getSelection();	
+//		if (sel instanceof IStructuredSelection) {
+//			if (!sel.isEmpty()) {
+//				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
+//				Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__SUB_SERVICES, service);
+//				getEditingDomain().getCommandStack().execute(cmd);
+//			}
+//		}		
+//	}
 	
-	private void handleAddCalledService() {		
-		ISelection sel = treeViewerServices.getSelection();	
-		if (sel instanceof IStructuredSelection) {			
-			if (!sel.isEmpty()) {
-				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
-				ElementListSelectionDialog dialog = createServiceSelectionDialog();
-				if (dialog.open() == ElementListSelectionDialog.OK) {
-					Object[] res = dialog.getResult();
-					if (res != null && res.length > 0) {					
-						Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES, Arrays.asList(res));
-						getEditingDomain().getCommandStack().execute(cmd);
-					}
-				}
-			}
-		}		
-	}
+//	private void handleAddCalledService() {		
+//		ISelection sel = treeViewerServices.getSelection();	
+//		if (sel instanceof IStructuredSelection) {			
+//			if (!sel.isEmpty()) {
+//				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
+//				ElementListSelectionDialog dialog = createServiceSelectionDialog();
+//				if (dialog.open() == ElementListSelectionDialog.OK) {
+//					Object[] res = dialog.getResult();
+//					if (res != null && res.length > 0) {					
+//						Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES, Arrays.asList(res));
+//						getEditingDomain().getCommandStack().execute(cmd);
+//					}
+//				}
+//			}
+//		}		
+//	}
 	
 	private void handleAddMappedService() {
 		ISelection sel = treeViewerResources.getSelection();	

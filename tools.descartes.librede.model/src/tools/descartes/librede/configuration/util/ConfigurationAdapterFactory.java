@@ -172,6 +172,22 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createTraceFilterAdapter();
 			}
 			@Override
+			public Adapter caseResourceDemand(ResourceDemand object) {
+				return createResourceDemandAdapter();
+			}
+			@Override
+			public Adapter caseExternalCall(ExternalCall object) {
+				return createExternalCallAdapter();
+			}
+			@Override
+			public Adapter caseCompositeService(CompositeService object) {
+				return createCompositeServiceAdapter();
+			}
+			@Override
+			public Adapter caseTask(Task object) {
+				return createTaskAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -468,6 +484,62 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTraceFilterAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ResourceDemand <em>Resource Demand</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ResourceDemand
+	 * @generated
+	 */
+	public Adapter createResourceDemandAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ExternalCall <em>External Call</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ExternalCall
+	 * @generated
+	 */
+	public Adapter createExternalCallAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.CompositeService <em>Composite Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.CompositeService
+	 * @generated
+	 */
+	public Adapter createCompositeServiceAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.Task <em>Task</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.Task
+	 * @generated
+	 */
+	public Adapter createTaskAdapter() {
 		return null;
 	}
 

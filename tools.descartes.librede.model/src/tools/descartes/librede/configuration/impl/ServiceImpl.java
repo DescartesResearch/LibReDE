@@ -31,18 +31,19 @@ package tools.descartes.librede.configuration.impl;
 import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
-import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.Task;
 
 /**
  * <!-- begin-user-doc -->
@@ -53,9 +54,8 @@ import tools.descartes.librede.configuration.Service;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#isBackgroundService <em>Background Service</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getResources <em>Resources</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getSubServices <em>Sub Services</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getCalledServices <em>Called Services</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getTasks <em>Tasks</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getAccessedResources <em>Accessed Resources</em>}</li>
  * </ul>
  *
  * @generated
@@ -81,34 +81,14 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	protected boolean backgroundService = BACKGROUND_SERVICE_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getResources() <em>Resources</em>}' reference list.
+	 * The cached value of the '{@link #getTasks() <em>Tasks</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getResources()
+	 * @see #getTasks()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Resource> resources;
-
-	/**
-	 * The cached value of the '{@link #getSubServices() <em>Sub Services</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getSubServices()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Service> subServices;
-
-	/**
-	 * The cached value of the '{@link #getCalledServices() <em>Called Services</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCalledServices()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Service> calledServices;
+	protected EList<Task> tasks;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -155,50 +135,26 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Resource> getResources() {
-		if (resources == null) {
-			resources = new EObjectWithInverseResolvingEList.ManyInverse<Resource>(Resource.class, this, ConfigurationPackage.SERVICE__RESOURCES, ConfigurationPackage.RESOURCE__SERVICES);
+	public EList<Task> getTasks() {
+		if (tasks == null) {
+			tasks = new EObjectContainmentEList<Task>(Task.class, this, ConfigurationPackage.SERVICE__TASKS);
 		}
-		return resources;
+		return tasks;
 	}
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
-	public EList<Service> getSubServices() {
-		if (subServices == null) {
-			subServices = new EObjectContainmentEList<Service>(Service.class, this, ConfigurationPackage.SERVICE__SUB_SERVICES);
+	public EList<Resource> getAccessedResources() {
+		EList<Resource> result = new BasicEList<>();
+		for (Task t : tasks) {
+			if (t instanceof ResourceDemand) {
+				result.add(((ResourceDemand)t).getResource());
+			}
 		}
-		return subServices;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Service> getCalledServices() {
-		if (calledServices == null) {
-			calledServices = new EObjectResolvingEList<Service>(Service.class, this, ConfigurationPackage.SERVICE__CALLED_SERVICES);
-		}
-		return calledServices;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case ConfigurationPackage.SERVICE__RESOURCES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getResources()).basicAdd(otherEnd, msgs);
-		}
-		return super.eInverseAdd(otherEnd, featureID, msgs);
+		return ECollections.unmodifiableEList(result);
 	}
 
 	/**
@@ -209,10 +165,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ConfigurationPackage.SERVICE__RESOURCES:
-				return ((InternalEList<?>)getResources()).basicRemove(otherEnd, msgs);
-			case ConfigurationPackage.SERVICE__SUB_SERVICES:
-				return ((InternalEList<?>)getSubServices()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.SERVICE__TASKS:
+				return ((InternalEList<?>)getTasks()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -227,12 +181,10 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				return isBackgroundService();
-			case ConfigurationPackage.SERVICE__RESOURCES:
-				return getResources();
-			case ConfigurationPackage.SERVICE__SUB_SERVICES:
-				return getSubServices();
-			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
-				return getCalledServices();
+			case ConfigurationPackage.SERVICE__TASKS:
+				return getTasks();
+			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
+				return getAccessedResources();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -249,17 +201,9 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				setBackgroundService((Boolean)newValue);
 				return;
-			case ConfigurationPackage.SERVICE__RESOURCES:
-				getResources().clear();
-				getResources().addAll((Collection<? extends Resource>)newValue);
-				return;
-			case ConfigurationPackage.SERVICE__SUB_SERVICES:
-				getSubServices().clear();
-				getSubServices().addAll((Collection<? extends Service>)newValue);
-				return;
-			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
-				getCalledServices().clear();
-				getCalledServices().addAll((Collection<? extends Service>)newValue);
+			case ConfigurationPackage.SERVICE__TASKS:
+				getTasks().clear();
+				getTasks().addAll((Collection<? extends Task>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -276,14 +220,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				setBackgroundService(BACKGROUND_SERVICE_EDEFAULT);
 				return;
-			case ConfigurationPackage.SERVICE__RESOURCES:
-				getResources().clear();
-				return;
-			case ConfigurationPackage.SERVICE__SUB_SERVICES:
-				getSubServices().clear();
-				return;
-			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
-				getCalledServices().clear();
+			case ConfigurationPackage.SERVICE__TASKS:
+				getTasks().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -299,12 +237,10 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				return backgroundService != BACKGROUND_SERVICE_EDEFAULT;
-			case ConfigurationPackage.SERVICE__RESOURCES:
-				return resources != null && !resources.isEmpty();
-			case ConfigurationPackage.SERVICE__SUB_SERVICES:
-				return subServices != null && !subServices.isEmpty();
-			case ConfigurationPackage.SERVICE__CALLED_SERVICES:
-				return calledServices != null && !calledServices.isEmpty();
+			case ConfigurationPackage.SERVICE__TASKS:
+				return tasks != null && !tasks.isEmpty();
+			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
+				return !getAccessedResources().isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

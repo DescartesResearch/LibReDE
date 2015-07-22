@@ -219,6 +219,33 @@ public interface ConfigurationFactory extends EFactory {
 	TraceFilter createTraceFilter();
 
 	/**
+	 * Returns a new object of class '<em>Resource Demand</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Resource Demand</em>'.
+	 * @generated
+	 */
+	ResourceDemand createResourceDemand();
+
+	/**
+	 * Returns a new object of class '<em>External Call</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>External Call</em>'.
+	 * @generated
+	 */
+	ExternalCall createExternalCall();
+
+	/**
+	 * Returns a new object of class '<em>Composite Service</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Composite Service</em>'.
+	 * @generated
+	 */
+	CompositeService createCompositeService();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

@@ -215,7 +215,7 @@ public class ObservationDataGenerator {
 			public double cell(int row) {
 				Service s = services[row];
 				double sumD = 0.0;
-				for (Resource r : s.getResources()) {
+				for (Resource r : s.getAccessedResources()) {
 					sumD += demands.get(stateModel.getStateVariableIndex(r, s));
 				}				
 				return sumD;
@@ -302,7 +302,7 @@ public class ObservationDataGenerator {
 	
 		for (int i = 0; i < services.length; i++) {
 			double sumRT = 0.0;
-			for (Resource resource : services[i].getResources()) {
+			for (Resource resource : services[i].getAccessedResources()) {
 				int stateIdx = stateModel.getStateVariableIndex(resource, services[i]);
 				double util = utilization.get(resToIdx.get(resource));
 				sumRT += (demands.get(stateIdx) * (erlangC.calculateValue(util) + 1 - util)) / (1 - util);

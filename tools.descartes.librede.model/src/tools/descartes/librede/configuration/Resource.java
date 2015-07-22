@@ -127,7 +127,6 @@ public interface Resource extends ModelEntity {
 	/**
 	 * Returns the value of the '<em><b>Services</b></em>' reference list.
 	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
-	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Service#getResources <em>Resources</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Services</em>' reference list isn't clear,
@@ -136,8 +135,7 @@ public interface Resource extends ModelEntity {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Services</em>' reference list.
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource_Services()
-	 * @see tools.descartes.librede.configuration.Service#getResources
-	 * @model opposite="resources"
+	 * @model
 	 * @generated
 	 */
 	EList<Service> getServices();

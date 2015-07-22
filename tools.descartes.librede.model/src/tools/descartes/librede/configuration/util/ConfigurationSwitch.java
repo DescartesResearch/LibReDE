@@ -219,6 +219,41 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case ConfigurationPackage.RESOURCE_DEMAND: {
+				ResourceDemand resourceDemand = (ResourceDemand)theEObject;
+				T result = caseResourceDemand(resourceDemand);
+				if (result == null) result = caseTask(resourceDemand);
+				if (result == null) result = caseModelEntity(resourceDemand);
+				if (result == null) result = caseNamedElement(resourceDemand);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.EXTERNAL_CALL: {
+				ExternalCall externalCall = (ExternalCall)theEObject;
+				T result = caseExternalCall(externalCall);
+				if (result == null) result = caseTask(externalCall);
+				if (result == null) result = caseModelEntity(externalCall);
+				if (result == null) result = caseNamedElement(externalCall);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.COMPOSITE_SERVICE: {
+				CompositeService compositeService = (CompositeService)theEObject;
+				T result = caseCompositeService(compositeService);
+				if (result == null) result = caseService(compositeService);
+				if (result == null) result = caseModelEntity(compositeService);
+				if (result == null) result = caseNamedElement(compositeService);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.TASK: {
+				Task task = (Task)theEObject;
+				T result = caseTask(task);
+				if (result == null) result = caseModelEntity(task);
+				if (result == null) result = caseNamedElement(task);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -520,6 +555,66 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseTraceFilter(TraceFilter object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Resource Demand</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Resource Demand</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseResourceDemand(ResourceDemand object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>External Call</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>External Call</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExternalCall(ExternalCall object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Composite Service</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Composite Service</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseCompositeService(CompositeService object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Task</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Task</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTask(Task object) {
 		return null;
 	}
 
