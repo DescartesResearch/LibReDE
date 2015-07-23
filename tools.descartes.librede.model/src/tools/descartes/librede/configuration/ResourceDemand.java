@@ -22,6 +22,7 @@ package tools.descartes.librede.configuration;
 public interface ResourceDemand extends Task {
 	/**
 	 * Returns the value of the '<em><b>Resource</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Resource#getDemands <em>Demands</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Resource</em>' reference isn't clear,
@@ -31,7 +32,8 @@ public interface ResourceDemand extends Task {
 	 * @return the value of the '<em>Resource</em>' reference.
 	 * @see #setResource(Resource)
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResourceDemand_Resource()
-	 * @model required="true"
+	 * @see tools.descartes.librede.configuration.Resource#getDemands
+	 * @model opposite="demands" required="true"
 	 * @generated
 	 */
 	Resource getResource();

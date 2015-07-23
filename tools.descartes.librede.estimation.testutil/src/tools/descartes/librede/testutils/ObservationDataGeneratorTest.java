@@ -269,7 +269,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		for (Resource res : resources) {
 			double util = 0;
 			int temp = stateVar;			
-			for (Service serv : res.getServices()) {
+			for (Service serv : res.getAccessingServices()) {
 				int idx = tputData.indexOf(serv);
 				sumD[idx] += demands.get(temp);
 				util += demands.get(temp) * tputData.execute().get(idx) / res.getNumberOfServers();
@@ -277,7 +277,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 			}
 			assertThat(util).isEqualTo(utilData.execute().get(utilData.indexOf(res)), offset(EPSILON));
 			
-			for (Service serv : res.getServices()) {
+			for (Service serv : res.getAccessingServices()) {
 				int idx = tputData.indexOf(serv);
 				sumRT[idx] += (demands.get(stateVar) * (erlangC[res.getNumberOfServers()].calculateValue(util) + 1 - util)) / (1 - util);
 				stateVar++;

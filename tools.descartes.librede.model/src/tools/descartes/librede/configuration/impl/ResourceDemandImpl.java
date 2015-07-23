@@ -4,6 +4,7 @@ package tools.descartes.librede.configuration.impl;
 
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
@@ -87,11 +88,63 @@ public class ResourceDemandImpl extends TaskImpl implements ResourceDemand {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setResource(Resource newResource) {
+	public NotificationChain basicSetResource(Resource newResource, NotificationChain msgs) {
 		Resource oldResource = resource;
 		resource = newResource;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.RESOURCE_DEMAND__RESOURCE, oldResource, resource));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.RESOURCE_DEMAND__RESOURCE, oldResource, newResource);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setResource(Resource newResource) {
+		if (newResource != resource) {
+			NotificationChain msgs = null;
+			if (resource != null)
+				msgs = ((InternalEObject)resource).eInverseRemove(this, ConfigurationPackage.RESOURCE__DEMANDS, Resource.class, msgs);
+			if (newResource != null)
+				msgs = ((InternalEObject)newResource).eInverseAdd(this, ConfigurationPackage.RESOURCE__DEMANDS, Resource.class, msgs);
+			msgs = basicSetResource(newResource, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.RESOURCE_DEMAND__RESOURCE, newResource, newResource));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.RESOURCE_DEMAND__RESOURCE:
+				if (resource != null)
+					msgs = ((InternalEObject)resource).eInverseRemove(this, ConfigurationPackage.RESOURCE__DEMANDS, Resource.class, msgs);
+				return basicSetResource((Resource)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.RESOURCE_DEMAND__RESOURCE:
+				return basicSetResource(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**

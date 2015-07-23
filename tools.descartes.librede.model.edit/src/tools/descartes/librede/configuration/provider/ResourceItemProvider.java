@@ -94,6 +94,8 @@ public class ResourceItemProvider
 
 			addNumberOfServersPropertyDescriptor(object);
 			addSchedulingStrategyPropertyDescriptor(object);
+			addDemandsPropertyDescriptor(object);
+			addAccessingServicesPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -143,6 +145,50 @@ public class ResourceItemProvider
 	}
 
 	/**
+	 * This adds a property descriptor for the Demands feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addDemandsPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Resource_demands_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Resource_demands_feature", "_UI_Resource_type"),
+				 ConfigurationPackage.Literals.RESOURCE__DEMANDS,
+				 true,
+				 false,
+				 true,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Accessing Services feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addAccessingServicesPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Resource_accessingServices_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Resource_accessingServices_feature", "_UI_Resource_type"),
+				 ConfigurationPackage.Literals.RESOURCE__ACCESSING_SERVICES,
+				 false,
+				 false,
+				 false,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
 	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
 	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
 	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
@@ -155,7 +201,6 @@ public class ResourceItemProvider
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(ConfigurationPackage.Literals.RESOURCE__CHILD_RESOURCES);
-			childrenFeatures.add(ConfigurationPackage.Literals.RESOURCE__SERVICES);
 		}
 		return childrenFeatures;
 	}
@@ -214,7 +259,6 @@ public class ResourceItemProvider
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case ConfigurationPackage.RESOURCE__CHILD_RESOURCES:
-			case ConfigurationPackage.RESOURCE__SERVICES:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -236,16 +280,6 @@ public class ResourceItemProvider
 			(createChildParameter
 				(ConfigurationPackage.Literals.RESOURCE__CHILD_RESOURCES,
 				 ConfigurationFactory.eINSTANCE.createResource()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(ConfigurationPackage.Literals.RESOURCE__SERVICES,
-				 ConfigurationFactory.eINSTANCE.createService()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(ConfigurationPackage.Literals.RESOURCE__SERVICES,
-				 ConfigurationFactory.eINSTANCE.createCompositeService()));
 	}
 
 	@Override
@@ -276,7 +310,7 @@ public class ResourceItemProvider
 	
 	@Override
 	protected Object createWrapper(EObject object, EStructuralFeature feature, Object value, int index) {
-		if (feature == ConfigurationPackage.Literals.RESOURCE__SERVICES) {
+		if (feature == ConfigurationPackage.Literals.RESOURCE__ACCESSING_SERVICES) {
 			return new MappedServiceItemProvider(value, object, feature, index, adapterFactory);
 		}
 		return super.createWrapper(object, feature, value, index);

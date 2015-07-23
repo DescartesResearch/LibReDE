@@ -587,13 +587,22 @@ public interface ConfigurationPackage extends EPackage {
 	int RESOURCE__CHILD_RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Services</b></em>' reference list.
+	 * The feature id for the '<em><b>Demands</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int RESOURCE__SERVICES = MODEL_ENTITY_FEATURE_COUNT + 3;
+	int RESOURCE__DEMANDS = MODEL_ENTITY_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Accessing Services</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE__ACCESSING_SERVICES = MODEL_ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Resource</em>' class.
@@ -602,7 +611,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int RESOURCE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 4;
+	int RESOURCE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of operations of the '<em>Resource</em>' class.
@@ -1248,13 +1257,22 @@ public interface ConfigurationPackage extends EPackage {
 	int TASK__NAME = MODEL_ENTITY__NAME;
 
 	/**
+	 * The feature id for the '<em><b>Service</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TASK__SERVICE = MODEL_ENTITY_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Task</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TASK_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 0;
+	int TASK_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Task</em>' class.
@@ -1283,6 +1301,15 @@ public interface ConfigurationPackage extends EPackage {
 	 * @ordered
 	 */
 	int RESOURCE_DEMAND__NAME = TASK__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Service</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int RESOURCE_DEMAND__SERVICE = TASK__SERVICE;
 
 	/**
 	 * The feature id for the '<em><b>Resource</b></em>' reference.
@@ -1329,6 +1356,15 @@ public interface ConfigurationPackage extends EPackage {
 	 * @ordered
 	 */
 	int EXTERNAL_CALL__NAME = TASK__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Service</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXTERNAL_CALL__SERVICE = TASK__SERVICE;
 
 	/**
 	 * The feature id for the '<em><b>Called Service</b></em>' reference.
@@ -1699,15 +1735,26 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getResource_ChildResources();
 
 	/**
-	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Resource#getServices <em>Services</em>}'.
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Resource#getDemands <em>Demands</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Services</em>'.
-	 * @see tools.descartes.librede.configuration.Resource#getServices()
+	 * @return the meta object for the reference list '<em>Demands</em>'.
+	 * @see tools.descartes.librede.configuration.Resource#getDemands()
 	 * @see #getResource()
 	 * @generated
 	 */
-	EReference getResource_Services();
+	EReference getResource_Demands();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Resource#getAccessingServices <em>Accessing Services</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Accessing Services</em>'.
+	 * @see tools.descartes.librede.configuration.Resource#getAccessingServices()
+	 * @see #getResource()
+	 * @generated
+	 */
+	EReference getResource_AccessingServices();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.Service <em>Service</em>}'.
@@ -2298,6 +2345,17 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getTask();
 
 	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.Task#getService <em>Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Service</em>'.
+	 * @see tools.descartes.librede.configuration.Task#getService()
+	 * @see #getTask()
+	 * @generated
+	 */
+	EReference getTask_Service();
+
+	/**
 	 * Returns the meta object for enum '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2537,12 +2595,20 @@ public interface ConfigurationPackage extends EPackage {
 		EReference RESOURCE__CHILD_RESOURCES = eINSTANCE.getResource_ChildResources();
 
 		/**
-		 * The meta object literal for the '<em><b>Services</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Demands</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference RESOURCE__SERVICES = eINSTANCE.getResource_Services();
+		EReference RESOURCE__DEMANDS = eINSTANCE.getResource_Demands();
+
+		/**
+		 * The meta object literal for the '<em><b>Accessing Services</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference RESOURCE__ACCESSING_SERVICES = eINSTANCE.getResource_AccessingServices();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ServiceImpl <em>Service</em>}' class.
@@ -3017,6 +3083,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EClass TASK = eINSTANCE.getTask();
+
+		/**
+		 * The meta object literal for the '<em><b>Service</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TASK__SERVICE = eINSTANCE.getTask_Service();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

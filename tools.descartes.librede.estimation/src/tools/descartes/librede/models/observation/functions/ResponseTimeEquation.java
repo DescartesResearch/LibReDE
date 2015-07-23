@@ -264,7 +264,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 * Calculate the utilization using the utilization law.
 			 */
 			double U_i = 0;
-			for (Service curService : res_i.getServices()) {
+			for (Service curService : res_i.getAccessingServices()) {
 				int idx = throughputQuery.indexOf(curService);
 				U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
 			}
@@ -492,7 +492,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 			 */
 			// sorted according to state variable ordering
 			double[] tput = new double[state.length];
-			for (Service curService : res_i.getServices()) {
+			for (Service curService : res_i.getAccessingServices()) {
 				int idx = throughputQuery.indexOf(curService);
 				tput[getStateModel().getStateVariableIndex(res_i, curService)] = X.get(idx);
 			}

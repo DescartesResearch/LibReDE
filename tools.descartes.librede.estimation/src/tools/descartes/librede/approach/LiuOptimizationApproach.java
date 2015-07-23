@@ -66,7 +66,7 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service service : res.getServices()) {
+			for (Service service : res.getAccessingServices()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(res, service, cursor, 0, Double.POSITIVE_INFINITY));
 				builder.addVariable(res, service);
 			}

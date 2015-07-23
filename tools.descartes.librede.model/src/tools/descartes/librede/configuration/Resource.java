@@ -43,7 +43,8 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link tools.descartes.librede.configuration.Resource#getNumberOfServers <em>Number Of Servers</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Resource#getSchedulingStrategy <em>Scheduling Strategy</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Resource#getChildResources <em>Child Resources</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.Resource#getServices <em>Services</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Resource#getDemands <em>Demands</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Resource#getAccessingServices <em>Accessing Services</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource()
@@ -125,19 +126,37 @@ public interface Resource extends ModelEntity {
 	EList<Resource> getChildResources();
 
 	/**
-	 * Returns the value of the '<em><b>Services</b></em>' reference list.
-	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
+	 * Returns the value of the '<em><b>Demands</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.ResourceDemand}.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.ResourceDemand#getResource <em>Resource</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Services</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Demands</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Services</em>' reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource_Services()
-	 * @model
+	 * @return the value of the '<em>Demands</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource_Demands()
+	 * @see tools.descartes.librede.configuration.ResourceDemand#getResource
+	 * @model opposite="resource"
 	 * @generated
 	 */
-	EList<Service> getServices();
+	EList<ResourceDemand> getDemands();
+
+	/**
+	 * Returns the value of the '<em><b>Accessing Services</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.Service}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Accessing Services</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Accessing Services</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getResource_AccessingServices()
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * @generated
+	 */
+	EList<Service> getAccessingServices();
 
 } // Resource

@@ -96,7 +96,7 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 			double util = initialDemands.dot(throughput.execute()) / res.getNumberOfServers();
 			Vector curDemands = initialDemands.times(targetUtilization / util);
 			
-			for (Service service : res.getServices()) {
+			for (Service service : res.getAccessingServices()) {
 				int idx = throughput.indexOf(service);
 				initialState[stateModel.getStateVariableIndex(res,  service)] = curDemands.get(idx);
 			}

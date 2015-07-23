@@ -62,7 +62,7 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service service : res.getServices()) {
+			for (Service service : res.getAccessingServices()) {
 				if (!service.isBackgroundService()) {
 					builder.addVariable(res, service);
 				} else {

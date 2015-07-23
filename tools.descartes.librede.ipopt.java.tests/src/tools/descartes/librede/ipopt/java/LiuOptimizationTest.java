@@ -135,13 +135,13 @@ public class LiuOptimizationTest extends LibredeTest {
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource resource : workload.getResources()) {
-			for (Service service : resource.getServices()) {
+			for (Service service : resource.getAccessingServices()) {
 				builder.addVariable(resource, service);
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		for (Resource resource : workload.getResources()) {
-			for (Service service : resource.getServices()) {
+			for (Service service : resource.getAccessingServices()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
 			}	
 		}

@@ -80,7 +80,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
 		for (Resource resource : workload.getResources()) {
-			for (Service service : resource.getServices()) {
+			for (Service service : resource.getAccessingServices()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
 			}
 		}
@@ -130,14 +130,14 @@ public class MenasceOptimizationTest extends LibredeTest {
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service service : res.getServices()) {
+			for (Service service : res.getAccessingServices()) {
 				builder.addVariable(res, service);
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));		
 		for (Resource resource : workload.getResources()) {
 			builder.addConstraint(new UtilizationConstraint(resource, cursor));
-			for (Service service : resource.getServices()) {
+			for (Service service : resource.getAccessingServices()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
 			}
 		}		

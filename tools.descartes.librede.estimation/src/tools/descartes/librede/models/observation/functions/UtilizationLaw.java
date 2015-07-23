@@ -102,10 +102,10 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		this.res_i = resource;
 		
 		variables = zeros(stateModel.getStateSize());
-		varFocusedIndices = indices(resource.getServices().size(), new VectorFunction() {
+		varFocusedIndices = indices(resource.getAccessingServices().size(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
-				return stateModel.getStateVariableIndex(resource, resource.getServices().get(row));
+				return stateModel.getStateVariableIndex(resource, resource.getAccessingServices().get(row));
 			}
 		});
 		
@@ -113,7 +113,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		 * IMPORTANT: we query the throughput for all services (including background services). For background services
 		 * the repository should by default return 1 as throughput (i.e. constant background work).
 		 */
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getServices()).average().using(repository);
+		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getAccessingServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	

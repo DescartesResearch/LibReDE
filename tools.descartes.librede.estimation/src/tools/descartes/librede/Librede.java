@@ -144,8 +144,6 @@ public class Librede {
 	}
 	
 	public static void execute(LibredeConfiguration conf) {
-		completeWorkloadDescription(conf);
-		
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
@@ -173,14 +171,6 @@ public class Librede {
 			} catch (Exception e) {
 				log.error("Error running estimation.", e);
 			}			
-		}
-	}
-	
-	private static void completeWorkloadDescription(LibredeConfiguration conf) {
-		for (Resource res : conf.getWorkloadDescription().getResources()) {
-			if (res.getServices().isEmpty()) {
-				res.getServices().addAll(conf.getWorkloadDescription().getServices());
-			}
 		}
 	}
 	

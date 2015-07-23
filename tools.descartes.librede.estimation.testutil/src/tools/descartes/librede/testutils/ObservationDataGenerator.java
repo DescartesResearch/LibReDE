@@ -137,7 +137,7 @@ public class ObservationDataGenerator {
 			final List<Integer> idx = new ArrayList<>(numWorkloadClasses);
 			for (int j = 0; j < numWorkloadClasses; j++) {
 				if (mapping[j][i]) {
-					resources[i].getServices().add(services[j]);
+					resources[i].getAccessingServices().add(services[j]);
 					idx.add(j);
 				}
 			}
@@ -152,7 +152,7 @@ public class ObservationDataGenerator {
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : resources) {
-			for (Service serv : res.getServices()) {
+			for (Service serv : res.getAccessingServices()) {
 				builder.addVariable(res, serv);
 			}
 		}

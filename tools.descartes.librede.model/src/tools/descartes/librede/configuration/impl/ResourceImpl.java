@@ -30,13 +30,20 @@ package tools.descartes.librede.configuration.impl;
 
 import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 
@@ -51,7 +58,8 @@ import tools.descartes.librede.configuration.Service;
  *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getNumberOfServers <em>Number Of Servers</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getSchedulingStrategy <em>Scheduling Strategy</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getChildResources <em>Child Resources</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getServices <em>Services</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getDemands <em>Demands</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ResourceImpl#getAccessingServices <em>Accessing Services</em>}</li>
  * </ul>
  *
  * @generated
@@ -108,14 +116,14 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 	protected EList<Resource> childResources;
 
 	/**
-	 * The cached value of the '{@link #getServices() <em>Services</em>}' reference list.
+	 * The cached value of the '{@link #getDemands() <em>Demands</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getServices()
+	 * @see #getDemands()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Service> services;
+	protected EList<ResourceDemand> demands;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -195,11 +203,53 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Service> getServices() {
-		if (services == null) {
-			services = new EObjectResolvingEList<Service>(Service.class, this, ConfigurationPackage.RESOURCE__SERVICES);
+	public EList<ResourceDemand> getDemands() {
+		if (demands == null) {
+			demands = new EObjectWithInverseResolvingEList<ResourceDemand>(ResourceDemand.class, this, ConfigurationPackage.RESOURCE__DEMANDS, ConfigurationPackage.RESOURCE_DEMAND__RESOURCE);
 		}
-		return services;
+		return demands;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public EList<Service> getAccessingServices() {
+		EList<Service> services = new BasicEList<Service>();
+		for (ResourceDemand d : getDemands()) {
+			 services.add(d.getService());
+		}
+		return ECollections.unmodifiableEList(services);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.RESOURCE__DEMANDS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getDemands()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.RESOURCE__DEMANDS:
+				return ((InternalEList<?>)getDemands()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -216,8 +266,10 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 				return getSchedulingStrategy();
 			case ConfigurationPackage.RESOURCE__CHILD_RESOURCES:
 				return getChildResources();
-			case ConfigurationPackage.RESOURCE__SERVICES:
-				return getServices();
+			case ConfigurationPackage.RESOURCE__DEMANDS:
+				return getDemands();
+			case ConfigurationPackage.RESOURCE__ACCESSING_SERVICES:
+				return getAccessingServices();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -241,9 +293,9 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 				getChildResources().clear();
 				getChildResources().addAll((Collection<? extends Resource>)newValue);
 				return;
-			case ConfigurationPackage.RESOURCE__SERVICES:
-				getServices().clear();
-				getServices().addAll((Collection<? extends Service>)newValue);
+			case ConfigurationPackage.RESOURCE__DEMANDS:
+				getDemands().clear();
+				getDemands().addAll((Collection<? extends ResourceDemand>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -266,8 +318,8 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 			case ConfigurationPackage.RESOURCE__CHILD_RESOURCES:
 				getChildResources().clear();
 				return;
-			case ConfigurationPackage.RESOURCE__SERVICES:
-				getServices().clear();
+			case ConfigurationPackage.RESOURCE__DEMANDS:
+				getDemands().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -287,8 +339,10 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 				return schedulingStrategy != SCHEDULING_STRATEGY_EDEFAULT;
 			case ConfigurationPackage.RESOURCE__CHILD_RESOURCES:
 				return childResources != null && !childResources.isEmpty();
-			case ConfigurationPackage.RESOURCE__SERVICES:
-				return services != null && !services.isEmpty();
+			case ConfigurationPackage.RESOURCE__DEMANDS:
+				return demands != null && !demands.isEmpty();
+			case ConfigurationPackage.RESOURCE__ACCESSING_SERVICES:
+				return !getAccessingServices().isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
