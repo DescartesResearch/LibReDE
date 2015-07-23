@@ -40,6 +40,7 @@ import java.util.Random;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Indices;
@@ -137,7 +138,10 @@ public class ObservationDataGenerator {
 			final List<Integer> idx = new ArrayList<>(numWorkloadClasses);
 			for (int j = 0; j < numWorkloadClasses; j++) {
 				if (mapping[j][i]) {
-					resources[i].getAccessingServices().add(services[j]);
+					ResourceDemand d = ConfigurationFactory.eINSTANCE.createResourceDemand();
+					d.setName(resources[i].getName());
+					d.setResource(resources[i]);
+					services[j].getTasks().add(d);
 					idx.add(j);
 				}
 			}

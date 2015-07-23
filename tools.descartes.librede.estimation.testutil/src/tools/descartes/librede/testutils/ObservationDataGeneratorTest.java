@@ -57,6 +57,8 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 	
 	private ErlangCEquation[] erlangC = new ErlangCEquation[3];
 	
+	private static final int ITERATION_COUNT = 250;
+	
 	@Before
 	public void setUp() throws Exception {
 		erlangC[1] = new ErlangCEquation(1);
@@ -79,7 +81,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25, 0.0);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -98,7 +100,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -117,7 +119,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -136,7 +138,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -156,7 +158,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -179,7 +181,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 				0.3, 0.35, 0.4, 0.25);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -207,7 +209,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 				0.3, 0.35);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			assertObservation(utilData, tputData, rtData, demands);
@@ -226,7 +228,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			if (i >= 1) {
@@ -247,7 +249,7 @@ public class ObservationDataGeneratorTest extends LibredeTest {
 		Vector demands = vector(0.25, 0.3, 0.35, 0.4);
 		generator.setDemands(demands);
 		
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < ITERATION_COUNT; i++) {
 			generator.nextObservation();
 			view.next();
 			Vector tput = tputData.execute();
