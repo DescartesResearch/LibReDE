@@ -75,6 +75,7 @@ import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.configuration.actions.RunEstimationAction;
@@ -96,7 +97,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 	private Button btnNewResource;
 	private Button btnRemoveResource;
 	private Button btnNewClass;
-	private Button btnAddServiceMapping;
 	private Button btnRemoveClass;
 	private Section sctnResources;
 	private Section sctnServices;
@@ -193,18 +193,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleAddResource();
-			}
-		});
-		
-		btnAddServiceMapping = new Button(resourcesComposite, SWT.NONE);
-		GridData gd_btnAddServiceMapping = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gd_btnAddServiceMapping.widthHint = 90;
-		btnAddServiceMapping.setLayoutData(gd_btnAddServiceMapping);
-		btnAddServiceMapping.setText("Add Mapping");
-		btnAddServiceMapping.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleAddMappedService();
 			}
 		});
 		
@@ -328,57 +316,18 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		getEditingDomain().getCommandStack().execute(cmd);
 	}
 	
-//	private void handleAddSubService() {
-//		Service service = ConfigurationFactory.eINSTANCE.createService();
-//		service.setName("New Service");
-//		
-//		ISelection sel = treeViewerServices.getSelection();	
-//		if (sel instanceof IStructuredSelection) {
-//			if (!sel.isEmpty()) {
-//				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
-//				Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__SUB_SERVICES, service);
-//				getEditingDomain().getCommandStack().execute(cmd);
-//			}
-//		}		
-//	}
-	
-//	private void handleAddCalledService() {		
-//		ISelection sel = treeViewerServices.getSelection();	
-//		if (sel instanceof IStructuredSelection) {			
-//			if (!sel.isEmpty()) {
-//				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
-//				ElementListSelectionDialog dialog = createServiceSelectionDialog();
-//				if (dialog.open() == ElementListSelectionDialog.OK) {
-//					Object[] res = dialog.getResult();
-//					if (res != null && res.length > 0) {					
-//						Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.SERVICE__CALLED_SERVICES, Arrays.asList(res));
-//						getEditingDomain().getCommandStack().execute(cmd);
-//					}
-//				}
-//			}
-//		}		
-//	}
-	
-	private void handleAddMappedService() {
-		ISelection sel = treeViewerResources.getSelection();	
-		if (sel instanceof IStructuredSelection) {			
-			if (!sel.isEmpty()) {
-				EObject parent = (EObject) ((IStructuredSelection) sel).getFirstElement();
-				ElementListSelectionDialog dialog = createServiceSelectionDialog();
-				if (dialog.open() == ElementListSelectionDialog.OK) {
-					Object[] res = dialog.getResult();
-					if (res != null && res.length > 0) {					
-						Command cmd = AddCommand.create(getEditingDomain(), parent, ConfigurationPackage.Literals.RESOURCE__SERVICES, Arrays.asList(res));
-						getEditingDomain().getCommandStack().execute(cmd);
-					}
-				}
-			}
-		}
-	}
-	
 	private void handleAddService() {
 		Service service = ConfigurationFactory.eINSTANCE.createService();
 		service.setName("New Service");
+		
+		if (getModel().getWorkloadDescription() != null) {
+			for (Resource resource : getModel().getWorkloadDescription().getResources()) {
+				ResourceDemand demand = ConfigurationFactory.eINSTANCE.createResourceDemand();
+				demand.setName(resource.getName());
+				demand.setResource(resource);
+				service.getTasks().add(demand);
+			}
+		}
 		
 		Command cmd;
 		if (getModel().getWorkloadDescription() == null) {
