@@ -95,5 +95,21 @@ public class TaskItemProvider extends ModelEntityItemProvider {
 	protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
 	}
+	
+	@Override
+	public Object getColumnImage(Object object, int columnIndex) {
+		if (columnIndex == 0) {
+			return getImage(object);
+		}
+		return super.getColumnImage(object, columnIndex);
+	}
+	
+	@Override
+	public String getColumnText(Object object, int columnIndex) {
+		if (columnIndex == 0) {
+			return getText(object);
+		}
+		return super.getColumnText(object, columnIndex);
+	}
 
 }
