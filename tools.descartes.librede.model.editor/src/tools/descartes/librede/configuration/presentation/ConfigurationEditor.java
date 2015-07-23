@@ -202,14 +202,6 @@ public class ConfigurationEditor
 	protected List<PropertySheetPage> propertySheetPages = new ArrayList<PropertySheetPage>();
 
 	/**
-	 * This keeps track of the active viewer pane, in the book.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected ViewerPane currentViewerPane;
-
-	/**
 	 * This keeps track of the active content viewer, which may be either one of the viewers in the pages or the content outline viewer.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -731,21 +723,6 @@ public class ConfigurationEditor
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setCurrentViewerPane(ViewerPane viewerPane) {
-		if (currentViewerPane != viewerPane) {
-			if (currentViewerPane != null) {
-				currentViewerPane.showFocus(false);
-			}
-			currentViewerPane = viewerPane;
-		}
-		setCurrentViewer(currentViewerPane.getViewer());
-	}
-
-	/**
 	 * This makes sure that one content viewer, either for the current page or the outline view, if it has focus,
 	 * is the current one.
 	 * <!-- begin-user-doc -->
@@ -807,7 +784,7 @@ public class ConfigurationEditor
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void createContextMenuFor(StructuredViewer viewer) {
+	public void createContextMenuFor(StructuredViewer viewer) {
 		MenuManager contextMenu = new MenuManager("#PopUp");
 		contextMenu.add(new Separator("additions"));
 		contextMenu.setRemoveAllWhenShown(true);
@@ -1034,7 +1011,7 @@ public class ConfigurationEditor
 	 * @generated
 	 */
 	public void handleContentOutlineSelection(ISelection selection) {
-		if (currentViewerPane != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+		if (currentViewer != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
 			Iterator<?> selectedElements = ((IStructuredSelection)selection).iterator();
 			if (selectedElements.hasNext()) {
 				// Get the first selected element.
@@ -1243,12 +1220,7 @@ public class ConfigurationEditor
 	 */
 	@Override
 	public void setFocus() {
-		if (currentViewerPane != null) {
-			currentViewerPane.setFocus();
-		}
-		else {
-			getControl(getActivePage()).setFocus();
-		}
+		getControl(getActivePage()).setFocus();
 	}
 
 	/**

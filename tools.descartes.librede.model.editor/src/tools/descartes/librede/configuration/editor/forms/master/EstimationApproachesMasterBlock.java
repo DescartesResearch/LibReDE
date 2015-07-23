@@ -118,6 +118,8 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 		tableAlgorithmsViewer.addFilter(new ClassesViewerFilter(EstimationSpecification.class, EstimationAlgorithmConfiguration.class));
 		tableAlgorithmsViewer.addSelectionChangedListener(this);
 		
+		registerViewer(tableAlgorithmsViewer);
+		
 		return tableAlgorithms;
 	}
 

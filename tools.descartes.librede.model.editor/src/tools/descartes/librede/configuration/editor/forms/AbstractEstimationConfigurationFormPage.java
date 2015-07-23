@@ -250,4 +250,8 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 	public AdapterFactory getAdapterFactory() {
 		return ((ConfigurationEditor)getEditor()).getAdapterFactory();
 	}
+	
+	public ConfigurationEditor getConfigurationEditor() {
+		return (ConfigurationEditor)getEditor();
+	}
 }

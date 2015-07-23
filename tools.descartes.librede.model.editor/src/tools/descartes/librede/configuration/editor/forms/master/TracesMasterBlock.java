@@ -114,6 +114,8 @@ public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 		tableTracesViewer.addFilter(new ClassesViewerFilter(InputSpecification.class, TraceConfiguration.class));
 		tableTracesViewer.addSelectionChangedListener(this);
 		
+		registerViewer(tableTracesViewer);
+		
 		return tableTraces;
 	}
 

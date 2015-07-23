@@ -65,6 +65,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -278,6 +280,14 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 				.setContentProvider(new AdapterFactoryContentProvider(page.getAdapterFactory()));
 		mappingTableViewer.setLabelProvider(new AdapterFactoryLabelProvider(
 				page.getAdapterFactory()));
+		
+		mappingTableViewer.getControl().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				page.getConfigurationEditor().setCurrentViewer(mappingTableViewer);
+			}
+		});
+		page.getConfigurationEditor().createContextMenuFor(mappingTableViewer);
 		
 		Button btnAddMapping = toolkit.createButton(mappingTableButtonComposite, "Add", SWT.PUSH);
 		GridData gd_btnAddMapping = new GridData();

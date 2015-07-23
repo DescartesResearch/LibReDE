@@ -122,6 +122,8 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 		tableExportersViewer.setInput(model.getOutput());
 		tableExportersViewer.addSelectionChangedListener(this);
 		
+		registerViewer(tableExportersViewer);
+		
 		return tableExporters;
 	}
 

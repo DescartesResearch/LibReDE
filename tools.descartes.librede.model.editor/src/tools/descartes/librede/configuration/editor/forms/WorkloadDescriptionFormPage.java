@@ -29,8 +29,8 @@ package tools.descartes.librede.configuration.editor.forms;
 import java.util.Arrays;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.internal.runtime.DataArea;
 import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.common.ui.ViewerPane;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -41,33 +41,30 @@ import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
-import org.eclipse.jface.action.AbstractAction;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -93,24 +90,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		}
 	}
 	
-	private class RemoveAction extends Action {
-		
-		public RemoveAction() {
-			super("Remove");
-		}
-
-		@Override
-		public void run() {
-			IStructuredSelection selection = (IStructuredSelection) treeViewerServices.getSelection();
-			if (!selection.isEmpty()) {
-				Command remove = DeleteCommand.create(getEditingDomain(),
-						selection.toList());
-				getEditingDomain().getCommandStack().execute(remove);
-			}
-		}
-		
-	}
-
 	private Tree treeResources;
 	private Tree treeClasses;
 	private Composite resourcesComposite;
@@ -123,8 +102,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 	private Section sctnServices;
 	private TreeViewer treeViewerResources;
 	private TreeViewer treeViewerServices;
-	
-	private MenuManager treeViewerServicesContextMenu;
 	
 	private EMFDataBindingContext bindingContext = new EMFDataBindingContext();
 	private Section sctnImport;
@@ -198,24 +175,10 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		managedForm.getToolkit().paintBordersFor(resourcesComposite);
 		resourcesComposite.setLayout(new GridLayout(2, false));
 		
-		Composite tableComposite = new Composite(resourcesComposite, SWT.NONE);
-		
-		GridData gd_tableComposite_1 = new GridData(GridData.FILL_BOTH);
-		gd_tableComposite_1.heightHint = 200;
-		gd_tableComposite_1.grabExcessVerticalSpace = true;
-		gd_tableComposite_1.widthHint = 50;
-		gd_tableComposite_1.verticalSpan = 3;
-		tableComposite.setLayoutData(gd_tableComposite_1);
-		
-		treeViewerResources = new TreeViewer(tableComposite, SWT.BORDER | SWT.FULL_SELECTION);
-		treeResources = treeViewerResources.getTree();
-		treeResources.setHeaderVisible(true);
-		treeResources.setLinesVisible(true);
-		
-		initTreeFromEMF(tableComposite, treeViewerResources, 
-				Resource.class,
+		treeViewerResources = createTreeViewer(resourcesComposite, Resource.class,
 				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME, ConfigurationPackage.Literals.RESOURCE__NUMBER_OF_SERVERS, ConfigurationPackage.Literals.RESOURCE__SCHEDULING_STRATEGY },
 				new String[] { "Name", "Number of Servers", "Scheduling Strategy"}, new int[] { 10, 0, 0});
+		
 		/*
 		 * IMPORTANT: filter out resources below service entries (redundant)
 		 */
@@ -276,21 +239,7 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		managedForm.getToolkit().paintBordersFor(wclComposite);
 		wclComposite.setLayout(new GridLayout(2, false));
 		
-		Composite tableComposite_1 = new Composite(wclComposite, SWT.NONE);
-		
-		GridData gd_tableComposite_1_1 = new GridData(GridData.FILL_BOTH);
-		gd_tableComposite_1_1.heightHint = 200;
-		gd_tableComposite_1_1.widthHint = 50;
-		gd_tableComposite_1_1.verticalSpan = 4;
-		tableComposite_1.setLayoutData(gd_tableComposite_1_1);
-		
-		treeViewerServices = new TreeViewer(tableComposite_1, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
-		treeClasses = treeViewerServices.getTree();
-		treeClasses.setHeaderVisible(true);
-		treeClasses.setLinesVisible(true);
-		
-		initTreeFromEMF(tableComposite_1, treeViewerServices, 
-				Service.class, 
+		treeViewerServices = createTreeViewer(wclComposite, Service.class, 
 				new EStructuralFeature[] { ConfigurationPackage.Literals.NAMED_ELEMENT__NAME, ConfigurationPackage.Literals.SERVICE__BACKGROUND_SERVICE },
 				new String[] { "Name", "Background Service" }, new int[] { 10, 0 });
 		
@@ -314,40 +263,48 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		btnRemoveClass.addSelectionListener(new RemoveSelectionSelectionListener(treeViewerServices));
 		
 		bindingContext.bindValue(WidgetProperties.enabled().observe(btnRemoveClass), ViewerProperties.singleSelection().observe(treeViewerServices), null, new DisableOnEmptySelection());
-		
-		// Add a context menu to the viewer
-		treeViewerServicesContextMenu = new MenuManager();
-		treeViewerServicesContextMenu.setRemoveAllWhenShown(true);
-		treeViewerServicesContextMenu.addMenuListener(new IMenuListener() {			
-			@Override
-			public void menuAboutToShow(IMenuManager manager) {
-				fillServicesContextMenu(manager);			
-			}
-		});
-		Menu contextMenu = treeViewerServicesContextMenu.createContextMenu(treeViewerServices.getControl());
-		treeViewerServices.getControl().setMenu(contextMenu);
 	}
 	
-	private void initTreeFromEMF(Composite treeComposite, TreeViewer treeViewer, Class<?> objectType, EStructuralFeature[] attributes, String[] headers, int[] weights) {
-		TreeColumnLayout colLayout = new TreeColumnLayout();
-		treeComposite.setLayout(colLayout);
+	private TreeViewer createTreeViewer(Composite composite, Class<?> objectType, EStructuralFeature[] attributes, String[] headers, int[] weights) {
+		Composite tableComposite = new Composite(composite, SWT.NONE);
 		
+		GridData gd_tableComposite = new GridData(GridData.FILL_BOTH);
+		gd_tableComposite.heightHint = 200;
+		gd_tableComposite.widthHint = 50;
+		gd_tableComposite.verticalSpan = 4;
+		tableComposite.setLayoutData(gd_tableComposite);
+		
+		final TreeViewer viewer = new TreeViewer(tableComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL);
+		Tree tree = viewer.getTree();
+		tree.setHeaderVisible(true);
+		tree.setLinesVisible(true);
+		
+		tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				getConfigurationEditor().setCurrentViewer(viewer);
+			}
+		});
+			
+		initTreeFromEMF(tableComposite, viewer, objectType, attributes, headers, weights);
+		getConfigurationEditor().createContextMenuFor(viewer);
+		return viewer;
+	}
+	
+	private void initTreeFromEMF(Composite composite, TreeViewer treeViewer, Class<?> objectType, EStructuralFeature[] attributes, String[] headers, int[] weights) {
+		TreeColumnLayout colLayout = new TreeColumnLayout();
+		composite.setLayout(colLayout);
 		for (int i = 0; i < headers.length; i++) {
 			// Create column
 			TreeViewerColumn tableViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
-			TreeColumn tableColumn = tableViewerColumn.getColumn();
-			colLayout.setColumnData(tableColumn, new ColumnWeightData(weights[i], 130, true));
-			tableColumn.setText(headers[i]);
+			colLayout.setColumnData(tableViewerColumn.getColumn(), new ColumnWeightData(weights[i], 130, true));
+			tableViewerColumn.getColumn().setText(headers[i]);
 			tableViewerColumn.setEditingSupport(EObjectEditingSupport.create(treeViewer, getEditingDomain(), attributes[i]));
 		}
 		treeViewer.setContentProvider(new AdapterFactoryContentProvider(getAdapterFactory()));
 		treeViewer.setLabelProvider(new AdapterFactoryLabelProvider(getAdapterFactory()));
 		treeViewer.addFilter(new ClassesViewerFilter(WorkloadDescription.class, objectType));
 		treeViewer.setInput(getModel().getWorkloadDescription());
-	}
-	
-	private void fillServicesContextMenu(IMenuManager menu) {
-		menu.add(new RemoveAction());
 	}
 
 	private void handleAddResource() {

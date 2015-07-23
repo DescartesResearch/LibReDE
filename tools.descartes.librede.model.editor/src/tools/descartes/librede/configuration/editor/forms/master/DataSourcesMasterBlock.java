@@ -97,6 +97,8 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		tableSourcesViewer.addFilter(new ClassesViewerFilter(InputSpecification.class, DataSourceConfiguration.class));
 		tableSourcesViewer.addSelectionChangedListener(this);
 		
+		registerViewer(tableSourcesViewer);
+		
 		return tableSources;
 	}
 
