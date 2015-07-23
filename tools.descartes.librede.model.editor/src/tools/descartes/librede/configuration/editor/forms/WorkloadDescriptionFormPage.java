@@ -91,8 +91,6 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 		}
 	}
 	
-	private Tree treeResources;
-	private Tree treeClasses;
 	private Composite resourcesComposite;
 	private Button btnNewResource;
 	private Button btnRemoveResource;
@@ -298,6 +296,14 @@ public class WorkloadDescriptionFormPage extends AbstractEstimationConfiguration
 	private void handleAddResource() {
 		Resource res = ConfigurationFactory.eINSTANCE.createResource();
 		res.setName("New Resource");
+		if (getModel().getWorkloadDescription() != null) {
+			for (Service s : getModel().getWorkloadDescription().getServices()) {
+				ResourceDemand d = ConfigurationFactory.eINSTANCE.createResourceDemand();
+				d.setName(res.getName());
+				d.setResource(res);
+				s.getTasks().add(d);
+			}
+		}
 		
 		Command cmd;
 		if (getModel().getWorkloadDescription() == null) {
