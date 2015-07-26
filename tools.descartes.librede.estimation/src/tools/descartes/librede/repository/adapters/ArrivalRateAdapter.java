@@ -45,9 +45,6 @@ import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestRate;
 
 public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
-	////////////////////////////////////////////////////////////////
-	// Arrival rate
-	////////////////////////////////////////////////////////////////		
 	
 	@Override
 	public Interpolation getInterpolation() {
@@ -59,6 +56,7 @@ public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
 		return Arrays.asList(
 					AggregationRule.aggregate(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 						.from(Aggregation.AVERAGE)
+						.priority(10)
 						.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE)),
 					AggregationRule.aggregate(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 						.check(new RulePrecondition() {				
@@ -67,9 +65,11 @@ public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
 								return (entity instanceof Service) && ((Service)entity).isBackgroundService();
 							}
 						})
+						.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
 						.build(new DeriveConstantRate()),
 					AggregationRule.aggregate(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 						.requiring(StandardMetrics.ARRIVALS, Aggregation.SUM)
+						.priority(0)
 						.build(new RequestRateAggregationHandler(StandardMetrics.ARRIVALS))
 					);
 	}

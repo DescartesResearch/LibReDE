@@ -56,6 +56,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 		return Arrays.asList(
 				AggregationRule.aggregate(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.from(Aggregation.AVERAGE)
+					.priority(10)
 					.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE)),
 				AggregationRule.aggregate(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {				
@@ -63,9 +64,12 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 						public boolean check(ModelEntity entity) {
 							return (entity instanceof Service) && ((Service)entity).isBackgroundService();
 						}
-					}).build(new DeriveConstantRate()),
+					})
+					.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
+					.build(new DeriveConstantRate()),
 				AggregationRule.aggregate(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
+					.priority(0)
 					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES))
 				);
 	}

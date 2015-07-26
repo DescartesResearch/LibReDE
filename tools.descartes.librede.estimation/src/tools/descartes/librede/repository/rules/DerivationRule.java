@@ -59,6 +59,11 @@ public class DerivationRule<D extends Dimension> extends AbstractRule<D> {
 		return this;
 	}
 	
+	public DerivationRule<D> priority(int priority) {
+		setPriority(priority);
+		return this;
+	}
+	
 	public DerivationRule<D> build(IMetricDerivationHandler<D> handler) {
 		this.handler = handler;
 		return this;

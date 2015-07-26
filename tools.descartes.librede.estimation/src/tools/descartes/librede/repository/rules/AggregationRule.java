@@ -57,6 +57,11 @@ public class AggregationRule<D extends Dimension> extends AbstractRule<D> {
 		return this;
 	}
 	
+	public AggregationRule<D> priority(int priority) {
+		setPriority(priority);
+		return this;
+	}
+	
 	public AggregationRule<D> build() {
 		checkCompleteness();
 		this.handler = new DefaultAggregationHandler<>(getMetric(), sourceAggregation);

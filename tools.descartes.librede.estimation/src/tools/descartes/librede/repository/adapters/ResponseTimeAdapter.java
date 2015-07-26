@@ -56,9 +56,11 @@ public class ResponseTimeAdapter implements IMetricAdapter<Time> {
 					.build(),
 				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
 					.from(Aggregation.NONE)
+					.priority(0)
 					.build(),
 				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
 					.from(Aggregation.SUM)
+					.priority(10)
 					.build(),
 				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
 					.from(Aggregation.NONE)
@@ -72,10 +74,12 @@ public class ResponseTimeAdapter implements IMetricAdapter<Time> {
 				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
 					.from(Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.priority(10)
 					.build(new ThroughputWeightedAggregationHandler<Time>(StandardMetrics.RESPONSE_TIME)),
 				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
 					.from(Aggregation.SUM)
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
+					.priority(0)
 					.build(new AverageResponseTimeAggregationHandler())
 				);
 	}

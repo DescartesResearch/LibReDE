@@ -51,6 +51,7 @@ public class QueueLengthSeenOnArrivalAdapter implements IMetricAdapter<RequestCo
 		return Arrays.asList(
 				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
 					.from(Aggregation.NONE)
+					.priority(10)
 					.build(),
 				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MINIMUM)
 					.from(Aggregation.NONE)
@@ -61,6 +62,7 @@ public class QueueLengthSeenOnArrivalAdapter implements IMetricAdapter<RequestCo
 				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
 					.from(Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.priority(0)
 					.build(new ThroughputWeightedAggregationHandler<RequestCount>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL))
 				);
 	}

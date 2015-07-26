@@ -51,9 +51,11 @@ public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 		return Arrays.asList(
 				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.from(Aggregation.NONE)
+					.priority(0)
 					.build(),
 				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.from(Aggregation.SUM)
+					.priority(10)
 					.build(),
 				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.MINIMUM)
 					.from(Aggregation.NONE)

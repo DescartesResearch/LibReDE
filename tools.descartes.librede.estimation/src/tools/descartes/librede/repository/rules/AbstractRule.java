@@ -40,6 +40,7 @@ public abstract class AbstractRule<D extends Dimension> {
 	private final Aggregation aggregation;
 	private final List<RuleDependency<?>> dependencies = new LinkedList<>();
 	private final List<RulePrecondition> preconditions = new LinkedList<>();
+	private int priority;
 	
 	protected AbstractRule(Metric<D> metric, Aggregation aggregation) {
 		this.metric = metric;
@@ -64,6 +65,14 @@ public abstract class AbstractRule<D extends Dimension> {
 	
 	public Aggregation getAggregation() {
 		return aggregation;
+	}
+	
+	public int getPriority() {
+		return priority;
+	}
+	
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 	
 	public boolean applies(ModelEntity entity) {
