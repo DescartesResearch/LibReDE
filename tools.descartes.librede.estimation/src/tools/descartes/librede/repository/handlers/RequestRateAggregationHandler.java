@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.repository.handlers;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
@@ -38,6 +40,8 @@ import tools.descartes.librede.units.Unit;
 
 public class RequestRateAggregationHandler extends BaseAggregationHandler<RequestRate> {
 	
+	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
+	
 	private Metric<RequestCount> countMetric;
 	
 	public RequestRateAggregationHandler(Metric<RequestCount> countMetric) {
@@ -49,6 +53,9 @@ public class RequestRateAggregationHandler extends BaseAggregationHandler<Reques
 	public double aggregate(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit,
 			ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 		if (aggregation == Aggregation.AVERAGE) {
+			if (log.isTraceEnabled()) {
+				log.trace("Calculate requrest rate " + aggregation.getLiteral() + " of " + metric.getName() + " for entity " + entity + ".");
+			}
 			double sum = repository.aggregate(countMetric, RequestCount.REQUESTS,
 					entity, Aggregation.SUM, start, end);
 			return unit.convertFrom(sum / (end.minus(start).getValue(Time.SECONDS)), RequestRate.REQ_PER_SECOND);

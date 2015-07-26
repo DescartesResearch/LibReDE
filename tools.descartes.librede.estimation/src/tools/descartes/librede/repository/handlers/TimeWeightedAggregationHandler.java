@@ -40,7 +40,7 @@ import tools.descartes.librede.units.Unit;
 
 public class TimeWeightedAggregationHandler<D extends Dimension> extends BaseAggregationHandler<D> {
 
-	private static final Logger log = Logger.getLogger(TimeWeightedAggregationHandler.class);
+	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	
 	public TimeWeightedAggregationHandler(Metric<?> delegatedMetric) {
 		super(delegatedMetric, Aggregation.AVERAGE);

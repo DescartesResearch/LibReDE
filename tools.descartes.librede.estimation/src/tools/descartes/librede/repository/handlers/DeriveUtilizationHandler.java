@@ -44,7 +44,7 @@ import tools.descartes.librede.units.Unit;
 
 public class DeriveUtilizationHandler extends BaseDerivationHandler<Ratio> {
 	
-	private static final Logger log = Logger.getLogger(DeriveUtilizationHandler.class);
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
 	public DeriveUtilizationHandler() {
 		super(Arrays.asList(StandardMetrics.BUSY_TIME, StandardMetrics.IDLE_TIME), Arrays.asList(Aggregation.SUM, Aggregation.SUM));
@@ -54,7 +54,9 @@ public class DeriveUtilizationHandler extends BaseDerivationHandler<Ratio> {
 	public TimeSeries derive(IMonitoringRepository repository, Metric<Ratio> metric,
 			Unit<Ratio> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
 			Quantity<Time> end) {
-		log.trace("Derive average utilization from busy time and idle time.");
+		if (log.isTraceEnabled()) {
+			log.trace("Derive average utilization from busy time and idle time.");
+		}
 		if (aggregation == Aggregation.AVERAGE) {
 			TimeSeries busy = repository.select(StandardMetrics.BUSY_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
 			TimeSeries idle = repository.select(StandardMetrics.IDLE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
@@ -65,7 +67,9 @@ public class DeriveUtilizationHandler extends BaseDerivationHandler<Ratio> {
 				util.setEndTime(end.getValue(Time.SECONDS));
 				return UnitConverter.convertTo(util, Ratio.NONE, unit);
 			} else {
-				log.trace("Could not find required busy time and/or idle time traces. Skip derivation of average utilization.");
+				if (log.isTraceEnabled()) {
+					log.trace("Could not find required busy time and/or idle time traces. Skip derivation of average utilization.");
+				}
 				return TimeSeries.EMPTY;
 			}
 		}

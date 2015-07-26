@@ -40,7 +40,7 @@ import tools.descartes.librede.units.Unit;
 
 public class DefaultAggregationHandler<D extends Dimension> extends BaseAggregationHandler<D> {
 
-	private Logger log = Logger.getLogger(DefaultAggregationHandler.class);
+	private Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	
 	// the aggregation level from which we calculate the sum
 	private final Aggregation baseAggregation;

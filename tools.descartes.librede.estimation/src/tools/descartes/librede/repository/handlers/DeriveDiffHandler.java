@@ -40,7 +40,7 @@ import tools.descartes.librede.units.Unit;
 
 public class DeriveDiffHandler<D extends Dimension> extends BaseDerivationHandler<D> {
 	
-	private static final Logger log = Logger.getLogger(DeriveDiffHandler.class);
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
 	public DeriveDiffHandler(Metric<D> delegatedMetric) {
 		super(delegatedMetric, Aggregation.CUMULATIVE_SUM);
@@ -50,13 +50,17 @@ public class DeriveDiffHandler<D extends Dimension> extends BaseDerivationHandle
 	public TimeSeries derive(IMonitoringRepository repository, Metric<D> metric,
 			Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
 			Quantity<Time> end) {
-		log.trace("Derive sum from cumulative sum of " + metric.getName());
+		if (log.isTraceEnabled()) {
+			log.trace("Derive sum from cumulative sum of " + metric.getName());
+		}
 		if (aggregation == Aggregation.SUM) {
 			TimeSeries cumSum = repository.select(metric, unit, entity, Aggregation.CUMULATIVE_SUM, start, end);
 			if (!cumSum.isEmpty()) {
 				return cumSum.diff();
 			} else {
-				log.trace("Could not find required traces. Skip derivation of sum.");
+				if (log.isTraceEnabled()) {
+					log.trace("Could not find required traces. Skip derivation of sum.");
+				}
 				return TimeSeries.EMPTY;
 			}
 		}

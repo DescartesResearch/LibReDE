@@ -42,14 +42,16 @@ import tools.descartes.librede.units.UnitsFactory;
 
 public class DeriveConstantRate implements IMetricAggregationHandler<RequestRate> {
 	
-	private static final Logger log = Logger.getLogger(DeriveConstantRate.class);
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
 	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 	
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit,
 			ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
-		log.trace("Derive constant rate " + metric.getName());
+		if (log.isTraceEnabled()) {
+			log.trace("Derive constant rate " + metric.getName());
+		}
 		if (aggregation == Aggregation.AVERAGE) {
 			return 1.0;
 		}

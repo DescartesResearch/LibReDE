@@ -42,7 +42,7 @@ import tools.descartes.librede.units.Unit;
 
 public class AverageResponseTimeAggregationHandler extends BaseAggregationHandler<Time> {
 
-	private static final Logger log = Logger.getLogger(AverageResponseTimeAggregationHandler.class);
+	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	
 	public AverageResponseTimeAggregationHandler() {
 		super(Arrays.asList(StandardMetrics.RESPONSE_TIME, StandardMetrics.DEPARTURES), Arrays.asList(Aggregation.SUM, Aggregation.AVERAGE));

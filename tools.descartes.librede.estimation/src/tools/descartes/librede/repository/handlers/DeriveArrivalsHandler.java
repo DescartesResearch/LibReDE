@@ -44,7 +44,7 @@ import tools.descartes.librede.units.Unit;
 
 public class DeriveArrivalsHandler extends BaseDerivationHandler<RequestCount> {
 	
-	private static final Logger log = Logger.getLogger(DeriveArrivalsHandler.class);
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 
 	public DeriveArrivalsHandler() {
 		super(StandardMetrics.RESPONSE_TIME, Aggregation.NONE);
@@ -54,7 +54,9 @@ public class DeriveArrivalsHandler extends BaseDerivationHandler<RequestCount> {
 	public TimeSeries derive(IMonitoringRepository repository, Metric<RequestCount> metric,
 			Unit<RequestCount> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
 			Quantity<Time> end) {
-		log.trace("Derive non-aggregated arrivals from response times");
+		if (log.isTraceEnabled()) {
+			log.trace("Derive non-aggregated arrivals from response times");
+		}
 		if (aggregation == Aggregation.NONE) {
 			TimeSeries respTime = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity, Aggregation.NONE, start, end);
 			if (!respTime.isEmpty()) {
@@ -63,7 +65,9 @@ public class DeriveArrivalsHandler extends BaseDerivationHandler<RequestCount> {
 				arrivals.setEndTime(end.getValue(Time.SECONDS));
 				return UnitConverter.convertTo(arrivals, RequestCount.REQUESTS, unit);
 			} else {
-				log.trace("Could not find response time traces. Skip derivation of arrivals.");
+				if (log.isTraceEnabled()) {
+					log.trace("Could not find response time traces. Skip derivation of arrivals.");
+				}
 				return TimeSeries.EMPTY;
 			}
 		}

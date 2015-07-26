@@ -44,7 +44,7 @@ import tools.descartes.librede.units.Unit;
 
 public class ThroughputWeightedAggregationHandler<D extends Dimension> extends BaseAggregationHandler<D> {
 
-	private static final Logger log = Logger.getLogger(ThroughputWeightedAggregationHandler.class);
+	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	
 	public ThroughputWeightedAggregationHandler(Metric<?> delegatedMetric) {
 		super(Arrays.asList(delegatedMetric, StandardMetrics.THROUGHPUT), Arrays.asList(Aggregation.AVERAGE, Aggregation.AVERAGE));
