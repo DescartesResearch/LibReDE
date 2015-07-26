@@ -50,10 +50,6 @@ public interface IMonitoringRepository {
 	
 	public <D extends Dimension> boolean exists(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 	
-	public <D extends Dimension> void addMetricDerivationHandler(Metric<D> metric, ModelEntity entity, Aggregation aggregation, IMetricDerivationHandler<D> handler);
-
-	public <D extends Dimension> void addMetricAggregationHandler(Metric<D> metric, ModelEntity entity, Aggregation aggregation, IMetricAggregationHandler<D> handler);
-	
 	public <D extends Dimension> Quantity<Time> getAggregationInterval(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 	
 	public <D extends Dimension> Quantity<Time> getMonitoringStartTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);

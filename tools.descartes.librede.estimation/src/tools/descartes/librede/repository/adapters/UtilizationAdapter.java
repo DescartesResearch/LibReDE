@@ -24,21 +24,43 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.repository;
+package tools.descartes.librede.repository.adapters;
 
+import java.util.Collections;
 import java.util.List;
 
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.DeriveUtilizationHandler;
 import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
-import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Ratio;
 
-public interface IMetricAdapter<D extends Dimension> {
+public class UtilizationAdapter implements IMetricAdapter<Ratio> {
+
+	@Override
+	public Interpolation getInterpolation() {
+		return Interpolation.PIECEWISE_CONSTANT;
+	}
 	
-	Interpolation getInterpolation();
-	
-	List<AggregationRule<D>> getAggregationRules();
-	
-	List<DerivationRule<D>> getDerivationRules();
-	
+	@Override
+	public List<AggregationRule<Ratio>> getAggregationRules() {
+		return Collections.singletonList(
+				AggregationRule.aggregate(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
+					.from(Aggregation.AVERAGE)
+					.build()
+				);
+	}
+
+	@Override
+	public List<DerivationRule<Ratio>> getDerivationRules() {
+		return Collections.singletonList(
+				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
+					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)
+					.build(new DeriveUtilizationHandler())
+				);
+	}
 }

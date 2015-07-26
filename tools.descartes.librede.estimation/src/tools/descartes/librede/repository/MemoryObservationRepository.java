@@ -40,6 +40,9 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
+import tools.descartes.librede.repository.rules.AggregationRule;
+import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.RulesConfig;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -197,11 +200,15 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private Map<DataKey<?>, DataEntry<?>> data = new HashMap<>();
+	private final RulesConfig rules = new RulesConfig();
 	private WorkloadDescription workload;
 	private Quantity<Time> currentTime;
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
+		for (Metric<?> m : Registry.INSTANCE.getMetrics()) {
+			registerRules(m);			
+		}
 		registerDefaultHandlers();
 	}
 	
@@ -214,15 +221,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private <D extends Dimension> void setData(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
-		DataEntry<D> oldEntry = getEntry(m, entity, aggregation);
-		
 		TimeSeriesDataEntry<D> entry = new TimeSeriesDataEntry<>(UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit()), aggregationInterval);
-		if (oldEntry != null) {
-			entry.aggregationHandler = oldEntry.aggregationHandler;
-		}
-		data.put(new DataKey<D>(m, entity, aggregation),  entry);
-		
-		log.info("Data" + ((oldEntry== null) ? "" : "(replaced)") + ": " + entity.getName() 
+		boolean replaced = addEntry(new DataKey<D>(m, entity, aggregation), entry);		
+		log.info("Data" + (replaced ? "" : "(replaced)") + ": " + entity.getName() 
 			+ ":" + m.getName() 
 			+ ":" + aggregation.getLiteral() 
 			+ " <- ["
@@ -230,13 +231,69 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			+ "mean=" + LinAlg.nanmean(observations.getData(0)).get(0) + ", "
 			+ "start=" + observations.getStartTime() +"s, "
 			+ "end=" + observations.getEndTime() + "s]");
-		
-		if (oldEntry == null) {
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <D extends Dimension> boolean addEntry(DataKey<D> key, DataEntry<D> entry) {
+		DataEntry<?> oldEntry = data.put(key, entry);
+		if (oldEntry != null) {
+			if (entry.aggregationHandler == null) {
+				entry.aggregationHandler = (IMetricAggregationHandler<D>) oldEntry.aggregationHandler;
+			}
+		} else {
 			// This is the first time we add data for this metric, entity and aggregation combination
-			// Install all aggregation and derivation handlers
-			Registry.INSTANCE.getMetricHandler(m).registerHandlers(this, entity, aggregation);
+			notifyNewEntry(key.metric, key.entity, key.aggregation);
+		}
+		return oldEntry != null;				
+	}
+	
+	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
+		for (AggregationRule<?> r : rules.getAggregationRules(metric, aggregation)) {
+			DataEntry<?> entry = getEntry(r.getMetric(), entity, r.getAggregation());
+			if ((entry == null) || (entry.aggregationHandler == null)) {
+				addAggregation(r, entity);
+			}
+		}
+		for (DerivationRule<?> r : rules.getDerivationRules(metric, aggregation)) {
+			if (!exists(r.getMetric(), entity, r.getAggregation())) {
+				addDerivation(r, entity);
+			}
 		}
 	}
+	
+	private <D extends Dimension> void addAggregation(AggregationRule<D> t, ModelEntity entity) {
+		Metric<D> metric = t.getMetric();
+		Aggregation aggregation = t.getAggregation();
+		IMetricAggregationHandler<D> handler = t.getAggregationHandler();
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Aggregation: " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
+		}
+		DataEntry<D> entry = getEntry(metric, entity, aggregation);
+		boolean newEntry = (entry == null);
+		
+		if (newEntry) {
+			entry = new DerivedDataEntry<D>();
+			addEntry(new DataKey<D>(metric, entity, aggregation), entry);
+		}
+		if (entry.aggregationHandler == null) {
+			entry.aggregationHandler = handler;
+		}		
+		log.info("Aggregation" + (newEntry ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
+	}
+	
+	private <D extends Dimension> void addDerivation(DerivationRule<D> t, ModelEntity entity) {
+		Metric<D> metric = t.getMetric();
+		Aggregation aggregation = t.getAggregation();
+		IMetricDerivationHandler<D> handler = t.getDerivationHandler();
+		
+		DerivedDataEntry<D> entry = new DerivedDataEntry<>();
+		entry.derivationHandler = handler;
+		boolean replaced = addEntry(new DataKey<D>(metric, entity, aggregation), entry);
+		
+		log.info("Derivation" + (replaced ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
+	}
+	
 	
 	@Override
 	public List<Resource> listResources() {
@@ -259,7 +316,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	@Override
-	public void setCurrentTime(Quantity<Time> currentTime) {
+ 	public void setCurrentTime(Quantity<Time> currentTime) {
 		this.currentTime = currentTime;
 	}
 	
@@ -304,53 +361,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 
 	@Override
-	public <D extends Dimension> void addMetricDerivationHandler(Metric<D> metric, ModelEntity entity,
-			Aggregation aggregation, IMetricDerivationHandler<D> handler) {
-		DataEntry<D> oldEntry = getEntry(metric, entity, aggregation);
-		
-		DerivedDataEntry<D> entry = new DerivedDataEntry<>();
-		entry.derivationHandler = handler;
-		if (oldEntry != null) {
-			entry.aggregationHandler = oldEntry.aggregationHandler;
-		}
-		data.put(new DataKey<D>(metric, entity, aggregation),  entry);
-		
-		log.info("Derivation" + ((oldEntry == null) ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
-		
-		if (oldEntry == null) {
-			// This is the first time we add data for this metric, entity and aggregation combination
-			// Install all aggregation and derivation handlers
-			Registry.INSTANCE.getMetricHandler(metric).registerHandlers(this, entity, aggregation);
-		}
-		
-	}
-
-	@Override
-	public <D extends Dimension> void addMetricAggregationHandler(Metric<D> metric, ModelEntity entity,
-			Aggregation aggregation, IMetricAggregationHandler<D> handler) {
-		log.info("Aggregation: " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
-		
-		DataEntry<D> entry = getEntry(metric, entity, aggregation);
-		boolean newEntry = (entry == null);
-		
-		if (newEntry) {
-			entry = new DerivedDataEntry<D>();
-			data.put(new DataKey<D>(metric, entity, aggregation), entry);
-		}
-		if (entry.aggregationHandler == null) {
-			entry.aggregationHandler = handler;
-		}
-		
-		log.info("Aggregation" + (newEntry ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
-
-		if (newEntry) {
-			// This is the first time we add data for this metric, entity and aggregation combination
-			// Install all aggregation and derivation handlers
-			Registry.INSTANCE.getMetricHandler(metric).registerHandlers(this, entity, aggregation);
-		}		
-	}
-	
-	@Override
 	public <D extends Dimension> Quantity<Time> getAggregationInterval(Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation) {
 		DataEntry<D> entry = getEntry(metric, entity, aggregation);
@@ -377,17 +387,31 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return (DataEntry<D>)data.get(key);
 	}
 	
+	private <D extends Dimension> void registerRules(Metric<D> m) {
+		List<AggregationRule<D>> aggregationRules = Registry.INSTANCE.getMetricHandler(m).getAggregationRules();
+		for (AggregationRule<D> r : aggregationRules) {
+			rules.addAggregationRule(r);
+		}
+		List<DerivationRule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
+		for (DerivationRule<D> r : derivationRules) {
+			rules.addDerivationRule(r);
+		}
+	}
+	
 	private void registerDefaultHandlers() {
 		if (log.isDebugEnabled()) {
 			log.debug("Register default handlers for metrics");
 		}
-		
-		for (Metric<?> metric : Registry.INSTANCE.getMetrics()) {
+		for (AggregationRule<?> rule : rules.getDefaultDerivationRules()) {
 			for (Resource resource : workload.getResources()) {
-				Registry.INSTANCE.getMetricHandler(metric).registerDefaultHandlers(this, resource);
+				if (rule.applies(resource)) {
+					addAggregation(rule, resource);
+				}
 			}
 			for (Service service : workload.getServices()) {
-				Registry.INSTANCE.getMetricHandler(metric).registerDefaultHandlers(this, service);
+				if (rule.applies(service)) {
+					addAggregation(rule, service);
+				}
 			}
 		}
 	}
