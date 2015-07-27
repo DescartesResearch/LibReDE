@@ -34,25 +34,19 @@ import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
-import org.eclipse.ui.forms.IManagedForm;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.InputSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
@@ -62,16 +56,10 @@ import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.FileTraceDetailsPage;
 import tools.descartes.librede.configuration.impl.FileTraceConfigurationImpl;
 import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.model.util.PrettyPrinter;
-import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetricAdapter;
-import tools.descartes.librede.repository.StandardMetricHelpers;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
-import tools.descartes.librede.units.UnitsPackage;
 
 public class TracesMasterBlock extends AbstractMasterBlockWithButtons {
 
