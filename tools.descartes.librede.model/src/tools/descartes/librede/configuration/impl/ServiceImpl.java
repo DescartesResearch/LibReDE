@@ -38,8 +38,10 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
@@ -56,6 +58,7 @@ import tools.descartes.librede.configuration.Task;
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#isBackgroundService <em>Background Service</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getTasks <em>Tasks</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getAccessedResources <em>Accessed Resources</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getCallees <em>Callees</em>}</li>
  * </ul>
  *
  * @generated
@@ -89,6 +92,16 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @ordered
 	 */
 	protected EList<Task> tasks;
+
+	/**
+	 * The cached value of the '{@link #getCallees() <em>Callees</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCallees()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<ExternalCall> callees;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -162,11 +175,40 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<ExternalCall> getCallees() {
+		if (callees == null) {
+			callees = new EObjectWithInverseResolvingEList<ExternalCall>(ExternalCall.class, this, ConfigurationPackage.SERVICE__CALLEES, ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE);
+		}
+		return callees;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.SERVICE__CALLEES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getCallees()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__TASKS:
 				return ((InternalEList<?>)getTasks()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.SERVICE__CALLEES:
+				return ((InternalEList<?>)getCallees()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -185,6 +227,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return getTasks();
 			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
 				return getAccessedResources();
+			case ConfigurationPackage.SERVICE__CALLEES:
+				return getCallees();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -205,6 +249,10 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				getTasks().clear();
 				getTasks().addAll((Collection<? extends Task>)newValue);
 				return;
+			case ConfigurationPackage.SERVICE__CALLEES:
+				getCallees().clear();
+				getCallees().addAll((Collection<? extends ExternalCall>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -222,6 +270,9 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return;
 			case ConfigurationPackage.SERVICE__TASKS:
 				getTasks().clear();
+				return;
+			case ConfigurationPackage.SERVICE__CALLEES:
+				getCallees().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -241,6 +292,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return tasks != null && !tasks.isEmpty();
 			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
 				return !getAccessedResources().isEmpty();
+			case ConfigurationPackage.SERVICE__CALLEES:
+				return callees != null && !callees.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

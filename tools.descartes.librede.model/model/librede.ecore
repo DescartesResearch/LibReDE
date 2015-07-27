@@ -59,6 +59,8 @@
         eType="#//Task" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="accessedResources" upperBound="-1"
         eType="#//Resource" changeable="false" volatile="true" transient="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="callees" upperBound="-1"
+        eType="#//ExternalCall" eOpposite="#//ExternalCall/calledService"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="SchedulingStrategy">
     <eLiterals name="FCFS"/>
@@ -176,7 +178,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ExternalCall" eSuperTypes="#//Task">
     <eStructuralFeatures xsi:type="ecore:EReference" name="calledService" lowerBound="1"
-        eType="#//Service"/>
+        eType="#//Service" eOpposite="#//Service/callees"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CompositeService" eSuperTypes="#//Service">
     <eStructuralFeatures xsi:type="ecore:EReference" name="subServices" upperBound="-1"

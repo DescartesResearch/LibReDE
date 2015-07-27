@@ -659,13 +659,22 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE__ACCESSED_RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Callees</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__CALLEES = MODEL_ENTITY_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Service</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 3;
+	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of operations of the '<em>Service</em>' class.
@@ -1440,6 +1449,15 @@ public interface ConfigurationPackage extends EPackage {
 	int COMPOSITE_SERVICE__ACCESSED_RESOURCES = SERVICE__ACCESSED_RESOURCES;
 
 	/**
+	 * The feature id for the '<em><b>Callees</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__CALLEES = SERVICE__CALLEES;
+
+	/**
 	 * The feature id for the '<em><b>Sub Services</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1798,6 +1816,17 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getService_AccessedResources();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getCallees <em>Callees</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Callees</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getCallees()
+	 * @see #getService()
+	 * @generated
+	 */
+	EReference getService_Callees();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
@@ -2643,6 +2672,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference SERVICE__ACCESSED_RESOURCES = eINSTANCE.getService_AccessedResources();
+
+		/**
+		 * The meta object literal for the '<em><b>Callees</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SERVICE__CALLEES = eINSTANCE.getService_Callees();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.

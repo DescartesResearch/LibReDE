@@ -42,6 +42,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Service#getTasks <em>Tasks</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Service#getAccessedResources <em>Accessed Resources</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getCallees <em>Callees</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getService()
@@ -108,5 +109,23 @@ public interface Service extends ModelEntity {
 	 * @generated
 	 */
 	EList<Resource> getAccessedResources();
+
+	/**
+	 * Returns the value of the '<em><b>Callees</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.ExternalCall}.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.ExternalCall#getCalledService <em>Called Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Callees</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Callees</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_Callees()
+	 * @see tools.descartes.librede.configuration.ExternalCall#getCalledService
+	 * @model opposite="calledService"
+	 * @generated
+	 */
+	EList<ExternalCall> getCallees();
 
 } // Service

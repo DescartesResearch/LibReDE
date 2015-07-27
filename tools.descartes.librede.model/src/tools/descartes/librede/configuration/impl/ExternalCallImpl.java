@@ -30,6 +30,7 @@ package tools.descartes.librede.configuration.impl;
 
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
@@ -113,11 +114,63 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setCalledService(Service newCalledService) {
+	public NotificationChain basicSetCalledService(Service newCalledService, NotificationChain msgs) {
 		Service oldCalledService = calledService;
 		calledService = newCalledService;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE, oldCalledService, calledService));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE, oldCalledService, newCalledService);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setCalledService(Service newCalledService) {
+		if (newCalledService != calledService) {
+			NotificationChain msgs = null;
+			if (calledService != null)
+				msgs = ((InternalEObject)calledService).eInverseRemove(this, ConfigurationPackage.SERVICE__CALLEES, Service.class, msgs);
+			if (newCalledService != null)
+				msgs = ((InternalEObject)newCalledService).eInverseAdd(this, ConfigurationPackage.SERVICE__CALLEES, Service.class, msgs);
+			msgs = basicSetCalledService(newCalledService, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE, newCalledService, newCalledService));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
+				if (calledService != null)
+					msgs = ((InternalEObject)calledService).eInverseRemove(this, ConfigurationPackage.SERVICE__CALLEES, Service.class, msgs);
+				return basicSetCalledService((Service)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
+				return basicSetCalledService(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
