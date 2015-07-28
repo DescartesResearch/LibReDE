@@ -40,8 +40,10 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
+import tools.descartes.librede.repository.rules.AbstractRule;
 import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.RuleDependency;
 import tools.descartes.librede.repository.rules.RulesConfig;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
@@ -249,16 +251,37 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 		for (AggregationRule<?> r : rules.getAggregationRules(metric, aggregation)) {
-			DataEntry<?> entry = getEntry(r.getMetric(), entity, r.getAggregation());
-			if ((entry == null) || (entry.aggregationRule == null)) {
-				addAggregation(r, entity);
+			List<ModelEntity> entities = r.getNotificationSet(entity);
+			for (ModelEntity e : entities) {
+				if (r.applies(e)) {
+					if (checkDependencies(r, e)) {
+						addAggregation(r, e);
+					}
+				}
 			}
 		}
 		for (DerivationRule<?> r : rules.getDerivationRules(metric, aggregation)) {
-			if (!exists(r.getMetric(), entity, r.getAggregation())) {
-				addDerivation(r, entity);
+			List<ModelEntity> entities = r.getNotificationSet(entity);
+			for (ModelEntity e : entities) {
+				if (r.applies(e)) {
+					if (checkDependencies(r, e)) {
+						addDerivation(r, e);
+					}
+				}
 			}
 		}
+	}
+	
+	private boolean checkDependencies(AbstractRule<?> rule, ModelEntity entity) {
+		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
+		for (ModelEntity e : scopeEntities) {
+			for (RuleDependency<?> dep : rule.getDependencies()) {
+				if (!exists(dep.getMetric(), e, dep.getAggregation())) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	private <D extends Dimension> void addAggregation(AggregationRule<D> t, ModelEntity entity) {
