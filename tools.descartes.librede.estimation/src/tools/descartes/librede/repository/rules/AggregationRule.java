@@ -62,6 +62,11 @@ public class AggregationRule<D extends Dimension> extends AbstractRule<D> {
 		return this;
 	}
 	
+	public AggregationRule<D> scope(RuleScope scope) {
+		setScope(scope);
+		return this;
+	}
+	
 	public AggregationRule<D> build() {
 		checkCompleteness();
 		this.handler = new DefaultAggregationHandler<>(getMetric(), sourceAggregation);

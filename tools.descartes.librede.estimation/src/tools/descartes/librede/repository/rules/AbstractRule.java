@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede.repository.rules;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,11 +36,26 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 
 public abstract class AbstractRule<D extends Dimension> {
+	
+	private static class DefaultScope implements RuleScope {
+
+		@Override
+		public List<ModelEntity> getScopeSet(ModelEntity base) {
+			return Collections.singletonList(base);
+		}
+
+		@Override
+		public List<ModelEntity> getNotificationSet(ModelEntity changed) {
+			return Collections.singletonList(changed);
+		}
+		
+	}
 
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
 	private final List<RuleDependency<?>> dependencies = new LinkedList<>();
 	private final List<RulePrecondition> preconditions = new LinkedList<>();
+	private RuleScope resolver = new DefaultScope();
 	private int priority;
 	
 	protected AbstractRule(Metric<D> metric, Aggregation aggregation) {
@@ -73,6 +89,18 @@ public abstract class AbstractRule<D extends Dimension> {
 	
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+	
+	public void setScope(RuleScope resolver) {
+		this.resolver = resolver;
+	}
+	
+	public List<ModelEntity> getScopeSet(ModelEntity base) {
+		return resolver.getScopeSet(base);
+	}
+	
+	public List<ModelEntity> getNotificationSet(ModelEntity changed) {
+		return resolver.getNotificationSet(changed);
 	}
 	
 	public boolean applies(ModelEntity entity) {

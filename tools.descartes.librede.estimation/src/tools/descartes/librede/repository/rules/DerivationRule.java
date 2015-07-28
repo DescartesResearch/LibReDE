@@ -59,6 +59,11 @@ public class DerivationRule<D extends Dimension> extends AbstractRule<D> {
 		return this;
 	}
 	
+	public DerivationRule<D> scope(RuleScope resolver) {
+		setScope(resolver);
+		return this;
+	}
+	
 	public DerivationRule<D> priority(int priority) {
 		setPriority(priority);
 		return this;
