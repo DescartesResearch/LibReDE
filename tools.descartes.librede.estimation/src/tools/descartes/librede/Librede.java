@@ -95,9 +95,11 @@ import tools.descartes.librede.repository.adapters.BusyTimeAdapter;
 import tools.descartes.librede.repository.adapters.DeparturesAdapter;
 import tools.descartes.librede.repository.adapters.IdleTimeAdapter;
 import tools.descartes.librede.repository.adapters.QueueLengthSeenOnArrivalAdapter;
+import tools.descartes.librede.repository.adapters.ResidenceTimeAdapter;
 import tools.descartes.librede.repository.adapters.ResponseTimeAdapter;
 import tools.descartes.librede.repository.adapters.ThroughputAdapter;
 import tools.descartes.librede.repository.adapters.UtilizationAdapter;
+import tools.descartes.librede.repository.adapters.VisitsAdapter;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
@@ -126,9 +128,11 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, new BusyTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, new DeparturesAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, new IdleTimeAdapter());
+		Registry.INSTANCE.registerMetric(StandardMetrics.RESIDENCE_TIME, new ResidenceTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.RESPONSE_TIME, new ResponseTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.THROUGHPUT, new ThroughputAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, new QueueLengthSeenOnArrivalAdapter());
+		Registry.INSTANCE.registerMetric(StandardMetrics.VISITS, new VisitsAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION, new UtilizationAdapter());
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);

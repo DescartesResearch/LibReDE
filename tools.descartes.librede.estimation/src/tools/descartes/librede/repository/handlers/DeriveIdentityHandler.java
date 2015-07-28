@@ -37,15 +37,18 @@ import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
 public class DeriveIdentityHandler<D extends Dimension> extends BaseDerivationHandler<D> {
+	
+	private Metric<D> from;
 
 	public DeriveIdentityHandler(Metric<D> delegatedMetric, Aggregation delegatedAggregation) {
 		super(delegatedMetric, delegatedAggregation);
+		this.from = delegatedMetric;
 	}
 
 	@Override
 	public TimeSeries derive(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {		
-		return repository.select(metric, unit, entity, aggregation, start, end);
+		return repository.select(from, unit, entity, aggregation, start, end);
 	}
 
 }

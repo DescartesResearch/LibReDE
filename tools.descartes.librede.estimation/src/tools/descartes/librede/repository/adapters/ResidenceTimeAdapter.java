@@ -161,27 +161,27 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.NONE)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)
 					.check(new NoExternalCallPrecondition())
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESIDENCE_TIME, Aggregation.NONE)),
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
 					.check(new NoExternalCallPrecondition())
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)),
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
 					.check(new NoExternalCallPrecondition())
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)),
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MINIMUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
 					.check(new NoExternalCallPrecondition())
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESIDENCE_TIME, Aggregation.MINIMUM)),
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MAXIMUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
 					.check(new NoExternalCallPrecondition())
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESIDENCE_TIME, Aggregation.MAXIMUM)),
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.MAXIMUM)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)
 					.check(new NoExternalCallPrecondition())
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)),
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)),
 				// Add derivation rule for cumulative sum
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
