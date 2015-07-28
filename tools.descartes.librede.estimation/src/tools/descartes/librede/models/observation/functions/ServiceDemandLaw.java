@@ -79,7 +79,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	private Service cls_r;
 	
 	private Query<Scalar, Ratio> utilizationQuery;
-	private Query<Vector, Time> avgResponseTimeQuery;
+	private Query<Vector, Time> avgResidenceTimeQuery;
 	private Query<Vector, RequestRate> avgThroughputQuery;
 	private Query<Scalar, RequestRate> avgThroughputQueryCurrentService;
 	
@@ -123,7 +123,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		 * the amount of background work relative to the user services.
 		 */
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-		avgResponseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
+		avgResidenceTimeQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
 	}
@@ -135,7 +135,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	public boolean isApplicable(List<String> messages) {
 		boolean result = true;
 		result = result && checkQueryPrecondition(utilizationQuery, messages);
-		result = result && checkQueryPrecondition(avgResponseTimeQuery, messages);
+		result = result && checkQueryPrecondition(avgResidenceTimeQuery, messages);
 		result = result && checkQueryPrecondition(avgThroughputQuery, messages);
 		return result;
 	}
@@ -149,9 +149,9 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		 * We only get the aggregate utilization of a resource. In order to apportion this utilization between
 		 * services, we assume R ~ D.
 		 */
-		Vector R = avgResponseTimeQuery.get(historicInterval);
+		Vector R = avgResidenceTimeQuery.get(historicInterval);
 		Vector X = avgThroughputQuery.get(historicInterval);
-		double R_r = R.get(avgResponseTimeQuery.indexOf(cls_r));
+		double R_r = R.get(avgResidenceTimeQuery.indexOf(cls_r));
 		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
 		double U_i = utilizationQuery.get(historicInterval).getValue();
 		int p = res_i.getNumberOfServers();
@@ -174,7 +174,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	
 	@Override
 	public boolean hasData() {
-		return avgResponseTimeQuery.hasData(historicInterval) && avgThroughputQuery.hasData(historicInterval);
+		return avgResidenceTimeQuery.hasData(historicInterval) && avgThroughputQuery.hasData(historicInterval);
 	}
 	
 

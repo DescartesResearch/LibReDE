@@ -50,7 +50,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	
 	private final Service cls_r;
 	
-	private final Query<Scalar, Time> individualResponseTimesQuery;
+	private final Query<Scalar, Time> individualResidenceTimesQuery;
 	
 	/**
 	 * Creates a new instance.
@@ -88,13 +88,13 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		
 		switch(aggregation) {
 		case AVERAGE:
-			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(cls_r).average().using(repository);
+			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).average().using(repository);
 			break;
 		case MAXIMUM:
-			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(cls_r).max().using(repository);
+			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).max().using(repository);
 			break;
 		case MINIMUM:
-			individualResponseTimesQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(cls_r).min().using(repository);
+			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).min().using(repository);
 			break;
 		default:
 			throw new IllegalArgumentException();
@@ -107,7 +107,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	@Override
 	public boolean isApplicable(List<String> messages) {
 		boolean result = true;
-		result = result && checkQueryPrecondition(individualResponseTimesQuery, messages);
+		result = result && checkQueryPrecondition(individualResidenceTimesQuery, messages);
 		return result;
 	}
 
@@ -116,7 +116,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getFactor() {
-		double rt = individualResponseTimesQuery.get(historicInterval).getValue();
+		double rt = individualResidenceTimesQuery.get(historicInterval).getValue();
 		if (rt != rt) {
 			// We did not observe a request in this interval
 			// --> R = 0.0 * D 
@@ -131,7 +131,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		double rt = individualResponseTimesQuery.get(historicInterval).getValue();
+		double rt = individualResidenceTimesQuery.get(historicInterval).getValue();
 		// We did not observe a request in this interval
 		// therefore, we approximate the demand with zero
 		return (rt != rt) ? 0.0 : rt;
@@ -139,7 +139,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	
 	@Override
 	public boolean hasData() {
-		return individualResponseTimesQuery.hasData(historicInterval);
+		return individualResidenceTimesQuery.hasData(historicInterval);
 	}
 
 }
