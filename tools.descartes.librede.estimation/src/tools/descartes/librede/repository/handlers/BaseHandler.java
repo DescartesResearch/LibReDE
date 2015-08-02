@@ -58,41 +58,6 @@ public abstract class BaseHandler<D extends Dimension> {
 		this.length = delegatedMetrics.size();
 	}
 	
-	public Quantity<Time> getAggregationInterval(MemoryObservationRepository repository, Metric<D> metric,
-			ModelEntity entity, Aggregation aggregation) {
-		Quantity<Time> ret = repository.getAggregationInterval(delegatedMetrics.get(0), entity, delegatedAggregations.get(0));
-		for (int i = 1; i < length; i++) {
-			ret = max(ret, repository.getAggregationInterval(delegatedMetrics.get(i), entity, delegatedAggregations.get(i)));
-		}
-		return ret;
-	}
-
-	public Quantity<Time> getStartTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity,
-			Aggregation aggregation) {
-		Quantity<Time> ret = repository.getMonitoringStartTime(delegatedMetrics.get(0), entity, delegatedAggregations.get(0));
-		for (int i = 1; i < length; i++) {
-			ret = max(ret, repository.getMonitoringStartTime(delegatedMetrics.get(i), entity, delegatedAggregations.get(i)));
-		}
-		return ret;
-	}
-
-	public Quantity<Time> getEndTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity,
-			Aggregation aggregation) {
-		Quantity<Time> ret = repository.getMonitoringEndTime(delegatedMetrics.get(0), entity, delegatedAggregations.get(0));
-		for (int i = 1; i < length; i++) {
-			ret = min(ret, repository.getMonitoringEndTime(delegatedMetrics.get(i), entity, delegatedAggregations.get(i)));
-		}
-		return ret;
-	}
-	
-	private Quantity<Time> min(Quantity<Time> t1, Quantity<Time> t2) {
-		return (t1.getValue(Time.SECONDS) < t2.getValue(Time.SECONDS)) ? t1 : t2;
-	}
-	
-	private Quantity<Time> max(Quantity<Time> t1, Quantity<Time> t2) {
-		return (t1.getValue(Time.SECONDS) > t2.getValue(Time.SECONDS)) ? t1 : t2;
-	}
-	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

@@ -38,10 +38,4 @@ public interface IMetricAggregationHandler<D extends Dimension> {
 	
 	double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 
-	Quantity<Time> getAggregationInterval(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation);
-	
-	Quantity<Time> getStartTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation);
-	
-	Quantity<Time> getEndTime(MemoryObservationRepository repository, Metric<D> metric, ModelEntity entity, Aggregation aggregation);
-	
 }

@@ -58,21 +58,4 @@ public class DeriveConstantRate implements IMetricAggregationHandler<RequestRate
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}
 
-	@Override
-	public Quantity<Time> getAggregationInterval(MemoryObservationRepository repository, Metric<RequestRate> metric,
-			ModelEntity entity, Aggregation aggregation) {
-		return ZERO_SECONDS;
-	}
-
-	@Override
-	public Quantity<Time> getStartTime(MemoryObservationRepository repository, Metric<RequestRate> metric,
-			ModelEntity entity, Aggregation aggregation) {
-		return ZERO_SECONDS;
-	}
-
-	@Override
-	public Quantity<Time> getEndTime(MemoryObservationRepository repository, Metric<RequestRate> metric,
-			ModelEntity entity, Aggregation aggregation) {
-		return repository.getCurrentTime();
-	}
 }
