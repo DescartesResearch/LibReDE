@@ -49,6 +49,7 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
 import tools.descartes.librede.units.Time;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
@@ -166,6 +167,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 		}
 
 		try {
+			Set<IEstimationAlgorithm> inactiveAlgorithms = new HashSet<IEstimationAlgorithm>();
 			ResultTable.Builder builder = ResultTable.builder(
 					this.getClass(), workload);
 
@@ -173,11 +175,23 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 				while (cursor.next()) {					
 					builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
 					
-					for (IEstimationAlgorithm a : algorithms) {
-						a.update();
-						Vector curEstimates = a.estimate();
-						for (int i = 0; i < curEstimates.rows(); i++) {
-							builder.set(a.getStateModel().getResource(i), a.getStateModel().getService(i), curEstimates.get(i));
+					for (int i = 0; i < algorithms.size(); i++) {
+						IEstimationAlgorithm a = algorithms.get(i);
+						try {
+							a.update();
+							Vector curEstimates = a.estimate();
+							for (int j = 0; j < curEstimates.rows(); j++) {
+								builder.set(a.getStateModel().getResource(j), a.getStateModel().getService(j), curEstimates.get(j));
+							}
+							if (inactiveAlgorithms.remove(a)) {
+								log.info("Estimation algorithm [" + i + "]: Reactived (new data available).");
+							}
+						} catch(OutOfMonitoredRangeException ex) {
+							if (!inactiveAlgorithms.contains(a)) {
+								log.warn("Estimation algorithm [" + i + "]: " + ex.getMessage());
+								log.warn("Estimation algorithm [" + i + "]: Disabled due to missing data.", ex);
+								inactiveAlgorithms.add(a);
+							}
 						}
 					}
 					
@@ -185,8 +199,20 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 				}
 			} else {
 				while(cursor.next()) {
-					for (IEstimationAlgorithm a : algorithms) {
-						a.update();
+					for (int i = 0; i < algorithms.size(); i++) {
+						IEstimationAlgorithm a = algorithms.get(i);
+						try {
+							a.update();
+							if (inactiveAlgorithms.remove(a)) {
+								log.info("Estimation algorithm [" + i + "]: Reactived (new data available).");
+							}
+						} catch(OutOfMonitoredRangeException ex) {
+							if (!inactiveAlgorithms.contains(a)) {
+								log.warn("Estimation algorithm [" + i + "]: " + ex.getMessage());
+								log.warn("Estimation algorithm [" + i + "]: Disabled due to missing data.", ex);
+								inactiveAlgorithms.add(a);
+							}
+						}
 					}
 				}
 				

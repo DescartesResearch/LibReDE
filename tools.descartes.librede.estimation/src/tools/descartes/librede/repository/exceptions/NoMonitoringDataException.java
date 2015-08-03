@@ -40,7 +40,7 @@ public class NoMonitoringDataException extends MonitoringRepositoryException {
 	
 	@Override
 	public String getMessage() {
-		return super.getMessage() + printDebugInformation();
+		return super.getMessage() + " " + printDebugInformation();
 	}
 	
 	private String printDebugInformation() {
