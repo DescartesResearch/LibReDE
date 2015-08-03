@@ -41,10 +41,6 @@ import tools.descartes.librede.units.Unit;
 
 public class DeriveResidenceTimeFromExternalCalls extends BaseDerivationHandler<Time> {
 
-	public DeriveResidenceTimeFromExternalCalls() {
-		super(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE);
-	}
-
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<Time> metric, Unit<Time> unit, ModelEntity entity,
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {		

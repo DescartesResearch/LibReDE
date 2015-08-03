@@ -50,7 +50,7 @@ public class UtilizationAdapter implements IMetricAdapter<Ratio> {
 		return Arrays.asList(
 				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)),
+					.build(new DefaultAggregationHandler<Ratio>(Aggregation.AVERAGE)),
 				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
 					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)

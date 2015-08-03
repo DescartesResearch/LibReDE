@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.repository.handlers;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -45,10 +43,6 @@ import tools.descartes.librede.units.Unit;
 public class DeriveResponeTimeHandler extends BaseDerivationHandler<Time> {
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
-
-	public DeriveResponeTimeHandler() {
-		super(Arrays.asList(StandardMetrics.ARRIVALS, StandardMetrics.DEPARTURES), Arrays.asList(Aggregation.NONE, Aggregation.NONE));
-	}
 
 	@Override
 	public TimeSeries derive(IMonitoringRepository repository, Metric<Time> metric, Unit<Time> unit,

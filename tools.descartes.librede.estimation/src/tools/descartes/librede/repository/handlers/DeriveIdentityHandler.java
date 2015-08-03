@@ -40,8 +40,7 @@ public class DeriveIdentityHandler<D extends Dimension> extends BaseDerivationHa
 	
 	private Metric<D> from;
 
-	public DeriveIdentityHandler(Metric<D> delegatedMetric, Aggregation delegatedAggregation) {
-		super(delegatedMetric, delegatedAggregation);
+	public DeriveIdentityHandler(Metric<D> delegatedMetric) {
 		this.from = delegatedMetric;
 	}
 	

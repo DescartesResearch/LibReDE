@@ -52,23 +52,23 @@ public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.requiring(Aggregation.NONE)
 					.priority(0)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
 					.priority(10)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.SUM)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.SUM)),
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.MINIMUM)
 					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.MAXIMUM)
 					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
-					.build(new DeriveDiffHandler<RequestCount>(StandardMetrics.ARRIVALS)),
+					.build(new DeriveDiffHandler<RequestCount>()),
 				DerivationRule.derive(StandardMetrics.ARRIVALS)
 					.requiring(StandardMetrics.RESPONSE_TIME)
 					.build(new DeriveArrivalsHandler())

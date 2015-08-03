@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.repository.handlers;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
@@ -39,16 +37,7 @@ import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public abstract class BaseDerivationHandler<D extends Dimension> extends BaseHandler<D> implements IMetricDerivationHandler<D> {
-
-	public BaseDerivationHandler(Metric<?> delegatedMetric, Aggregation delegatedAggregation) {
-		super(delegatedMetric, delegatedAggregation);
-	}
-
-	public BaseDerivationHandler(List<? extends Metric<?>> delegatedMetrics, List<? extends Aggregation> delegatedAggregations) {
-		super(delegatedMetrics, delegatedAggregations);
-	}
-	
+public abstract class BaseDerivationHandler<D extends Dimension> implements IMetricDerivationHandler<D> {
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {

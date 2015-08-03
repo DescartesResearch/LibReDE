@@ -31,20 +31,15 @@ import org.apache.log4j.Logger;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.repository.IMetricDerivationHandler;
 import tools.descartes.librede.repository.IMonitoringRepository;
-import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
-import tools.descartes.librede.units.UnitsFactory;
 
-public class DeriveConstantRate implements IMetricDerivationHandler<RequestRate> {
+public class DeriveConstantRate extends BaseDerivationHandler<RequestRate> {
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
-	
-	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 	
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit,
@@ -57,11 +52,4 @@ public class DeriveConstantRate implements IMetricDerivationHandler<RequestRate>
 		}
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}
-
-	@Override
-	public TimeSeries derive(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit,
-			ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
-		throw new UnsupportedOperationException();
-	}
-
 }

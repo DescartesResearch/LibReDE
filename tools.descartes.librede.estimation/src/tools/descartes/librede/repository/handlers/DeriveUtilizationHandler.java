@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.repository.handlers;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -44,10 +42,6 @@ public class DeriveUtilizationHandler extends BaseDerivationHandler<Ratio> {
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
-	public DeriveUtilizationHandler() {
-		super(Arrays.asList(StandardMetrics.BUSY_TIME, StandardMetrics.IDLE_TIME), Arrays.asList(Aggregation.SUM, Aggregation.SUM));
-	}
-
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<Ratio> metric,
 			Unit<Ratio> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,

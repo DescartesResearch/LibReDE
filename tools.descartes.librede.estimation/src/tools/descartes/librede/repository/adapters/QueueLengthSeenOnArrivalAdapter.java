@@ -51,18 +51,18 @@ public class QueueLengthSeenOnArrivalAdapter implements IMetricAdapter<RequestCo
 				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
 					.requiring(Aggregation.NONE)
 					.priority(10)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MINIMUM)
 					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MAXIMUM)
 					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
-					.build(new ThroughputWeightedAggregationHandler<RequestCount>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL))
+					.build(new ThroughputWeightedAggregationHandler<RequestCount>())
 				);
 	}
 

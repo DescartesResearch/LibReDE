@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.repository.handlers;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -44,10 +42,6 @@ public class AverageResponseTimeAggregationHandler extends BaseDerivationHandler
 
 	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	
-	public AverageResponseTimeAggregationHandler() {
-		super(Arrays.asList(StandardMetrics.RESPONSE_TIME, StandardMetrics.DEPARTURES), Arrays.asList(Aggregation.SUM, Aggregation.AVERAGE));
-	}
-
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<Time> metric, Unit<Time> unit,
 			ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {

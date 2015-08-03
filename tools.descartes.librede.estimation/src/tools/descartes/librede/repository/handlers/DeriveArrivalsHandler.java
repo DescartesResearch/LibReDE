@@ -46,10 +46,6 @@ public class DeriveArrivalsHandler extends BaseDerivationHandler<RequestCount> {
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 
-	public DeriveArrivalsHandler() {
-		super(StandardMetrics.RESPONSE_TIME, Aggregation.NONE);
-	}
-
 	@Override
 	public TimeSeries derive(IMonitoringRepository repository, Metric<RequestCount> metric,
 			Unit<RequestCount> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,

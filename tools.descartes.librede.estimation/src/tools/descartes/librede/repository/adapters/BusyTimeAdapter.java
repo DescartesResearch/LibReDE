@@ -50,10 +50,10 @@ public class BusyTimeAdapter implements IMetricAdapter<Time> {
 		return Arrays.asList(
 				DerivationRule.derive(StandardMetrics.BUSY_TIME, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.BUSY_TIME, Aggregation.SUM)),
+					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM)),
 				DerivationRule.derive(StandardMetrics.BUSY_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
-					.build(new DeriveDiffHandler<Time>(StandardMetrics.BUSY_TIME))
+					.build(new DeriveDiffHandler<Time>())
 				);
 	}
 }

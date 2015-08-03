@@ -50,10 +50,10 @@ public class IdleTimeAdapter implements IMetricAdapter<Time> {
 		return Arrays.asList(
 				DerivationRule.derive(StandardMetrics.IDLE_TIME, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.IDLE_TIME, Aggregation.SUM)),
+					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM)),
 				DerivationRule.derive(StandardMetrics.IDLE_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
-					.build(new DeriveDiffHandler<Time>(StandardMetrics.IDLE_TIME))
+					.build(new DeriveDiffHandler<Time>())
 				);
 	}
 

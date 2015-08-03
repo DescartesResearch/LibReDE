@@ -41,10 +41,6 @@ import tools.descartes.librede.units.Unit;
 public class DeriveDiffHandler<D extends Dimension> extends BaseDerivationHandler<D> {
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
-	
-	public DeriveDiffHandler(Metric<D> delegatedMetric) {
-		super(delegatedMetric, Aggregation.CUMULATIVE_SUM);
-	}
 
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<D> metric,

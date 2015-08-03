@@ -55,7 +55,7 @@ public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
 				DerivationRule.derive(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(10)
-					.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE)),
+					.build(new TimeWeightedAggregationHandler<RequestRate>()),
 				DerivationRule.derive(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {				
 						@Override

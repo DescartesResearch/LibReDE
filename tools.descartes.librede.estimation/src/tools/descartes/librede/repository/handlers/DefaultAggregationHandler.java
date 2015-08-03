@@ -45,8 +45,7 @@ public class DefaultAggregationHandler<D extends Dimension> extends BaseDerivati
 	// the aggregation level from which we calculate the sum
 	private final Aggregation baseAggregation;
 
-	public DefaultAggregationHandler(Metric<D> metric, Aggregation baseAggregation) {
-		super(metric, baseAggregation);
+	public DefaultAggregationHandler(Aggregation baseAggregation) {
 		this.baseAggregation = baseAggregation;
 	}
 	

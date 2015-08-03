@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.repository.handlers;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -46,10 +44,6 @@ public class ThroughputWeightedAggregationHandler<D extends Dimension> extends B
 
 	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	
-	public ThroughputWeightedAggregationHandler(Metric<?> delegatedMetric) {
-		super(Arrays.asList(delegatedMetric, StandardMetrics.THROUGHPUT), Arrays.asList(Aggregation.AVERAGE, Aggregation.AVERAGE));
-	}
-
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {

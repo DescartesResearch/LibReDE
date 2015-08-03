@@ -28,7 +28,6 @@ package tools.descartes.librede.repository.handlers;
 
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -40,10 +39,6 @@ import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
 public class DeriveVisitCountHandler extends BaseDerivationHandler<RequestCount> {
-
-	public DeriveVisitCountHandler() {
-		super(StandardMetrics.VISITS, Aggregation.AVERAGE);
-	}
 
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<RequestCount> metric, Unit<RequestCount> unit,

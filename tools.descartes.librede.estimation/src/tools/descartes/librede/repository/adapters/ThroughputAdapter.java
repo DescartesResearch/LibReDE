@@ -55,7 +55,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(10)
-					.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.THROUGHPUT)),
+					.build(new TimeWeightedAggregationHandler<RequestRate>()),
 				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {				
 						@Override

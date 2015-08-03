@@ -45,7 +45,6 @@ public class RequestRateAggregationHandler extends BaseDerivationHandler<Request
 	private Metric<RequestCount> countMetric;
 	
 	public RequestRateAggregationHandler(Metric<RequestCount> countMetric) {
-		super(countMetric, Aggregation.SUM);
 		this.countMetric = countMetric;
 	}
 

@@ -60,11 +60,11 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(Aggregation.NONE)
 					.priority(10)
-					.build(new DefaultAggregationHandler<>(StandardMetrics.VISITS, Aggregation.NONE)),
+					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(20)
-					.build(new TimeWeightedAggregationHandler<RequestCount>(StandardMetrics.VISITS)),
+					.build(new TimeWeightedAggregationHandler<RequestCount>()),
 				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
