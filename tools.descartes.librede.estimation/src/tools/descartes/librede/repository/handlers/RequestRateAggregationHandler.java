@@ -40,7 +40,7 @@ import tools.descartes.librede.units.Unit;
 
 public class RequestRateAggregationHandler extends BaseDerivationHandler<RequestRate> {
 	
-	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
 	private Metric<RequestCount> countMetric;
 	

@@ -40,7 +40,7 @@ import tools.descartes.librede.units.Unit;
 
 public class AverageResponseTimeAggregationHandler extends BaseDerivationHandler<Time> {
 
-	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<Time> metric, Unit<Time> unit,

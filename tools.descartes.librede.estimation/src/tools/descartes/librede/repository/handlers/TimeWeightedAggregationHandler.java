@@ -40,7 +40,7 @@ import tools.descartes.librede.units.Unit;
 
 public class TimeWeightedAggregationHandler<D extends Dimension> extends BaseDerivationHandler<D> {
 
-	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
+	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit,

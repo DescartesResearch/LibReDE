@@ -32,6 +32,4 @@ public class Loggers {
 	
 	public static final Logger DERIVATION_HANDLER_LOG = Logger.getLogger("tools.descartes.librede.repository.handlers.derivation");
 	
-	public static final Logger AGGREGATION_HANDLER_LOG = Logger.getLogger("tools.descartes.librede.repository.handlers.aggregation");
-
 }
