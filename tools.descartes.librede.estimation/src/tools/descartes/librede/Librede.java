@@ -222,10 +222,11 @@ public class Librede {
 				Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
 				
 
-				TimeSeries ts = repo.select(metric, unit, key.getEntity(), key.getAggregation());
-				if (ts == null) {
+				TimeSeries ts;
+				if (!repo.exists(metric, key.getEntity(), key.getAggregation())) {
 					ts = curEvent.getData();
 				} else {
+					ts = repo.select(metric, unit, key.getEntity(), key.getAggregation());
 					ts = ts.append(curEvent.getData());
 				}
 				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
