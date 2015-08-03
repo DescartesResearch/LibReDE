@@ -45,7 +45,6 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.rules.AbstractRule;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RuleDependency;
 import tools.descartes.librede.repository.rules.RulesConfig;
@@ -64,6 +63,10 @@ import tools.descartes.librede.units.UnitsFactory;
 public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
+	
+	private static final Quantity<Time> MAX_SECONDS = UnitsFactory.eINSTANCE.createQuantity(Double.MAX_VALUE, Time.SECONDS);
+	
+	private static final Quantity<Time> MIN_SECONDS = UnitsFactory.eINSTANCE.createQuantity(Double.MIN_VALUE, Time.SECONDS);
 	
 	private static final Quantity<Time> NaN = UnitsFactory.eINSTANCE.createQuantity(Double.NaN, Time.SECONDS);	
 	
@@ -118,12 +121,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private class DataEntry<D extends Dimension> {
 
-		private AggregationRule<D> aggregationRule = null;
 		private DerivationRule<D> derivationRule = null;
 		private TimeSeries data = null;
 		private Set<DataEntry<?>> dependentEntries = new HashSet<>();
-		private List<DataEntry<?>> requiredEntriesOfDerivation = Collections.emptyList();
-		private List<DataEntry<?>> requiredEntriesOfAggregation = Collections.emptyList();
+		private List<DataEntry<?>> requiredEntries = Collections.emptyList();
 		private Quantity<Time> aggregationInterval;
 		private Quantity<Time> startTime;
 		private Quantity<Time> endTime;
@@ -148,23 +149,26 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			return endTime;
 		}
 		
-		public void setAggregationRule(AggregationRule<D> rule, List<DataEntry<?>> requiredEntries) {
-			if (aggregationRule == null || aggregationRule.getPriority() < rule.getPriority()) {
-				this.aggregationRule = rule;
-				updateRequiredEntries(requiredEntries, requiredEntriesOfDerivation);
-				update();
-			}
-		}
-		
 		public void setDerivationRule(DerivationRule<D> rule, List<DataEntry<?>> requiredEntries) {
+			if ((rule.getAggregation() == Aggregation.NONE) && (data != null)) {
+				// Prevent the registration of a derivation rules for Aggregation.NONE
+				// if this entry already contains null. This rule would be redundant and
+				//can cause loops in the dependency graph.
+				return;
+			}
 			if (derivationRule == null || derivationRule.getPriority() < rule.getPriority()) {
 				this.derivationRule = rule;
-				updateRequiredEntries(requiredEntriesOfAggregation, requiredEntries);
+				updateRequiredEntries(requiredEntries);
 				update();
 			}
 		}
 		
 		public void setTimeSeries(TimeSeries data, Quantity<Time> aggregationInterval) {
+			if ((derivationRule != null) && (derivationRule.getAggregation() == Aggregation.NONE)) {
+				// Special case for Aggregation.NONE --> No derivation rule may be set if 
+				// time series data is set.
+				this.derivationRule = null;
+			}
 			this.data = data;
 			this.aggregationInterval = aggregationInterval;
 			this.startTime = UnitsFactory.eINSTANCE.createQuantity(data.getStartTime(), Time.SECONDS);
@@ -189,52 +193,38 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			notifyDependentEntries();
 		}
 		
-		private void updateRequiredEntries(List<DataEntry<?>> newReqEntriesAggregation, List<DataEntry<?>> newReqEntriesDerivation) {
-			for (DataEntry<?> e : requiredEntriesOfAggregation) {
-				e.removeDependency(this);
-			}
-			for (DataEntry<?> e : requiredEntriesOfDerivation) {
-				e.removeDependency(this);
-			}
-			for (DataEntry<?> e : newReqEntriesAggregation) {
+		private void updateRequiredEntries(List<DataEntry<?>> newReqEntriesDerivation) {
+			for (DataEntry<?> e : requiredEntries) {
 				e.removeDependency(this);
 			}
 			for (DataEntry<?> e : newReqEntriesDerivation) {
-				e.removeDependency(this);
+				// The entry may depend on itself (e.g., if aggregation is done on the contained timeseries)
+				// To prevent endless recursion on notification, exclude this from dependencies
+				if (!e.equals(this)) {
+					e.addDependency(this);
+				}
 			}
-			this.requiredEntriesOfAggregation = newReqEntriesAggregation;
-			this.requiredEntriesOfDerivation = newReqEntriesDerivation;
+			this.requiredEntries = newReqEntriesDerivation;
 		}
 		
 		private void deriveValuesFromDerivedEntries() {
-			Quantity<Time> startTime = null;
-			Quantity<Time> endTime = null;
-			Quantity<Time> aggregationInterval = null;
-			List<DataEntry<?>> requiredEntries = (derivationRule == null) ? requiredEntriesOfAggregation : requiredEntriesOfDerivation;
+			// If this entry does not depend on others, we assume it can provide values
+			// for all possible time values.
+			Quantity<Time> startTime = MIN_SECONDS;
+			Quantity<Time> endTime = MAX_SECONDS;
+			Quantity<Time> aggregationInterval = ZERO_SECONDS;
 			for (DataEntry<?> reqEntry : requiredEntries) {
 				// Find maximum start time
-				if (startTime == null) {
+				if (reqEntry.getStartTime().compareTo(startTime) > 0) {
 					startTime = reqEntry.getStartTime();
-				} else {
-					if (reqEntry.getStartTime().compareTo(startTime) > 0) {
-						startTime = reqEntry.getStartTime();
-					}					
-				}
+				}					
 				// Find minimum end time
-				if (endTime == null) {
+				if (reqEntry.getEndTime().compareTo(endTime) < 0) {
 					endTime = reqEntry.getEndTime();
-				} else {
-					if (reqEntry.getEndTime().compareTo(endTime) < 0) {
-						endTime = reqEntry.getEndTime();
-					}
 				}
 				// Find maximum aggregation interval
-				if (aggregationInterval == null) {
+				if (reqEntry.getAggregationInterval().compareTo(aggregationInterval) > 0) {
 					aggregationInterval = reqEntry.getAggregationInterval();
-				} else {
-					if (reqEntry.getAggregationInterval().compareTo(aggregationInterval) > 0) {
-						aggregationInterval = reqEntry.getAggregationInterval();
-					}
 				}
 			}
 			this.startTime = startTime;
@@ -292,7 +282,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			+ "end=" + observations.getEndTime() + "s]");
 	}
 	
-	@SuppressWarnings("unchecked")
 	private <D extends Dimension> void addEntry(DataKey<D> key, DataEntry<D> newEntry) {
 		data.put(key,  newEntry);
 		// This is the first time we add data for this metric, entity and aggregation combination
@@ -300,16 +289,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
-		for (AggregationRule<?> r : rules.getAggregationRules(metric, aggregation)) {
-			List<ModelEntity> entities = r.getNotificationSet(entity);
-			for (ModelEntity e : entities) {
-				if (r.applies(e)) {
-					if (checkDependencies(r, e)) {
-						addAggregation(r, e);
-					}
-				}
-			}
-		}
 		for (DerivationRule<?> r : rules.getDerivationRules(metric, aggregation)) {
 			List<ModelEntity> entities = r.getNotificationSet(entity);
 			for (ModelEntity e : entities) {
@@ -346,24 +325,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			}
 		}
 		return requiredEntries;
-	}
-	
-	private <D extends Dimension> void addAggregation(AggregationRule<D> t, ModelEntity entity) {
-		Metric<D> metric = t.getMetric();
-		Aggregation aggregation = t.getAggregation();
-		IMetricAggregationHandler<D> handler = t.getAggregationHandler();
-
-		DataKey<D> key = new DataKey<>(metric, entity, aggregation);
-		DataEntry<D> entry = getEntry(key);
-		boolean newEntry = (entry == null);		
-		if (newEntry) {
-			entry = new DataEntry<D>();
-		}
-		entry.setAggregationRule(t, getRequiredEntries(t, entity));
-		if (newEntry) {
-			addEntry(key, entry);
-		}
-		log.info("Aggregation" + (newEntry ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
 	}
 	
 	private <D extends Dimension> void addDerivation(DerivationRule<D> t, ModelEntity entity) {
@@ -437,10 +398,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (entry == null) {
 			return Double.NaN;
 		}
-		if (entry.aggregationRule == null) {
-			throw new IllegalStateException("No aggregation handler for " + metric.getName() + " and " + aggregation.getLiteral() + " is available.");
+		if (entry.derivationRule == null) {
+			throw new IllegalStateException("No derivation handler for " + metric.getName() + " and " + aggregation.getLiteral() + " is available.");
 		}
-		return entry.aggregationRule.getAggregationHandler().aggregate(this, metric, unit, entity, aggregation, start, end);
+		return entry.derivationRule.getDerivationHandler().aggregate(this, metric, unit, entity, aggregation, start, end);
 	}
 
 	@Override
@@ -480,10 +441,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private <D extends Dimension> void registerRules(Metric<D> m) {
-		List<AggregationRule<D>> aggregationRules = Registry.INSTANCE.getMetricHandler(m).getAggregationRules();
-		for (AggregationRule<D> r : aggregationRules) {
-			rules.addAggregationRule(r);
-		}
 		List<DerivationRule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
 		for (DerivationRule<D> r : derivationRules) {
 			rules.addDerivationRule(r);
@@ -494,15 +451,15 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (log.isDebugEnabled()) {
 			log.debug("Register default handlers for metrics");
 		}
-		for (AggregationRule<?> rule : rules.getDefaultDerivationRules()) {
+		for (DerivationRule<?> rule : rules.getDefaultDerivationRules()) {
 			for (Resource resource : workload.getResources()) {
 				if (rule.applies(resource)) {
-					addAggregation(rule, resource);
+					addDerivation(rule, resource);
 				}
 			}
 			for (Service service : workload.getServices()) {
 				if (rule.applies(service)) {
-					addAggregation(rule, service);
+					addDerivation(rule, service);
 				}
 			}
 		}

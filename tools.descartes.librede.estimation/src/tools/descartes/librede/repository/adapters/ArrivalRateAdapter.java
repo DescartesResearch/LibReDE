@@ -27,7 +27,6 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -39,7 +38,6 @@ import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DeriveConstantRate;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestRate;
@@ -52,31 +50,26 @@ public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
 	}
 
 	@Override
-	public List<AggregationRule<RequestRate>> getAggregationRules() {
-		return Arrays.asList(
-					AggregationRule.aggregate(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
-						.from(Aggregation.AVERAGE)
-						.priority(10)
-						.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE)),
-					AggregationRule.aggregate(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
-						.check(new RulePrecondition() {				
-							@Override
-							public boolean check(ModelEntity entity) {
-								return (entity instanceof Service) && ((Service)entity).isBackgroundService();
-							}
-						})
-						.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
-						.build(new DeriveConstantRate()),
-					AggregationRule.aggregate(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
-						.requiring(StandardMetrics.ARRIVALS, Aggregation.SUM)
-						.priority(0)
-						.build(new RequestRateAggregationHandler(StandardMetrics.ARRIVALS))
-					);
-	}
-
-	@Override
 	public List<DerivationRule<RequestRate>> getDerivationRules() {
-		return Collections.emptyList();
+		return Arrays.asList(
+				DerivationRule.derive(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
+					.priority(10)
+					.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.ARRIVAL_RATE)),
+				DerivationRule.derive(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
+					.check(new RulePrecondition() {				
+						@Override
+						public boolean check(ModelEntity entity) {
+							return (entity instanceof Service) && ((Service)entity).isBackgroundService();
+						}
+					})
+					.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
+					.build(new DeriveConstantRate()),
+				DerivationRule.derive(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.ARRIVALS, Aggregation.SUM)
+					.priority(0)
+					.build(new RequestRateAggregationHandler(StandardMetrics.ARRIVALS))
+				);
 	}
 
 }

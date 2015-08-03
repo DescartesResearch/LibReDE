@@ -38,7 +38,7 @@ import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public class TimeWeightedAggregationHandler<D extends Dimension> extends BaseAggregationHandler<D> {
+public class TimeWeightedAggregationHandler<D extends Dimension> extends BaseDerivationHandler<D> {
 
 	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	

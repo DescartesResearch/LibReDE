@@ -26,15 +26,15 @@
  */
 package tools.descartes.librede.repository.adapters;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Time;
 
@@ -46,17 +46,11 @@ public class BusyTimeAdapter implements IMetricAdapter<Time> {
 	}
 
 	@Override
-	public List<AggregationRule<Time>> getAggregationRules() {
-		return Collections.singletonList(
-				AggregationRule.aggregate(StandardMetrics.BUSY_TIME, Aggregation.SUM)
-					.from(Aggregation.SUM)
-					.build()
-				);
-	}
-
-	@Override
 	public List<DerivationRule<Time>> getDerivationRules() {
-		return Collections.singletonList(
+		return Arrays.asList(
+				DerivationRule.derive(StandardMetrics.BUSY_TIME, Aggregation.SUM)
+					.requiring(Aggregation.SUM)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.BUSY_TIME, Aggregation.SUM)),
 				DerivationRule.derive(StandardMetrics.BUSY_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
 					.build(new DeriveDiffHandler<Time>(StandardMetrics.BUSY_TIME))

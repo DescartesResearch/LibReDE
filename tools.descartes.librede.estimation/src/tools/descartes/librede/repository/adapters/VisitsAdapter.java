@@ -28,17 +28,20 @@ package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.Task;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveVisitCountHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.repository.rules.RuleScope;
@@ -52,17 +55,17 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 	}
 
 	@Override
-	public List<AggregationRule<RequestCount>> getAggregationRules() {
+	public List<DerivationRule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
-				AggregationRule.aggregate(StandardMetrics.VISITS, Aggregation.AVERAGE)
-					.from(Aggregation.NONE)
+				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
+					.requiring(Aggregation.NONE)
 					.priority(10)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.VISITS, Aggregation.AVERAGE)
-					.from(Aggregation.AVERAGE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.VISITS, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
 					.priority(20)
 					.build(new TimeWeightedAggregationHandler<RequestCount>(StandardMetrics.VISITS)),
-				AggregationRule.aggregate(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
 					.check(new RulePrecondition() {
@@ -78,16 +81,24 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 						}
 						@Override
 						public List<ModelEntity> getNotificationSet(ModelEntity base) {
-							return getScopeSet(base);
+							if (base instanceof Service) {
+								List<ModelEntity> ret = new LinkedList<ModelEntity>();
+								ret.add(base);
+								List<Task> tasks = ((Service)base).getTasks();
+								for (Task t : tasks) {
+									if (t instanceof ExternalCall) {
+										ret.add(t);
+									}
+								}
+								return ret;
+							} else if (base instanceof ExternalCall) {
+								return getScopeSet(base);
+							}
+							return Collections.emptyList();
 						}						
 					})
 					.build(new DeriveVisitCountHandler())
 				);
-	}
-
-	@Override
-	public List<DerivationRule<RequestCount>> getDerivationRules() {
-		return Collections.emptyList();
 	}
 
 }

@@ -27,15 +27,14 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.ThroughputWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.RequestCount;
 
@@ -47,29 +46,24 @@ public class QueueLengthSeenOnArrivalAdapter implements IMetricAdapter<RequestCo
 	}
 
 	@Override
-	public List<AggregationRule<RequestCount>> getAggregationRules() {
+	public List<DerivationRule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
-				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
-					.from(Aggregation.NONE)
+				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
+					.requiring(Aggregation.NONE)
 					.priority(10)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MINIMUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MAXIMUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
-					.from(Aggregation.AVERAGE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MINIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.MAXIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
 					.build(new ThroughputWeightedAggregationHandler<RequestCount>(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL))
 				);
-	}
-
-	@Override
-	public List<DerivationRule<RequestCount>> getDerivationRules() {
-		return Collections.emptyList();
 	}
 
 }

@@ -39,7 +39,7 @@ import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public class DeriveResidenceTimeFromExternalCalls extends BaseAggregationHandler<Time> {
+public class DeriveResidenceTimeFromExternalCalls extends BaseDerivationHandler<Time> {
 
 	public DeriveResidenceTimeFromExternalCalls() {
 		super(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE);

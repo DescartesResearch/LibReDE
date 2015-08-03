@@ -29,15 +29,12 @@ package tools.descartes.librede.repository;
 import java.util.List;
 
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Dimension;
 
 public interface IMetricAdapter<D extends Dimension> {
 	
 	Interpolation getInterpolation();
-	
-	List<AggregationRule<D>> getAggregationRules();
 	
 	List<DerivationRule<D>> getDerivationRules();
 	

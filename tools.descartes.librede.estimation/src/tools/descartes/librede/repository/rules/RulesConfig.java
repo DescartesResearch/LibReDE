@@ -35,16 +35,14 @@ import java.util.Map;
 
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.units.Dimension;
 
 public class RulesConfig {
 	private final Map<Metric<?>, EnumMap<Aggregation, List<DerivationRule<?>>>> derivationRules = new HashMap<>();
-	private final Map<Metric<?>, EnumMap<Aggregation, List<AggregationRule<?>>>> aggregationRules = new HashMap<>();
-	private final List<AggregationRule<?>> defaultRules = new LinkedList<>();
+	private final List<DerivationRule<?>> defaultRules = new LinkedList<>();
 	
 	public void addDerivationRule(DerivationRule<?> rule) {
 		if (rule.getDependencies().isEmpty()) {
-			throw new IllegalArgumentException();
+			defaultRules.add(rule);
 		} else {
 			for (RuleDependency<?> r : rule.getDependencies()) {
 				EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRules.get(r.getMetric());
@@ -62,36 +60,6 @@ public class RulesConfig {
 		}
 	}
 	
-	public void addAggregationRule(AggregationRule<?> rule) {
-		if (rule.getDependencies().isEmpty()) {
-			defaultRules.add(rule);
-		}
-		for (RuleDependency<?> r : rule.getDependencies()) {
-			EnumMap<Aggregation, List<AggregationRule<?>>> metricEntry = aggregationRules.get(r.getMetric());
-			if (metricEntry == null) {
-				metricEntry = new EnumMap<>(Aggregation.class);
-				aggregationRules.put(r.getMetric(), metricEntry);
-			}
-			List<AggregationRule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
-			if (aggregationEntry == null) {
-				aggregationEntry = new LinkedList<>();
-				metricEntry.put(r.getAggregation(), aggregationEntry);
-			}
-			aggregationEntry.add(rule);
-		}
-	}
-	
-	public List<AggregationRule<?>> getAggregationRules(Metric<?> metric, Aggregation aggregation) {
-		EnumMap<Aggregation, List<AggregationRule<?>>> metricEntry = aggregationRules.get(metric);
-		if (metricEntry != null) {
-			List<AggregationRule<?>> aggregationEntry = metricEntry.get(aggregation);
-			if (aggregationEntry != null) {
-				return aggregationEntry;
-			}
-		}
-		return Collections.emptyList();
-	}
-	
 	public List<DerivationRule<?>> getDerivationRules(Metric<?> metric, Aggregation aggregation) {
 		EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRules.get(metric);
 		if (metricEntry != null) {
@@ -103,7 +71,7 @@ public class RulesConfig {
 		return Collections.emptyList();
 	}
 	
-	public List<AggregationRule<?>> getDefaultDerivationRules() {
+	public List<DerivationRule<?>> getDefaultDerivationRules() {
 		return defaultRules;
 	}
 }

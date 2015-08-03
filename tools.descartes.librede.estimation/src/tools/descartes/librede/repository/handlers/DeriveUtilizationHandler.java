@@ -35,8 +35,6 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMonitoringRepository;
-import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.repository.UnitConverter;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.Time;
@@ -51,27 +49,16 @@ public class DeriveUtilizationHandler extends BaseDerivationHandler<Ratio> {
 	}
 
 	@Override
-	public TimeSeries derive(IMonitoringRepository repository, Metric<Ratio> metric,
+	public double aggregate(IMonitoringRepository repository, Metric<Ratio> metric,
 			Unit<Ratio> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
 			Quantity<Time> end) {
 		if (log.isTraceEnabled()) {
 			log.trace("Derive average utilization from busy time and idle time.");
 		}
 		if (aggregation == Aggregation.AVERAGE) {
-			TimeSeries busy = repository.select(StandardMetrics.BUSY_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			TimeSeries idle = repository.select(StandardMetrics.IDLE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			if (!busy.isEmpty() && !idle.isEmpty()) {
-				// TODO: check that timestamps of idle and busy are equal
-				TimeSeries util = new TimeSeries(idle.getTime(), busy.getData().arrayDividedBy(busy.getData().plus(idle.getData())));
-				util.setStartTime(start.getValue(Time.SECONDS));
-				util.setEndTime(end.getValue(Time.SECONDS));
-				return UnitConverter.convertTo(util, Ratio.NONE, unit);
-			} else {
-				if (log.isTraceEnabled()) {
-					log.trace("Could not find required busy time and/or idle time traces. Skip derivation of average utilization.");
-				}
-				return TimeSeries.EMPTY;
-			}
+			double busy = repository.aggregate(StandardMetrics.BUSY_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
+			double idle = repository.aggregate(StandardMetrics.IDLE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
+			return unit.convertFrom(busy / (busy + idle), Ratio.NONE);
 		}
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}

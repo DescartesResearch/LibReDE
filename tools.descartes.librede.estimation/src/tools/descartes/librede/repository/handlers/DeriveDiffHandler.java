@@ -47,22 +47,17 @@ public class DeriveDiffHandler<D extends Dimension> extends BaseDerivationHandle
 	}
 
 	@Override
-	public TimeSeries derive(IMonitoringRepository repository, Metric<D> metric,
+	public double aggregate(IMonitoringRepository repository, Metric<D> metric,
 			Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start,
 			Quantity<Time> end) {
 		if (log.isTraceEnabled()) {
 			log.trace("Derive sum from cumulative sum of " + metric.getName());
 		}
 		if (aggregation == Aggregation.SUM) {
-			TimeSeries cumSum = repository.select(metric, unit, entity, Aggregation.CUMULATIVE_SUM, start, end);
-			if (!cumSum.isEmpty()) {
-				return cumSum.diff();
-			} else {
-				if (log.isTraceEnabled()) {
-					log.trace("Could not find required traces. Skip derivation of sum.");
-				}
-				return TimeSeries.EMPTY;
-			}
+			TimeSeries cumSum = repository.select(metric, unit, entity, Aggregation.CUMULATIVE_SUM, start, end);			
+			double v1 = cumSum.get(start.getValue(Time.SECONDS), 0);
+			double v2 = cumSum.get(end.getValue(Time.SECONDS), 0);
+			return v2 - v1; // the values have the right unit, converted when read from repository
 		}
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}

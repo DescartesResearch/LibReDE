@@ -33,45 +33,39 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveArrivalsHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.RequestCount;
 
 public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
-	
+
 	@Override
 	public Interpolation getInterpolation() {
 		return Interpolation.LINEAR;
 	}
 
 	@Override
-	public List<AggregationRule<RequestCount>> getAggregationRules() {
-		return Arrays.asList(
-				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.SUM)
-					.from(Aggregation.NONE)
-					.priority(0)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.SUM)
-					.from(Aggregation.SUM)
-					.priority(10)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.MINIMUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.MAXIMUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
-					.from(Aggregation.NONE)
-					.build()
-				);
-	}
-
-	@Override
 	public List<DerivationRule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
+				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.SUM)
+					.requiring(Aggregation.NONE)
+					.priority(0)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.SUM)
+					.requiring(Aggregation.SUM)
+					.priority(10)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.SUM)),
+				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.MINIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.MAXIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.ARRIVALS, Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
 					.build(new DeriveDiffHandler<RequestCount>(StandardMetrics.ARRIVALS)),

@@ -40,7 +40,7 @@ import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public class AverageResponseTimeAggregationHandler extends BaseAggregationHandler<Time> {
+public class AverageResponseTimeAggregationHandler extends BaseDerivationHandler<Time> {
 
 	private static final Logger log = Loggers.AGGREGATION_HANDLER_LOG;
 	

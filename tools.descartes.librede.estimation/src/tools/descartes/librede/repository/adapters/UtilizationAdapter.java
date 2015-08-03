@@ -26,15 +26,15 @@
  */
 package tools.descartes.librede.repository.adapters;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveUtilizationHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Ratio;
 
@@ -44,19 +44,13 @@ public class UtilizationAdapter implements IMetricAdapter<Ratio> {
 	public Interpolation getInterpolation() {
 		return Interpolation.PIECEWISE_CONSTANT;
 	}
-	
-	@Override
-	public List<AggregationRule<Ratio>> getAggregationRules() {
-		return Collections.singletonList(
-				AggregationRule.aggregate(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
-					.from(Aggregation.AVERAGE)
-					.build()
-				);
-	}
 
 	@Override
 	public List<DerivationRule<Ratio>> getDerivationRules() {
-		return Collections.singletonList(
+		return Arrays.asList(
+				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)),
 				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
 					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)

@@ -39,7 +39,7 @@ import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public class DeriveVisitCountHandler extends BaseAggregationHandler<RequestCount> {
+public class DeriveVisitCountHandler extends BaseDerivationHandler<RequestCount> {
 
 	public DeriveVisitCountHandler() {
 		super(StandardMetrics.VISITS, Aggregation.AVERAGE);

@@ -27,7 +27,6 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -39,7 +38,6 @@ import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DeriveConstantRate;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestRate;
@@ -52,13 +50,13 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 	}
 
 	@Override
-	public List<AggregationRule<RequestRate>> getAggregationRules() {
+	public List<DerivationRule<RequestRate>> getDerivationRules() {
 		return Arrays.asList(
-				AggregationRule.aggregate(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
-					.from(Aggregation.AVERAGE)
+				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
 					.priority(10)
 					.build(new TimeWeightedAggregationHandler<RequestRate>(StandardMetrics.THROUGHPUT)),
-				AggregationRule.aggregate(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {				
 						@Override
 						public boolean check(ModelEntity entity) {
@@ -67,16 +65,11 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 					})
 					.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
 					.build(new DeriveConstantRate()),
-				AggregationRule.aggregate(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.priority(0)
 					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES))
 				);
-	}
-
-	@Override
-	public List<DerivationRule<RequestRate>> getDerivationRules() {
-		return Collections.emptyList();
 	}
 
 }

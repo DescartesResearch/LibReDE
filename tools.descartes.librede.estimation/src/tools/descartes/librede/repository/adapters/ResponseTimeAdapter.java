@@ -34,10 +34,10 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.AverageResponseTimeAggregationHandler;
+import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
 import tools.descartes.librede.repository.handlers.DeriveResponeTimeHandler;
 import tools.descartes.librede.repository.handlers.ThroughputWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.AggregationRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Time;
 
@@ -49,44 +49,38 @@ public class ResponseTimeAdapter implements IMetricAdapter<Time> {
 	}
 
 	@Override
-	public List<AggregationRule<Time>> getAggregationRules() {
+	public List<DerivationRule<Time>> getDerivationRules() {
 		return Arrays.asList(
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
-					.from(Aggregation.NONE)
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
+					.requiring(Aggregation.NONE)
 					.priority(0)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
-					.from(Aggregation.SUM)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
+					.requiring(Aggregation.SUM)
 					.priority(10)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.MAXIMUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)
-					.from(Aggregation.NONE)
-					.build(),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
-					.from(Aggregation.AVERAGE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)),
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.MAXIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<>(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(10)
 					.build(new ThroughputWeightedAggregationHandler<Time>(StandardMetrics.RESPONSE_TIME)),
-				AggregationRule.aggregate(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
-					.from(Aggregation.SUM)
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
+					.requiring(Aggregation.SUM)
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.priority(0)
-					.build(new AverageResponseTimeAggregationHandler())
-				);
-	}
-
-	@Override
-	public List<DerivationRule<Time>> getDerivationRules() {
-		return Arrays.asList(
+					.build(new AverageResponseTimeAggregationHandler()),
 				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.SUM)
 					.build(new DeriveDiffHandler<Time>(StandardMetrics.RESPONSE_TIME)),

@@ -37,5 +37,7 @@ import tools.descartes.librede.units.Unit;
 public interface IMetricDerivationHandler<D extends Dimension> {
 	
 	TimeSeries derive(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
+	
+	double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 
 }
