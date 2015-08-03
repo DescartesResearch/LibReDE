@@ -319,21 +319,13 @@ public class MetricImpl<D extends Dimension> extends MinimalEObjectImpl.Containe
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (id: ");
-		result.append(id);
-		result.append(", name: ");
-		result.append(name);
-		result.append(", allowedAggregations: ");
-		result.append(allowedAggregations);
-		result.append(')');
-		return result.toString();
+		return name;
 	}
 
 } //MetricImpl

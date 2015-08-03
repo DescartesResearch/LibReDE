@@ -352,7 +352,7 @@ public class TimeSeries {
 			return this;
 		}
 		if ((startTime < this.startTime) || (endTime > this.endTime)) {
-			throw new IllegalArgumentException("Requested subset [" + startTime + ", " + endTime + ") is not contained by this series time range [" + this.startTime + ", " + this.endTime + ").");
+			throw new IllegalArgumentException("Requested subset [" + startTime + ", " + endTime + "] is not contained by this series time range [" + this.startTime + ", " + this.endTime + "].");
 		}
 		
 		double idx1 = (startTime != startTime) ? offset - 1 : interpolationSearch(startTime);

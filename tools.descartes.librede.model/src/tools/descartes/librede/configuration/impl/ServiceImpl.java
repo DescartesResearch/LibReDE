@@ -301,16 +301,15 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (backgroundService: ");
-		result.append(backgroundService);
-		result.append(')');
+		StringBuffer result = new StringBuffer();
+		result.append("Service ");
+		result.append(getName());
 		return result.toString();
 	}
 

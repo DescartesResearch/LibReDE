@@ -350,18 +350,15 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (numberOfServers: ");
-		result.append(numberOfServers);
-		result.append(", schedulingStrategy: ");
-		result.append(schedulingStrategy);
-		result.append(')');
+		StringBuffer result = new StringBuffer();
+		result.append("Resource ");
+		result.append(getName());
 		return result.toString();
 	}
 

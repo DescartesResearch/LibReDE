@@ -308,19 +308,23 @@ public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Contai
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (value: ");
+		StringBuffer result = new StringBuffer();
 		result.append(value);
-		result.append(')');
+		result.append(unit.getSymbol());
 		return result.toString();
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
 	@Override
 	public int compareTo(Quantity<D> o) {
 		return Double.compare(value, o.getValue(unit));

@@ -121,5 +121,20 @@ public abstract class TaskImpl extends ModelEntityImpl implements Task {
 		}
 		return super.eIsSet(featureID);
 	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer();
+		result.append("Task ");
+		result.append(getName());
+		return result.toString();
+	}
 
 } //TaskImpl

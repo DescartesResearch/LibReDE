@@ -44,7 +44,7 @@ public class OutOfMonitoredRangeException extends MonitoringRepositoryException 
 	public OutOfMonitoredRangeException(Metric<?> metric, Aggregation aggregation, ModelEntity entity, 
 			Quantity<Time> requestedStartTime, Quantity<Time> requestedEndTime,
 			Quantity<Time> actualStartTime, Quantity<Time> actualEndTime) {
-		super(metric, aggregation, entity);
+		super("No monitoring data available for the requested time frame.", metric, aggregation, entity);
 		this.requestedStartTime = requestedStartTime;
 		this.requestedEndTime = requestedEndTime;
 		this.actualStartTime = actualStartTime;
@@ -65,6 +65,23 @@ public class OutOfMonitoredRangeException extends MonitoringRepositoryException 
 	
 	public Quantity<Time> getActualEndTime() {
 		return actualEndTime;
+	}
+	
+	@Override
+	public String getMessage() {
+		return super.getMessage() + printDebugInformation();
+	}
+	
+	private String printDebugInformation() {
+		StringBuilder msg = new StringBuilder();
+		msg.append("{");
+		msg.append("entity=").append(getEntity()).append(", ");
+		msg.append("metric=").append(getMetric()).append(", ");
+		msg.append("aggregation=").append(getAggregation()).append(", ");
+		msg.append("requested=[").append(requestedStartTime).append(", ").append(requestedEndTime).append("], ");
+		msg.append("actual=[").append(actualStartTime).append(", ").append(actualEndTime).append("]");
+		msg.append("}");
+		return msg.toString();
 	}
 
 }

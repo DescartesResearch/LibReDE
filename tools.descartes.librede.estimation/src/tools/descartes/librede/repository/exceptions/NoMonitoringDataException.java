@@ -35,7 +35,22 @@ public class NoMonitoringDataException extends MonitoringRepositoryException {
 	private static final long serialVersionUID = -4307167876153053003L;
 	
 	public NoMonitoringDataException(Metric<?> metric, Aggregation aggregation, ModelEntity entity) {
-		super(metric, aggregation, entity);
+		super("No monitoring data available for requested entity.", metric, aggregation, entity);
+	}
+	
+	@Override
+	public String getMessage() {
+		return super.getMessage() + printDebugInformation();
+	}
+	
+	private String printDebugInformation() {
+		StringBuilder msg = new StringBuilder();
+		msg.append("{");
+		msg.append("entity=").append(getEntity()).append(", ");
+		msg.append("metric=").append(getMetric()).append(", ");
+		msg.append("aggregation=").append(getAggregation());
+		msg.append("}");
+		return msg.toString();
 	}
 	
 }

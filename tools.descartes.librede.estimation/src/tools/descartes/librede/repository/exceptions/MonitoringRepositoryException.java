@@ -38,7 +38,8 @@ public class MonitoringRepositoryException extends RuntimeException {
 	private final Aggregation aggregation;
 	private final ModelEntity entity;
 
-	public MonitoringRepositoryException(Metric<?> metric, Aggregation aggregation, ModelEntity entity) {
+	public MonitoringRepositoryException(String msg, Metric<?> metric, Aggregation aggregation, ModelEntity entity) {
+		super(msg);
 		this.metric = metric;
 		this.aggregation = aggregation;
 		this.entity = entity;
