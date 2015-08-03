@@ -39,6 +39,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.Time;
@@ -100,7 +101,7 @@ public class MemoryObservationRepositoryTest extends LibredeTest {
 		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(6);
 	}
 	
-	@Test
+	@Test(expected = NoMonitoringDataException.class)
 	public void testGetDataEmpty() {
 		TimeSeries ts = repo.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, resources[0], Aggregation.AVERAGE);
 		assertThat(ts).isNotNull();
