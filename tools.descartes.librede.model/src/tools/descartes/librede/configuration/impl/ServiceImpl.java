@@ -162,7 +162,7 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 */
 	public EList<Resource> getAccessedResources() {
 		EList<Resource> result = new BasicEList<>();
-		for (Task t : tasks) {
+		for (Task t : getTasks()) {
 			if (t instanceof ResourceDemand) {
 				result.add(((ResourceDemand)t).getResource());
 			}
