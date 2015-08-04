@@ -55,21 +55,19 @@ public class ResultTable {
 		private Map<StateVariable, Integer> entryToColumn;
 		
 		private Builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
-			int stateSize = workload.getResources().size() * workload.getServices().size();
 			this.approach = approach;
+			TreeSet<StateVariable> variables = new TreeSet<StateVariable>();			
+			for (Resource res : workload.getResources()) {
+				for (Service cls : res.getAccessingServices()) {
+					variables.add(new StateVariable(res, cls));					
+				}
+			}
+			int stateSize = variables.size();			
 			estimateBuilder = MatrixBuilder.create(stateSize);		
 			timestampBuilder = VectorBuilder.create();
 			entryToColumn = new HashMap<StateVariable, Integer>(stateSize);
 			buffer = new double[stateSize];
 			
-
-			TreeSet<StateVariable> variables = new TreeSet<StateVariable>();			
-			for (Resource res : workload.getResources()) {
-				for (Service cls : workload.getServices()) {
-					variables.add(new StateVariable(res, cls));
-					
-				}
-			}
 			int i = 0;
 			for (StateVariable var : variables) {
 				entryToColumn.put(var, i);
