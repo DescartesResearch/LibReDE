@@ -100,6 +100,7 @@ import tools.descartes.librede.repository.adapters.ResponseTimeAdapter;
 import tools.descartes.librede.repository.adapters.ThroughputAdapter;
 import tools.descartes.librede.repository.adapters.UtilizationAdapter;
 import tools.descartes.librede.repository.adapters.VisitsAdapter;
+import tools.descartes.librede.repository.exceptions.MonitoringRepositoryException;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestCount;
@@ -408,55 +409,63 @@ public class Librede {
 			}
 		});
 		
-		Query<Vector, Ratio> util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(sortedResources).average().using(validatingCursor);
-		Query<Vector, RequestRate> tput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(sortedServices).average().using(validatingCursor);
-		Query<Vector, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(sortedServices).average().using(validatingCursor);
-		File output = new File("C:\\Users\\Simon\\Workspaces\\specjent-model\\specjent-model2\\data.csv");
-		try (PrintStream out = new PrintStream(output)) {
-			out.print("#");
-			for (Resource r : sortedResources) {
-				out.print(", ");
-				out.print(r.getName());
-			}
-			for (int i = 0; i < 2; i++) {
-				for (Service s : sortedServices) {
-					out.print(", ");
-					out.print(s.getName());
-				}
-			}
-			out.println();
-			
-			while(validatingCursor.next()) {
-				out.print(util.execute());
-				out.print(", ");
-				out.print(tput.execute());
-				out.print(", ");
-				out.print(resp.execute());
-				out.println();				
-				
-				if (log.isDebugEnabled()) {
-					StringBuilder validationData = new StringBuilder();
-					validationData.append(validatingCursor.getIntervalEnd(validatingCursor.getLastInterval()).getValue(Time.SECONDS)).append(", ");
-					validationData.append("U=").append(util.execute()).append(", ");
-					validationData.append("X=").append(tput.execute()).append(", ");
-					validationData.append("T=").append(resp.execute()).append(", ");
-					log.debug(validationData);
-				}
-				for (IValidator validator : validators) {
-					validator.predict(demands);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		//TODO: Implement Exporter for this.
+//		Query<Vector, Ratio> util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(sortedResources).average().using(validatingCursor);
+//		Query<Vector, RequestRate> tput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(sortedServices).average().using(validatingCursor);
+//		Query<Vector, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(sortedServices).average().using(validatingCursor);
+//		File output = new File("C:\\Users\\Simon\\Workspaces\\specjent-model\\specjent-model2\\data.csv");
+//		try (PrintStream out = new PrintStream(output)) {
+//			out.print("#");
+//			for (Resource r : sortedResources) {
+//				out.print(", ");
+//				out.print(r.getName());
+//			}
+//			for (int i = 0; i < 2; i++) {
+//				for (Service s : sortedServices) {
+//					out.print(", ");
+//					out.print(s.getName());
+//				}
+//			}
+//			out.println();
+//			
+//			while(validatingCursor.next()) {
+//				out.print(util.execute());
+//				out.print(", ");
+//				out.print(tput.execute());
+//				out.print(", ");
+//				out.print(resp.execute());
+//				out.println();				
+//				
+//				if (log.isDebugEnabled()) {
+//					StringBuilder validationData = new StringBuilder();
+//					validationData.append(validatingCursor.getIntervalEnd(validatingCursor.getLastInterval()).getValue(Time.SECONDS)).append(", ");
+//					validationData.append("U=").append(util.execute()).append(", ");
+//					validationData.append("X=").append(tput.execute()).append(", ");
+//					validationData.append("T=").append(resp.execute()).append(", ");
+//					log.debug(validationData);
+//				}
+//				for (IValidator validator : validators) {
+//					validator.predict(demands);
+//				}
+//			}
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
 		
+		log.info("Run validation...");
 		for (IValidator validator : validators) {
+			String validatorName =  Registry.INSTANCE.getDisplayName(validator.getClass());
+			log.info("Executing validator " + validatorName);
 			if (log.isDebugEnabled()) {
-				log.debug("Predicted " + validator.getClass().getName() + ":" + validator.getPredictedValues());
-				log.debug("Observed " + validator.getClass().getName() + ":" + validator.getObservedValues());
+				log.debug("Predicted " + validatorName + ":" + validator.getPredictedValues());
+				log.debug("Observed " + validatorName + ":" + validator.getObservedValues());
 			}
-			estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
-			estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
+			try {
+				estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
+				estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
+			} catch(MonitoringRepositoryException ex) {
+				log.warn("Failed to execute validator " + validatorName + ":" + ex.getMessage());
+			}
 		}				
 	}
 	
