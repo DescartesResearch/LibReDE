@@ -277,6 +277,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (!existing) {
 			entry = new DataEntry<>(key);
 		}
+		observations.setInterpolationMethod(Registry.INSTANCE.getMetricHandler(m).getInterpolation());
 		entry.setTimeSeries(UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit()), aggregationInterval);
 		if (!existing) {
 			addEntry(key, entry);
