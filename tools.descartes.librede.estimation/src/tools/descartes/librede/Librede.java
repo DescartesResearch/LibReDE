@@ -279,6 +279,8 @@ public class Librede {
 				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
 				continue;
 			}
+			String approachName = Registry.INSTANCE.getDisplayName(currentApproach.getClass());
+			log.info("Run estimation approach " + approachName);
 			
 			ResultTable estimates = initAndExecuteEstimation(currentApproach, 
 					repository.getWorkload(), 
@@ -306,6 +308,8 @@ public class Librede {
 				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
 				continue;
 			}
+			String approachName = Registry.INSTANCE.getDisplayName(currentApproach.getClass());
+			log.info("Run estimation approach " + approachName);
 			
 			ResultTable estimates = initAndExecuteEstimation(currentApproach, 
 					repository.getWorkload(), 
@@ -353,11 +357,13 @@ public class Librede {
 				log.error("Error instantiating estimation approach: " + currentConf.getType(), ex);
 				continue;
 			}
+			String approachName = Registry.INSTANCE.getDisplayName(currentApproach.getClass());
+			log.info("Run estimation approach " + approachName);
 			
 			List<IValidator> validators = initValidators(conf, cursor);
 			
 			for (int i = 0; i < conf.getValidation().getValidationFolds(); i++) {
-				log.info("Running repetition " + (i + 1) + " of estimation approach " + currentConf.getType());
+				log.info("Start repetition " + (i + 1));
 				cursor.startTrainingPhase(i);			
 				
 				ResultTable estimates = initAndExecuteEstimation(currentApproach, 
@@ -428,13 +434,13 @@ public class Librede {
 //			}
 //			out.println();
 //			
-//			while(validatingCursor.next()) {
-//				out.print(util.execute());
-//				out.print(", ");
-//				out.print(tput.execute());
-//				out.print(", ");
-//				out.print(resp.execute());
-//				out.println();				
+		log.info("Run validation...");
+		String[] validatorNames = new String[validators.size()];
+		for (int i = 0; i < validatorNames.length; i++) {
+			validatorNames[i] = Registry.INSTANCE.getDisplayName(validators.get(i).getClass());
+		}
+		Set<IValidator> disabledValidators = new HashSet<IValidator>();
+		while(validatingCursor.next()) {
 //				
 //				if (log.isDebugEnabled()) {
 //					StringBuilder validationData = new StringBuilder();
@@ -444,28 +450,33 @@ public class Librede {
 //					validationData.append("T=").append(resp.execute()).append(", ");
 //					log.debug(validationData);
 //				}
-//				for (IValidator validator : validators) {
-//					validator.predict(demands);
-//				}
-//			}
+			for (int i = 0; i < validatorNames.length; i++) {
+				IValidator current = validators.get(i);
+				try {
+					current.predict(demands);
+					disabledValidators.remove(current);
+				} catch(MonitoringRepositoryException ex) {
+					if (disabledValidators.contains(current)) {
+						log.warn("Failed to execute validator " + validatorNames[i] + ": " + ex.getMessage());
+						disabledValidators.add(current);
+					}					
+				}
+			}
+		}
 //		} catch (FileNotFoundException e) {
 //			e.printStackTrace();
 //		}
 		
-		log.info("Run validation...");
+		
 		for (IValidator validator : validators) {
 			String validatorName =  Registry.INSTANCE.getDisplayName(validator.getClass());
-			log.info("Executing validator " + validatorName);
 			if (log.isDebugEnabled()) {
 				log.debug("Predicted " + validatorName + ":" + validator.getPredictedValues());
 				log.debug("Observed " + validatorName + ":" + validator.getObservedValues());
 			}
-			try {
-				estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
-				estimates.addValidationResults(validator.getClass(), validator.getPredictionError());
-			} catch(MonitoringRepositoryException ex) {
-				log.warn("Failed to execute validator " + validatorName + ":" + ex.getMessage());
-			}
+
+			estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
+			estimates.addValidationResults(validator.getClass(), validator.getPredictionError());			
 		}				
 	}
 	
@@ -491,6 +502,7 @@ public class Librede {
 		// Aggregate results
 		StateVariable[] variables = null;
 		List<String> approaches = new ArrayList<String>(results.size());
+		
 		Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
 		for (ResultTable[] folds : results) {
 			boolean first = true;
@@ -509,6 +521,14 @@ public class Librede {
 				validators.addAll(curFold.getValidators());
 			}
 		}
+		
+		// Print approaches legend
+		System.out.println("Approaches");
+		System.out.println("==========");
+		for (int i = 0; i < approaches.size(); i++) {
+			System.out.printf("[%d] %s\n", i + 1,  approaches.get(i));
+		}
+		System.out.println();
 
 		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
@@ -522,96 +542,112 @@ public class Librede {
 			meanEstimates.addRow(LinAlg.mean(lastEstimates.toMatrix()));
 
 			for (Class<? extends IValidator> validator : validators) {
-				MatrixBuilder errors = null; 
+				MatrixBuilder errorsBuilder = null; 
 				for (ResultTable curFold : folds) {
 					Vector vec = curFold.getValidationErrors(validator);
-					if (errors == null) {
-						errors = MatrixBuilder.create(vec.rows());
+					if (errorsBuilder == null) {
+						errorsBuilder = MatrixBuilder.create(vec.rows());
 						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
 					}
-					errors.addRow(vec);
+					errorsBuilder.addRow(vec);
 				}
 				
-				Vector mean = LinAlg.mean(errors.toMatrix());
-				if (!meanErrors.containsKey(validator)) {
-					meanErrors.put(validator, MatrixBuilder.create(mean.rows()));
+				Matrix errors = errorsBuilder.toMatrix();
+				if (!errors.isEmpty()) {
+					Vector mean = LinAlg.mean(errorsBuilder.toMatrix());
+					if (!meanErrors.containsKey(validator)) {
+						meanErrors.put(validator, MatrixBuilder.create(mean.rows()));
+					}
+					meanErrors.get(validator).addRow(mean);
 				}
-				meanErrors.get(validator).addRow(mean);
 			}
 			
 		}
 		
 		// Estimates
 		System.out.println("Estimates");
+		System.out.println("=========");
 		printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
 		System.out.println();
 		
 		if (validators.size() > 0) {
 			// Cross-Validation Results
 			System.out.println("Cross-Validation Results:");
+			System.out.println("=========================");
 			
 			for (Class<? extends IValidator> validator : validators) {
 				String name = Registry.INSTANCE.getDisplayName(validator);
-				System.out.println("\n" + name + ":");				
-				printValidationResultsTable(validatedEntities.get(validator), approaches, meanErrors.get(validator).toMatrix());
+				System.out.println(name + ":");
+				if (meanErrors.containsKey(validator)) {
+					Matrix errors = meanErrors.get(validator).toMatrix();
+					printValidationResultsTable(validatedEntities.get(validator), approaches, errors);
+					System.out.println();
+				} else {
+					System.out.println("No results.");
+				}
 			}
 		}
 	}
 	
 	private static void printValidationResultsTable(List<ModelEntity> entities, List<String> approaches, Matrix values) {
-		System.out.printf("%-60.60s | ", "Approach");
-		
-		for (ModelEntity var : entities) {
-			System.out.printf("%-8.8s", var.getName());
+		System.out.printf("%-80.80s | ", "Resource or service");
+		for (int i = 0; i < approaches.size(); i++) {
+			System.out.printf("%-9.9s", "[" + (i + 1) + "]");
 		}
-		
 		System.out.println("|");
 
-		for (int i = 0; i < (64 + entities.size() * 8); i++) {
+		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
 			System.out.print("-");
 		}
 		System.out.println();
-
-		for (int r = 0; r < values.rows(); r++) {
-			System.out.printf("%-60.60s |", approaches.get(r));
-			Vector row = values.row(r);
-			for (int i = 0; i < row.rows(); i++) {
-				System.out.printf(" %.5f", row.get(i));
-			}
-			System.out.println(" |");
+		
+		int idx = 0;
+		for (ModelEntity entity : entities) {
+			System.out.printf("%-80.80s | ", limitOutput(entity.getName(), 80));
+			for (int i = 0; i < approaches.size(); i++) {
+				System.out.printf("%.5f%% ", values.get(i, idx) * 100);
+			}			
+			System.out.println("|");
+			idx++;
 		}
 	}
 	
 	private static void printEstimatesTable(StateVariable[] variables, List<String> approaches, Matrix values) {
-		System.out.printf("%-60.60s | ", "Approach");
-		Resource last = null;
-		for (StateVariable var : variables) {
-			if (var.getResource().equals(last)) {
-				System.out.printf("%-8.8s", "");
-			} else {
-				System.out.printf("%-8.8s", var.getResource().getName());
-			}
-		}
-		System.out.println();
-
-		System.out.printf("%60.60s | ", "");
-		for (StateVariable var : variables) {
-			System.out.printf("%-8.8s", var.getService().getName());
+		System.out.printf("%-20.20s | ", "Resource");
+		System.out.printf("%-60.60s | ", "Service");
+		for (int i = 0; i < approaches.size(); i++) {
+			System.out.printf("%-9.9s", "[" + (i + 1) + "]");
 		}
 		System.out.println("|");
 
-		for (int i = 0; i < (64 + variables.length * 8); i++) {
+		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
 			System.out.print("-");
 		}
 		System.out.println();
-
-		for (int r = 0; r < values.rows(); r++) {
-			System.out.printf("%-60.60s |", approaches.get(r));
-			Vector row = values.row(r);
-			for (int i = 0; i < row.rows(); i++) {
-				System.out.printf(" %.5f", row.get(i));
+		Resource last = null;
+		int idx = 0;
+		for (StateVariable var : variables) {
+			if (var.getResource().equals(last)) {
+				System.out.printf("%-20.20s | ", "");
+			} else {
+				System.out.printf("%-20.20s | ", limitOutput(var.getResource().getName(), 20));
 			}
-			System.out.println(" |");
+			System.out.printf("%-60.60s | ", limitOutput(var.getService().getName(), 60));
+			for (int i = 0; i < approaches.size(); i++) {
+				System.out.printf("%.5fs ", values.get(i, idx));
+			}			
+			System.out.println("|");
+			last = var.getResource();
+			idx++;
+		}
+	}
+	
+	private static String limitOutput(String output, int max) {
+		if (output.length() > max) {
+			int third = (max - 5) / 3;
+			return output.substring(0, max - third - 5) + " ... " + output.substring(output.length() - third);
+		} else {
+			return output;
 		}
 	}
 	
@@ -625,13 +661,15 @@ public class Librede {
 				log.error("Could not instantiate exporter: " + exportConf.getName());
 				continue;
 			}
+			String exporterName = Registry.INSTANCE.getDisplayName(exporter.getClass());
+			log.info("Run exporter " + exporterName);
 			for (ResultTable[] folds : results) {
 				int i = 0;
 				for (ResultTable curFold : folds) {
 					try {
 						exporter.writeResults(curFold.getApproach().getSimpleName(), i, curFold.getStateVariables(), curFold.getEstimates());
 					} catch (Exception e) {
-						log.error("Could not export results.", e);
+						log.error("Error running exporter " + exporterName, e);
 					}
 					i++;
 				}

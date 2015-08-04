@@ -34,6 +34,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.LinAlg;
+import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
@@ -99,20 +100,27 @@ public class UtilizationValidator implements IValidator {
 	
 	@Override
 	public Vector getPredictionError() {
-		return LinAlg.mean(allErrors.toMatrix());
+		return checkedMean(allErrors.toMatrix());
 	}
 	
 	public Vector getPredictedValues() {
-		return LinAlg.mean(predictedUtilization.toMatrix());
+		return checkedMean(predictedUtilization.toMatrix());
 	}
 	
 	public Vector getObservedValues() {
-		return LinAlg.mean(observedUtilization.toMatrix());
+		return checkedMean(observedUtilization.toMatrix());
 	}
 	
 	@Override
 	public List<ModelEntity> getModelEntities() {
 		return resources;
+	}
+	
+	private Vector checkedMean(Matrix matrix) {
+		if (matrix.isEmpty()) {
+			return LinAlg.empty();
+		}
+		return LinAlg.mean(matrix);
 	}
 
 }

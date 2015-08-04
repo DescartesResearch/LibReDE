@@ -34,6 +34,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.LinAlg;
+import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
@@ -98,7 +99,7 @@ public class ResponseTimeValidator implements IValidator {
 	}
 	
 	public Vector getPredictionError() {
-		return LinAlg.mean(allErrors.toMatrix());
+		return checkedMean(allErrors.toMatrix());
 	}
 	
 	@Override
@@ -108,11 +109,18 @@ public class ResponseTimeValidator implements IValidator {
 	
 	@Override
 	public Vector getObservedValues() {
-		return LinAlg.mean(observedRespTimes.toMatrix());
+		return checkedMean(observedRespTimes.toMatrix());
 	}
 	
 	@Override
 	public Vector getPredictedValues() {
-		return LinAlg.mean(predictedRespTimes.toMatrix());
+		return checkedMean(predictedRespTimes.toMatrix());
+	}
+	
+	private Vector checkedMean(Matrix matrix) {
+		if (matrix.isEmpty()) {
+			return LinAlg.empty();
+		}
+		return LinAlg.mean(matrix);
 	}
 }
