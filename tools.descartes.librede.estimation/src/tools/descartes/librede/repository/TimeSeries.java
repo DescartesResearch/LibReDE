@@ -68,7 +68,9 @@ public class TimeSeries {
 				if (idx1 < 0) {
 					return content.get(idx2, column);
 				} else {
-					return (content.get(idx2, column) - content.get(idx1, column)) / (time.get(idx2)- time.get(idx1)) * x;
+					double x0 = time.get(idx1);
+					double x1 = time.get(idx2);
+					return content.get(idx1, column) * ((x1 - x) / (x1 - x0)) + content.get(idx2, column) * ((x - x0) / (x1 - x0));
 				}
 			}
 		};		
