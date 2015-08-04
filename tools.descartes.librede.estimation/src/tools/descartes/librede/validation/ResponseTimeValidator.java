@@ -60,7 +60,7 @@ public class ResponseTimeValidator implements IValidator {
 			IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
+			for (Service serv : res.getAccessingServices()) {
 				builder.addVariable(res, serv);
 			}
 		}
