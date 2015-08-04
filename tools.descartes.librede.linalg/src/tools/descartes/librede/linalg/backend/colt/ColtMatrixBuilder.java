@@ -32,6 +32,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 
 public class ColtMatrixBuilder extends MatrixBuilder {
@@ -85,8 +86,14 @@ public class ColtMatrixBuilder extends MatrixBuilder {
 			} else {
 				return new ColtMatrix(matrix.viewPart(0, 0, last, matrix.columns()));
 			}
+		} else {
+			if (last > 1) {
+				return new ColtVector(matrix.viewColumn(0).viewPart(0, last));
+			} else {
+				return new Scalar(matrix.get(0, 0));
+			}
 		}
-		return new ColtVector(matrix.viewColumn(0));
+		
 	}
 	
 	private void grow() {
