@@ -49,6 +49,10 @@ public class ColtMatrixBuilder extends MatrixBuilder {
 
 	@Override
 	public void addRow(Vector values) {
+		if (values.isEmpty()) {
+			return;
+		}
+		
 		if (values.rows() != matrix.columns()) {
 			throw new ArrayIndexOutOfBoundsException();
 		}
