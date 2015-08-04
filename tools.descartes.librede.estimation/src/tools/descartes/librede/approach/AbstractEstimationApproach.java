@@ -50,6 +50,7 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
@@ -170,7 +171,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 			Set<IEstimationAlgorithm> inactiveAlgorithms = new HashSet<IEstimationAlgorithm>();
 			ResultTable.Builder builder = ResultTable.builder(
 					this.getClass(), workload);
-
+			int iterations = 0;
 			if (iterative) {
 				while (cursor.next()) {					
 					builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
@@ -194,7 +195,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 							}
 						}
 					}
-					
+					iterations++;
 					builder.save();
 				}
 			} else {
@@ -214,6 +215,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 							}
 						}
 					}
+					iterations++;
 				}
 				
 				builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
@@ -225,6 +227,14 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 				}
 				builder.save();
 			}
+			
+			
+			if (iterations > 0) {
+				log.info("Number of iterations for estimation approach: " + iterations);
+			} else {
+				log.warn("Estimation was skipped (zero iterations): start time=" + cursor.getIntervalStart(0) + ", current time=" + cursor.getRepository().getCurrentTime() + ", step size=" + cursor.getIntervalEnd(0).minus(cursor.getIntervalStart(0)));
+			}
+			
 			return builder.build();
 		} finally {
 			for (IEstimationAlgorithm a: algorithms) {
