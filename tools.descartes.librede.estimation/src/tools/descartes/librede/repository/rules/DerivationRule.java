@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.repository.rules;
 
+import java.util.List;
+
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMetricDerivationHandler;
@@ -84,6 +86,30 @@ public class DerivationRule<D extends Dimension> extends AbstractRule<D> {
 	
 	public IMetricDerivationHandler<D> getDerivationHandler() {
 		return handler;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder res = new StringBuilder("Derivation rule ");
+		res.append("*/").append(this.getMetric()).append("/").append(this.getAggregation());
+		List<RuleDependency<?>> dependencies = getDependencies();
+		if (!dependencies.isEmpty()) {
+			res.append(" <- (");
+			boolean first = true;
+			for (RuleDependency<?> dep : dependencies) {
+				if (!first) {
+					res.append(",");
+				}
+				res.append("*/").append(dep.getMetric()).append("/").append(dep.getAggregation());
+				first = false;
+			}
+			res.append(")");
+		}
+		res.append(" {");
+		res.append("priority=").append(getPriority()).append(", ");
+		res.append("handler=").append(handler);
+		res.append("}");
+		return res.toString();
 	}
 	
 

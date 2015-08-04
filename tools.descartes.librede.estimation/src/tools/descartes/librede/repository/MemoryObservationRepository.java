@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.Task;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.metrics.Aggregation;
@@ -253,9 +254,11 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
+		log.info("Set up in-memory observaiton repository");
 		for (Metric<?> m : Registry.INSTANCE.getMetrics()) {
 			registerRules(m);			
 		}
+		rules.logConfigDump();
 		registerDefaultHandlers();
 	}
 	
@@ -278,15 +281,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (!existing) {
 			addEntry(key, entry);
 		}
-	
-		log.info("Data" + (existing ? "" : "(replaced)") + ": " + entity.getName() 
-			+ ":" + m.getName() 
-			+ ":" + aggregation.getLiteral() 
-			+ " <- ["
-			+ "length=" + observations.samples() + ", "
-			+ "mean=" + LinAlg.nanmean(observations.getData(0)).get(0) + ", "
-			+ "start=" + observations.getStartTime() +"s, "
-			+ "end=" + observations.getEndTime() + "s]");
+
+		log.debug((existing ? "New" : "Replaced") + "time series entry " + entity + "/" + m + "/" + aggregation);
 	}
 	
 	private <D extends Dimension> void addEntry(DataKey<D> key, DataEntry<D> newEntry) {
@@ -349,7 +345,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (newEntry) {
 			addEntry(key, entry);
 		}
-		log.info("Derivation" + (newEntry ? "" : " (replaced)") + ": " + entity.getName() + ":" + metric.getName() + ":" + aggregation.getLiteral() + " <- " + handler.toString());
+		log.debug((newEntry ? "New" : "Replaced") + "derivation entry " + entity + "/" + metric + "/" + aggregation);
 	}
 	
 	@Override
@@ -488,6 +484,36 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 					addDerivation(rule, service);
 				}
 			}
+		}
+	}
+	
+	public void logContentDump() {
+		for (Resource resource : workload.getResources()) {
+			logEntityContentDump(resource);
+		}
+		for (Service service : workload.getServices()) {
+			logEntityContentDump(service);
+			for (Task task : service.getTasks()) {
+				logEntityContentDump(task);
+			}
+		}
+	}
+	
+	private void logEntityContentDump(ModelEntity entity) {
+		StringBuilder dump = new StringBuilder(entity.toString());
+		dump.append(": ");
+		boolean empty = true;
+		for (Metric<?> m : Registry.INSTANCE.getMetrics()) {
+			for (Aggregation a : Aggregation.values()) {
+				DataEntry<?> entry = getEntry(m, entity, a);
+				if (entry != null) {
+					empty = false;
+					dump.append(m).append("/").append(a).append(", ");
+				}
+			}
+		}
+		if (!empty) {
+			log.info(dump);
 		}
 	}
 }

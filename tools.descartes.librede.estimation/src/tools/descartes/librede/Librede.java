@@ -187,7 +187,8 @@ public class Librede {
 	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
-		try (DataSourceSelector selector = new DataSourceSelector()) {		
+		try (DataSourceSelector selector = new DataSourceSelector()) {
+			log.info("Start loading monitoring data");
 			for (TraceConfiguration trace : conf.getInput().getObservations()) {
 				String dataSourceName = trace.getDataSource().getName();
 				if (!dataSources.containsKey(dataSourceName)) {
@@ -213,9 +214,12 @@ public class Librede {
 				ds.load();
 			}
 			
+			Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
 			TraceEvent curEvent = null;
 			while ((curEvent = selector.poll()) != null) {
 				TraceKey key = curEvent.getKey();
+				loadedTraces.add(key);
+								
 				@SuppressWarnings("unchecked")
 				Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
 				@SuppressWarnings("unchecked")
@@ -238,8 +242,15 @@ public class Librede {
 					repo.insert(metric, unit, key.getEntity(), ts);
 				}
 			}
+			
+			for (TraceKey t : loadedTraces) {
+				TimeSeries ts = repo.select((Metric<Dimension>)t.getMetric(), (Unit<Dimension>)t.getUnit(), t.getEntity(), t.getAggregation());
+				log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation() +" <- [length=" + ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start=" + ts.getStartTime() + "s, end=" + ts.getEndTime() + "s]");
+			}
+			log.info("Successfully loaded monitoring data.");
+			((MemoryObservationRepository)repo).logContentDump();
 		} catch (IOException e1) {
-			log.error("Error closing selector");
+			log.error("Error loading monitoring data.", e1);
 		} finally {			
 			for (IDataSource ds : dataSources.values()) {
 				try {

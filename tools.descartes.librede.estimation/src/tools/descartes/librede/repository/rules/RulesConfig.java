@@ -32,36 +32,45 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 
 public class RulesConfig {
-	private final Map<Metric<?>, EnumMap<Aggregation, List<DerivationRule<?>>>> derivationRules = new HashMap<>();
+	private static final Logger log = Logger.getLogger(RulesConfig.class);
+	
+	private final Map<Metric<?>, EnumMap<Aggregation, List<DerivationRule<?>>>> derivationRulesByDependency = new HashMap<>();
+	private final Set<DerivationRule<?>> derivationRules = new TreeSet<>();
 	private final List<DerivationRule<?>> defaultRules = new LinkedList<>();
+	
 	
 	public void addDerivationRule(DerivationRule<?> rule) {
 		if (rule.getDependencies().isEmpty()) {
 			defaultRules.add(rule);
 		} else {
 			for (RuleDependency<?> r : rule.getDependencies()) {
-				EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRules.get(r.getMetric());
+				EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry == null) {
 					metricEntry = new EnumMap<>(Aggregation.class);
-					derivationRules.put(r.getMetric(), metricEntry);
+					derivationRulesByDependency.put(r.getMetric(), metricEntry);
 				}
 				List<DerivationRule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
 				if (aggregationEntry == null) {
 					aggregationEntry = new LinkedList<>();
 					metricEntry.put(r.getAggregation(), aggregationEntry);
 				}
-				aggregationEntry.add(rule);
+				aggregationEntry.add(rule);				
 			}
+			derivationRules.add(rule);
 		}
 	}
 	
 	public List<DerivationRule<?>> getDerivationRules(Metric<?> metric, Aggregation aggregation) {
-		EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRules.get(metric);
+		EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRulesByDependency.get(metric);
 		if (metricEntry != null) {
 			List<DerivationRule<?>> derivationEntry = metricEntry.get(aggregation);
 			if (derivationEntry != null) {
@@ -73,5 +82,15 @@ public class RulesConfig {
 	
 	public List<DerivationRule<?>> getDefaultDerivationRules() {
 		return defaultRules;
+	}
+	
+	public void logConfigDump() {
+		for (DerivationRule<?> d : defaultRules) {
+			log.info(d.toString());
+		}
+		
+		for (DerivationRule<?> d : derivationRules) {
+			log.info(d.toString());
+		}
 	}
 }

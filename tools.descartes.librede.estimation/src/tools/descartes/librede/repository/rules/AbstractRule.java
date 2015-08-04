@@ -35,7 +35,7 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 
-public abstract class AbstractRule<D extends Dimension> {
+public abstract class AbstractRule<D extends Dimension> implements Comparable<AbstractRule<D>> {
 	
 	private static class DefaultScope implements RuleScope {
 
@@ -110,6 +110,18 @@ public abstract class AbstractRule<D extends Dimension> {
 			}
 		}
 		return true;
+	}
+	
+	@Override
+	public int compareTo(AbstractRule<D> o) {
+		int c = this.getMetric().getName().compareTo(o.getMetric().getName());
+		if (c == 0) {
+			c = this.getAggregation().compareTo(o.getAggregation());
+			if (c == 0) {
+				c = Integer.compare(this.getPriority(), o.getPriority());
+			}
+		}
+		return c;
 	}
 }
  
