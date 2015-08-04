@@ -66,8 +66,8 @@ public class DeparturesAdapter implements IMetricAdapter<RequestCount> {
 				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.CUMULATIVE_SUM)
-					.requiring(Aggregation.SUM)
+				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.SUM)
+					.requiring(Aggregation.CUMULATIVE_SUM)
 					.build(new DeriveDiffHandler<RequestCount>()),
 				DerivationRule.derive(StandardMetrics.DEPARTURES)
 					.requiring(StandardMetrics.RESPONSE_TIME)

@@ -81,8 +81,8 @@ public class ResponseTimeAdapter implements IMetricAdapter<Time> {
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.priority(0)
 					.build(new AverageResponseTimeAggregationHandler()),
-				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)
-					.requiring(Aggregation.SUM)
+				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
+					.requiring(Aggregation.CUMULATIVE_SUM)
 					.build(new DeriveDiffHandler<Time>()),
 				DerivationRule.derive(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)
 					.requiring(StandardMetrics.ARRIVALS)

@@ -185,8 +185,8 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 					.priority(100)
 					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
 				// Add derivation rule for cumulative sum
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)
-					.requiring(Aggregation.SUM)
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
+					.requiring(Aggregation.CUMULATIVE_SUM)
 					.build(new DeriveDiffHandler<Time>())
 				);
 	}
