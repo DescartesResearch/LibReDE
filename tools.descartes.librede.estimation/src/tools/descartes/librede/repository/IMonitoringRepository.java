@@ -56,6 +56,10 @@ public interface IMonitoringRepository {
 	
 	public <D extends Dimension> Quantity<Time> getMonitoringEndTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
 	
+	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations);
+	
+	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval);
+	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
