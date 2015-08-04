@@ -308,8 +308,20 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
-				if (!exists(dep.getMetric(), e, dep.getAggregation())) {
-					return false;
+				if (rule.getMetric().equals(dep.getMetric())
+						&& rule.getAggregation().equals(dep.getAggregation())) {
+					// self-referential rules are only allowed if the associated
+					// entry contains actual (non-derived) monitoring data.
+					// Otherwise, we may replace rules which triggered 
+					// the activation of this rule.
+					DataEntry<?> entry = getEntry(dep.getMetric(), e, dep.getAggregation());
+					if ((entry == null) || (entry.data == null)) {
+						return false;
+					}
+				} else {
+					if (!exists(dep.getMetric(), e, dep.getAggregation())) {
+						return false;
+					}
 				}
 			}
 		}
