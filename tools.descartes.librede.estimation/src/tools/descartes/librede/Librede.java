@@ -456,7 +456,7 @@ public class Librede {
 					current.predict(demands);
 					disabledValidators.remove(current);
 				} catch(MonitoringRepositoryException ex) {
-					if (disabledValidators.contains(current)) {
+					if (!disabledValidators.contains(current)) {
 						log.warn("Failed to execute validator " + validatorNames[i] + ": " + ex.getMessage());
 						disabledValidators.add(current);
 					}					
