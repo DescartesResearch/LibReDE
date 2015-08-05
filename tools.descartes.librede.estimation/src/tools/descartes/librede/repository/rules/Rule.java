@@ -52,7 +52,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		
 	}
 	
-	private IMetricDerivationHandler<D> handler;
+	private IRuleActivationHandler<D> handler;
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
 	private final List<RuleDependency<?>> dependencies = new LinkedList<>();
@@ -95,7 +95,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		return this;
 	}
 	
-	public Rule<D> build(IMetricDerivationHandler<D> handler) {
+	public Rule<D> build(IRuleActivationHandler<D> handler) {
 		this.handler = handler;
 		return this;
 	}
@@ -108,7 +108,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		return new Rule<D>(metric, aggregation);
 	}
 	
-	public IMetricDerivationHandler<D> getDerivationHandler() {
+	public IRuleActivationHandler<D> getDerivationHandler() {
 		return handler;
 	}
 	

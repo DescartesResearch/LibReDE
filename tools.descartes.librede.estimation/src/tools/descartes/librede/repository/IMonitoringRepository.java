@@ -34,6 +34,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -59,6 +60,8 @@ public interface IMonitoringRepository {
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations);
 	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval);
+	
+	public <D extends Dimension> void insertDerivation(Rule<D> t, IMetricDerivationHandler<D> handler, ModelEntity entity);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();

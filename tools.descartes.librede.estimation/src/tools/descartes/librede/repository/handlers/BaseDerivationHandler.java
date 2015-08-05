@@ -32,12 +32,14 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMetricDerivationHandler;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.repository.rules.IRuleActivationHandler;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public abstract class BaseDerivationHandler<D extends Dimension> implements IMetricDerivationHandler<D> {
+public abstract class BaseDerivationHandler<D extends Dimension> implements IMetricDerivationHandler<D>, IRuleActivationHandler<D> {
 	@Override
 	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
@@ -48,5 +50,15 @@ public abstract class BaseDerivationHandler<D extends Dimension> implements IMet
 	public TimeSeries derive(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void activateRule(IMonitoringRepository repository, Rule<D> rule, ModelEntity entity) {
+		repository.insertDerivation(rule, this, entity);
+	}
+	
+	@Override
+	public void deactivateRule(IMonitoringRepository repository, Rule<D> rule, ModelEntity entity) {
+		 //TODO: implement someting for removal.
 	}
 }
