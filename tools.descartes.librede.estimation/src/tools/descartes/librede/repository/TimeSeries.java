@@ -44,7 +44,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 
-public class TimeSeries {
+public class TimeSeries implements Cloneable {
 	
 	public enum Interpolation
 	{
@@ -219,6 +219,12 @@ public class TimeSeries {
 	}
 	
 	public TimeSeries append(TimeSeries series) {
+		if (this.isEmpty()) {
+			return (TimeSeries) series.clone();
+		}
+		if (series.isEmpty()) {
+			return (TimeSeries) series.clone();
+		}
 		TimeSeries ts = new TimeSeries(vertcat(timestamps, series.timestamps), vertcat(values, series.values));
 		ts.setStartTime(Math.min(getStartTime(), series.getStartTime()));
 		ts.setEndTime(Math.max(getEndTime(), series.getEndTime()));
@@ -354,7 +360,7 @@ public class TimeSeries {
 		}
 		if ((startTime != startTime) && (endTime != endTime)) {
 			// Both are NaN therefor skip subset
-			return this;
+			return (TimeSeries)this.clone();
 		}
 		if ((startTime < this.startTime) || (endTime > this.endTime)) {
 			throw new IllegalArgumentException("Requested subset [" + startTime + ", " + endTime + "] is not contained by this series time range [" + this.startTime + ", " + this.endTime + "].");
@@ -501,5 +507,13 @@ public class TimeSeries {
 
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;	
+	}
+	
+	@Override
+	protected Object clone() {
+		try {
+			return super.clone();
+		} catch(CloneNotSupportedException ex) {};
+		return null;
 	}
 }
