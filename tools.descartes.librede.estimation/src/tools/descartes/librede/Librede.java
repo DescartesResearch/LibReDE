@@ -164,7 +164,7 @@ public class Librede {
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
-		loadRepository(conf, repo);
+		loadRepository(conf, repo, existingDatasources);
 		
 		if (!conf.getValidation().isValidateEstimates()) {
 			
@@ -209,7 +209,6 @@ public class Librede {
 					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
 					try {
 						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
-						selector.add(newSource);
 						dataSources.put(dataSourceName, newSource);
 					} catch (Exception e) {
 						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
@@ -217,6 +216,7 @@ public class Librede {
 					}
 				}
 				IDataSource source = dataSources.get(dataSourceName);
+				selector.add(source);
 				try {
 					source.addTrace(trace);
 				} catch(IOException ex) {

@@ -28,6 +28,7 @@ package tools.descartes.librede.util;
 
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.datasource.memory.InMemoryDataSource;
 import tools.descartes.librede.exceptions.NonOverlappingRangeException;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.TimeSeries;
@@ -69,20 +70,19 @@ public class RepositoryUtil {
 	 * Returns the maximum intersection interval of all TimeSeries which are
 	 * specified in both repository and configuration.
 	 * 
-	 * @param repository
+	 * @param dataSource
 	 * @param configuration
 	 * @return range
 	 * @throws NonOverlappingRangeException 
 	 */
-	public static Range deduceMaximumOverlappingInterval(IMonitoringRepository repository, LibredeConfiguration configuration) throws NonOverlappingRangeException {
+	public static Range deduceMaximumOverlappingInterval(InMemoryDataSource dataSource, LibredeConfiguration configuration) throws NonOverlappingRangeException {
 		double maxStart = Double.MIN_VALUE;
 		double minEnd = Double.MAX_VALUE;
 		for (TraceConfiguration trace : configuration.getInput().getObservations()) {
+			TimeSeries timeSeries = dataSource.getData(trace.getLocation());
 			if (trace.getMappings().size() >= 1) {
-				maxStart = Math.max(repository.getMonitoringStartTime(trace.getMetric(), trace.getMappings().get(0)
-						.getEntity(), trace.getAggregation()).getValue(Time.SECONDS), maxStart);
-				minEnd = Math.min(repository.getMonitoringEndTime(trace.getMetric(), trace.getMappings().get(0)
-						.getEntity(), trace.getAggregation()).getValue(Time.SECONDS), minEnd);
+				maxStart = Math.max(timeSeries.getStartTime(), maxStart);
+				minEnd = Math.min(timeSeries.getEndTime(), minEnd);
 			}
 		}
 		Range range = (new RepositoryUtil()).new Range(maxStart, minEnd);
@@ -92,15 +92,14 @@ public class RepositoryUtil {
 		return range;
 	}
 	
-	public static Range deduceMaximumInterval(IMonitoringRepository repository, LibredeConfiguration configuration) {
+	public static Range deduceMaximumInterval(InMemoryDataSource dataSource, LibredeConfiguration configuration) {
 		double start = Double.MAX_VALUE;
 		double end = Double.MIN_VALUE;
 		for (TraceConfiguration trace : configuration.getInput().getObservations()) {
+			TimeSeries timeSeries = dataSource.getData(trace.getLocation());
 			if (trace.getMappings().size() >= 1) {
-				start = Math.min(repository.getMonitoringStartTime(trace.getMetric(), trace.getMappings().get(0)
-						.getEntity(), trace.getAggregation()).getValue(Time.SECONDS), start);
-				end = Math.max(repository.getMonitoringEndTime(trace.getMetric(), trace.getMappings().get(0)
-						.getEntity(), trace.getAggregation()).getValue(Time.SECONDS), end);
+				start = Math.min(timeSeries.getStartTime(), start);
+				end = Math.max(timeSeries.getEndTime(), end);
 			}
 		}
 		return (new RepositoryUtil()).new Range(start, end);
