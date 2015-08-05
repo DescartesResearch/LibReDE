@@ -154,6 +154,10 @@ public class Librede {
 	}
 	
 	public static LibredeResults execute(LibredeConfiguration conf) {
+		return execute(conf, Collections.<String, IDataSource>emptyMap());
+	}
+	
+	public static LibredeResults execute(LibredeConfiguration conf, Map<String, IDataSource> existingDatasources) {
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
@@ -188,7 +192,11 @@ public class Librede {
 	}
 	
 	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
-		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
+		loadRepository(conf, repo, Collections.<String, IDataSource>emptyMap());
+	}
+	
+	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo, Map<String, IDataSource> existingDataSources) {
+		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>(existingDataSources);
 		
 		try (DataSourceSelector selector = new DataSourceSelector()) {
 			log.info("Start loading monitoring data");
