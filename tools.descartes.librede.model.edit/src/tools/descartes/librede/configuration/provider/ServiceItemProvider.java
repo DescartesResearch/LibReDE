@@ -76,7 +76,9 @@ public class ServiceItemProvider
 
 			addBackgroundServicePropertyDescriptor(object);
 			addAccessedResourcesPropertyDescriptor(object);
-			addCalleesPropertyDescriptor(object);
+			addIncomingCallsPropertyDescriptor(object);
+			addOutgoingCallsPropertyDescriptor(object);
+			addResourceDemandsPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -126,22 +128,66 @@ public class ServiceItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Callees feature.
+	 * This adds a property descriptor for the Incoming Calls feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addCalleesPropertyDescriptor(Object object) {
+	protected void addIncomingCallsPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Service_callees_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Service_callees_feature", "_UI_Service_type"),
-				 ConfigurationPackage.Literals.SERVICE__CALLEES,
+				 getString("_UI_Service_incomingCalls_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Service_incomingCalls_feature", "_UI_Service_type"),
+				 ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS,
 				 true,
 				 false,
 				 true,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Outgoing Calls feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addOutgoingCallsPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Service_outgoingCalls_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Service_outgoingCalls_feature", "_UI_Service_type"),
+				 ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS,
+				 false,
+				 false,
+				 false,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Resource Demands feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addResourceDemandsPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Service_resourceDemands_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Service_resourceDemands_feature", "_UI_Service_type"),
+				 ConfigurationPackage.Literals.SERVICE__RESOURCE_DEMANDS,
+				 false,
+				 false,
+				 false,
 				 null,
 				 null,
 				 null));

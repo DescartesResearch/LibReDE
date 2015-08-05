@@ -48,7 +48,7 @@ package tools.descartes.librede.configuration;
 public interface ExternalCall extends Task {
 	/**
 	 * Returns the value of the '<em><b>Called Service</b></em>' reference.
-	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Service#getCallees <em>Callees</em>}'.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Service#getIncomingCalls <em>Incoming Calls</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Called Service</em>' reference isn't clear,
@@ -58,8 +58,8 @@ public interface ExternalCall extends Task {
 	 * @return the value of the '<em>Called Service</em>' reference.
 	 * @see #setCalledService(Service)
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getExternalCall_CalledService()
-	 * @see tools.descartes.librede.configuration.Service#getCallees
-	 * @model opposite="callees" required="true"
+	 * @see tools.descartes.librede.configuration.Service#getIncomingCalls
+	 * @model opposite="incomingCalls" required="true"
 	 * @generated
 	 */
 	Service getCalledService();

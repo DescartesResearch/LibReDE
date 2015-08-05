@@ -133,9 +133,9 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 		if (newCalledService != calledService) {
 			NotificationChain msgs = null;
 			if (calledService != null)
-				msgs = ((InternalEObject)calledService).eInverseRemove(this, ConfigurationPackage.SERVICE__CALLEES, Service.class, msgs);
+				msgs = ((InternalEObject)calledService).eInverseRemove(this, ConfigurationPackage.SERVICE__INCOMING_CALLS, Service.class, msgs);
 			if (newCalledService != null)
-				msgs = ((InternalEObject)newCalledService).eInverseAdd(this, ConfigurationPackage.SERVICE__CALLEES, Service.class, msgs);
+				msgs = ((InternalEObject)newCalledService).eInverseAdd(this, ConfigurationPackage.SERVICE__INCOMING_CALLS, Service.class, msgs);
 			msgs = basicSetCalledService(newCalledService, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
@@ -153,7 +153,7 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 		switch (featureID) {
 			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
 				if (calledService != null)
-					msgs = ((InternalEObject)calledService).eInverseRemove(this, ConfigurationPackage.SERVICE__CALLEES, Service.class, msgs);
+					msgs = ((InternalEObject)calledService).eInverseRemove(this, ConfigurationPackage.SERVICE__INCOMING_CALLS, Service.class, msgs);
 				return basicSetCalledService((Service)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);

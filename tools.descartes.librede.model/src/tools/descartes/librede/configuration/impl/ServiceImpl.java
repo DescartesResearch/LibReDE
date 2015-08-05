@@ -58,7 +58,9 @@ import tools.descartes.librede.configuration.Task;
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#isBackgroundService <em>Background Service</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getTasks <em>Tasks</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getAccessedResources <em>Accessed Resources</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getCallees <em>Callees</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getIncomingCalls <em>Incoming Calls</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getOutgoingCalls <em>Outgoing Calls</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ServiceImpl#getResourceDemands <em>Resource Demands</em>}</li>
  * </ul>
  *
  * @generated
@@ -94,15 +96,14 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	protected EList<Task> tasks;
 
 	/**
-	 * The cached value of the '{@link #getCallees() <em>Callees</em>}' reference list.
+	 * The cached value of the '{@link #getIncomingCalls() <em>Incoming Calls</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getCallees()
+	 * @see #getIncomingCalls()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ExternalCall> callees;
-
+	protected EList<ExternalCall> incomingCalls;
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -175,11 +176,41 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<ExternalCall> getCallees() {
-		if (callees == null) {
-			callees = new EObjectWithInverseResolvingEList<ExternalCall>(ExternalCall.class, this, ConfigurationPackage.SERVICE__CALLEES, ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE);
+	public EList<ExternalCall> getIncomingCalls() {
+		if (incomingCalls == null) {
+			incomingCalls = new EObjectWithInverseResolvingEList<ExternalCall>(ExternalCall.class, this, ConfigurationPackage.SERVICE__INCOMING_CALLS, ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE);
 		}
-		return callees;
+		return incomingCalls;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public EList<ExternalCall> getOutgoingCalls() {
+		EList<ExternalCall> calls = new BasicEList<>();
+		for (Task t : getTasks()) {
+			if (t instanceof ExternalCall) {
+				calls.add((ExternalCall)t);
+			}
+		}
+		return calls;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<ResourceDemand> getResourceDemands() {
+		EList<ResourceDemand> demands = new BasicEList<>();
+		for (Task t : getTasks()) {
+			if (t instanceof ResourceDemand) {
+				demands.add((ResourceDemand)t);
+			}
+		}
+		return demands;
 	}
 
 	/**
@@ -191,8 +222,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ConfigurationPackage.SERVICE__CALLEES:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getCallees()).basicAdd(otherEnd, msgs);
+			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncomingCalls()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -207,8 +238,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 		switch (featureID) {
 			case ConfigurationPackage.SERVICE__TASKS:
 				return ((InternalEList<?>)getTasks()).basicRemove(otherEnd, msgs);
-			case ConfigurationPackage.SERVICE__CALLEES:
-				return ((InternalEList<?>)getCallees()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
+				return ((InternalEList<?>)getIncomingCalls()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -227,8 +258,12 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return getTasks();
 			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
 				return getAccessedResources();
-			case ConfigurationPackage.SERVICE__CALLEES:
-				return getCallees();
+			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
+				return getIncomingCalls();
+			case ConfigurationPackage.SERVICE__OUTGOING_CALLS:
+				return getOutgoingCalls();
+			case ConfigurationPackage.SERVICE__RESOURCE_DEMANDS:
+				return getResourceDemands();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -249,9 +284,9 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				getTasks().clear();
 				getTasks().addAll((Collection<? extends Task>)newValue);
 				return;
-			case ConfigurationPackage.SERVICE__CALLEES:
-				getCallees().clear();
-				getCallees().addAll((Collection<? extends ExternalCall>)newValue);
+			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
+				getIncomingCalls().clear();
+				getIncomingCalls().addAll((Collection<? extends ExternalCall>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -271,8 +306,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__TASKS:
 				getTasks().clear();
 				return;
-			case ConfigurationPackage.SERVICE__CALLEES:
-				getCallees().clear();
+			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
+				getIncomingCalls().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -292,8 +327,12 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 				return tasks != null && !tasks.isEmpty();
 			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
 				return !getAccessedResources().isEmpty();
-			case ConfigurationPackage.SERVICE__CALLEES:
-				return callees != null && !callees.isEmpty();
+			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
+				return incomingCalls != null && !incomingCalls.isEmpty();
+			case ConfigurationPackage.SERVICE__OUTGOING_CALLS:
+				return !getOutgoingCalls().isEmpty();
+			case ConfigurationPackage.SERVICE__RESOURCE_DEMANDS:
+				return !getResourceDemands().isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

@@ -42,7 +42,9 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link tools.descartes.librede.configuration.Service#isBackgroundService <em>Background Service</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Service#getTasks <em>Tasks</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Service#getAccessedResources <em>Accessed Resources</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.Service#getCallees <em>Callees</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getIncomingCalls <em>Incoming Calls</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getOutgoingCalls <em>Outgoing Calls</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.Service#getResourceDemands <em>Resource Demands</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getService()
@@ -111,21 +113,53 @@ public interface Service extends ModelEntity {
 	EList<Resource> getAccessedResources();
 
 	/**
-	 * Returns the value of the '<em><b>Callees</b></em>' reference list.
+	 * Returns the value of the '<em><b>Incoming Calls</b></em>' reference list.
 	 * The list contents are of type {@link tools.descartes.librede.configuration.ExternalCall}.
 	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.ExternalCall#getCalledService <em>Called Service</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Callees</em>' reference list isn't clear,
+	 * If the meaning of the '<em>Incoming Calls</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Callees</em>' reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_Callees()
+	 * @return the value of the '<em>Incoming Calls</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_IncomingCalls()
 	 * @see tools.descartes.librede.configuration.ExternalCall#getCalledService
 	 * @model opposite="calledService"
 	 * @generated
 	 */
-	EList<ExternalCall> getCallees();
+	EList<ExternalCall> getIncomingCalls();
+
+	/**
+	 * Returns the value of the '<em><b>Outgoing Calls</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.ExternalCall}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Outgoing Calls</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Outgoing Calls</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_OutgoingCalls()
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * @generated
+	 */
+	EList<ExternalCall> getOutgoingCalls();
+
+	/**
+	 * Returns the value of the '<em><b>Resource Demands</b></em>' reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.ResourceDemand}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Resource Demands</em>' reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Resource Demands</em>' reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_ResourceDemands()
+	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * @generated
+	 */
+	EList<ResourceDemand> getResourceDemands();
 
 } // Service

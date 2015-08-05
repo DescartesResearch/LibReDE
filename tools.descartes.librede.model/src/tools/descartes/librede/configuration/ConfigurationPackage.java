@@ -659,13 +659,31 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE__ACCESSED_RESOURCES = MODEL_ENTITY_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Callees</b></em>' reference list.
+	 * The feature id for the '<em><b>Incoming Calls</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE__CALLEES = MODEL_ENTITY_FEATURE_COUNT + 3;
+	int SERVICE__INCOMING_CALLS = MODEL_ENTITY_FEATURE_COUNT + 3;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Calls</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__OUTGOING_CALLS = MODEL_ENTITY_FEATURE_COUNT + 4;
+
+	/**
+	 * The feature id for the '<em><b>Resource Demands</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SERVICE__RESOURCE_DEMANDS = MODEL_ENTITY_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Service</em>' class.
@@ -674,7 +692,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 4;
+	int SERVICE_FEATURE_COUNT = MODEL_ENTITY_FEATURE_COUNT + 6;
 
 	/**
 	 * The number of operations of the '<em>Service</em>' class.
@@ -1449,13 +1467,31 @@ public interface ConfigurationPackage extends EPackage {
 	int COMPOSITE_SERVICE__ACCESSED_RESOURCES = SERVICE__ACCESSED_RESOURCES;
 
 	/**
-	 * The feature id for the '<em><b>Callees</b></em>' reference list.
+	 * The feature id for the '<em><b>Incoming Calls</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int COMPOSITE_SERVICE__CALLEES = SERVICE__CALLEES;
+	int COMPOSITE_SERVICE__INCOMING_CALLS = SERVICE__INCOMING_CALLS;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing Calls</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__OUTGOING_CALLS = SERVICE__OUTGOING_CALLS;
+
+	/**
+	 * The feature id for the '<em><b>Resource Demands</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_SERVICE__RESOURCE_DEMANDS = SERVICE__RESOURCE_DEMANDS;
 
 	/**
 	 * The feature id for the '<em><b>Sub Services</b></em>' containment reference list.
@@ -1818,15 +1854,37 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getService_AccessedResources();
 
 	/**
-	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getCallees <em>Callees</em>}'.
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getIncomingCalls <em>Incoming Calls</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Callees</em>'.
-	 * @see tools.descartes.librede.configuration.Service#getCallees()
+	 * @return the meta object for the reference list '<em>Incoming Calls</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getIncomingCalls()
 	 * @see #getService()
 	 * @generated
 	 */
-	EReference getService_Callees();
+	EReference getService_IncomingCalls();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getOutgoingCalls <em>Outgoing Calls</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Outgoing Calls</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getOutgoingCalls()
+	 * @see #getService()
+	 * @generated
+	 */
+	EReference getService_OutgoingCalls();
+
+	/**
+	 * Returns the meta object for the reference list '{@link tools.descartes.librede.configuration.Service#getResourceDemands <em>Resource Demands</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Resource Demands</em>'.
+	 * @see tools.descartes.librede.configuration.Service#getResourceDemands()
+	 * @see #getService()
+	 * @generated
+	 */
+	EReference getService_ResourceDemands();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.TraceConfiguration <em>Trace Configuration</em>}'.
@@ -2674,12 +2732,28 @@ public interface ConfigurationPackage extends EPackage {
 		EReference SERVICE__ACCESSED_RESOURCES = eINSTANCE.getService_AccessedResources();
 
 		/**
-		 * The meta object literal for the '<em><b>Callees</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Incoming Calls</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference SERVICE__CALLEES = eINSTANCE.getService_Callees();
+		EReference SERVICE__INCOMING_CALLS = eINSTANCE.getService_IncomingCalls();
+
+		/**
+		 * The meta object literal for the '<em><b>Outgoing Calls</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SERVICE__OUTGOING_CALLS = eINSTANCE.getService_OutgoingCalls();
+
+		/**
+		 * The meta object literal for the '<em><b>Resource Demands</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SERVICE__RESOURCE_DEMANDS = eINSTANCE.getService_ResourceDemands();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl <em>Trace Configuration</em>}' class.
