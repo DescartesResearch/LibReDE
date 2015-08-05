@@ -26,19 +26,43 @@
  */
 package tools.descartes.librede.repository.rules;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMetricDerivationHandler;
 import tools.descartes.librede.units.Dimension;
 
-public class DerivationRule<D extends Dimension> extends AbstractRule<D> {
+public class DerivationRule<D extends Dimension> implements Comparable<DerivationRule<D>> {
+	
+	static class DefaultScope implements RuleScope {
+
+		@Override
+		public List<ModelEntity> getScopeSet(ModelEntity base) {
+			return Collections.singletonList(base);
+		}
+
+		@Override
+		public List<ModelEntity> getNotificationSet(ModelEntity changed) {
+			return Collections.singletonList(changed);
+		}
+		
+	}
 	
 	private IMetricDerivationHandler<D> handler;
+	private final Metric<D> metric;
+	private final Aggregation aggregation;
+	private final List<RuleDependency<?>> dependencies = new LinkedList<>();
+	private final List<RulePrecondition> preconditions = new LinkedList<>();
+	private RuleScope resolver = new DefaultScope();
+	private int priority;
 		
 	private DerivationRule(Metric<D> metric, Aggregation aggregation) {
-		super(metric, aggregation);
+		this.metric = metric;
+		this.aggregation = aggregation;
 	}
 	
 	public DerivationRule<D> requiring(Aggregation aggregation) {
@@ -110,6 +134,67 @@ public class DerivationRule<D extends Dimension> extends AbstractRule<D> {
 		res.append("handler=").append(handler);
 		res.append("}");
 		return res.toString();
+	}
+
+	public List<RuleDependency<?>> getDependencies() {
+		return dependencies;
+	}
+
+	protected void addPrecondition(RulePrecondition precondition) {
+		preconditions.add(precondition);
+	}
+
+	protected void addDependency(Metric<? extends Dimension> metric, Aggregation aggregation) {
+		dependencies.add(new RuleDependency<>(metric, aggregation));
+	}
+
+	public Metric<D> getMetric() {
+		return metric;
+	}
+
+	public Aggregation getAggregation() {
+		return aggregation;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	public void setScope(RuleScope resolver) {
+		this.resolver = resolver;
+	}
+
+	public List<ModelEntity> getScopeSet(ModelEntity base) {
+		return resolver.getScopeSet(base);
+	}
+
+	public List<ModelEntity> getNotificationSet(ModelEntity changed) {
+		return resolver.getNotificationSet(changed);
+	}
+
+	public boolean applies(ModelEntity entity) {
+		for (RulePrecondition cond : preconditions) {
+			if (!cond.check(entity)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public int compareTo(DerivationRule<D> o) {
+		int c = this.getMetric().getName().compareTo(o.getMetric().getName());
+		if (c == 0) {
+			c = this.getAggregation().compareTo(o.getAggregation());
+			if (c == 0) {
+				c = Integer.compare(this.getPriority(), o.getPriority());
+			}
+		}
+		return c;
 	}
 	
 

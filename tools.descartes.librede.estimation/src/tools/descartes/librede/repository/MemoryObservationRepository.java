@@ -47,7 +47,6 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
-import tools.descartes.librede.repository.rules.AbstractRule;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RuleDependency;
 import tools.descartes.librede.repository.rules.RulesConfig;
@@ -305,7 +304,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 	}
 	
-	private boolean checkDependencies(AbstractRule<?> rule, ModelEntity entity) {
+	private boolean checkDependencies(DerivationRule<?> rule, ModelEntity entity) {
 		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
@@ -329,7 +328,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return true;
 	}
 	
-	private List<DataEntry<?>> getRequiredEntries(AbstractRule<?> rule, ModelEntity entity) {
+	private List<DataEntry<?>> getRequiredEntries(DerivationRule<?> rule, ModelEntity entity) {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
 		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
