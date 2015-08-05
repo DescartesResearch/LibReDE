@@ -25,6 +25,7 @@ Export-Package: tools.descartes.librede;uses:="tools.descartes.librede.repositor
    tools.descartes.librede.configuration,
    tools.descartes.librede.metrics",
  tools.descartes.librede.datasource.csv;uses:="tools.descartes.librede.datasource",
+ tools.descartes.librede.datasource.memory,
  tools.descartes.librede.exceptions,
  tools.descartes.librede.export;uses:="tools.descartes.librede.repository",
  tools.descartes.librede.export.csv;uses:="tools.descartes.librede.export,tools.descartes.librede.repository",
@@ -60,6 +61,10 @@ Export-Package: tools.descartes.librede;uses:="tools.descartes.librede.repositor
    tools.descartes.librede.configuration,
    tools.descartes.librede.linalg,
    tools.descartes.librede.metrics",
+ tools.descartes.librede.repository.adapters,
+ tools.descartes.librede.repository.exceptions,
+ tools.descartes.librede.repository.handlers,
+ tools.descartes.librede.repository.rules,
  tools.descartes.librede.util;uses:="tools.descartes.librede.repository,tools.descartes.librede.configuration",
  tools.descartes.librede.validation;
   uses:="tools.descartes.librede.repository,
