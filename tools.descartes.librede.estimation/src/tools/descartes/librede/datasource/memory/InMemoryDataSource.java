@@ -66,6 +66,10 @@ public class InMemoryDataSource extends AbstractDataSource {
 			}
 		}
 	}
+	
+	public TimeSeries getData(String identifier) {
+		return channels.get(identifier).data;
+	}
 
 	@Override
 	public List<TraceKey> addTrace(TraceConfiguration trace) throws IOException {
