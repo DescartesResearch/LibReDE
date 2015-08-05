@@ -63,6 +63,10 @@ public interface IMonitoringRepository {
 	
 	public <D extends Dimension> void insertDerivation(Rule<D> t, IMetricDerivationHandler<D> handler, ModelEntity entity);
 	
+	public void addListener(IMonitoringRepositoryListener listener);
+	
+	public void removeListener(IMonitoringRepositoryListener listener);
+	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	

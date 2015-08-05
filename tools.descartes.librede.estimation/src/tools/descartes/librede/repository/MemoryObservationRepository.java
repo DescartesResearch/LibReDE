@@ -253,6 +253,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private final RulesConfig rules = new RulesConfig();
 	private final WorkloadDescription workload;
 	private Quantity<Time> currentTime;
+	private final Set<IMonitoringRepositoryListener> listeners = new HashSet<>();
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
@@ -262,6 +263,16 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		rules.logConfigDump();
 		registerDefaultHandlers();
+	}
+	
+	@Override
+	public void addListener(IMonitoringRepositoryListener listener) {
+		listeners.add(listener);		
+	}
+	
+	@Override
+	public void removeListener(IMonitoringRepositoryListener listener) {
+		listeners.remove(listener);		
 	}
 	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
@@ -295,6 +306,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
+		for (IMonitoringRepositoryListener curListener : listeners) {
+			curListener.entryAdded(metric, entity, aggregation);
+		}
+		
 		for (Rule<?> r : rules.getDerivationRules(metric, aggregation)) {
 			List<ModelEntity> entities = r.getNotificationSet(entity);
 			for (ModelEntity e : entities) {
