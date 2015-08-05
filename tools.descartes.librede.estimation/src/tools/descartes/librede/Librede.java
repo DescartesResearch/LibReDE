@@ -68,6 +68,7 @@ import tools.descartes.librede.datasource.IDataSource;
 import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
+import tools.descartes.librede.datasource.memory.InMemoryDataSource;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.export.IExporter;
@@ -139,6 +140,7 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION, new UtilizationAdapter());
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
+		Registry.INSTANCE.registerImplementationType(IDataSource.class, InMemoryDataSource.class);
 		
 		Registry.INSTANCE.registerImplementationType(IEstimationAlgorithm.class, SimpleApproximation.class);
 		
