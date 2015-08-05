@@ -219,7 +219,10 @@ public class TimeSeries {
 	}
 	
 	public TimeSeries append(TimeSeries series) {
-		return new TimeSeries(vertcat(timestamps, series.timestamps), vertcat(values, series.values));
+		TimeSeries ts = new TimeSeries(vertcat(timestamps, series.timestamps), vertcat(values, series.values));
+		ts.setStartTime(Math.min(getStartTime(), series.getStartTime()));
+		ts.setEndTime(Math.max(getEndTime(), series.getEndTime()));
+		return ts;
 	}
 	
 	public double timeWeightedMean(int column, TimeSeries userWeights) {
