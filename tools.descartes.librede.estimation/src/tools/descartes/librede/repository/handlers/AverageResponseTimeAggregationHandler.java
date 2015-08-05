@@ -49,7 +49,7 @@ public class AverageResponseTimeAggregationHandler extends BaseDerivationHandler
 			if (log.isTraceEnabled()) {
 				log.trace("Calculate " + aggregation.getLiteral() + " of " + metric.getName() + " for entity " + entity + " from " + Aggregation.SUM.getLiteral() + ".");
 			}
-			double sumRt = repository.aggregate(StandardMetrics.RESPONSE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
+			double sumRt = repository.aggregate(metric, Time.SECONDS, entity, Aggregation.SUM, start, end);
 			double requests = repository.aggregate(StandardMetrics.DEPARTURES, RequestCount.REQUESTS, entity, Aggregation.SUM, start, end);
 			if (requests == 0.0) {
 				// no requests -> no mean response time

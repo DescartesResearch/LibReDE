@@ -38,6 +38,7 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.AverageResponseTimeAggregationHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
 import tools.descartes.librede.repository.handlers.DeriveIdentityHandler;
@@ -120,9 +121,44 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 	@Override
 	public List<DerivationRule<Time>> getDerivationRules() {
 		return Arrays.asList(
+				/////////////////////////////////
+				// residence time/NONE
+				/////////////////////////////////
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.NONE)
+					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)
+					.check(new NoExternalCallPrecondition())
+					.priority(100)
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
+				/////////////////////////////////
+				// residence time/AVERAGE
+				/////////////////////////////////
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
+					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.priority(20)
+					.build(new ThroughputWeightedAggregationHandler<Time>()),
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
+					.requiring(Aggregation.SUM)
+					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
+					.priority(10)
+					.build(new AverageResponseTimeAggregationHandler()),
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE)
+					.check(new ExternalCallPrecondition())
+					.scope(new ExternalCallScope())
+					.build(new DeriveResidenceTimeFromExternalCalls()),
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
+					.check(new NoExternalCallPrecondition())
+					.priority(100)
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
+				/////////////////////////////////
+				// residence time/SUM
+				/////////////////////////////////
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
 					.requiring(Aggregation.NONE)
 					.priority(0)
@@ -130,64 +166,47 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
 					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM)),
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MINIMUM)
-					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MAXIMUM)
-					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)
-					.requiring(Aggregation.NONE)
-					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
-					.requiring(Aggregation.AVERAGE)
-					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
-					.priority(10)
-					.build(new ThroughputWeightedAggregationHandler<Time>()),
-				// Add derivation rules for services with external calls
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE)
-					.check(new ExternalCallPrecondition())
-					.scope(new ExternalCallScope())
-					.build(new DeriveResidenceTimeFromExternalCalls()),
-				// Add identity derivation rules for services with no external calls RESIDENCE_TIME == RESPONSE_TIME
-				// IMPORTANT: prefer identity rules to derivation rules based on identity. Otherwise we may get long
-				// derivation rule chains.
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.NONE)
-					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.NONE)
-					.check(new NoExternalCallPrecondition())
-					.priority(100)
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
-					.check(new NoExternalCallPrecondition())
-					.priority(100)
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
+					.requiring(Aggregation.CUMULATIVE_SUM)
+					.build(new DeriveDiffHandler<Time>()),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.SUM)
 					.check(new NoExternalCallPrecondition())
 					.priority(100)
 					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
+				/////////////////////////////////
+				// residence time/MINIMUM
+				/////////////////////////////////
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MINIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MINIMUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
 					.check(new NoExternalCallPrecondition())
 					.priority(100)
 					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
+				/////////////////////////////////
+				// residence time/MAXIMUM
+				/////////////////////////////////
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MAXIMUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.MAXIMUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.MINIMUM)
 					.check(new NoExternalCallPrecondition())
 					.priority(100)
 					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
+				/////////////////////////////////
+				// residence time/CUMULATIVE_SUM
+				/////////////////////////////////
+				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)
+					.requiring(Aggregation.NONE)
+					.build(new DefaultAggregationHandler<Time>(Aggregation.NONE)),
 				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.CUMULATIVE_SUM)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.CUMULATIVE_SUM)
 					.check(new NoExternalCallPrecondition())
 					.priority(100)
-					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME)),
-				// Add derivation rule for cumulative sum
-				DerivationRule.derive(StandardMetrics.RESIDENCE_TIME, Aggregation.SUM)
-					.requiring(Aggregation.CUMULATIVE_SUM)
-					.build(new DeriveDiffHandler<Time>())
+					.build(new DeriveIdentityHandler<>(StandardMetrics.RESPONSE_TIME))		
 				);
 	}
 }
