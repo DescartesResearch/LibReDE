@@ -35,7 +35,7 @@ import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveUtilizationHandler;
-import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.units.Ratio;
 
 public class UtilizationAdapter implements IMetricAdapter<Ratio> {
@@ -46,12 +46,12 @@ public class UtilizationAdapter implements IMetricAdapter<Ratio> {
 	}
 
 	@Override
-	public List<DerivationRule<Ratio>> getDerivationRules() {
+	public List<Rule<Ratio>> getDerivationRules() {
 		return Arrays.asList(
-				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.build(new DefaultAggregationHandler<Ratio>(Aggregation.AVERAGE)),
-				DerivationRule.derive(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
 					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)
 					.build(new DeriveUtilizationHandler())

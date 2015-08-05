@@ -35,7 +35,7 @@ import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
-import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.units.Time;
 
 public class IdleTimeAdapter implements IMetricAdapter<Time> {
@@ -46,12 +46,12 @@ public class IdleTimeAdapter implements IMetricAdapter<Time> {
 	}
 
 		@Override
-	public List<DerivationRule<Time>> getDerivationRules() {
+	public List<Rule<Time>> getDerivationRules() {
 		return Arrays.asList(
-				DerivationRule.derive(StandardMetrics.IDLE_TIME, Aggregation.SUM)
+				Rule.rule(StandardMetrics.IDLE_TIME, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
 					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM)),
-				DerivationRule.derive(StandardMetrics.IDLE_TIME, Aggregation.SUM)
+				Rule.rule(StandardMetrics.IDLE_TIME, Aggregation.SUM)
 					.requiring(Aggregation.CUMULATIVE_SUM)
 					.build(new DeriveDiffHandler<Time>())
 				);

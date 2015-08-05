@@ -36,7 +36,7 @@ import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveDeparturesHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
-import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.units.RequestCount;
 
 public class DeparturesAdapter implements IMetricAdapter<RequestCount> {
@@ -47,29 +47,29 @@ public class DeparturesAdapter implements IMetricAdapter<RequestCount> {
 	}
 
 	@Override
-	public List<DerivationRule<RequestCount>> getDerivationRules() {
+	public List<Rule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.SUM)
+				Rule.rule(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.requiring(Aggregation.NONE)
 					.priority(10)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.SUM)
+				Rule.rule(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
 					.priority(0)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.SUM)),
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.MINIMUM)
+				Rule.rule(StandardMetrics.DEPARTURES, Aggregation.MINIMUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.MAXIMUM)
+				Rule.rule(StandardMetrics.DEPARTURES, Aggregation.MAXIMUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.CUMULATIVE_SUM)
+				Rule.rule(StandardMetrics.DEPARTURES, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.DEPARTURES, Aggregation.SUM)
+				Rule.rule(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.requiring(Aggregation.CUMULATIVE_SUM)
 					.build(new DeriveDiffHandler<RequestCount>()),
-				DerivationRule.derive(StandardMetrics.DEPARTURES)
+				Rule.rule(StandardMetrics.DEPARTURES)
 					.requiring(StandardMetrics.RESPONSE_TIME)
 					.build(new DeriveDeparturesHandler())
 				);

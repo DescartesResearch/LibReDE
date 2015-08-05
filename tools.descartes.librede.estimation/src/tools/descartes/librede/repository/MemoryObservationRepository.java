@@ -47,7 +47,7 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
-import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RuleDependency;
 import tools.descartes.librede.repository.rules.RulesConfig;
 import tools.descartes.librede.units.Dimension;
@@ -124,7 +124,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private class DataEntry<D extends Dimension> {
 
 		private final DataKey<D> key;
-		private DerivationRule<D> derivationRule = null;
+		private Rule<D> derivationRule = null;
 		private TimeSeries data = null;
 		private Set<DataEntry<?>> dependentEntries = new HashSet<>();
 		private List<DataEntry<?>> requiredEntries = Collections.emptyList();
@@ -156,7 +156,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			return endTime;
 		}
 		
-		public void setDerivationRule(DerivationRule<D> rule, List<DataEntry<?>> requiredEntries) {
+		public void setDerivationRule(Rule<D> rule, List<DataEntry<?>> requiredEntries) {
 			if ((rule.getAggregation() == Aggregation.NONE) && (data != null)) {
 				// Prevent the registration of a derivation rules for Aggregation.NONE
 				// if this entry already contains null. This rule would be redundant and
@@ -292,7 +292,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
-		for (DerivationRule<?> r : rules.getDerivationRules(metric, aggregation)) {
+		for (Rule<?> r : rules.getDerivationRules(metric, aggregation)) {
 			List<ModelEntity> entities = r.getNotificationSet(entity);
 			for (ModelEntity e : entities) {
 				if (r.applies(e)) {
@@ -304,7 +304,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 	}
 	
-	private boolean checkDependencies(DerivationRule<?> rule, ModelEntity entity) {
+	private boolean checkDependencies(Rule<?> rule, ModelEntity entity) {
 		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
@@ -328,7 +328,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return true;
 	}
 	
-	private List<DataEntry<?>> getRequiredEntries(DerivationRule<?> rule, ModelEntity entity) {
+	private List<DataEntry<?>> getRequiredEntries(Rule<?> rule, ModelEntity entity) {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
 		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
@@ -342,7 +342,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		return requiredEntries;
 	}
 	
-	private <D extends Dimension> void addDerivation(DerivationRule<D> t, ModelEntity entity) {
+	private <D extends Dimension> void addDerivation(Rule<D> t, ModelEntity entity) {
 		Metric<D> metric = t.getMetric();
 		Aggregation aggregation = t.getAggregation();
 		IMetricDerivationHandler<D> handler = t.getDerivationHandler();
@@ -475,8 +475,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private <D extends Dimension> void registerRules(Metric<D> m) {
-		List<DerivationRule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
-		for (DerivationRule<D> r : derivationRules) {
+		List<Rule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
+		for (Rule<D> r : derivationRules) {
 			rules.addDerivationRule(r);
 		}
 	}
@@ -485,7 +485,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (log.isDebugEnabled()) {
 			log.debug("Register default handlers for metrics");
 		}
-		for (DerivationRule<?> rule : rules.getDefaultDerivationRules()) {
+		for (Rule<?> rule : rules.getDefaultDerivationRules()) {
 			for (Resource resource : workload.getResources()) {
 				if (rule.applies(resource)) {
 					addDerivation(rule, resource);

@@ -38,7 +38,7 @@ import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DeriveConstantRate;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestRate;
 
@@ -50,13 +50,13 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 	}
 
 	@Override
-	public List<DerivationRule<RequestRate>> getDerivationRules() {
+	public List<Rule<RequestRate>> getDerivationRules() {
 		return Arrays.asList(
-				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(10)
 					.build(new TimeWeightedAggregationHandler<RequestRate>()),
-				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {				
 						@Override
 						public boolean check(ModelEntity entity) {
@@ -65,7 +65,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 					})
 					.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
 					.build(new DeriveConstantRate()),
-				DerivationRule.derive(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.priority(0)
 					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES))

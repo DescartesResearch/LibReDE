@@ -42,7 +42,7 @@ import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveVisitCountHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.repository.rules.RuleScope;
 import tools.descartes.librede.units.RequestCount;
@@ -55,17 +55,17 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 	}
 
 	@Override
-	public List<DerivationRule<RequestCount>> getDerivationRules() {
+	public List<Rule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
-				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(Aggregation.NONE)
 					.priority(10)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(20)
 					.build(new TimeWeightedAggregationHandler<RequestCount>()),
-				DerivationRule.derive(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
 					.check(new RulePrecondition() {
