@@ -158,6 +158,9 @@ public class Librede {
 	}
 	
 	public static LibredeResults execute(LibredeConfiguration conf, Map<String, IDataSource> existingDatasources) {
+		
+		checkWorkloadDescription(conf.getWorkloadDescription());
+		
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
@@ -680,6 +683,14 @@ public class Librede {
 					}
 					i++;
 				}
+			}
+		}
+	}
+	
+	private static void checkWorkloadDescription(WorkloadDescription workload) {
+		for (Service curService : workload.getServices()) {
+			if (curService.getAccessedResources().isEmpty()) {
+				log.warn("Service " + curService.getName() + " does not access any resource. Please check that resource demands are defined for this service.");
 			}
 		}
 	}
