@@ -34,6 +34,7 @@ public class LibredeTest {
 
 	@BeforeClass
 	public static void register() {
+		Librede.initLogging();
 		Librede.init();
 	}
 }

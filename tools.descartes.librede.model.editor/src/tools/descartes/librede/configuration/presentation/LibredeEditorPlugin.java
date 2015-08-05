@@ -123,6 +123,7 @@ public final class LibredeEditorPlugin extends EMFPlugin {
 		@Override
 		public void start(BundleContext context) throws Exception {
 			super.start(context);
+			Librede.initLogging();
 			Librede.init();
 			NNLSLibrary.init();
 			IpoptLibrary.init();

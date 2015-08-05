@@ -71,6 +71,7 @@ public class Console {
 
 			parser.parseArgument(args);
 			
+			Librede.initLogging();
 			Librede.init();
 			IpoptLibrary.init();
 			NNLSLibrary.init();

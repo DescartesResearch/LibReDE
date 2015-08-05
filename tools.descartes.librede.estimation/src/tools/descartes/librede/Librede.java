@@ -114,11 +114,13 @@ import tools.descartes.librede.validation.UtilizationValidator;
 
 public class Librede {
 	
-	private static final Logger log = Logger.getLogger(Librede.class);	
+	private static final Logger log = Logger.getLogger(Librede.class);
 	
-	public static void init() {
+	public static void initLogging() {
 		BasicConfigurator.configure();
-		
+	}
+	
+	public static void init() {		
 		Registry.INSTANCE.registerDimension(Time.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestCount.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestRate.INSTANCE);
