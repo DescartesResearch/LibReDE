@@ -87,7 +87,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 
 	private static final Quantity<Time> ZERO = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 
-	private final Logger log = Logger.getLogger(this.getClass());
+	private final Logger log = Loggers.DATASOURCE_LOG;
 
 	/**
 	 * For each monitored file, a channel is created to maintain the current

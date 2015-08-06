@@ -36,6 +36,7 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.datasource.AbstractFileDataSource;
+import tools.descartes.librede.datasource.Loggers;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.units.Time;
@@ -44,7 +45,7 @@ import tools.descartes.librede.units.Unit;
 @Component(displayName = "CSV Data Source")
 public class CsvDataSource extends AbstractFileDataSource {
 	
-	private static final Logger log = Logger.getLogger(CsvDataSource.class);
+	private static final Logger log = Loggers.DATASOURCE_LOG;
 
 	@ParameterDefinition(name = "Separators", label = "Separators", required = false, defaultValue = ",")
 	private String separators;

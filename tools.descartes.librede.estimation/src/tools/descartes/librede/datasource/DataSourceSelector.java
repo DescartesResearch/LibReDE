@@ -57,7 +57,7 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 
 	private static final Quantity<Time> ZERO = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
 
-	private static final Logger log = Logger.getLogger(DataSourceSelector.class);
+	private static final Logger log = Loggers.DATASOURCE_LOG;
 
 	// The minimum latest observation time of all data sources
 	private Quantity<Time> minLatestObservationTime = ZERO;
