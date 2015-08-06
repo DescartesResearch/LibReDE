@@ -26,8 +26,10 @@
  */
 package tools.descartes.librede.datasource;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 /**
  * Abstract class containing helper functionality for all types of data sources.
@@ -36,21 +38,42 @@ import java.util.List;
  */
 public abstract class AbstractDataSource implements IDataSource {
 	
-	private List<IDataSourceListener> listeners = new LinkedList<IDataSourceListener>();
+	private static final Logger log = Loggers.DATASOURCE_LOG;
+	
+	private String name = "<UNNAMED>";
+	private Set<IDataSourceListener> listeners = new HashSet<IDataSourceListener>();
 	
 	@Override
-	public void addListener(IDataSourceListener listener) {
-		listeners.add(listener);		
+	public void addListener(IDataSourceListener listener) {	
+		if(listeners.add(listener)) {
+			if (log.isDebugEnabled()) {
+				log.debug("New listener added to data source " + name + ": " + listener);
+			}
+		}
 	}
 	
 	@Override
 	public void removeListener(IDataSourceListener listener) {
-		listeners.remove(listener);		
+		if (listeners.remove(listener)) {
+			if (log.isDebugEnabled()) {
+				log.debug("Listener removed from data source " + name + ": " + listener);
+			}
+		}
 	}
 
 	protected void notifyListeners(TraceEvent e) {
 		for (IDataSourceListener listener : listeners) {
 			listener.dataAvailable(this, e);
 		}
+	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;		
 	}
 }

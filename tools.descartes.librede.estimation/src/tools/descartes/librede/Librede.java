@@ -199,24 +199,31 @@ public class Librede {
 	}
 	
 	public static void loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo, Map<String, IDataSource> existingDataSources) {
-		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>(existingDataSources);
+		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		
 		try (DataSourceSelector selector = new DataSourceSelector()) {
 			log.info("Start loading monitoring data");
 			for (TraceConfiguration trace : conf.getInput().getObservations()) {
 				String dataSourceName = trace.getDataSource().getName();
 				if (!dataSources.containsKey(dataSourceName)) {
-					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
-					try {
-						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
-						dataSources.put(dataSourceName, newSource);
-					} catch (Exception e) {
-						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
-						continue;
+					IDataSource newSource;
+					if (existingDataSources.containsKey(dataSourceName)) {
+						newSource = existingDataSources.get(dataSourceName);
+					} else {
+						Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
+						try {
+							newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
+						} catch (Exception e) {
+							log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
+							continue;
+						}
 					}
+					newSource.setName(dataSourceName);
+					selector.add(newSource);
+					dataSources.put(dataSourceName, newSource);
 				}
 				IDataSource source = dataSources.get(dataSourceName);
-				selector.add(source);
+				
 				try {
 					source.addTrace(trace);
 				} catch(IOException ex) {

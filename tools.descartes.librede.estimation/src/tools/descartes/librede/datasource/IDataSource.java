@@ -85,4 +85,19 @@ public interface IDataSource extends Closeable {
 	 */
 	public void removeListener(IDataSourceListener listener);
 
+	/**
+	 * Returns the name of this data source.
+	 * 
+	 * @return a String
+	 */
+	public String getName();
+
+	/**
+	 * Sets the name of the data source.
+	 * 
+	 * @param name
+	 *            a String
+	 */
+	public void setName(String name);
+
 }
