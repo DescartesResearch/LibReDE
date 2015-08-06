@@ -66,6 +66,7 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName="Non-linear Constrained Optimization")
 public class RecursiveOptimization extends AbstractEstimationAlgorithm {
@@ -270,13 +271,16 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	}
 	
 	
+	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
+	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, tools.descartes.librede.repository.IRepositoryCursor, int)
 	 */
 	@Override
 	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+			IObservationModel<?, ?> observationModel, 
+			IRepositoryCursor cursor,
+			int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, cursor, estimationWindow);
 		initStateConstraints(stateModel.getConstraints());
 		
 		this.stateSize = stateModel.getStateSize(); // number of variables

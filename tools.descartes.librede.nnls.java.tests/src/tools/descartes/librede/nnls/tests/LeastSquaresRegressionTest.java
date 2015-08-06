@@ -71,7 +71,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0)));
 
 		LeastSquaresRegression optim = new LeastSquaresRegression();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(stateModel, observationModel, cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -111,7 +111,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(generator.getStateModel(), cursor, workload.getResources().get(0)));
 		
 		LeastSquaresRegression optim = new LeastSquaresRegression();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(stateModel, observationModel, cursor, 10);
 
 		long start = System.nanoTime();
 

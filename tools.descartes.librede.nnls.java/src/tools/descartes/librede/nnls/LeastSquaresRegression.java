@@ -40,6 +40,7 @@ import tools.descartes.librede.models.observation.functions.ILinearOutputFunctio
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
 import tools.descartes.librede.registry.Component;
+import tools.descartes.librede.repository.IRepositoryCursor;
 import cern.colt.matrix.DoubleFactory2D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
@@ -72,8 +73,10 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 
 	@Override
 	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?,?> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+			IObservationModel<?,?> observationModel, 
+			IRepositoryCursor cursor,
+			int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, cursor, estimationWindow);
 		
 		independentVariables = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
 		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);

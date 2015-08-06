@@ -49,6 +49,7 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 import com.sun.jna.Pointer;
 
@@ -270,12 +271,14 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	}
 
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
+	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, tools.descartes.librede.repository.IRepositoryCursor, int)
 	 */
 	@Override
 	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+			IObservationModel<?, ?> observationModel, 
+			IRepositoryCursor cursor,
+			int estimationWindow) throws InitializationException {
+		super.initialize(stateModel, observationModel, cursor, estimationWindow);
 		
 		this.stateSize = stateModel.getStateSize();
 		this.outputSize = observationModel.getOutputSize();

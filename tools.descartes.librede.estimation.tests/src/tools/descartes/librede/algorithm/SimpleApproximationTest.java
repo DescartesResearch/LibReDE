@@ -86,7 +86,7 @@ public class SimpleApproximationTest extends LibredeTest {
 		}
 		
 		algorithm = new SimpleApproximation(Aggregation.AVERAGE);
-		algorithm.initialize(stateModel, model, 60);
+		algorithm.initialize(stateModel, model, cursor, 60);
 		
 		long start = System.nanoTime();
 
@@ -115,7 +115,7 @@ public class SimpleApproximationTest extends LibredeTest {
 		}
 		
 		algorithm = new SimpleApproximation(Aggregation.AVERAGE);
-		algorithm.initialize(stateModel, model, 60);		
+		algorithm.initialize(stateModel, model, cursor, 60);		
 		
 		long start = System.nanoTime();
 

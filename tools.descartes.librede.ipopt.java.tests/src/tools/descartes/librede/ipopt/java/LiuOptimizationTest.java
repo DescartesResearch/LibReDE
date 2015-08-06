@@ -95,7 +95,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, 1);
+		optim.initialize(stateModel, observationModel, cursor, 1);
 
 		long start = System.nanoTime();
 
@@ -163,7 +163,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		}
 		
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, 1);
+		optim.initialize(stateModel, observationModel, cursor, 1);
 
 		long start = System.nanoTime();
 

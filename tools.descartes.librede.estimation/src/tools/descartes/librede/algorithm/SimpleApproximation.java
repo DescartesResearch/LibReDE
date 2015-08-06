@@ -44,6 +44,7 @@ import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 /**
  * The simple approximation algorithm estimates the resource demands by
@@ -82,9 +83,11 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 
 	@Override
 	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow)
+			IObservationModel<?, ?> observationModel, 
+			IRepositoryCursor cursor,
+			int estimationWindow)
 			throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+		super.initialize(stateModel, observationModel, cursor, estimationWindow);
 		
 		// Fill with NaN. NaN values are ignored by the aggregation function.
 		this.buffer = matrix(estimationWindow, stateModel.getStateSize(),

@@ -91,7 +91,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(stateModel, observationModel, cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -151,7 +151,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(stateModel, observationModel, cursor, 10);
 
 		long start = System.nanoTime();
 

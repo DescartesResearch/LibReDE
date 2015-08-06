@@ -290,5 +290,20 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	public ResourceDemand getResourceDemand(int stateVariableIdx) {
 		return variables.get(stateVariableIdx);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder("Constant State Model { ");
+		Resource last = null;
+		for (ResourceDemand demand : variables) {
+			if (demand.getResource() != last) {
+				ret.append(demand.getResource().getName()).append(" -> ");
+				last = demand.getResource();
+			}
+			ret.append(demand.getService().getName()).append(" ");
+		}
+		ret.append("}");
+		return ret.toString();
+	}
 
 }

@@ -31,6 +31,7 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 /**
  * This interface must be implemented by all estimation algorithms. It provides
@@ -52,6 +53,8 @@ public interface IEstimationAlgorithm {
 	 *            an instance of IStateModel
 	 * @param observationModel
 	 *            an instance of IObservationModel
+	 * @param cursor
+	 *            an instance of IRepositoryCursor
 	 * @param estimationWindow
 	 *            the size of the sliding window to be used on the input
 	 *            measurement data. The size of the sliding window is the number
@@ -60,7 +63,9 @@ public interface IEstimationAlgorithm {
 	 * @throws InitializationException
 	 */
 	void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow)
+			IObservationModel<?, ?> observationModel,
+			IRepositoryCursor cursor,
+			int estimationWindow)
 			throws InitializationException;
 
 	/**

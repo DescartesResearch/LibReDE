@@ -31,12 +31,14 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 public class LinearOptimizationAlgorithm extends AbstractEstimationAlgorithm {
 
 	@Override
 	public void initialize(IStateModel<?> stateModel,
 			IObservationModel<?, ?> observationModel,
+			IRepositoryCursor cursor,
 			int estimationWindow) throws InitializationException {
 		//SimplexSolver solver = new SimplexSolver();
 		

@@ -87,7 +87,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
-		filter.initialize(stateModel, observationModel, 1);
+		filter.initialize(stateModel, observationModel, cursor, 1);
 		
 		long start = System.nanoTime();	
 		
@@ -131,7 +131,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
-		filter.initialize(stateModel, observationModel, 1);
+		filter.initialize(stateModel, observationModel, cursor, 1);
 		
 		long start = System.nanoTime();	
 		

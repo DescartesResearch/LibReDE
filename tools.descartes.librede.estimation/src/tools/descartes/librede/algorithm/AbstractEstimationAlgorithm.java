@@ -26,20 +26,27 @@
  */
 package tools.descartes.librede.algorithm;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IMonitoringRepository;
+import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.rules.IRuleActivationHandler;
 import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.RulePrecondition;
+import tools.descartes.librede.repository.rules.RuleScope;
 import tools.descartes.librede.units.Time;
 
 /**
@@ -50,15 +57,43 @@ import tools.descartes.librede.units.Time;
  */
 public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler<Time> {
 	
+	private static class QueryScope implements RuleScope {
+		private final Set<ModelEntity> entities = new HashSet<ModelEntity>();
+		
+		public QueryScope(Query<?,?> query) {
+			entities.addAll(query.getEntities());
+		}
+
+		@Override
+		public Set<ModelEntity> getScopeSet(ModelEntity base) {
+			return entities;
+		}
+
+		@Override
+		public Set<ModelEntity> getNotificationSet(ModelEntity base) {
+			return Collections.singleton(base);
+		}		
+	}
+	
+	private static final Logger log = Logger.getLogger(AbstractEstimationAlgorithm.class);
+	
 	private IStateModel<?> stateModel;
 	private IObservationModel<?, ?> observationModel;
-	private final List<ResourceDemand> scope = new LinkedList<ResourceDemand>();
+	private IRepositoryCursor cursor;
+	private final List<Rule<?>> dependencies = new LinkedList<Rule<?>>();
+	private final Set<Rule<?>> unsatisfiedDependencies = new HashSet<Rule<?>>();
+	private boolean activated = false;
 	
 	@Override
 	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
-			int estimationWindow) throws InitializationException {
+			IRepositoryCursor cursor, int estimationWindow) throws InitializationException {
 		this.stateModel = stateModel;
 		this.observationModel = observationModel;
+		this.cursor = cursor;
+		initializeDependencies();
+		for (Rule<?> rule : dependencies) {
+			cursor.getRepository().addRule(rule);
+		}
 	}
 
 	@Override
@@ -73,17 +108,55 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 
 	@Override
 	public void destroy() {
-		// Do nothing		
+		for (Rule<?> rule : dependencies) {
+			cursor.getRepository().removeRule(rule);
+		}
 	}
 	
 	@Override
 	public void activateRule(IMonitoringRepository repository, Rule<Time> rule, ModelEntity entity) {
-		
+		if (unsatisfiedDependencies.contains(rule)) {
+			if (log.isDebugEnabled()) {
+				log.debug("Satisfied dependency rule: " + rule);
+			}
+			unsatisfiedDependencies.remove(rule);
+			if (unsatisfiedDependencies.isEmpty()) {
+				activateAlgorithm();
+			}
+		}
+	}
+	
+	private void activateAlgorithm() {
+		log.info("Activated state model: " + stateModel);
+		activated = true;
 	}
 	
 	@Override
 	public void deactivateRule(IMonitoringRepository repository, Rule<Time> rule, ModelEntity entity) {
-		
+		if (!unsatisfiedDependencies.add(rule)) {
+			if (log.isDebugEnabled()) {
+				log.debug("Unsatisfied dependency rule: " + rule);
+			}
+			if (activated) {
+				deactivateAlgorithm();
+			}
+		}				
+	}
+	
+	private void deactivateAlgorithm() {
+		activated = false;
+	}
+	
+	protected void initializeDependencies() {
+	}
+	
+	protected void addDependency(Query<?,?> query) {
+		Rule<Time> newRule = Rule.rule(StandardMetrics.RESOURCE_DEMAND, Aggregation.AVERAGE);
+		newRule.requiring(query.getMetric(), query.getAggregation());
+		newRule.scope(new QueryScope(query));
+		newRule.build(this);
+		dependencies.add(newRule);
+		unsatisfiedDependencies.add(newRule);
 	}
 	
 }
