@@ -67,6 +67,10 @@ public interface IMonitoringRepository {
 	
 	public void removeListener(IMonitoringRepositoryListener listener);
 	
+	public <D extends Dimension> void addRule(Rule<D> rule);
+	
+	public <D extends Dimension> void removeRule(Rule<D> rule);
+	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	

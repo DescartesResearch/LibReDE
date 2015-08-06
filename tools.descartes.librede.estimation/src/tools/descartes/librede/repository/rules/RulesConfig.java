@@ -48,7 +48,7 @@ public class RulesConfig {
 	private final List<Rule<?>> defaultRules = new LinkedList<>();
 	
 	
-	public void addDerivationRule(Rule<?> rule) {
+	public void addRule(Rule<?> rule) {
 		if (rule.getDependencies().isEmpty()) {
 			defaultRules.add(rule);
 		} else {
@@ -66,6 +66,19 @@ public class RulesConfig {
 				aggregationEntry.add(rule);				
 			}
 			derivationRules.add(rule);
+		}
+	}
+	
+	public void removeRule(Rule<?> rule) {
+		if (derivationRules.contains(rule)) {
+			for (RuleDependency<?> r : rule.getDependencies()) {
+				EnumMap<Aggregation, List<Rule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
+				if (metricEntry != null) {
+					List<Rule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
+					aggregationEntry.remove(rule);
+				}
+			}
+			derivationRules.remove(rule);
 		}
 	}
 	

@@ -275,6 +275,16 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		listeners.remove(listener);		
 	}
 	
+	@Override
+	public <D extends Dimension> void addRule(Rule<D> rule) {
+		rules.addRule(rule);		
+	}
+	
+	@Override
+	public <D extends Dimension> void removeRule(Rule<D> rule) {
+		rules.removeRule(rule);
+	}
+	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
 		this.setData(m, unit, entity, observations, Aggregation.NONE, ZERO_SECONDS);
 	}
@@ -501,7 +511,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private <D extends Dimension> void registerRules(Metric<D> m) {
 		List<Rule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
 		for (Rule<D> r : derivationRules) {
-			rules.addDerivationRule(r);
+			rules.addRule(r);
 		}
 	}
 	
