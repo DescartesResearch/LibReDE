@@ -544,7 +544,12 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				DataEntry<?> entry = getEntry(m, entity, a);
 				if (entry != null) {
 					empty = false;
-					dump.append(m).append("/").append(a).append(", ");
+					dump.append(m).append("/").append(a);
+					if (entry.data != null) {
+						dump.append("(").append("length=").append(entry.data.samples()).append(", mean=").append(entry.data.mean(0));
+						dump.append(", start=").append(entry.data.getStartTime()).append("s, end=").append(entry.data.getEndTime()).append("s)");
+					}
+					dump.append(", ");
 				}
 			}
 		}
