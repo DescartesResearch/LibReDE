@@ -42,10 +42,10 @@ package tools.descartes.librede.configuration;
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getResourceDemand()
- * @model
+ * @model superTypes="tools.descartes.librede.configuration.Task tools.descartes.librede.units.Comparable<tools.descartes.librede.configuration.ResourceDemand>"
  * @generated
  */
-public interface ResourceDemand extends Task {
+public interface ResourceDemand extends Task, Comparable<ResourceDemand> {
 	/**
 	 * Returns the value of the '<em><b>Resource</b></em>' reference.
 	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Resource#getDemands <em>Demands</em>}'.

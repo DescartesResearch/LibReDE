@@ -1271,7 +1271,12 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		exporterConfigurationEClass.getESuperTypes().add(this.getNamedElement());
 		fileTraceConfigurationEClass.getESuperTypes().add(this.getTraceConfiguration());
 		modelEntityEClass.getESuperTypes().add(this.getNamedElement());
-		resourceDemandEClass.getESuperTypes().add(this.getTask());
+		EGenericType g1 = createEGenericType(this.getTask());
+		resourceDemandEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(theUnitsPackage.getComparable());
+		EGenericType g2 = createEGenericType(this.getResourceDemand());
+		g1.getETypeArguments().add(g2);
+		resourceDemandEClass.getEGenericSuperTypes().add(g1);
 		externalCallEClass.getESuperTypes().add(this.getTask());
 		compositeServiceEClass.getESuperTypes().add(this.getService());
 		taskEClass.getESuperTypes().add(this.getModelEntity());
@@ -1319,8 +1324,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEReference(getService_ResourceDemands(), this.getResourceDemand(), null, "resourceDemands", null, 0, -1, Service.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(traceConfigurationEClass, TraceConfiguration.class, "TraceConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		EGenericType g1 = createEGenericType(theMetricsPackage.getMetric());
-		EGenericType g2 = createEGenericType();
+		g1 = createEGenericType(theMetricsPackage.getMetric());
+		g2 = createEGenericType();
 		g1.getETypeArguments().add(g2);
 		EGenericType g3 = createEGenericType(theUnitsPackage.getDimension());
 		g2.setEUpperBound(g3);

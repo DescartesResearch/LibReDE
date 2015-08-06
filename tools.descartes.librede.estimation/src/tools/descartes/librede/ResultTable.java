@@ -57,7 +57,7 @@ public class ResultTable {
 		
 		private Builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
 			this.approach = approach;
-			TreeSet<ResourceDemand> variables = new TreeSet<ResourceDemand>(new ResourceDemandComparator());			
+			TreeSet<ResourceDemand> variables = new TreeSet<ResourceDemand>();			
 			for (Resource res : workload.getResources()) {
 				for (ResourceDemand demand : res.getDemands()) {
 					variables.add(demand);					
@@ -98,17 +98,6 @@ public class ResultTable {
 			
 			return new ResultTable(approach, columnToEntry, estimates);
 		}
-	}
-	
-	private static class ResourceDemandComparator implements Comparator<ResourceDemand> {
-		@Override
-		public int compare(ResourceDemand rd1, ResourceDemand rd2) {
-			int ret = rd1.getResource().getName().compareTo(rd2.getResource().getName());
-			if (ret == 0) {
-				ret = rd1.getService().getName().compareTo(rd2.getService().getName());
-			}
-			return ret;
-		}		
 	}
 	
 	private final Class<? extends IEstimationApproach> approach;

@@ -57,7 +57,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	
 	public static class Builder<C extends IStateConstraint> {
 		// The set is automatically sorted by resource names and service names
-		private Set<ResourceDemand> stateVariables = new TreeSet<>(new ResourceDemandComparator());
+		private Set<ResourceDemand> stateVariables = new TreeSet<>();
 		private List<C> constraints = new ArrayList<C>();
 		private IStateInitializer stateInitializer;
 		
@@ -108,17 +108,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			return secondDev;
 		}
 		
-	}
-	
-	private static class ResourceDemandComparator implements Comparator<ResourceDemand> {
-		@Override
-		public int compare(ResourceDemand rd1, ResourceDemand rd2) {
-			int ret = rd1.getResource().getName().compareTo(rd2.getResource().getName());
-			if (ret == 0) {
-				ret = rd1.getService().getName().compareTo(rd2.getService().getName());
-			}
-			return ret;
-		}		
 	}
 	
 	private final int stateSize;

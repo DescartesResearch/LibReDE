@@ -231,5 +231,19 @@ public class ResourceDemandImpl extends TaskImpl implements ResourceDemand {
 		}
 		return super.eIsSet(featureID);
 	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	@Override
+	public int compareTo(ResourceDemand o) {
+		int ret = this.getResource().getName().compareTo(o.getResource().getName());
+		if (ret == 0) {
+			ret = this.getService().getName().compareTo(o.getService().getName());
+		}
+		return ret;
+	}
 
 } //ResourceDemandImpl

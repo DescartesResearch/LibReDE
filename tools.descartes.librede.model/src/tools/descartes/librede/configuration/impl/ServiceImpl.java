@@ -204,13 +204,11 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @generated
 	 */
 	public EList<ResourceDemand> getResourceDemands() {
-		EList<ResourceDemand> demands = new BasicEList<>();
-		for (Task t : getTasks()) {
-			if (t instanceof ResourceDemand) {
-				demands.add((ResourceDemand)t);
-			}
-		}
-		return demands;
+		// TODO: implement this method to return the 'Resource Demands' reference list
+		// Ensure that you remove @generated or mark it @generated NOT
+		// The list is expected to implement org.eclipse.emf.ecore.util.InternalEList and org.eclipse.emf.ecore.EStructuralFeature.Setting
+		// so it's likely that an appropriate subclass of org.eclipse.emf.ecore.util.EcoreEList should be used.
+		throw new UnsupportedOperationException();
 	}
 
 	/**
