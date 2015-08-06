@@ -41,7 +41,6 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.Task;
 import tools.descartes.librede.configuration.WorkloadDescription;
-import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
@@ -321,7 +320,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		
 		for (Rule<?> r : rules.getDerivationRules(metric, aggregation)) {
-			List<ModelEntity> entities = r.getNotificationSet(entity);
+			Set<ModelEntity> entities = r.getNotificationSet(entity);
 			for (ModelEntity e : entities) {
 				if (r.applies(e)) {
 					if (checkDependencies(r, e)) {
@@ -340,7 +339,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private boolean checkDependencies(Rule<?> rule, ModelEntity entity) {
-		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
+		Set<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
 				if (rule.getMetric().equals(dep.getMetric())
@@ -365,7 +364,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private List<DataEntry<?>> getRequiredEntries(Rule<?> rule, ModelEntity entity) {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
-		List<ModelEntity> scopeEntities = rule.getScopeSet(entity);
+		Set<ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
 				DataEntry<?> reqEntry = getEntry(dep.getMetric(), e, dep.getAggregation());

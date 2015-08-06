@@ -26,14 +26,14 @@
  */
 package tools.descartes.librede.repository.rules;
 
-import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 
 public interface RuleScope {
 	
-	List<ModelEntity> getScopeSet(ModelEntity base);
+	Set<ModelEntity> getScopeSet(ModelEntity base);
 	
-	List<ModelEntity> getNotificationSet(ModelEntity base);
+	Set<ModelEntity> getNotificationSet(ModelEntity base);
 
 }

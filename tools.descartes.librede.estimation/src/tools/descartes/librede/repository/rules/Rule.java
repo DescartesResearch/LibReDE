@@ -29,11 +29,11 @@ package tools.descartes.librede.repository.rules;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.repository.IMetricDerivationHandler;
 import tools.descartes.librede.units.Dimension;
 
 public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
@@ -41,13 +41,13 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	static class DefaultScope implements RuleScope {
 
 		@Override
-		public List<ModelEntity> getScopeSet(ModelEntity base) {
-			return Collections.singletonList(base);
+		public Set<ModelEntity> getScopeSet(ModelEntity base) {
+			return Collections.singleton(base);
 		}
 
 		@Override
-		public List<ModelEntity> getNotificationSet(ModelEntity changed) {
-			return Collections.singletonList(changed);
+		public Set<ModelEntity> getNotificationSet(ModelEntity changed) {
+			return Collections.singleton(changed);
 		}
 		
 	}
@@ -168,11 +168,11 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		this.resolver = resolver;
 	}
 
-	public List<ModelEntity> getScopeSet(ModelEntity base) {
+	public Set<ModelEntity> getScopeSet(ModelEntity base) {
 		return resolver.getScopeSet(base);
 	}
 
-	public List<ModelEntity> getNotificationSet(ModelEntity changed) {
+	public Set<ModelEntity> getNotificationSet(ModelEntity changed) {
 		return resolver.getNotificationSet(changed);
 	}
 

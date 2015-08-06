@@ -27,8 +27,10 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
@@ -85,8 +87,8 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 	
 	private static class ExternalCallScope implements RuleScope {
 		@Override
-		public List<ModelEntity> getScopeSet(ModelEntity entity) {
-			List<ModelEntity> entities = new LinkedList<>();
+		public Set<ModelEntity> getScopeSet(ModelEntity entity) {
+			Set<ModelEntity> entities = new HashSet<>();
 			entities.add(entity);
 
 			List<Task> tasks = ((Service)entity).getTasks();
@@ -102,8 +104,8 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 		}
 
 		@Override
-		public List<ModelEntity> getNotificationSet(ModelEntity base) {
-			List<ModelEntity> entities = new LinkedList<>();
+		public Set<ModelEntity> getNotificationSet(ModelEntity base) {
+			Set<ModelEntity> entities = new HashSet<>();
 			entities.add(base);
 			List<ExternalCall> callees = ((Service)base).getIncomingCalls();
 			for (ExternalCall t : callees) {
