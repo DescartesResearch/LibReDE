@@ -156,8 +156,8 @@ public class ObservationDataGenerator {
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : resources) {
-			for (Service serv : res.getAccessingServices()) {
-				builder.addVariable(res, serv);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
 		stateModel = builder.build();

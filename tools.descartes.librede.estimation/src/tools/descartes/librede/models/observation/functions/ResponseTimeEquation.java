@@ -290,8 +290,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				 * - index of the resource corresponding to x_{row} s - index of
 				 * the service corresponding to x_{row}
 				 */
-				Resource res_i = getStateModel().getResource(row);
-				Service cls_s = getStateModel().getService(row);
+				Resource res_i = getStateModel().getResourceDemand(row).getResource();
+				Service cls_s = getStateModel().getResourceDemand(row).getService();
 
 				// get current throughput data
 				Vector X = throughputQuery.get(historicInterval);
@@ -391,10 +391,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction implements IDif
 				 * corresponding to x_{column} t - index of the service
 				 * corresponding to x_{column}
 				 */
-				Resource res_i = getStateModel().getResource(row);
-				Service cls_s = getStateModel().getService(row);
-				Resource res_j = getStateModel().getResource(column);
-				Service cls_t = getStateModel().getService(column);
+				Resource res_i = getStateModel().getResourceDemand(row).getResource();
+				Service cls_s = getStateModel().getResourceDemand(row).getService();
+				Resource res_j = getStateModel().getResourceDemand(column).getResource();
+				Service cls_t = getStateModel().getResourceDemand(column).getService();
 				
 				// if resources of x_{row} and x_{column} do not match the second
 				// derivative is zero

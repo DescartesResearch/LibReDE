@@ -26,9 +26,21 @@
  */
 package tools.descartes.librede.algorithm;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.repository.IMonitoringRepository;
+import tools.descartes.librede.repository.rules.IRuleActivationHandler;
+import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.units.Time;
 
 /**
  * This abstract class provides standard implementations for some of the methods in {@link IEstimationAlgorithm}.
@@ -36,10 +48,11 @@ import tools.descartes.librede.models.state.IStateModel;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm {
+public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler<Time> {
 	
 	private IStateModel<?> stateModel;
 	private IObservationModel<?, ?> observationModel;
+	private final List<ResourceDemand> scope = new LinkedList<ResourceDemand>();
 	
 	@Override
 	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
@@ -61,6 +74,16 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	@Override
 	public void destroy() {
 		// Do nothing		
+	}
+	
+	@Override
+	public void activateRule(IMonitoringRepository repository, Rule<Time> rule, ModelEntity entity) {
+		
+	}
+	
+	@Override
+	public void deactivateRule(IMonitoringRepository repository, Rule<Time> rule, ModelEntity entity) {
+		
 	}
 	
 }

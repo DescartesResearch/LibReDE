@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
@@ -45,15 +46,13 @@ import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
 public class ServiceDemandLawNaNTest extends LibredeTest {
 	
-	private final static int SERVICE_IDX = 1;
-	private final static int RESOURCE_IDX = 0;
+	private final static int STATE_IDX = 1;
 	
 	private ObservationDataGenerator generator;
 	private ServiceDemandLaw law;
@@ -70,8 +69,9 @@ public class ServiceDemandLawNaNTest extends LibredeTest {
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		resource = generator.getStateModel().getResource(RESOURCE_IDX);
-		service = generator.getStateModel().getService(SERVICE_IDX);
+		ResourceDemand demand = generator.getStateModel().getResourceDemand(STATE_IDX);
+		resource = demand.getResource();
+		service = demand.getService();
 		
 		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	

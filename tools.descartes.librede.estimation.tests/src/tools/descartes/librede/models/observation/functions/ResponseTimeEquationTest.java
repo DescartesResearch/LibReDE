@@ -59,7 +59,7 @@ import tools.descartes.librede.units.UnitsFactory;
 @RunWith(Parameterized.class)
 public class ResponseTimeEquationTest extends LibredeTest {
 	
-	private final static int SERVICE_IDX = 0;
+	private final static int STATE_IDX = 0;
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeEquation law;
@@ -86,7 +86,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		service = generator.getStateModel().getService(SERVICE_IDX);
+		service = generator.getStateModel().getResourceDemand(STATE_IDX).getService();
 		
 		law = new ResponseTimeEquation(generator.getStateModel(), cursor, service, useObservedUtilization);
 		state = generator.getDemands();

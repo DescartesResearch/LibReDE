@@ -28,6 +28,7 @@ package tools.descartes.librede.repository;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 
 public class WorkloadBuilder {
@@ -38,15 +39,19 @@ public class WorkloadBuilder {
 		return res;
 	}
 	
-	public static Service newService(String name) {
+	public static Service newService(String name, Resource... resources) {
 		Service serv = ConfigurationFactory.eINSTANCE.createService();
 		serv.setName(name);
+		for (Resource res : resources) {
+			ResourceDemand demand = ConfigurationFactory.eINSTANCE.createResourceDemand();
+			demand.setResource(res);
+			serv.getTasks().add(demand);
+		}
 		return serv;
 	}
 	
-	public static Service newBackgroundService(String name) {
-		Service serv = ConfigurationFactory.eINSTANCE.createService();
-		serv.setName(name);
+	public static Service newBackgroundService(String name, Resource... resources) {
+		Service serv = newService(name, resources);
 		serv.setBackgroundService(true);
 		return serv;
 	}

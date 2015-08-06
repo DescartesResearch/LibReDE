@@ -33,7 +33,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.VectorObservationModel;
@@ -62,8 +62,8 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 			WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : res.getAccessingServices()) {
-				builder.addVariable(res, serv);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
 		builder.setStateInitializer(new TargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));

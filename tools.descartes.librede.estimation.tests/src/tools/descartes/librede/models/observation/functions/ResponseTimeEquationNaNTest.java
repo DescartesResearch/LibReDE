@@ -37,7 +37,6 @@ import java.util.Collection;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -88,8 +87,8 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		service1 = generator.getStateModel().getService(0);
-		service2 = generator.getStateModel().getService(1);
+		service1 = generator.getWorkloadDescription().getServices().get(0);
+		service2 = generator.getWorkloadDescription().getServices().get(1);
 		
 		law1 = new ResponseTimeEquation(generator.getStateModel(), cursor, service1, useObservedUtilization);
 		law2 = new ResponseTimeEquation(generator.getStateModel(), cursor, service2, useObservedUtilization);

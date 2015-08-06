@@ -35,6 +35,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
@@ -63,11 +64,11 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 		
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> stateModelBuilder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service service : res.getAccessingServices()) {
-				if (!service.isBackgroundService()) {
-					stateModelBuilder.addVariable(res, service);
+			for (ResourceDemand demand : res.getDemands()) {
+				if (!demand.getService().isBackgroundService()) {
+					stateModelBuilder.addVariable(demand);
 				} else {
-					log.warn("Background services are not supported by Service Demand Law approach. Service \"" + service.getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
+					log.warn("Background services are not supported by Service Demand Law approach. Service \"" + demand.getService().getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
 				}
 			}
 			stateModels.add(stateModelBuilder.build());

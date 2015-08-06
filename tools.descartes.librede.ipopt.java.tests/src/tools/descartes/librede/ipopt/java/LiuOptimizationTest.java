@@ -31,10 +31,10 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
@@ -46,8 +46,6 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
-import tools.descartes.librede.models.state.constraints.ConstantStateBoundsConstraint;
-import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -79,9 +77,9 @@ public class LiuOptimizationTest extends LibredeTest {
 		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 5);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
-		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
+		builder.addVariable(workload.getResources().get(0).getDemands().get(0));
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
-		builder.addConstraint(new NoRequestsBoundsConstraint(workload.getResources().get(0), workload.getServices().get(0), cursor, 0, 1));
+		builder.addConstraint(new NoRequestsBoundsConstraint(workload.getResources().get(0).getDemands().get(0), cursor, 0, 1));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
@@ -135,14 +133,14 @@ public class LiuOptimizationTest extends LibredeTest {
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource resource : workload.getResources()) {
-			for (Service service : resource.getAccessingServices()) {
-				builder.addVariable(resource, service);
+			for (ResourceDemand demand : resource.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		for (Resource resource : workload.getResources()) {
-			for (Service service : resource.getAccessingServices()) {
-				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
+			for (ResourceDemand demand : resource.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 			}	
 		}
 		stateModel = builder.build();

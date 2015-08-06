@@ -29,6 +29,7 @@ package tools.descartes.librede.models.state;
 import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
@@ -55,9 +56,7 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	Indices getStateVariableIndices(Resource res);
 	
-	Resource getResource(int stateVariableIdx);
-	
-	Service getService(int stateVariableIdx);
+	ResourceDemand getResourceDemand(int stateVariableIdx);
 	
 	List<C> getConstraints();
 	

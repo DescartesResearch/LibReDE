@@ -28,29 +28,27 @@ package tools.descartes.librede.models.state.constraints;
 
 import java.util.List;
 
-import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.StateVariable;
 
 public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, IDifferentiableFunction {
 
 	// the state variable to which the bounds apply to
-	private final StateVariable variable;
+	private final ResourceDemand variable;
 	private final double lower;
 	private final double upper;
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	public ConstantStateBoundsConstraint(Resource resource, Service service, double lowerBound, double upperBound) {
-		this.variable = new StateVariable(resource, service);
+	public ConstantStateBoundsConstraint(ResourceDemand demand, double lowerBound, double upperBound) {
+		this.variable = demand;
 		this.lower = lowerBound;
 		this.upper = upperBound;
 	}
 	
-	public StateVariable getStateVariable() {
+	public ResourceDemand getStateVariable() {
 		return this.variable;
 	}
 

@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
@@ -61,15 +62,16 @@ public class ConstantStateModelTest extends LibredeTest {
 	@Test
 	public void testNonRecStateModel() {
 		List<Resource> resources = Arrays.asList(WorkloadBuilder.newResource("R1"), WorkloadBuilder.newResource("R2"), WorkloadBuilder.newResource("R3"));
-		List<Service> services = Arrays.asList(WorkloadBuilder.newService("S1"), WorkloadBuilder.newService("S2"), WorkloadBuilder.newService("S3"));
+		List<Service> services = Arrays.asList(WorkloadBuilder.newService("S1", resources.get(0), resources.get(2)), 
+				WorkloadBuilder.newService("S2", resources.get(1)), WorkloadBuilder.newService("S3", resources.get(1), resources.get(2)));
 		Vector initialState = vector(1, 2, 3, 4, 5);
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		builder.addVariable(resources.get(0), services.get(0));
-		builder.addVariable(resources.get(2), services.get(0));
-		builder.addVariable(resources.get(1), services.get(1));
-		builder.addVariable(resources.get(1), services.get(2));
-		builder.addVariable(resources.get(2), services.get(2));
+		for (Resource res : resources) {
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
+			}
+		}
 		builder.setStateInitializer(new PredefinedStateInitializer(initialState));
 		
 		ConstantStateModel<Unconstrained> stateModel = builder.build();
@@ -79,17 +81,17 @@ public class ConstantStateModelTest extends LibredeTest {
 		assertThat(stateModel.getAllServices()).isEqualTo(services);
 		assertThat(stateModel.getResources()).isEqualTo(resources);
 		
-		assertThat(stateModel.getResource(0)).isEqualTo(resources.get(0));
-		assertThat(stateModel.getResource(1)).isEqualTo(resources.get(1));
-		assertThat(stateModel.getResource(2)).isEqualTo(resources.get(1));
-		assertThat(stateModel.getResource(3)).isEqualTo(resources.get(2));
-		assertThat(stateModel.getResource(4)).isEqualTo(resources.get(2));
+		assertThat(stateModel.getResourceDemand(0).getResource()).isEqualTo(resources.get(0));
+		assertThat(stateModel.getResourceDemand(1).getResource()).isEqualTo(resources.get(1));
+		assertThat(stateModel.getResourceDemand(2).getResource()).isEqualTo(resources.get(1));
+		assertThat(stateModel.getResourceDemand(3).getResource()).isEqualTo(resources.get(2));
+		assertThat(stateModel.getResourceDemand(4).getResource()).isEqualTo(resources.get(2));
 		
-		assertThat(stateModel.getService(0)).isEqualTo(services.get(0));
-		assertThat(stateModel.getService(1)).isEqualTo(services.get(1));
-		assertThat(stateModel.getService(2)).isEqualTo(services.get(2));
-		assertThat(stateModel.getService(3)).isEqualTo(services.get(0));
-		assertThat(stateModel.getService(4)).isEqualTo(services.get(2));
+		assertThat(stateModel.getResourceDemand(0).getService()).isEqualTo(services.get(0));
+		assertThat(stateModel.getResourceDemand(1).getService()).isEqualTo(services.get(1));
+		assertThat(stateModel.getResourceDemand(2).getService()).isEqualTo(services.get(2));
+		assertThat(stateModel.getResourceDemand(3).getService()).isEqualTo(services.get(0));
+		assertThat(stateModel.getResourceDemand(4).getService()).isEqualTo(services.get(2));
 		
 		assertThat(stateModel.getInitialState()).isEqualTo(initialState, offset(1e-9));
 		assertThat(stateModel.getStateVariableIndices(resources.get(0))).isEqualTo(indices(0));

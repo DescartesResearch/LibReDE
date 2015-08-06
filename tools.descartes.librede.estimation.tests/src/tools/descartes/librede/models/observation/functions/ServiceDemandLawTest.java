@@ -35,11 +35,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
@@ -51,8 +53,7 @@ import tools.descartes.librede.units.UnitsFactory;
 
 public class ServiceDemandLawTest extends LibredeTest {
 	
-	private final static int SERVICE_IDX = 2;
-	private final static int RESOURCE_IDX = 1;
+	private final static int STATE_IDX = 7;
 	
 	private ObservationDataGenerator generator;
 	private ServiceDemandLaw law;
@@ -69,8 +70,9 @@ public class ServiceDemandLawTest extends LibredeTest {
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		resource = generator.getStateModel().getResource(RESOURCE_IDX);
-		service = generator.getStateModel().getService(SERVICE_IDX);
+		ResourceDemand demand = generator.getStateModel().getResourceDemand(STATE_IDX);
+		resource = demand.getResource();
+		service = demand.getService();
 		
 		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
@@ -81,11 +83,13 @@ public class ServiceDemandLawTest extends LibredeTest {
 
 	@Test
 	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
-		Vector r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		Query<Vector, RequestRate> x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor);
+		Query<Vector, Time> r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(cursor);
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
 		
-		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
+		Vector xVec = x.execute();
+		Vector rVec = r.execute();
+		assertThat(law.getObservedOutput()).isEqualTo(xVec.get(x.indexOf(service)) * rVec.get(r.indexOf(service)) * util / xVec.dot(rVec), offset(1e-9));
 	}
 
 	@Test

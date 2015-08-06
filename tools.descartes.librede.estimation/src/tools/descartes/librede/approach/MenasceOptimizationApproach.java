@@ -33,6 +33,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
@@ -46,7 +47,6 @@ import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
-import tools.descartes.librede.models.state.constraints.ConstantStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
@@ -68,9 +68,9 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
 				builder.addConstraint(new UtilizationConstraint(res, cursor));
 			}
-			for (Service service : res.getAccessingServices()) {
-				builder.addConstraint(new NoRequestsBoundsConstraint(res, service, cursor, 0, Double.POSITIVE_INFINITY));
-				builder.addVariable(res, service);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
+				builder.addVariable(demand);
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));

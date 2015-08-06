@@ -26,10 +26,10 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
-import tools.descartes.librede.models.state.StateVariable;
+import tools.descartes.librede.configuration.ResourceDemand;
 
 public interface IStateBoundsConstraint extends ILinearStateConstraint {
 
-	public StateVariable getStateVariable();
+	public ResourceDemand getStateVariable();
 
 }

@@ -31,6 +31,7 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.LinAlg;
@@ -60,8 +61,8 @@ public class ResponseTimeValidator implements IValidator {
 			IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : res.getAccessingServices()) {
-				builder.addVariable(res, serv);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
 		this.stateModel = builder.build(); 

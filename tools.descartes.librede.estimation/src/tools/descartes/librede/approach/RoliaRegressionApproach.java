@@ -33,7 +33,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.ILeastSquaresRegressionAlgorithm;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
@@ -58,8 +58,8 @@ public class RoliaRegressionApproach extends AbstractEstimationApproach {
 		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service serv : res.getAccessingServices()) {
-				builder.addVariable(res, serv);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 			stateModels.add(builder.build());
 		}

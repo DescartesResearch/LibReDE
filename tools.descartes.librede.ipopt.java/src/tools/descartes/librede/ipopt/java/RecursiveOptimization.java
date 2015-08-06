@@ -26,12 +26,8 @@
  */
 package tools.descartes.librede.ipopt.java;
 
-import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.nanmean;
-import static tools.descartes.librede.linalg.LinAlg.norm2;
-import static tools.descartes.librede.linalg.LinAlg.transpose;
-import static tools.descartes.librede.linalg.LinAlg.vertcat;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
@@ -47,6 +43,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.DoubleByReference;
 
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.ipopt.java.backend.Eval_F_CB;
@@ -60,12 +57,9 @@ import tools.descartes.librede.ipopt.java.backend.IpoptOptionValue;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
-import tools.descartes.librede.models.diff.HessianMatrixBuilder;
-import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -232,7 +226,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		}
 		
 		for (IStateBoundsConstraint c : boundsConstraints) {
-			StateVariable var = c.getStateVariable();			
+			ResourceDemand var = c.getStateVariable();			
 			NativeHelper.setDoubleArray(x_L, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getLowerBound());
 			NativeHelper.setDoubleArray(x_U, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getUpperBound());
 		}

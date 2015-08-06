@@ -31,7 +31,7 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
@@ -39,8 +39,8 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -59,8 +59,8 @@ public class UtilizationValidator implements IValidator {
 	public void initialize(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : res.getAccessingServices()) {
-				builder.addVariable(res, serv);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
 		stateModel = builder.build(); 

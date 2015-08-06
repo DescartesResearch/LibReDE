@@ -50,7 +50,6 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
-import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
@@ -182,7 +181,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 							a.update();
 							Vector curEstimates = a.estimate();
 							for (int j = 0; j < curEstimates.rows(); j++) {
-								builder.set(a.getStateModel().getResource(j), a.getStateModel().getService(j), curEstimates.get(j));
+								builder.set(a.getStateModel().getResourceDemand(j), curEstimates.get(j));
 							}
 							if (inactiveAlgorithms.remove(a)) {
 								log.info("Estimation algorithm [" + i + "]: Reactived (new data available).");
@@ -222,7 +221,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 				for (IEstimationAlgorithm a : algorithms) {
 					Vector curEstimates = a.estimate();
 					for (int i = 0; i < curEstimates.rows(); i++) {
-						builder.set(a.getStateModel().getResource(i), a.getStateModel().getService(i), curEstimates.get(i));
+						builder.set(a.getStateModel().getResourceDemand(i), curEstimates.get(i));
 					}
 				}
 				builder.save();

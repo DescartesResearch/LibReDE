@@ -35,6 +35,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
@@ -62,11 +63,11 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service service : res.getAccessingServices()) {
-				if (!service.isBackgroundService()) {
-					builder.addVariable(res, service);
+			for (ResourceDemand demand : res.getDemands()) {
+				if (!demand.getService().isBackgroundService()) {
+					builder.addVariable(demand);
 				} else {
-					log.warn("Background services are not supported by Approximation with Response Times approach. Service \"" + service.getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
+					log.warn("Background services are not supported by Approximation with Response Times approach. Service \"" + demand.getService().getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
 				}
 			}
 			stateModels.add(builder.build());

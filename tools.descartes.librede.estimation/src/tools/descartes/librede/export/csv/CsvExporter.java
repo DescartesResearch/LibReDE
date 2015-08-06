@@ -29,10 +29,10 @@ package tools.descartes.librede.export.csv;
 import java.io.File;
 import java.io.PrintWriter;
 
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.export.IExporter;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.TimeSeries;
@@ -46,7 +46,7 @@ public class CsvExporter implements IExporter {
 	@ParameterDefinition(name = "FileName", label = "File Name Prefix", required = true)
 	private String fileName;
 	
-	public void writeResults(String approach, int fold, StateVariable[] variables, TimeSeries estimates) throws Exception {		
+	public void writeResults(String approach, int fold, ResourceDemand[] variables, TimeSeries estimates) throws Exception {		
 		File outputFile;
 		if (fileName != null && !fileName.isEmpty()) {
 			outputFile = new File(outputPath, fileName + "_" + approach + "_" + "fold_" + fold + ".csv");
@@ -59,7 +59,7 @@ public class CsvExporter implements IExporter {
 
 		PrintWriter out = new PrintWriter(outputFile);
 		out.print("#timestamp");
-		for (StateVariable var : variables) {
+		for (ResourceDemand var : variables) {
 			out.print(", ");
 			out.print(var.getResource().getName() + "/" + var.getService().getName());			
 		}

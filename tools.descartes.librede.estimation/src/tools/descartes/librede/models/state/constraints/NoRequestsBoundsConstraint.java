@@ -30,6 +30,7 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
@@ -37,7 +38,6 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -56,14 +56,14 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	private Query<Scalar, RequestRate> throughputQuery;	
 	private final double lowerBound;	
 	private final double upperBound;	
-	private final StateVariable variable;
+	private final ResourceDemand variable;
 	private IStateModel<? extends IStateConstraint> stateModel;
 	
-	public NoRequestsBoundsConstraint(Resource resource, Service service, IRepositoryCursor cursor, double lowerBound, double upperBound) {
+	public NoRequestsBoundsConstraint(ResourceDemand demand, IRepositoryCursor cursor, double lowerBound, double upperBound) {
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
-		this.variable = new StateVariable(resource, service);
-		this.throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor);
+		this.variable = demand;
+		this.throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(demand.getService()).average().using(cursor);
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	}
 
 	@Override
-	public StateVariable getStateVariable() {
+	public ResourceDemand getStateVariable() {
 		return this.variable;
 	}
 

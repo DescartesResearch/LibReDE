@@ -27,6 +27,7 @@
 package tools.descartes.librede;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +37,12 @@ import java.util.TreeSet;
 import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
-import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.validation.IValidator;
 
@@ -52,24 +53,24 @@ public class ResultTable {
 		private MatrixBuilder estimateBuilder;		
 		private VectorBuilder timestampBuilder;
 		private double[] buffer;
-		private Map<StateVariable, Integer> entryToColumn;
+		private Map<ResourceDemand, Integer> entryToColumn;
 		
 		private Builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
 			this.approach = approach;
-			TreeSet<StateVariable> variables = new TreeSet<StateVariable>();			
+			TreeSet<ResourceDemand> variables = new TreeSet<ResourceDemand>(new ResourceDemandComparator());			
 			for (Resource res : workload.getResources()) {
-				for (Service cls : res.getAccessingServices()) {
-					variables.add(new StateVariable(res, cls));					
+				for (ResourceDemand demand : res.getDemands()) {
+					variables.add(demand);					
 				}
 			}
 			int stateSize = variables.size();			
 			estimateBuilder = MatrixBuilder.create(stateSize);		
 			timestampBuilder = VectorBuilder.create();
-			entryToColumn = new HashMap<StateVariable, Integer>(stateSize);
+			entryToColumn = new HashMap<ResourceDemand, Integer>(stateSize);
 			buffer = new double[stateSize];
 			
 			int i = 0;
-			for (StateVariable var : variables) {
+			for (ResourceDemand var : variables) {
 				entryToColumn.put(var, i);
 				i++;
 			}
@@ -80,8 +81,8 @@ public class ResultTable {
 			Arrays.fill(buffer, 0);
 		}
 		
-		public void set(Resource resource, Service service, double value) {
-			buffer[entryToColumn.get(new StateVariable(resource, service))] = value;
+		public void set(ResourceDemand demand, double value) {
+			buffer[entryToColumn.get(demand)] = value;
 		}
 		
 		public void save() {
@@ -89,8 +90,8 @@ public class ResultTable {
 		}
 		
 		public ResultTable build() {
-			StateVariable[] columnToEntry = new StateVariable[entryToColumn.size()];
-			for (Map.Entry<StateVariable, Integer> e : entryToColumn.entrySet()) {
+			ResourceDemand[] columnToEntry = new ResourceDemand[entryToColumn.size()];
+			for (Map.Entry<ResourceDemand, Integer> e : entryToColumn.entrySet()) {
 				columnToEntry[e.getValue()] = e.getKey();
 			}
 			TimeSeries estimates = new TimeSeries(timestampBuilder.toVector(), estimateBuilder.toMatrix());
@@ -99,13 +100,24 @@ public class ResultTable {
 		}
 	}
 	
+	private static class ResourceDemandComparator implements Comparator<ResourceDemand> {
+		@Override
+		public int compare(ResourceDemand rd1, ResourceDemand rd2) {
+			int ret = rd1.getResource().getName().compareTo(rd2.getResource().getName());
+			if (ret == 0) {
+				ret = rd1.getService().getName().compareTo(rd2.getService().getName());
+			}
+			return ret;
+		}		
+	}
+	
 	private final Class<? extends IEstimationApproach> approach;
-	private final StateVariable[] columnToEntry;
+	private final ResourceDemand[] columnToEntry;
 	private final TimeSeries estimates;
 	private Map<Class<? extends IValidator>, List<ModelEntity>> validationEntities;
 	private Map<Class<? extends IValidator>, Vector> validationResults;
 	
-	private ResultTable(Class<? extends IEstimationApproach> approach, StateVariable[] columnToEntry, TimeSeries estimates) {
+	private ResultTable(Class<? extends IEstimationApproach> approach, ResourceDemand[] columnToEntry, TimeSeries estimates) {
 		this.approach = approach;
 		this.columnToEntry = columnToEntry;
 		this.estimates = estimates;
@@ -141,7 +153,7 @@ public class ResultTable {
 		return estimates.getData().row(estimates.samples() - 1);
 	}
 	
-	public StateVariable[] getStateVariables() {
+	public ResourceDemand[] getStateVariables() {
 		return columnToEntry;
 	}
 	

@@ -76,7 +76,7 @@ public class TargetUtilizationInitializer implements IStateInitializer {
 		return vector(stateModel.getStateSize(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
-				if (stateModel.getService(row).isBackgroundService()) {
+				if (stateModel.getResourceDemand(row).getService().isBackgroundService()) {
 					return 0.0;
 				} else {
 					return initialDemand;

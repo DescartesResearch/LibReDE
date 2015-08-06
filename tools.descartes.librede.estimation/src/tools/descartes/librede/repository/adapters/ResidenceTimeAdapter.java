@@ -105,7 +105,7 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 		public List<ModelEntity> getNotificationSet(ModelEntity base) {
 			List<ModelEntity> entities = new LinkedList<>();
 			entities.add(base);
-			List<ExternalCall> callees = ((Service)base).getCallees();
+			List<ExternalCall> callees = ((Service)base).getIncomingCalls();
 			for (ExternalCall t : callees) {
 				entities.add(t.getService());
 			}

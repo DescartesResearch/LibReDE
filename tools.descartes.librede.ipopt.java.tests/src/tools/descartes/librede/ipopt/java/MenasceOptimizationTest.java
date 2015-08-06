@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
@@ -76,12 +77,12 @@ public class MenasceOptimizationTest extends LibredeTest {
 		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 1);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
-		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
+		builder.addVariable(workload.getResources().get(0).getDemands().get(0));
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
 		for (Resource resource : workload.getResources()) {
-			for (Service service : resource.getAccessingServices()) {
-				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
+			for (ResourceDemand demand : resource.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 			}
 		}
 		stateModel = builder.build();
@@ -130,15 +131,15 @@ public class MenasceOptimizationTest extends LibredeTest {
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service service : res.getAccessingServices()) {
-				builder.addVariable(res, service);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));		
 		for (Resource resource : workload.getResources()) {
 			builder.addConstraint(new UtilizationConstraint(resource, cursor));
-			for (Service service : resource.getAccessingServices()) {
-				builder.addConstraint(new NoRequestsBoundsConstraint(resource, service, cursor, 0, Double.POSITIVE_INFINITY));
+			for (ResourceDemand demand : resource.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 			}
 		}		
 		stateModel = builder.build();

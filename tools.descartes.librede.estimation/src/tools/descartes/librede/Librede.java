@@ -56,6 +56,7 @@ import tools.descartes.librede.configuration.ExporterConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
@@ -77,7 +78,6 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.state.StateVariable;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
@@ -164,7 +164,7 @@ public class Librede {
 		MemoryObservationRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		repo.setCurrentTime(conf.getEstimation().getEndTimestamp());
 
-		loadRepository(conf, repo);
+		loadRepository(conf, repo, existingDatasources);
 		
 		if (!conf.getValidation().isValidateEstimates()) {
 			
@@ -209,7 +209,6 @@ public class Librede {
 					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
 					try {
 						IDataSource newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
-						selector.add(newSource);
 						dataSources.put(dataSourceName, newSource);
 					} catch (Exception e) {
 						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
@@ -217,6 +216,7 @@ public class Librede {
 					}
 				}
 				IDataSource source = dataSources.get(dataSourceName);
+				selector.add(source);
 				try {
 					source.addTrace(trace);
 				} catch(IOException ex) {
@@ -511,7 +511,7 @@ public class Librede {
 	
 	public static void printSummary(LibredeResults results) {
 		// Aggregate results
-		StateVariable[] variables = null;
+		ResourceDemand[] variables = null;
 		List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(results.getApproaches());
 		
 		Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
@@ -621,7 +621,7 @@ public class Librede {
 		}
 	}
 	
-	private static void printEstimatesTable(StateVariable[] variables, List<Class<? extends IEstimationApproach>> approaches, Matrix values) {
+	private static void printEstimatesTable(ResourceDemand[] variables, List<Class<? extends IEstimationApproach>> approaches, Matrix values) {
 		System.out.printf("%-20.20s | ", "Resource");
 		System.out.printf("%-60.60s | ", "Service");
 		for (int i = 0; i < approaches.size(); i++) {
@@ -635,7 +635,7 @@ public class Librede {
 		System.out.println();
 		Resource last = null;
 		int idx = 0;
-		for (StateVariable var : variables) {
+		for (ResourceDemand var : variables) {
 			if (var.getResource().equals(last)) {
 				System.out.printf("%-20.20s | ", "");
 			} else {
