@@ -43,22 +43,16 @@ import tools.descartes.librede.units.Unit;
 
 public final class Query<T extends Vector, D extends Dimension> {
 	
-	public static enum Type {
-		SERVICE, ALL_SERVICES, RESOURCE, ALL_RESOURCES
-	}
-	
 	private Aggregation aggregation;
-	private Query.Type type;
 	private Metric<D> metric;
 	private Unit<D> unit;
 	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, Metric<D> metric, Unit<D> unit,
+	protected Query(Aggregation aggregation, Metric<D> metric, Unit<D> unit,
 			List<ModelEntity> entities, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
-		this.type = type;
 		this.metric = metric;
 		this.unit = unit;
 		this.repositoryCursor = repositoryCursor;
@@ -67,10 +61,6 @@ public final class Query<T extends Vector, D extends Dimension> {
 
 	public Aggregation getAggregation() {
 		return aggregation;
-	}
-	
-	public Query.Type getType() {
-		return type;
 	}
 	
 	public Metric<D> getMetric() {

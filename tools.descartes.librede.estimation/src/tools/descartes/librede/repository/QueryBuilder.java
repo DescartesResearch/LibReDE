@@ -31,20 +31,20 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.repository.Query.Type;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Unit;
 
 public class QueryBuilder<D extends Dimension> {
 	
-	private Query.Type type;
 	private Metric<D> metric;
 	private Unit<D> unit;
 	private List<ModelEntity> entities = new LinkedList<>();
@@ -69,13 +69,11 @@ public class QueryBuilder<D extends Dimension> {
 	public class InClause {
 	
 		public ForClause forResource(Resource resource) {
-			type = Type.RESOURCE;
 			entities.add(resource);
 			return new ForClause();
 		}
 		
 		public ForClause forService(Service cls) {
-			type = Type.SERVICE;
 			entities.add(cls);
 			return new ForClause();
 		}
@@ -85,7 +83,6 @@ public class QueryBuilder<D extends Dimension> {
 		}
 		
 		public ForAllClause forServices(Collection<? extends Service> services) {
-			type = Type.ALL_SERVICES;
 			entities.addAll(services);
 			return new ForAllClause();
 		}
@@ -95,8 +92,35 @@ public class QueryBuilder<D extends Dimension> {
 		}
 		
 		public ForAllClause forResources(Collection<? extends Resource> resources) {
-			type = Type.ALL_RESOURCES;
 			entities.addAll(resources);
+			return new ForAllClause();
+		}
+		
+		public ForClause forResourceDemand(ResourceDemand demand) {
+			entities.add(demand);
+			return new ForClause();
+		}
+		
+		public ForAllClause forResourceDemands(ResourceDemand...demands) {
+			return forResourceDemands(Arrays.asList(demands));
+		}
+		
+		public ForAllClause forResourceDemands(Collection<? extends ResourceDemand> demands) {
+			entities.addAll(demands);
+			return new ForAllClause();
+		}
+		
+		public ForClause forExternalCall(ExternalCall call) {
+			entities.add(call);
+			return new ForClause();
+		}
+		
+		public ForAllClause forExternalCalls(ExternalCall...calls) {
+			return forExternalCalls(Arrays.asList(calls));
+		}
+		
+		public ForAllClause forExternalCalls(Collection<? extends ExternalCall> calls) {
+			entities.addAll(calls);
 			return new ForAllClause();
 		}
 		
@@ -153,7 +177,7 @@ public class QueryBuilder<D extends Dimension> {
 	
 	public class UsingClause<T extends Vector> {
 		public Query<T, D> using(IRepositoryCursor repository) {
-			return new Query<T, D>(aggregation, type, metric, unit, entities, repository);
+			return new Query<T, D>(aggregation, metric, unit, entities, repository);
 		}
 	}
 	
