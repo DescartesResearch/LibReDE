@@ -65,5 +65,7 @@ public interface IStateModel<C extends IStateConstraint> {
 	List<IDifferentiableFunction> getStateDerivatives();
 	
 	Vector getInitialState();
+	
+	InvocationGraph getInvocationGraph();
 
 }

@@ -123,11 +123,17 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	private final List<C> constraints;
 	private final IStateInitializer stateInitializer;
 	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
+	private final InvocationGraph invocationGraph;
 	
 	private ConstantStateModel(List<ResourceDemand> variables, List<C> constraints, IStateInitializer stateInitializer) {
+		this(variables, constraints, stateInitializer, null);
+	}
+	
+	private ConstantStateModel(List<ResourceDemand> variables, List<C> constraints, IStateInitializer stateInitializer, InvocationGraph graph) {
 		this.stateSize = variables.size();	
 		this.constraints = Collections.unmodifiableList(constraints);
 		this.variables = Collections.unmodifiableList(variables);
+		this.invocationGraph = graph;
 		
 		// Determine all resources and services contained in this state model
 		resources = new ArrayList<Resource>();
@@ -211,6 +217,10 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 
 	@Override
 	public Vector step(Vector state) {
+		if (invocationGraph != null) {
+			invocationGraph.step();
+		}
+		
 		return state;
 	}
 	
@@ -264,6 +274,11 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			throw new IllegalStateException("Size of initial state vector must be equal to the state size.");
 		}
 		return initialState;
+	}
+	
+	@Override
+	public InvocationGraph getInvocationGraph() {
+		return invocationGraph;
 	}
 
 	@Override
