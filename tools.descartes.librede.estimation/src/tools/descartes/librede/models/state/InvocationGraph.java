@@ -27,13 +27,13 @@ public class InvocationGraph {
 	private final int serviceCount;
 	private int last = 0;
 	
-	public InvocationGraph(IStateModel<?> stateModel, IRepositoryCursor cursor, int historySize) {
+	public InvocationGraph(List<Service> services, IRepositoryCursor cursor, int historySize) {
 		if (historySize < 1) {
 			throw new IllegalArgumentException();
 		}
 		
 		this.historySize = historySize;
-		services = stateModel.getUserServices();
+		this.services = services;
 		serviceCount = services.size();
 		for (int i = 0; i < serviceCount; i++) {
 			servicesToIdx.put(services.get(i), i);

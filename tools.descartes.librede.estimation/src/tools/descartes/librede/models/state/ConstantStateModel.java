@@ -60,6 +60,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		private Set<ResourceDemand> stateVariables = new TreeSet<>();
 		private List<C> constraints = new ArrayList<C>();
 		private IStateInitializer stateInitializer;
+		private InvocationGraph invocations;
 		
 		public void addVariable(ResourceDemand demand) {
 			stateVariables.add(demand);
@@ -76,11 +77,15 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			constraints.add(constraint);
 		}
 		
+		public void setInvocationGraph(InvocationGraph graph) {
+			this.invocations = graph;
+		}
+		
 		public ConstantStateModel<C> build() {
 			if (stateInitializer == null) {
 				stateInitializer = new PredefinedStateInitializer(zeros(stateVariables.size()));
 			}
-			ConstantStateModel<C> model = new ConstantStateModel<C>(new ArrayList<ResourceDemand>(stateVariables), constraints, stateInitializer);
+			ConstantStateModel<C> model = new ConstantStateModel<C>(new ArrayList<ResourceDemand>(stateVariables), constraints, stateInitializer, invocations);
 			for (IStateConstraint c : model.getConstraints()) {
 				c.setStateModel(model);
 			}
@@ -124,10 +129,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	private final IStateInitializer stateInitializer;
 	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
 	private final InvocationGraph invocationGraph;
-	
-	private ConstantStateModel(List<ResourceDemand> variables, List<C> constraints, IStateInitializer stateInitializer) {
-		this(variables, constraints, stateInitializer, null);
-	}
 	
 	private ConstantStateModel(List<ResourceDemand> variables, List<C> constraints, IStateInitializer stateInitializer, InvocationGraph graph) {
 		this.stateSize = variables.size();	

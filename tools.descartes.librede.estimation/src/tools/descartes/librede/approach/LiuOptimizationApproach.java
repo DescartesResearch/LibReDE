@@ -26,8 +26,11 @@
  */
 package tools.descartes.librede.approach;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
@@ -45,6 +48,7 @@ import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
@@ -64,13 +68,16 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 	@Override
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+		Set<Service> services = new HashSet<>();
 		for (Resource res : workload.getResources()) {
 			for (ResourceDemand demand : res.getDemands()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 				builder.addVariable(demand);
+				services.add(demand.getService());
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
+		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, getEstimationWindow()));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 
@@ -79,8 +86,14 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
 		for (int i = 0; i < getEstimationWindow(); i++) {
 			for (Service service : stateModel.getUserServices()) {
-				ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, true, i);
-				observationModel.addOutputFunction(func);
+				// Current assumption is that services which are not called by others
+				// are the system entry services. Since we look at the end to end
+				// response time, we only include these services to the estimation.
+				// The remaining services are referenced from these system entry services.
+				if (service.getIncomingCalls().isEmpty()) {
+					ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, true, i);
+					observationModel.addOutputFunction(func);
+				}
 			}
 			for (Resource resource : stateModel.getResources()) {
 				if (resource.getSchedulingStrategy() != SchedulingStrategy.IS) {
