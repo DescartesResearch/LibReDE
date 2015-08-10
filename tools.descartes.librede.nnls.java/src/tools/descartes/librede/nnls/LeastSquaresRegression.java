@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede.nnls;
 
+import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
@@ -169,6 +170,8 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	
 	@Override
 	public void update() throws EstimationException {
+		getStateModel().step(empty());
+		
 		outputFunction = getCastedObservationModel().getOutputFunction(0);
 		
 		numObservations++;

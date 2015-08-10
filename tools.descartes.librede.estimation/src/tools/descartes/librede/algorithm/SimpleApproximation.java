@@ -96,6 +96,9 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 
 	@Override
 	public void update() throws EstimationException {
+
+		getStateModel().step(empty());
+		
 		final Vector output = getObservationModel().getObservedOutput();
 
 		// update the buffer with current output of the observation model

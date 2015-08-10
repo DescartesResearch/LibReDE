@@ -60,7 +60,7 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	List<C> getConstraints();
 	
-	Vector getNextState(Vector currentState);
+	Vector step(Vector currentState);
 	
 	List<IDifferentiableFunction> getStateDerivatives();
 	

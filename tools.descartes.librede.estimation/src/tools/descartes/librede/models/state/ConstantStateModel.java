@@ -210,7 +210,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public Vector getNextState(Vector state) {
+	public Vector step(Vector state) {
 		return state;
 	}
 	
