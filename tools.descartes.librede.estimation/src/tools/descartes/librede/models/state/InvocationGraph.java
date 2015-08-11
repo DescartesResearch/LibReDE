@@ -26,23 +26,30 @@ public class InvocationGraph {
 	private final Map<Service, Integer> servicesToIdx = new HashMap<>();
 	private final int serviceCount;
 	private int last = 0;
+	private final boolean externalCalls;
 	
 	public InvocationGraph(List<Service> services, IRepositoryCursor cursor, int historySize) {
 		if (historySize < 1) {
 			throw new IllegalArgumentException();
-		}
-		
+		}		
 		this.historySize = historySize;
 		this.services = services;
+
 		serviceCount = services.size();
 		for (int i = 0; i < serviceCount; i++) {
 			servicesToIdx.put(services.get(i), i);
 		}
-		List<ExternalCall> calls = getExternalCalls(services);
-		reachability = calculateReachabilities(serviceCount, calls);
 		invocations = new double[historySize][serviceCount][serviceCount];
-		visitCountQuery = QueryBuilder.select(StandardMetrics.VISITS).in(RequestCount.REQUESTS)
-				.forExternalCalls(calls).average().using(cursor);
+		List<ExternalCall> calls = getExternalCalls(services);
+		this.externalCalls = !calls.isEmpty();
+		if (!externalCalls) {
+			reachability = new boolean[serviceCount][serviceCount];
+			visitCountQuery = null;
+		} else {
+			reachability = calculateReachabilities(serviceCount, calls);			
+			visitCountQuery = QueryBuilder.select(StandardMetrics.VISITS).in(RequestCount.REQUESTS)
+					.forExternalCalls(calls).average().using(cursor);
+		}
 	}
 	
 	public double getInvocationCount(Service a, Service b) {
@@ -65,9 +72,11 @@ public class InvocationGraph {
 	}
 	
 	public void step() {
-		last = (last + 1) % historySize;
-		updateInvocationMatrix();
-		calculateTransitiveClosureOfInvocationCounts();
+		if (externalCalls) {
+			last = (last + 1) % historySize;
+			updateInvocationMatrix();
+			calculateTransitiveClosureOfInvocationCounts();
+		}
 	}
 	
 	private void updateInvocationMatrix() {
@@ -127,6 +136,7 @@ public class InvocationGraph {
 	public Set<Service> getCalledServices(Service base) {
 		int idx = servicesToIdx.get(base);
 		Set<Service> calledServices = new HashSet<>();
+		calledServices.add(base);
 		for (int i = 0; i < serviceCount; i++) {
 			if (reachability[idx][i]) {
 				calledServices.add(services.get(i));
