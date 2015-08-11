@@ -172,7 +172,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		 * IMPORTANT: Query throughput for all services in scope.
 		 */
 		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
-				.forServices(usedServices).average().using(repository);
+				.forServices(getStateModel().getAllServices()).average().using(repository);
 	}
 
 	/*
