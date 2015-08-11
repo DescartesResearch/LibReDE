@@ -84,7 +84,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 		generator = new ObservationDataGenerator(42, 5, 4, numServers);
 		generator.setRandomDemands();
 		
-		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		cursor = generator.getCursor();
 		
 		service = generator.getStateModel().getResourceDemand(STATE_IDX).getService();
 		

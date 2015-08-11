@@ -26,8 +26,11 @@
  */
 package tools.descartes.librede.approach;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
@@ -45,6 +48,7 @@ import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
@@ -62,13 +66,16 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 
 	@Override
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
+		Set<Service> services = new HashSet<>();
 		Builder<Unconstrained> b = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
 			for (ResourceDemand demand : res.getDemands()) {
 				b.addVariable(demand);
+				services.add(demand.getService());
 			}
 		}
 		b.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
+		b.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
 		return Arrays.<IStateModel<?>> asList(b.build());
 	}
 

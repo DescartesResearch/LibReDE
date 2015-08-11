@@ -52,8 +52,10 @@ import tools.descartes.librede.models.observation.functions.ErlangCEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IMonitoringRepository;
+import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Quantity;
@@ -88,6 +90,8 @@ public class ObservationDataGenerator {
 	private IStateModel<Unconstrained> stateModel;
 	
 	private MemoryObservationRepository repository;
+	
+	private IRepositoryCursor cursor;
 	
 	public ObservationDataGenerator(long seed, int numWorkloadClasses, int numResources) {
 		this(seed, numWorkloadClasses, numResources, 1);
@@ -154,15 +158,19 @@ public class ObservationDataGenerator {
 		}		
 		model.getResources().addAll(Arrays.asList(resources));
 		
+		repository = new MemoryObservationRepository(model);
+		cursor = repository.getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), ONE_SECOND);
+		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : resources) {
 			for (ResourceDemand demand : res.getDemands()) {
 				builder.addVariable(demand);
 			}
 		}
+		builder.setInvocationGraph(new InvocationGraph(model.getServices(), cursor, 1));
 		stateModel = builder.build();
 		
-		repository = new MemoryObservationRepository(model);
+
 	}
 	
 	public double getUpperUtilizationBound() {
@@ -337,5 +345,9 @@ public class ObservationDataGenerator {
 	
 	public IStateModel<Unconstrained> getStateModel() {
 		return stateModel;
+	}
+	
+	public IRepositoryCursor getCursor() {
+		return cursor;
 	}
 }

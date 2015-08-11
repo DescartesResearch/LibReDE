@@ -41,6 +41,7 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
@@ -74,26 +75,26 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0).getDemands().get(0));
-		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, generator.getCursor()));
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), generator.getCursor(), 1));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();		
-		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false));
-		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
+		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, generator.getCursor(), workload.getServices().get(0), false));
+		observationModel.addOutputFunction(new UtilizationLaw(stateModel, generator.getCursor(), workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
-		filter.initialize(stateModel, observationModel, cursor, 1);
+		filter.initialize(stateModel, observationModel, generator.getCursor(), 1);
 		
 		long start = System.nanoTime();	
 		
 		for (int i = 0; i < ITERATIONS; i++) {
 			generator.nextObservation();
-			cursor.next();
+			generator.getCursor().next();
 			
 			filter.update();
 			
@@ -113,7 +114,6 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		
 		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
@@ -121,23 +121,24 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		for (Service service : workload.getServices()) {
 			builder.addVariable(service.getResourceDemands().get(0));
 		}
-		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, generator.getCursor()));
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), generator.getCursor(), 1));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
 		for (int i = 0; i < 5; i++) {
-			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(i), false));
+			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, generator.getCursor(), workload.getServices().get(i), false));
 		}
-		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
+		observationModel.addOutputFunction(new UtilizationLaw(stateModel, generator.getCursor(), workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
-		filter.initialize(stateModel, observationModel, cursor, 1);
+		filter.initialize(stateModel, observationModel, generator.getCursor(), 1);
 		
 		long start = System.nanoTime();	
 		
 		for (int i = 0; i < ITERATIONS; i++) {
 			generator.nextObservation();
-			cursor.next();
+			generator.getCursor().next();
 			
 			filter.update();
 			

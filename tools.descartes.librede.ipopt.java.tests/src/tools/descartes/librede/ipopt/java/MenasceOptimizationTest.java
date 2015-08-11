@@ -43,6 +43,7 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
@@ -51,8 +52,6 @@ import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.UnitsFactory;
 
 public class MenasceOptimizationTest extends LibredeTest {
 
@@ -74,7 +73,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 1);
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 1);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0).getDemands().get(0));
@@ -85,6 +84,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 			}
 		}
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 1));
 		stateModel = builder.build();
 		
 		observationModel = new VectorObservationModel<>();
@@ -127,7 +127,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		Vector demands = generator.getDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 1);
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 1);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
@@ -141,7 +141,8 @@ public class MenasceOptimizationTest extends LibredeTest {
 			for (ResourceDemand demand : resource.getDemands()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 			}
-		}		
+		}
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 1));
 		stateModel = builder.build();
 		
 

@@ -26,8 +26,11 @@
  */
 package tools.descartes.librede.approach;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
@@ -45,6 +48,7 @@ import tools.descartes.librede.models.observation.functions.ResponseTimeEquation
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
@@ -64,6 +68,7 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+		Set<Service> services = new HashSet<>();
 		for (Resource res : workload.getResources()) {
 			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
 				builder.addConstraint(new UtilizationConstraint(res, cursor));
@@ -71,8 +76,10 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 			for (ResourceDemand demand : res.getDemands()) {
 				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 				builder.addVariable(demand);
+				services.add(demand.getService());
 			}
 		}
+		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}

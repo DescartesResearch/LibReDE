@@ -43,6 +43,7 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
@@ -74,11 +75,12 @@ public class LiuOptimizationTest extends LibredeTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 5);
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 5);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		builder.addVariable(workload.getResources().get(0).getDemands().get(0));
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 5));
 		builder.addConstraint(new NoRequestsBoundsConstraint(workload.getResources().get(0).getDemands().get(0), cursor, 0, 1));
 		stateModel = builder.build();
 		
@@ -129,7 +131,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		Vector demands = generator.getDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS)), 5);
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 5);
 
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
 		for (Resource resource : workload.getResources()) {
@@ -143,6 +145,7 @@ public class LiuOptimizationTest extends LibredeTest {
 				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
 			}	
 		}
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 5));
 		stateModel = builder.build();
 		
 
