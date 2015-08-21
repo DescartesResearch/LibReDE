@@ -430,6 +430,11 @@ public class TimeSeries implements Cloneable {
 	
 		int firstIdx = offset;
 		int lastIdx = Math.max(offset + length - 1, offset);
+		
+		if ((firstIdx == lastIdx) && firstIdx >= timestamps.rows()) {
+			// view is behind the last value in the timeseries
+			return firstIdx;
+		}
 
 		while (timestamp >= first && timestamp <= last) {
 			double span = last - first;
