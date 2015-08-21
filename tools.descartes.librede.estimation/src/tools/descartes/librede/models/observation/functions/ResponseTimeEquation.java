@@ -31,9 +31,11 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
@@ -168,11 +170,21 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service)
 				.average().using(repository);
-		/*
-		 * IMPORTANT: Query throughput for all services in scope.
-		 */
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
-				.forServices(getStateModel().getAllServices()).average().using(repository);
+		if (useObservedUtilization) {
+			throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
+					.forServices(cls_r).average().using(repository);
+		} else {
+			/*
+			 * IMPORTANT: Query throughput for all services accessing resources in scope.
+			 * When calculating the utilization, we use the utilization law. 
+			 */
+			Set<Service> allServicesInScope = new HashSet<>();
+			for (Resource res : accessedResources.keySet()) {
+				allServicesInScope.addAll(res.getAccessingServices());
+			}
+			throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
+					.forServices(allServicesInScope).average().using(repository);
+		}
 	}
 
 	/*
