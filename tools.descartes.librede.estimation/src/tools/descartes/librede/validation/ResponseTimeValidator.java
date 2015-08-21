@@ -27,7 +27,9 @@
 package tools.descartes.librede.validation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
@@ -41,6 +43,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
@@ -60,11 +63,14 @@ public class ResponseTimeValidator implements IValidator {
 	public void initialize(WorkloadDescription workload,
 			IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		Set<Service> services = new HashSet<Service>();
 		for (Resource res : workload.getResources()) {
 			for (ResourceDemand demand : res.getDemands()) {
 				builder.addVariable(demand);
+				services.add(demand.getService());
 			}
 		}
+		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
 		this.stateModel = builder.build(); 
 		
 		this.respEq = new ArrayList<ResponseTimeEquation>();
