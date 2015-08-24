@@ -27,8 +27,12 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.metrics.Aggregation;
@@ -36,13 +40,34 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DeriveConstantRate;
+import tools.descartes.librede.repository.handlers.IncomingCallsSummationHandler;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
+import tools.descartes.librede.repository.rules.RuleScope;
 import tools.descartes.librede.units.RequestRate;
 
 public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
+	
+	private static class IncomingCallsScope implements RuleScope {
+		@Override
+		public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
+			if (base instanceof Service) {
+				return new HashSet<>(((Service) base).getIncomingCalls());
+			} else {
+				return Collections.emptySet();
+			}
+		}
+
+		@Override
+		public Set<? extends ModelEntity> getNotificationSet(ModelEntity base) {
+			if (base instanceof ExternalCall) {
+				return Collections.singleton(((ExternalCall)base).getCalledService());
+			}
+			return Collections.emptySet();
+		}		
+	}
 
 	@Override
 	public Interpolation getInterpolation() {
@@ -68,7 +93,12 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.DEPARTURES, Aggregation.SUM)
 					.priority(0)
-					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES))
+					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES)),
+				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.priority(0)
+					.scope(new IncomingCallsScope())
+					.build(new IncomingCallsSummationHandler())
 				);
 	}
 
