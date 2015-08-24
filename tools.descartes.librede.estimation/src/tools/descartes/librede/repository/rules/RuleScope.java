@@ -32,8 +32,8 @@ import tools.descartes.librede.configuration.ModelEntity;
 
 public interface RuleScope {
 	
-	Set<ModelEntity> getScopeSet(ModelEntity base);
+	Set<? extends ModelEntity> getScopeSet(ModelEntity base);
 	
-	Set<ModelEntity> getNotificationSet(ModelEntity base);
+	Set<? extends ModelEntity> getNotificationSet(ModelEntity base);
 
 }

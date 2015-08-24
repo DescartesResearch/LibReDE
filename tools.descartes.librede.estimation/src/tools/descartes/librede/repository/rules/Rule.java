@@ -41,12 +41,12 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	static class DefaultScope implements RuleScope {
 
 		@Override
-		public Set<ModelEntity> getScopeSet(ModelEntity base) {
+		public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
 			return Collections.singleton(base);
 		}
 
 		@Override
-		public Set<ModelEntity> getNotificationSet(ModelEntity changed) {
+		public Set<? extends ModelEntity> getNotificationSet(ModelEntity changed) {
 			return Collections.singleton(changed);
 		}
 		
@@ -168,11 +168,11 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		this.resolver = resolver;
 	}
 
-	public Set<ModelEntity> getScopeSet(ModelEntity base) {
+	public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
 		return resolver.getScopeSet(base);
 	}
 
-	public Set<ModelEntity> getNotificationSet(ModelEntity changed) {
+	public Set<? extends ModelEntity> getNotificationSet(ModelEntity changed) {
 		return resolver.getNotificationSet(changed);
 	}
 

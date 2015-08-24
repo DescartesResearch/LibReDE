@@ -320,7 +320,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		
 		for (Rule<?> r : rules.getDerivationRules(metric, aggregation)) {
-			Set<ModelEntity> entities = r.getNotificationSet(entity);
+			Set<? extends ModelEntity> entities = r.getNotificationSet(entity);
 			for (ModelEntity e : entities) {
 				if (r.applies(e)) {
 					if (checkDependencies(r, e)) {
@@ -339,7 +339,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private boolean checkDependencies(Rule<?> rule, ModelEntity entity) {
-		Set<ModelEntity> scopeEntities = rule.getScopeSet(entity);
+		Set<? extends ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
 				if (rule.getMetric().equals(dep.getMetric())
@@ -364,7 +364,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private List<DataEntry<?>> getRequiredEntries(Rule<?> rule, ModelEntity entity) {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
-		Set<ModelEntity> scopeEntities = rule.getScopeSet(entity);
+		Set<? extends ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
 				DataEntry<?> reqEntry = getEntry(dep.getMetric(), e, dep.getAggregation());
