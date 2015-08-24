@@ -29,6 +29,9 @@
 package tools.descartes.librede.configuration.impl;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.BasicEList;
@@ -39,6 +42,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
+import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ExternalCall;
@@ -162,13 +166,13 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @generated NOT
 	 */
 	public EList<Resource> getAccessedResources() {
-		EList<Resource> result = new BasicEList<>();
+		List<Resource> result = new LinkedList<>();
 		for (Task t : getTasks()) {
 			if (t instanceof ResourceDemand) {
 				result.add(((ResourceDemand)t).getResource());
 			}
 		}
-		return ECollections.unmodifiableEList(result);
+		return new EcoreEList.UnmodifiableEList<Resource>(this, ConfigurationPackage.Literals.SERVICE__ACCESSED_RESOURCES, result.size(), result.toArray());
 	}
 
 	/**
@@ -189,13 +193,13 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @generated NOT
 	 */
 	public EList<ExternalCall> getOutgoingCalls() {
-		EList<ExternalCall> calls = new BasicEList<>();
+		List<ExternalCall> calls = new LinkedList<>();
 		for (Task t : getTasks()) {
 			if (t instanceof ExternalCall) {
 				calls.add((ExternalCall)t);
 			}
 		}
-		return calls;
+		return new EcoreEList.UnmodifiableEList<ExternalCall>(this, ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS, calls.size(), calls.toArray());
 	}
 
 	/**
@@ -204,13 +208,13 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @generated NOT
 	 */
 	public EList<ResourceDemand> getResourceDemands() {
-		EList<ResourceDemand> demands = new BasicEList<>();
+		List<ResourceDemand> demands = new LinkedList<>();
 		for (Task t : getTasks()) {
 			if (t instanceof ResourceDemand) {
 				demands.add((ResourceDemand)t);
 			}
 		}
-		return demands;
+		return new EcoreEList.UnmodifiableEList<ResourceDemand>(this, ConfigurationPackage.Literals.SERVICE__RESOURCE_DEMANDS, demands.size(), demands.toArray());
 	}
 
 	/**

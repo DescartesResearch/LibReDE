@@ -29,18 +29,20 @@
 package tools.descartes.librede.configuration.impl;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
+import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.InternalEList;
+
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
@@ -216,11 +218,11 @@ public class ResourceImpl extends ModelEntityImpl implements Resource {
 	 * @generated NOT
 	 */
 	public EList<Service> getAccessingServices() {
-		EList<Service> services = new BasicEList<Service>();
+		List<Service> services = new LinkedList<Service>();
 		for (ResourceDemand d : getDemands()) {
 			 services.add(d.getService());
 		}
-		return ECollections.unmodifiableEList(services);
+		return new EcoreEList.UnmodifiableEList<Service>(this, ConfigurationPackage.Literals.RESOURCE__ACCESSING_SERVICES, services.size(), services.toArray());
 	}
 
 	/**
