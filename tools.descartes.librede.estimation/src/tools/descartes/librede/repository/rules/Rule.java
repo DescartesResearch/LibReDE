@@ -187,11 +187,20 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 
 	@Override
 	public int compareTo(Rule<D> o) {
+		if (this == o) {
+			// rules are only equal if they point to the same instance.
+			return 0;
+		}
+		
 		int c = this.getMetric().getName().compareTo(o.getMetric().getName());
 		if (c == 0) {
 			c = this.getAggregation().compareTo(o.getAggregation());
 			if (c == 0) {
 				c = Integer.compare(this.getPriority(), o.getPriority());
+				if (c == 0) {
+					// rules with the same priority are shown in consecutive order
+					c = 1;
+				}
 			}
 		}
 		return c;

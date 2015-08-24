@@ -49,6 +49,10 @@ public class RulesConfig {
 	
 	
 	public void addRule(Rule<?> rule) {
+		if (log.isDebugEnabled()) {
+			log.debug("Add rule: " + rule);
+		}
+		
 		if (rule.getDependencies().isEmpty()) {
 			defaultRules.add(rule);
 		} else {
