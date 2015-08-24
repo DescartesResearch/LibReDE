@@ -41,6 +41,7 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveVisitCountHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
@@ -67,6 +68,15 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 					.requiring(Aggregation.AVERAGE)
 					.priority(20)
 					.build(new TimeWeightedAggregationHandler<RequestCount>()),
+				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
+					.check(new RulePrecondition() {				
+						@Override
+						public boolean check(ModelEntity entity) {
+							return (entity instanceof ExternalCall);
+						}
+					})
+					.priority(-100) //IMPORTANT: Use this only if nothing else is available
+					.build(new ConstantHandler<RequestCount>(1.0)),
 				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)

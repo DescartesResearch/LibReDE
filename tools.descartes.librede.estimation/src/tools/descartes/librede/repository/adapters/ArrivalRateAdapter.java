@@ -29,17 +29,13 @@ package tools.descartes.librede.repository.adapters;
 import java.util.Arrays;
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.repository.handlers.DeriveConstantRate;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.Rule;
-import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestRate;
 
 public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
@@ -56,15 +52,6 @@ public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
 					.requiring(Aggregation.AVERAGE)
 					.priority(10)
 					.build(new TimeWeightedAggregationHandler<RequestRate>()),
-				Rule.rule(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
-					.check(new RulePrecondition() {				
-						@Override
-						public boolean check(ModelEntity entity) {
-							return (entity instanceof Service) && ((Service)entity).isBackgroundService();
-						}
-					})
-					.priority(20) //IMPORTANT: Must be larger than everything else so that it is not overwritten
-					.build(new DeriveConstantRate()),
 				Rule.rule(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.priority(0)

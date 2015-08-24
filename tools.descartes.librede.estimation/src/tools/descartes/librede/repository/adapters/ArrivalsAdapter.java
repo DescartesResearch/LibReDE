@@ -29,15 +29,20 @@ package tools.descartes.librede.repository.adapters;
 import java.util.Arrays;
 import java.util.List;
 
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveArrivalsHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
 import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.RequestRate;
 
 public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 
@@ -71,7 +76,18 @@ public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 					.build(new DeriveDiffHandler<RequestCount>()),
 				Rule.rule(StandardMetrics.ARRIVALS)
 					.requiring(StandardMetrics.RESPONSE_TIME)
-					.build(new DeriveArrivalsHandler())
+					.build(new DeriveArrivalsHandler()),
+				// If it is a background service, we assume that always one
+				// job is in the system
+				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
+					.check(new RulePrecondition() {				
+						@Override
+						public boolean check(ModelEntity entity) {
+							return (entity instanceof Service) && ((Service)entity).isBackgroundService();
+						}
+					})
+					.priority(-100) //IMPORTANT: Use this only if nothing else is available
+					.build(new ConstantHandler<RequestCount>(1.0))
 				);
 	}
 

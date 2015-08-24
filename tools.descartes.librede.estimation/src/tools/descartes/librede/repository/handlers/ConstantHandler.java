@@ -32,24 +32,27 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
+import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 
-public class DeriveConstantRate extends BaseDerivationHandler<RequestRate> {
+public class ConstantHandler<D extends Dimension> extends BaseDerivationHandler<D> {
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
+	private final double constantValue;
+	
+	public ConstantHandler(double value) {
+		this.constantValue = value;
+	}
+	
 	@Override
-	public double aggregate(IMonitoringRepository repository, Metric<RequestRate> metric, Unit<RequestRate> unit,
+	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 		if (log.isTraceEnabled()) {
-			log.trace("Derive constant rate " + metric.getName());
+			log.trace("Derive constant " + metric.getName());
 		}
-		if (aggregation == Aggregation.AVERAGE) {
-			return 1.0;
-		}
-		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
+		return constantValue;
 	}
 }
