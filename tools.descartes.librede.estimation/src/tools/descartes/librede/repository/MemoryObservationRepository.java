@@ -305,7 +305,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			addEntry(key, entry);
 		}
 
-		log.debug((existing ? "New" : "Replaced") + "time series entry " + entity + "/" + m + "/" + aggregation);
+		if (log.isDebugEnabled()) {
+			log.debug((existing ? "New" : "Replaced") + "time series entry " + entity + "/" + m + "/" + aggregation);
+		}
 	}
 	
 	private <D extends Dimension> void addEntry(DataKey<D> key, DataEntry<D> newEntry) {
@@ -343,17 +345,20 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		for (ModelEntity e : scopeEntities) {
 			for (RuleDependency<?> dep : rule.getDependencies()) {
 				if (rule.getMetric().equals(dep.getMetric())
-						&& rule.getAggregation().equals(dep.getAggregation())) {
+						&& rule.getAggregation().equals(dep.getAggregation())
+						&& entity.equals(e)) {
 					// self-referential rules are only allowed if the associated
 					// entry contains actual (non-derived) monitoring data.
 					// Otherwise, we may replace rules which triggered 
 					// the activation of this rule.
 					DataEntry<?> entry = getEntry(dep.getMetric(), e, dep.getAggregation());
 					if ((entry == null) || (entry.data == null)) {
+						log.info("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
 						return false;
 					}
 				} else {
 					if (!exists(dep.getMetric(), e, dep.getAggregation())) {
+						log.info("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
 						return false;
 					}
 				}
@@ -562,8 +567,6 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				}
 			}
 		}
-		if (!empty) {
-			log.info(dump);
-		}
+		log.info(dump);
 	}
 }
