@@ -43,6 +43,7 @@ public class UnitConverter {
 		TimeSeries converted = new TimeSeries(series.getTime(), convertedData);
 		converted.setStartTime(series.getStartTime());
 		converted.setEndTime(series.getEndTime());
+		converted.setInterpolationMethod(series.getInterpolationMethod());
 		return converted;
 	}
 
