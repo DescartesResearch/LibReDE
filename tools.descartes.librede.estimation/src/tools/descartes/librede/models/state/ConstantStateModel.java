@@ -274,6 +274,11 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		if (!initialState.isEmpty() && initialState.rows() != stateSize) {
 			throw new IllegalStateException("Size of initial state vector must be equal to the state size.");
 		}
+		for (int i = 0; i < initialState.rows(); i++) {
+			if (Double.isNaN(initialState.get(i))) {
+				throw new IllegalStateException("State initializer returns an invalid value.");
+			}
+ 		}
 		return initialState;
 	}
 	
