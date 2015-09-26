@@ -26,13 +26,16 @@
  */
 package tools.descartes.librede.models.state.initial;
 
-import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -65,40 +68,72 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 
 	@Override
 	public Vector getInitialValue(IStateModel<?> stateModel) {
-		Query<Vector, Time> respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(cursor);
+		Set<Service> systemServices = new HashSet<>();
+		for (Service curService : stateModel.getUserServices()) {
+			if (curService.getIncomingCalls().isEmpty()) {
+				systemServices.add(curService);
+			}
+		}		
+		Query<Vector, Time> respTime = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(systemServices).average().using(cursor);
 		Query<Vector, RequestRate> throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(cursor);
-
-		int resourceCount = stateModel.getResources().size();
-		
-		Vector initialDemands = respTime.execute();
-		for (int i = 0; i < initialDemands.rows(); i++) {
-			double d = initialDemands.get(i);
-			if (d != d) {
-				// NaN
-				initialDemands = initialDemands.set(i, 0.0);
+	
+		Vector tput = throughput.execute();
+		Vector rt = respTime.execute();
+		double[] initialState = new double[stateModel.getStateSize()];
+		Set<ResourceDemand> demands = new HashSet<>();
+		for (Service curService : systemServices) {			
+			// Collect all resource demands
+			demands.clear();
+			demands.addAll(curService.getResourceDemands());
+			Set<Service> calledServices = stateModel.getInvocationGraph().getCalledServices(curService);
+			for (Service called : calledServices) {
+				demands.addAll(called.getResourceDemands());
+			}
+			
+			// distribute the observed response time evenly between the resource demands
+			double baseDemand = 0.0; 
+			if (tput.get(throughput.indexOf(curService)) > 0.0) {
+				double curRespTime = rt.get(respTime.indexOf(curService));
+				baseDemand = curRespTime / demands.size();
+			}
+			// No request was observed for this system services
+			// --> we gained no information on the possible demand so skip the distribution between participating services.
+			if (baseDemand > 0.0) {
+				for (ResourceDemand curDemand : demands) {
+					double visits = 1.0;
+					if (curDemand.getService() != curService) {
+						visits = stateModel.getInvocationGraph().getInvocationCount(curService, curDemand.getService());
+					}
+					int stateVarIdx = stateModel.getStateVariableIndex(curDemand.getResource(), curDemand.getService());
+					if (initialState[stateVarIdx] > 0) {
+						// in a complex control graph a service may be called by different services
+						// as a workaround we always use the minimum of the calculated initial demands
+						// as a starting point. (The response time is an upper bound on the demands)
+						initialState[stateVarIdx] = Math.min(initialState[stateVarIdx], baseDemand / visits);
+					} else {
+						initialState[stateVarIdx] = baseDemand / visits;
+					}
+				}
 			}
 		}
-
-		if (resourceCount > 1) {
-			// If we have several resources, then distribute the demands evenly
-			// between the resources
-			initialDemands = initialDemands.times(1.0 / resourceCount);
-		}
-
 		// utilizations close to 100% or above turned out to cause convergence
 		// issues with many
 		// approaches that depend on it as a starting point. Therefore, we scale
 		// the demands to a value
 		// so that the utilization at the beginning is at a configured initial
 		// point (e.g., 50%).
-		double[] initialState = new double[stateModel.getStateSize()];
 		for (Resource res : stateModel.getResources()) {
-			double util = initialDemands.dot(throughput.execute()) / res.getNumberOfServers();
-			Vector curDemands = initialDemands.times(targetUtilization / util);
+			List<Service> accessingServices = res.getAccessingServices();
+			double util = 0.0;
+			for (Service curService : accessingServices) {
+				util += tput.get(throughput.indexOf(curService));
+			}
+			util = util / res.getNumberOfServers();
+			double correctionFactor = targetUtilization / util;
 			
-			for (Service service : res.getAccessingServices()) {
-				int idx = throughput.indexOf(service);
-				initialState[stateModel.getStateVariableIndex(res,  service)] = curDemands.get(idx);
+			for (Service curService : accessingServices) {
+				int idx = stateModel.getStateVariableIndex(res, curService);
+				initialState[idx] = initialState[idx] * correctionFactor; 
 			}
 		}	
 
