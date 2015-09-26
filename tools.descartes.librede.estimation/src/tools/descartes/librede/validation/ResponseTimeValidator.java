@@ -77,7 +77,7 @@ public class ResponseTimeValidator implements IValidator {
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
 			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv, false));
-			services.add(srv);
+			this.services.add(srv);
 		}
 		allErrors = MatrixBuilder.create(stateModel.getUserServices().size());	
 		predictedRespTimes = MatrixBuilder.create(stateModel.getUserServices().size());	
@@ -95,10 +95,12 @@ public class ResponseTimeValidator implements IValidator {
 		double[] actual = new double[respEq.size()];
 		int i = 0;
 		for (ResponseTimeEquation cur : respEq) {
-			real[i] = cur.getObservedOutput();
-			actual[i] = cur.getCalculatedOutput(state);
-			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
-			i++;
+			if (cur.isApplicable(new ArrayList<String>())) {
+				real[i] = cur.getObservedOutput();
+				actual[i] = cur.getCalculatedOutput(state);
+				relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
+			}
+			i++;				
 		}
 		allErrors.addRow(relErr);
 		predictedRespTimes.addRow(actual);
