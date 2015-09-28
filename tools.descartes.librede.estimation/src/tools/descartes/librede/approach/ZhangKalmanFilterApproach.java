@@ -82,14 +82,19 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 	@Override
 	protected IObservationModel<?, ?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
-		for (Service serv : stateModel.getUserServices()) {
-			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, serv, false);
-			observationModel.addOutputFunction(func);
+		for (Service service : stateModel.getUserServices()) {
+			// Current assumption is that services which are not called by others
+			// are the system entry services. Since we look at the end to end
+			// response time, we only include these services to the estimation.
+			// The remaining services are referenced from these system entry services.
+			if (service.getIncomingCalls().isEmpty()) {
+				ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, true, 0);
+				observationModel.addOutputFunction(func);
+			}
 		}
-
-		for (Resource res : stateModel.getResources()) {
-			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
-				UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
+		for (Resource resource : stateModel.getResources()) {
+			if (resource.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				UtilizationLaw func = new UtilizationLaw(stateModel, cursor, resource, 0);
 				observationModel.addOutputFunction(func);
 			}
 		}
