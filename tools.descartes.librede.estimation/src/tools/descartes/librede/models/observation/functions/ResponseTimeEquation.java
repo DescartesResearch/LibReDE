@@ -41,6 +41,7 @@ import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
@@ -151,18 +152,24 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		// called services.
 		usedServices = new ArrayList<>(invocations.getCalledServices(cls_r));
 		accessedResources = getAccessedResources(usedServices);
+		Set<Resource> finiteCapacityResources = new HashSet<>();
+		for (Resource curResource : accessedResources.keySet()) {
+			if (curResource.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				finiteCapacityResources.add(curResource);
+			}
+		}
 
 		if (useObservedUtilization) {
 			utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE)
-					.forResources(accessedResources.keySet()).average().using(repository);
+					.forResources(finiteCapacityResources).average().using(repository);
 		}
 
 		int maxParallel = 1;
-		for (Resource res : accessedResources.keySet()) {
+		for (Resource res : finiteCapacityResources) {
 			maxParallel = Math.max(maxParallel, res.getNumberOfServers());
 		}
 		erlangC = new ErlangCEquation[maxParallel + 1];
-		for (Resource res : accessedResources.keySet()) {
+		for (Resource res : finiteCapacityResources) {
 			if (erlangC[res.getNumberOfServers()] == null) {
 				erlangC[res.getNumberOfServers()] = new ErlangCEquation(res.getNumberOfServers());
 			}
@@ -179,7 +186,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			 * When calculating the utilization, we use the utilization law. 
 			 */
 			Set<Service> allServicesInScope = new HashSet<>();
-			for (Resource res : accessedResources.keySet()) {
+			for (Resource res : finiteCapacityResources) {
 				allServicesInScope.addAll(res.getAccessingServices());
 			}
 			throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
@@ -237,8 +244,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		for (Resource res_i : accessedResources.keySet()) {
 			double U_i = getUtilization(historicInterval, res_i, state, X);
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-			int p = res_i.getNumberOfServers();
-			double busyProp = erlangC[p].calculateValue(U_i);
+			double busyProp = 0.0;
+			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				int p = res_i.getNumberOfServers();
+				busyProp = erlangC[p].calculateValue(U_i);
+			}
 			
 			List<Service> accessingServices = accessedResources.get(res_i);
 			for (Service curService : accessingServices) {
@@ -297,18 +307,23 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	}
 
 	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X) {
-		if (useObservedUtilization) {
-			return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
+		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
+			// the resource has infinite capacity --> utilization is always zero
+			return 0.0;
 		} else {
-			/*
-			 * Calculate the utilization using the utilization law.
-			 */
-			double U_i = 0;
-			for (Service curService : res_i.getAccessingServices()) {
-				int idx = throughputQuery.indexOf(curService);
-				U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
+			if (useObservedUtilization) {
+				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
+			} else {
+				/*
+				 * Calculate the utilization using the utilization law.
+				 */
+				double U_i = 0;
+				for (Service curService : res_i.getAccessingServices()) {
+					int idx = throughputQuery.indexOf(curService);
+					U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
+				}
+				return U_i / res_i.getNumberOfServers();
 			}
-			return U_i / res_i.getNumberOfServers();
 		}
 	}
 
@@ -513,8 +528,13 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		for (Resource res_i : accessedResources.keySet()) {
 			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X);
 			DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, cls_r)];
-			int p = res_i.getNumberOfServers();
-			DerivativeStructure busyProp = erlangC[p].value(U_i);
+			DerivativeStructure busyProp;
+			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				int p = res_i.getNumberOfServers();
+				busyProp = erlangC[p].value(U_i);
+			} else {
+				busyProp = new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
+			}
 
 			List<Service> accessingServices = accessedResources.get(res_i);
 			for (Service curService : accessingServices) {
@@ -535,28 +555,33 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 
 	private DerivativeStructure getUtilization(int historicInterval, Resource res_i, DerivativeStructure[] state,
 			Vector X) {
-		if (useObservedUtilization) {
-			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(),
-					utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)));
+		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
+			// the resource has infinite capacity --> utilization is always zero
+			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
 		} else {
-			/*
-			 * Calculate the utilization using the utilization law.
-			 */
-			// sorted according to state variable ordering
-			double[] tput = new double[state.length];
-			for (Service curService : res_i.getAccessingServices()) {
-				int idx = throughputQuery.indexOf(curService);
-				tput[getStateModel().getStateVariableIndex(res_i, curService)] = X.get(idx);
-			}
-			// Important: if tput.length == 1, commons math crashes with a
-			// ArrayIndexOutOfBoundsException
-			DerivativeStructure U_i;
-			if (tput.length == 1) {
-				U_i = state[0].multiply(tput[0]);
+			if (useObservedUtilization) {
+				return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(),
+						utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)));
 			} else {
-				U_i = state[0].linearCombination(tput, state);
+				/*
+				 * Calculate the utilization using the utilization law.
+				 */
+				// sorted according to state variable ordering
+				double[] tput = new double[state.length];
+				for (Service curService : res_i.getAccessingServices()) {
+					int idx = throughputQuery.indexOf(curService);
+					tput[getStateModel().getStateVariableIndex(res_i, curService)] = X.get(idx);
+				}
+				// Important: if tput.length == 1, commons math crashes with a
+				// ArrayIndexOutOfBoundsException
+				DerivativeStructure U_i;
+				if (tput.length == 1) {
+					U_i = state[0].multiply(tput[0]);
+				} else {
+					U_i = state[0].linearCombination(tput, state);
+				}
+				return U_i.divide(res_i.getNumberOfServers());
 			}
-			return U_i.divide(res_i.getNumberOfServers());
 		}
 	}
 
