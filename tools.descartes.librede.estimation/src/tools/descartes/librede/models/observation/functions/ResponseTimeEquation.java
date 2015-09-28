@@ -90,8 +90,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	private boolean useObservedUtilization;
 
 	private Query<Vector, Ratio> utilQuery;
+	private Query<Vector, Ratio> stealTimeQuery;
 	private Query<Scalar, Time> responseTimeQuery;
-	private Query<Vector, RequestRate> throughputQuery;
+	private Query<Vector, RequestRate> throughputQuery;	
 	
 	private InvocationGraph invocations;
 
@@ -162,6 +163,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		if (useObservedUtilization) {
 			utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE)
 					.forResources(finiteCapacityResources).average().using(repository);
+			// The steal time is the ratio of time a virtual CPU is waiting for a physical
+			// CPU.
+			stealTimeQuery = QueryBuilder.select(StandardMetrics.STEAL_TIME).in(Ratio.NONE)
+					.forResources(finiteCapacityResources).average().using(repository);
 		}
 
 		int maxParallel = 1;
@@ -207,6 +212,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		result = result && checkQueryPrecondition(responseTimeQuery, messages);
 		result = result && checkQueryPrecondition(throughputQuery, messages);
 		if (useObservedUtilization) {
+			result = result && checkQueryPrecondition(stealTimeQuery, messages);
 			result = result && checkQueryPrecondition(utilQuery, messages);
 		}
 		return result;
@@ -242,7 +248,11 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		}
 
 		for (Resource res_i : accessedResources.keySet()) {
-			double U_i = getUtilization(historicInterval, res_i, state, X);
+			double S_i = 0.0;
+			if (useObservedUtilization) {
+				S_i = getStealTime(historicInterval, res_i);
+			}
+			double U_i = getUtilization(historicInterval, res_i, state, X, S_i);
 			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			double busyProp = 0.0;
 			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
@@ -256,7 +266,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
-				rt += visits * (D_ir + calculateQueueingTime(state, res_i, U_i, busyProp));
+				rt += visits * (1 - S_i) * (D_ir + calculateQueueingTime(state, res_i, U_i, busyProp));
 			}			
 		}
 		return rt;
@@ -271,6 +281,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	 * @param P_q
 	 *            - the probability that all servers are occupied when a new job
 	 *            arrives.
+	 * @param S_i
+	 *            a slow down factor for the processing (e.g., CPU contention in
+	 *            hypervisor)
 	 * @return
 	 */
 	private double calculateQueueingTime(Vector state, Resource res_i, double U_i, double P_q) {
@@ -305,14 +318,22 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			throw new AssertionError("Unsupported scheduling strategy.");
 		}
 	}
+	
+	private double getStealTime(int historicInterval, Resource res_i) {
+		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
+			return 0.0; // there is no slow-down
+		} else {
+			return stealTimeQuery.get(historicInterval).get(stealTimeQuery.indexOf(res_i));
+		}
+	}
 
-	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X) {
+	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X, double S_i) {
 		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
 			// the resource has infinite capacity --> utilization is always zero
 			return 0.0;
 		} else {
 			if (useObservedUtilization) {
-				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
+				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)) + S_i;
 			} else {
 				/*
 				 * Calculate the utilization using the utilization law.
@@ -322,7 +343,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 					int idx = throughputQuery.indexOf(curService);
 					U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
 				}
-				return U_i / res_i.getNumberOfServers();
+				return U_i / res_i.getNumberOfServers() + S_i;
 			}
 		}
 	}
@@ -350,13 +371,15 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 
 				// get current throughput data
 				Vector X = throughputQuery.get(historicInterval);
-				double U_i = getUtilization(historicInterval, res_i, state, X);
+				double S_i = getStealTime(historicInterval, res_i);
+				double U_i = getUtilization(historicInterval, res_i, state, X, S_i);
 
+				// TODO: also include invocation counts?
 				double dev = 0.0;
 				if (cls_r.equals(cls_s)) {
-					dev += 1;
+					dev += 1.0;
 				}
-				return dev + getFirstDerivationOfQueueingTime(state, res_i, cls_s, X, U_i);
+				return (1 - S_i) * (dev + getFirstDerivationOfQueueingTime(state, res_i, cls_s, X, U_i));
 			}
 		});
 	}
@@ -473,7 +496,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 				double X_s = X.get(throughputQuery.indexOf(cls_s));
 				double X_t = X.get(throughputQuery.indexOf(cls_t));
 
-				double U_i = getUtilization(historicInterval, res_i, state, X);
+				double S_i = getStealTime(historicInterval, res_i);
+				double U_i = getUtilization(historicInterval, res_i, state, X, S_i);
 				int k = res_i.getNumberOfServers();
 
 				switch (res_i.getSchedulingStrategy()) {
@@ -492,7 +516,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 					double dev = 0.0;
 					if (getStateModel().containsStateVariable(res_i, cls_r)) {
 						double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-						dev = D_ir * (devsdevtP_q / beta + (devsP_q * devtU + devtP_q * devsU) / (beta * beta)
+						dev = (1 - S_i) * D_ir * (devsdevtP_q / beta + (devsP_q * devtU + devtP_q * devsU) / (beta * beta)
 								+ (P_q * 2 * devsU * devtU) / (beta * beta * beta));
 					}
 					if (cls_r.equals(cls_s)) {
@@ -501,7 +525,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 					if (cls_r.equals(cls_t)) {
 						dev += deriveQueueingFactor(beta, devsU, P_q, devsP_q);
 					}
-					return dev;
+					return (1 - S_i) * dev;
 				case IS:
 					return 0.0;
 				default:
@@ -526,7 +550,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 
 		DerivativeStructure rt = null;
 		for (Resource res_i : accessedResources.keySet()) {
-			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X);
+			double S_i = getStealTime(historicInterval, res_i);
+			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X, S_i);
 			DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, cls_r)];
 			DerivativeStructure busyProp;
 			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
@@ -542,7 +567,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
-				DerivativeStructure curRt = D_ir.add(calculateQueueingTime(state, res_i, U_i, busyProp)).multiply(visits);
+				DerivativeStructure curRt = D_ir.add(calculateQueueingTime(state, res_i, U_i, busyProp)).multiply(1 - S_i).multiply(visits);
 				if (rt == null) {
 					rt = curRt;
 				} else {
@@ -554,14 +579,14 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	}
 
 	private DerivativeStructure getUtilization(int historicInterval, Resource res_i, DerivativeStructure[] state,
-			Vector X) {
+			Vector X, double S_i) {
 		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
 			// the resource has infinite capacity --> utilization is always zero
 			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
 		} else {
 			if (useObservedUtilization) {
 				return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(),
-						utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)));
+						utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i))).add(S_i);
 			} else {
 				/*
 				 * Calculate the utilization using the utilization law.
@@ -580,7 +605,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 				} else {
 					U_i = state[0].linearCombination(tput, state);
 				}
-				return U_i.divide(res_i.getNumberOfServers());
+				return U_i.divide(res_i.getNumberOfServers()).add(S_i);
 			}
 		}
 	}
