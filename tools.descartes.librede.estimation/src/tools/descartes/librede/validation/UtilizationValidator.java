@@ -32,6 +32,7 @@ import java.util.List;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
@@ -68,12 +69,14 @@ public class UtilizationValidator implements IValidator {
 		this.utilLaw = new ArrayList<UtilizationLaw>();
 		this.resources = new ArrayList<ModelEntity>();
 		for (Resource res : stateModel.getResources()) {
-			utilLaw.add(new UtilizationLaw(stateModel, cursor, res));
-			resources.add(res);
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				utilLaw.add(new UtilizationLaw(stateModel, cursor, res));
+				resources.add(res);
+			}
 		}
-		allErrors = MatrixBuilder.create(stateModel.getResources().size());
-		predictedUtilization = MatrixBuilder.create(stateModel.getResources().size());
-		observedUtilization = MatrixBuilder.create(stateModel.getResources().size());
+		allErrors = MatrixBuilder.create(resources.size());
+		predictedUtilization = MatrixBuilder.create(resources.size());
+		observedUtilization = MatrixBuilder.create(resources.size());
 	}
 	
 	@Override
