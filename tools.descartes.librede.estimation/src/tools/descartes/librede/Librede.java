@@ -94,6 +94,7 @@ import tools.descartes.librede.repository.adapters.QueueLengthSeenOnArrivalAdapt
 import tools.descartes.librede.repository.adapters.ResidenceTimeAdapter;
 import tools.descartes.librede.repository.adapters.ResourceDemandAdapter;
 import tools.descartes.librede.repository.adapters.ResponseTimeAdapter;
+import tools.descartes.librede.repository.adapters.StealTimeAdapter;
 import tools.descartes.librede.repository.adapters.ThroughputAdapter;
 import tools.descartes.librede.repository.adapters.UtilizationAdapter;
 import tools.descartes.librede.repository.adapters.VisitsAdapter;
@@ -135,6 +136,7 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.VISITS, new VisitsAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.UTILIZATION, new UtilizationAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.RESOURCE_DEMAND, new ResourceDemandAdapter());
+		Registry.INSTANCE.registerMetric(StandardMetrics.STEAL_TIME, new StealTimeAdapter());
 		
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, InMemoryDataSource.class);

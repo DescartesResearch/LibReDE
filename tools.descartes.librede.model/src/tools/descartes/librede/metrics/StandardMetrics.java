@@ -59,4 +59,6 @@ public interface StandardMetrics {
 	public static final Metric<Time> RESIDENCE_TIME = MetricsFactory.eINSTANCE.createMetric("RESIDENCE_TIME", "residence time", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.CUMULATIVE_SUM, Aggregation.SUM, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 	
 	public static final Metric<Time> RESOURCE_DEMAND = MetricsFactory.eINSTANCE.createMetric("RESOURCE_DEMAND", "resource demand", Time.INSTANCE, Aggregation.AVERAGE);
+	
+	public static final Metric<Ratio> STEAL_TIME = MetricsFactory.eINSTANCE.createMetric("STEAL_TIME", "steal time", Ratio.INSTANCE, Aggregation.AVERAGE);
 }
