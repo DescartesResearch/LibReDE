@@ -103,15 +103,14 @@ public class ResultTable {
 	private final Class<? extends IEstimationApproach> approach;
 	private final ResourceDemand[] columnToEntry;
 	private final TimeSeries estimates;
-	private Map<Class<? extends IValidator>, List<ModelEntity>> validationEntities;
-	private Map<Class<? extends IValidator>, Vector> validationResults;
+	private final Map<Class<? extends IValidator>, List<ModelEntity>> validationEntities = new HashMap<>();
+	private final Map<Class<? extends IValidator>, Vector> validationErrors = new HashMap<>();
+	private final Map<Class<? extends IValidator>, Vector> validationPredictions = new HashMap<>();
 	
 	private ResultTable(Class<? extends IEstimationApproach> approach, ResourceDemand[] columnToEntry, TimeSeries estimates) {
 		this.approach = approach;
 		this.columnToEntry = columnToEntry;
 		this.estimates = estimates;
-		this.validationEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
-		this.validationResults = new HashMap<Class <? extends IValidator>, Vector>();
 	}
 	
 	public static Builder builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
@@ -134,8 +133,9 @@ public class ResultTable {
 		return approach;
 	}
 	
-	public void addValidationResults(Class <? extends IValidator> validator, Vector errors) {
-		validationResults.put(validator, errors);
+	public void addValidationResults(Class <? extends IValidator> validator, Vector prediction, Vector errors) {
+		validationPredictions.put(validator, prediction);
+		validationErrors.put(validator, errors);
 	}
 	
 	public Vector getLastEstimates() {
@@ -147,7 +147,7 @@ public class ResultTable {
 	}
 	
 	public Set<Class <? extends IValidator>> getValidators() {
-		return validationResults.keySet();
+		return validationErrors.keySet();
 	}
 	
 	public void setValidatedEntities(Class<? extends IValidator> validator, List<ModelEntity> entities) {
@@ -159,6 +159,10 @@ public class ResultTable {
 	}
 
 	public Vector getValidationErrors(Class<? extends IValidator> validator) {
-		return validationResults.get(validator);
+		return validationErrors.get(validator);
+	}
+	
+	public Vector getValidationPredictions(Class<? extends IValidator> validator) {
+		return validationPredictions.get(validator);
 	}
 }

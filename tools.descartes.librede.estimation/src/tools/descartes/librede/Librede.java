@@ -490,13 +490,13 @@ public class Librede {
 		
 		for (IValidator validator : validators) {
 			String validatorName =  Registry.INSTANCE.getDisplayName(validator.getClass());
-			if (log.isDebugEnabled()) {
-				log.debug("Predicted " + validatorName + ":" + validator.getPredictedValues());
-				log.debug("Observed " + validatorName + ":" + validator.getObservedValues());
-			}
+//			if (log.isDebugEnabled()) {
+				log.info("Predicted " + validatorName + ":" + validator.getPredictedValues());
+				log.info("Observed " + validatorName + ":" + validator.getObservedValues());
+//			}
 
 			estimates.setValidatedEntities(validator.getClass(), validator.getModelEntities());
-			estimates.addValidationResults(validator.getClass(), validator.getPredictionError());			
+			estimates.addValidationResults(validator.getClass(), validator.getPredictedValues(), validator.getPredictionError());			
 		}				
 	}
 	
@@ -547,6 +547,7 @@ public class Librede {
 		System.out.println();
 
 		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
+		Map<Class<? extends IValidator>, MatrixBuilder> meanPredictions = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
 	
 		MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
@@ -560,23 +561,33 @@ public class Librede {
 
 			for (Class<? extends IValidator> validator : validators) {
 				MatrixBuilder errorsBuilder = null; 
+				MatrixBuilder predictionsBuilder = null; 
 				for (int i = 0; i < results.getNumberOfFolds(); i++) {
 					ResultTable curFold = results.getEstimates(approach, i);
-					Vector vec = curFold.getValidationErrors(validator);
+					Vector curErr = curFold.getValidationErrors(validator);
 					if (errorsBuilder == null) {
-						errorsBuilder = MatrixBuilder.create(vec.rows());
+						errorsBuilder = MatrixBuilder.create(curErr.rows());
 						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
 					}
-					errorsBuilder.addRow(vec);
+					errorsBuilder.addRow(curErr);
+					Vector curPred = curFold.getValidationPredictions(validator);
+					if (predictionsBuilder == null) {
+						predictionsBuilder = MatrixBuilder.create(curPred.rows());
+					}
+					predictionsBuilder.addRow(curPred);
 				}
 				
 				Matrix errors = errorsBuilder.toMatrix();
-				if (!errors.isEmpty()) {
-					Vector mean = LinAlg.mean(errorsBuilder.toMatrix());
+				Matrix predictions = predictionsBuilder.toMatrix();
+				if (!errors.isEmpty() && !predictions.isEmpty()) {
+					Vector curMeanErr = LinAlg.mean(errors);
+					Vector curMeanPred = LinAlg.mean(predictions);
 					if (!meanErrors.containsKey(validator)) {
-						meanErrors.put(validator, MatrixBuilder.create(mean.rows()));
+						meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
+						meanPredictions.put(validator,  MatrixBuilder.create(curMeanPred.rows()));
 					}
-					meanErrors.get(validator).addRow(mean);
+					meanErrors.get(validator).addRow(curMeanErr);
+					meanPredictions.get(validator).addRow(curMeanPred);
 				}
 			}
 			
@@ -597,8 +608,10 @@ public class Librede {
 				String name = Registry.INSTANCE.getDisplayName(validator);
 				System.out.println(name + ":");
 				if (meanErrors.containsKey(validator)) {
+					
 					Matrix errors = meanErrors.get(validator).toMatrix();
-					printValidationResultsTable(validatedEntities.get(validator), approaches, errors);
+					Matrix predictions = meanPredictions.get(validator).toMatrix();
+					printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors);
 					System.out.println();
 				} else {
 					System.out.println("No results.");
@@ -607,7 +620,7 @@ public class Librede {
 		}
 	}
 	
-	private static void printValidationResultsTable(List<ModelEntity> entities, List<Class<? extends IEstimationApproach>> approaches, Matrix values) {
+	private static void printValidationResultsTable(List<ModelEntity> entities, List<Class<? extends IEstimationApproach>> approaches, Matrix predictions, Matrix errors) {
 		System.out.printf("%-80.80s | ", "Resource or service");
 		for (int i = 0; i < approaches.size(); i++) {
 			System.out.printf("%-9.9s", "[" + (i + 1) + "]");
@@ -623,7 +636,7 @@ public class Librede {
 		for (ModelEntity entity : entities) {
 			System.out.printf("%-80.80s | ", limitOutput(entity.getName(), 80));
 			for (int i = 0; i < approaches.size(); i++) {
-				System.out.printf("%.5f%% ", values.get(i, idx) * 100);
+				System.out.printf("%.5e %.5f%% ", predictions.get(i, idx), errors.get(i, idx) * 100);
 			}			
 			System.out.println("|");
 			idx++;
