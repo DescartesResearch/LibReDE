@@ -344,8 +344,16 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 				double o_real = func.getObservedOutput();
 				if (func instanceof MultivariateDifferentiableFunction) {
 					DerivativeStructure o_calc = ((MultivariateDifferentiableFunction)func).value(state);
-					DerivativeStructure summand = o_calc.subtract(o_real).pow(2);
-					obj = (obj == null) ? summand : obj.add(summand);
+					if (Double.isNaN(o_calc.getValue()) || Double.isNaN(o_real)){
+						System.out.println("Blub");
+					}
+					if (o_real > 0) {
+	 					DerivativeStructure summand = o_calc.subtract(o_real).divide(o_real).pow(2);
+						obj = (obj == null) ? summand : obj.add(summand);
+					} else {
+						DerivativeStructure summand = o_calc.pow(2);
+						obj = (obj == null) ? summand : obj.add(summand);
+					}
 				}
 			}
 		}
