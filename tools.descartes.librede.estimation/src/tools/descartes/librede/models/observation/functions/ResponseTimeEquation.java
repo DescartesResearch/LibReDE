@@ -323,7 +323,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
 			return 0.0; // there is no slow-down
 		} else {
-			return stealTimeQuery.get(historicInterval).get(stealTimeQuery.indexOf(res_i));
+			if (stealTimeQuery != null) {
+				return stealTimeQuery.get(historicInterval).get(stealTimeQuery.indexOf(res_i));
+			} else {
+				// TODO: We need a complete MVA here since we do not have resource statistics here
+				return 0.0;
+			}
 		}
 	}
 
