@@ -26,15 +26,21 @@
  */
 package tools.descartes.librede.datasource;
 
-import static tools.descartes.librede.linalg.LinAlg.matrix;
-import static tools.descartes.librede.linalg.LinAlg.range;
-import static tools.descartes.librede.linalg.LinAlg.vector;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -42,6 +48,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,7 +63,6 @@ import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceFilter;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.repository.TimeSeries;
@@ -88,6 +94,128 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	private static final Quantity<Time> ZERO = UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS);
 
 	private final Logger log = Loggers.DATASOURCE_LOG;
+	
+	public static abstract class Stream {
+		
+		public abstract void open() throws IOException;
+	
+		public abstract int read(byte[] data, int offste, int length) throws IOException;
+		
+		public abstract void close() throws IOException;
+		
+	}
+	
+	private static class FileStream extends Stream {
+		private final File file;
+		private RandomAccessFile input;
+		
+		public FileStream(File path) throws IOException {
+			this.file = path;
+		}
+		
+		public void open() throws IOException {
+			input = new RandomAccessFile(file, "r");			
+		}
+
+		@Override
+		public int read(byte[] data, int offset, int length) throws IOException {
+			if (input.getFilePointer() >= input.length()) {
+				return -1;
+			}
+			return input.read(data, offset, length);
+		}
+
+		@Override
+		public void close() throws IOException {
+			input.close();			
+		}
+		
+		@Override
+		public String toString() {
+			return file.toString();
+		}
+
+		@Override
+		public int hashCode() {
+			return ((file == null) ? 0 : file.hashCode());
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			FileStream other = (FileStream) obj;
+			if (file == null) {
+				if (other.file != null)
+					return false;
+			} else if (!file.equals(other.file))
+				return false;
+			return true;
+		}
+
+		public File getFile() {
+			return file;
+		}
+
+	}
+	
+	private static class SocketStream extends Stream {
+		private final SocketAddress address;
+		private SocketChannel socket;
+		
+		public SocketStream(String host, int port) throws IOException {
+			this.address = new InetSocketAddress(host, port);
+		}
+		
+		@Override
+		public void open() throws IOException {
+			socket = SocketChannel.open();
+			socket.configureBlocking(false);
+			socket.connect(address);
+		}
+
+		@Override
+		public int read(byte[] data, int offset, int length) throws IOException {
+			return socket.read(ByteBuffer.wrap(data, offset, length));
+		}
+
+		@Override
+		public void close() throws IOException {
+			socket.close();			
+		}
+		
+		public SocketChannel getSocket() {
+			return socket;
+		}
+
+		@Override
+		public int hashCode() {
+			return ((address == null) ? 0 : address.hashCode());
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			SocketStream other = (SocketStream) obj;
+			if (address == null) {
+				if (other.address != null)
+					return false;
+			} else if (!address.equals(other.address))
+				return false;
+			return true;
+		}
+
+	
+	}
 
 	/**
 	 * For each monitored file, a channel is created to maintain the current
@@ -96,8 +224,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 */
 	private class Channel implements Closeable {
 		private Quantity<Time> channelCurrentTime = ZERO;
-		private File file;
-		private RandomAccessFile input;
+		private Stream input;
 		private String[][] valuesBuffer;
 		private byte[] buffer = new byte[BUFFER_SIZE];
 		private double[] timestampBuffer = new double[MAX_BUFFERED_LINES];
@@ -105,13 +232,12 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		private String linePart = ""; // contains any incomplete line at the end
 										// of a buffer
 
-		public Channel(File path) throws IOException {
-			this.file = path;
-			input = new RandomAccessFile(path, "r");
+		public Channel(Stream input) throws IOException {
+			this.input = input;
 		}
 
-		public File getFile() {
-			return file;
+		public Stream getStream() {
+			return input;
 		}
 
 		public void addTrace(TraceKey key, int column) {
@@ -137,79 +263,74 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		 */
 		public boolean read() {
 			try {
-				if (input.getFilePointer() < input.length()) {
-					// File has been changed, read additional lines.
+				int lineCnt = 0;
+				while (true) {
+					// We avoid RandomAccessFile#readLine() as it is
+					// performance-wise slow (many system calls) and we
+					// cannot say whether a line a the end of the input is
+					// complete or not.
+					int len = input.read(buffer, 0, BUFFER_SIZE);
+					if (len > 0) {
+						// Search for line terminators
+						boolean eol = false;
+						int s, i; // last line end (s), current index (i)
+						for (s = 0, i = 0; i < len; i++) {
+							eol = (buffer[i] == '\n' || buffer[i] == '\r');
+							if (eol) {
+								String line = new String(buffer, s, (i - s));
+								if (!linePart.isEmpty()) {
+									// Prepend the partial line from the
+									// previous buffer
+									line = linePart + line;
+									linePart = "";
+								}
 
-					int lineCnt = 0;
-					while (true) {
-						// We avoid RandomAccessFile#readLine() as it is
-						// performance-wise slow (many system calls) and we
-						// cannot say whether a line a the end of the input is
-						// complete or not.
-						int len = input.read(buffer, 0, BUFFER_SIZE);
-						boolean eof = (input.getFilePointer() == input.length());
-						if (len > 0) {
-							// Search for line terminators
-							boolean eol = false;
-							int s, i; // last line end (s), current index (i)
-							for (s = 0, i = 0; i < len; i++) {
-								eol = (buffer[i] == '\n' || buffer[i] == '\r');
-								if (eol) {
-									String line = new String(buffer, s, (i - s));
-									if (!linePart.isEmpty()) {
-										// Prepend the partial line from the
-										// previous buffer
-										line = linePart + line;
-										linePart = "";
-									}
+								// Call subclasses to parse the line
+								if (!skipLine(input, line)) {
+									try {
+										timestampBuffer[lineCnt] = parse(input, line, valuesBuffer[lineCnt]);
 
-									// Call subclasses to parse the line
-									if (!skipLine(file, line)) {
-										try {
-											timestampBuffer[lineCnt] = parse(file, line, valuesBuffer[lineCnt]);
-
-											lineCnt++;
-											if (lineCnt >= MAX_BUFFERED_LINES) {
-												// If MAX_BUFFERED_LINES is
-												// reached,
-												// we notify listeners of new
-												// data
-												notifySelector(MAX_BUFFERED_LINES);
-												lineCnt = 0;
-											}
-										} catch (ParseException e) {
-											// The error should be logged by the
-											// implementation of the parse
-											// function.
+										lineCnt++;
+										if (lineCnt >= MAX_BUFFERED_LINES) {
+											// If MAX_BUFFERED_LINES is
+											// reached,
+											// we notify listeners of new
+											// data
+											notifySelector(MAX_BUFFERED_LINES);
+											lineCnt = 0;
 										}
-									}
-									s = ++i;
-									// skip windows line ending
-									if ((i < len) && (buffer[i - 1] == '\r') && (buffer[i] == '\n')) {
-										i++;
-										s++;
+									} catch (ParseException e) {
+										// The error should be logged by the
+										// implementation of the parse
+										// function.
 									}
 								}
-							}
-							if (i != s) {
-								// there is an incomplete line at the end of
-								// the input, save that for next iteration
-								linePart = new String(buffer, s, len - s);
-							}
-							if (eof) {
-								break;
+								s = ++i;
+								// skip windows line ending
+								if ((i < len) && (buffer[i - 1] == '\r') && (buffer[i] == '\n')) {
+									i++;
+									s++;
+								}
 							}
 						}
+						if (i != s) {
+							// there is an incomplete line at the end of
+							// the input, save that for next iteration
+							linePart = new String(buffer, s, len - s);
+						}
+						if (len < 0) {
+							break;
+						}
 					}
+				}
 
-					if (lineCnt > 0) {
-						// Notify listeners of the remaining data
-						notifySelector(lineCnt);
-					}
+				if (lineCnt > 0) {
+					// Notify listeners of the remaining data
+					notifySelector(lineCnt);
 				}
 				return true;
 			} catch (IOException e) {
-				log.error("Error reading from input " + file + ". Close input.", e);
+				log.error("Error reading from input " + input + ". Close input.", e);
 				try {
 					close();
 				} catch (IOException e2) { /* Ignore */
@@ -239,7 +360,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			for (int i = 0; i < length; i++) {
 				if (applyFilters(filters, valuesBuffer[i])) {
 					try {
-						double value = parseNumber(file, valuesBuffer[i][column]);
+						double value = parseNumber(input, valuesBuffer[i][column]);
 						timestamps.add(timestampBuffer[i]);
 						values.add(value);
 					} catch (ParseException e) {
@@ -273,48 +394,16 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			}
 		}
 	}
+	
+	private abstract class ReaderThread extends Thread {
+		protected Map<Stream, Channel> watchList = new HashMap<>();
+		protected volatile boolean stop;
+		
 
-	/**
-	 * This threads listens to file change event reported by the operating
-	 * system.
-	 *
-	 */
-	private class WatchThread extends Thread {
-
-		private Map<File, Channel> watchList = new HashMap<File, Channel>();
-		private Set<File> observedDirectories = new HashSet<File>();
-		private WatchService watcher;
-		private volatile boolean stop;
-
-		public WatchThread() throws IOException {
-			watcher = FileSystems.getDefault().newWatchService();
+		public Channel getChannel(Stream stream) {
+			return watchList.get(stream);
 		}
-
-		public Channel getChannel(File file) {
-			return watchList.get(file);
-		}
-
-		/**
-		 * Add a new channel to be watched for changes.
-		 * 
-		 * @param channel
-		 * @throws IOException
-		 */
-		public void registerChannel(Channel channel) throws IOException {
-			File traceFile = channel.getFile();
-			synchronized (this) {
-				if (!watchList.containsKey(traceFile)) {
-					File directory = traceFile.getParentFile();
-					if (!observedDirectories.contains(directory)) {
-						directory.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
-								StandardWatchEventKinds.OVERFLOW);
-						observedDirectories.add(directory);
-					}
-					watchList.put(traceFile, channel);
-				}
-			}
-		}
-
+		
 		/**
 		 * Call this method to trigger a read from the files manually.
 		 */
@@ -325,6 +414,95 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 				}
 			}
 		}
+		
+		protected void readFromChannel(Channel channel) {
+			if (!channel.read()) {
+				// Channel was closed unexpectedly -> remove it from list
+				try {
+					channel.close();
+				} catch (IOException e) {
+					log.error("Error closing channel.");
+				}
+				watchList.remove(channel.getStream());
+			}
+		}
+	}
+	
+	private class SocketReaderThread extends ReaderThread {		
+		private Selector selector;
+		
+		public void registerChannel(Channel channel) throws IOException {
+			Stream stream = channel.getStream();
+			if (stream instanceof SocketStream) {
+				SocketChannel socket = ((SocketStream)stream).getSocket();
+				socket.register(selector, SelectionKey.OP_READ, channel);
+				watchList.put(stream, channel);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+		
+		@Override
+		public void run() {
+			try {
+				Selector selector = Selector.open();
+				while(!stop) {
+					selector.select();
+					
+					for (SelectionKey key : selector.selectedKeys()) {
+						Channel curChannel = (Channel)key.attachment();
+						if (curChannel != null) {
+							readFromChannel(curChannel);
+						}
+					}
+				}				
+			} catch (IOException e) {
+				log.error("Error waiting for new data.", e);
+			}		
+		}
+	}
+
+	/**
+	 * This threads listens to file change event reported by the operating
+	 * system.
+	 *
+	 */
+	private class WatchThread extends ReaderThread {
+
+		private Set<File> observedDirectories = new HashSet<File>();
+		private WatchService watcher;
+
+		public WatchThread() throws IOException {
+			watcher = FileSystems.getDefault().newWatchService();
+		}
+
+		/**
+		 * Add a new channel to be watched for changes.
+		 * 
+		 * @param channel
+		 * @throws IOException
+		 */
+		public void registerChannel(Channel channel) throws IOException {
+			Stream stream = channel.getStream();
+			if (stream instanceof FileStream) {
+				synchronized (this) {
+					if (!watchList.containsKey(stream)) {
+						File traceFile = ((FileStream)stream).getFile();
+						File directory = traceFile.getParentFile();
+						if (!observedDirectories.contains(directory)) {
+							directory.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+									StandardWatchEventKinds.OVERFLOW);
+							observedDirectories.add(directory);
+						}
+						watchList.put(stream, channel);
+					}
+				}
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+
 
 		@Override
 		public void run() {
@@ -378,17 +556,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			}
 		}
 
-		private void readFromChannel(Channel channel) {
-			if (!channel.read()) {
-				// Channel was closed unexpectedly -> remove it from list
-				try {
-					channel.close();
-				} catch (IOException e) {
-					log.error("Error closing channel.");
-				}
-				watchList.remove(channel.getFile());
-			}
-		}
+		
 	}
 
 	private WatchThread parser;
@@ -415,31 +583,47 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			throw new IllegalStateException();
 		}
 
-		if (!(configuration instanceof FileTraceConfiguration)) {
-			throw new IllegalArgumentException("Unsupported trace configuration type.");
-		}
-
-		FileTraceConfiguration fileTrace = (FileTraceConfiguration) configuration;
-		List<TraceKey> keys = new LinkedList<TraceKey>();
-
-		File inputFile = new File(fileTrace.getFile());
-		if (inputFile.exists() && inputFile.canRead()) {
-			// Open new channel if necessary
-			Channel channel = parser.getChannel(inputFile);
-			if (channel == null) {
-				channel = new Channel(inputFile);
-				parser.registerChannel(channel);
+		Stream stream;
+		if (configuration instanceof FileTraceConfiguration) {
+			FileTraceConfiguration fileTrace = (FileTraceConfiguration) configuration;
+			File inputFile = new File(fileTrace.getFile());
+			if (inputFile.exists() && inputFile.canRead()) {
+				stream = new FileStream(inputFile);
+			} else {
+				throw new FileNotFoundException(inputFile.toString());
 			}
-			for (TraceToEntityMapping mapping : fileTrace.getMappings()) {
-				TraceKey k = new TraceKey(fileTrace.getMetric(), fileTrace.getUnit(), fileTrace.getInterval(),
-						mapping.getEntity(), fileTrace.getAggregation(), mapping.getFilters());
-				channel.addTrace(k, mapping.getTraceColumn() - 1);
-				keys.add(k);
-			}
-			return keys;
 		} else {
-			throw new FileNotFoundException(inputFile.toString());
+			URI location;
+			try {
+				location = new URI(configuration.getLocation());
+				if (location.getScheme().equals("socket")) {
+					String host = location.getHost();
+					int port = location.getPort();
+					stream = new SocketStream(host, port);					
+				} else {
+					log.error("Unkown scheme " + location.getScheme());
+					return Collections.emptyList();
+				}
+			} catch (URISyntaxException e) {
+				log.error("Could not parse location URI.", e);
+				return Collections.emptyList();
+			}			
 		}
+		
+		// Open new channel if necessary		
+		Channel channel = parser.getChannel(stream);
+		if (channel == null) {
+			channel = new Channel(stream);
+			parser.registerChannel(channel);
+		}
+		List<TraceKey> keys = new LinkedList<TraceKey>();
+		for (TraceToEntityMapping mapping : configuration.getMappings()) {
+			TraceKey k = new TraceKey(configuration.getMetric(), configuration.getUnit(), configuration.getInterval(),
+					mapping.getEntity(), configuration.getAggregation(), mapping.getFilters());
+			channel.addTrace(k, mapping.getTraceColumn() - 1);
+			keys.add(k);
+		}
+		return keys;
 	}
 
 	public void load() {
@@ -450,20 +634,20 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	/**
 	 * Check whether the line in a file should be parsed.
 	 * 
-	 * @param file
-	 *            source file
+	 * @param stream
+	 *            source stream
 	 * @param line
 	 *            the content of the line
 	 * @return <code>true</code> if this line should be skipped,
 	 *         <code>false</code> otherwise.
 	 */
-	protected abstract boolean skipLine(File file, String line);
+	protected abstract boolean skipLine(Stream stream, String line);
 
 	/**
 	 * Parses the given line
 	 * 
-	 * @param file
-	 *            source file
+	 * @param stream
+	 *            source stream
 	 * @param line
 	 *            the content of the line
 	 * @param values
@@ -475,7 +659,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 * @throws ParseException
 	 *             if the line cannot be parsed correctly
 	 */
-	protected abstract double parse(File file, String line, String[] values) throws ParseException;
+	protected abstract double parse(Stream stream, String line, String[] values) throws ParseException;
 
 	/**
 	 * Parses a floating-point number from a string.
@@ -486,5 +670,5 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 * @throws ParseException
 	 *             if the number cannot be parsed correctly
 	 */
-	protected abstract double parseNumber(File file, String value) throws ParseException;
+	protected abstract double parseNumber(Stream stream, String value) throws ParseException;
 }
