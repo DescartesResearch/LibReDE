@@ -234,6 +234,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 
 		public Channel(Stream input) throws IOException {
 			this.input = input;
+			input.open();
 		}
 
 		public Stream getStream() {
@@ -318,9 +319,8 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 							// the input, save that for next iteration
 							linePart = new String(buffer, s, len - s);
 						}
-						if (len < 0) {
-							break;
-						}
+					} else {
+						break;
 					}
 				}
 
@@ -397,8 +397,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	
 	private abstract class ReaderThread extends Thread {
 		protected Map<Stream, Channel> watchList = new HashMap<>();
-		protected volatile boolean stop;
-		
+		protected volatile boolean stop;		
 
 		public Channel getChannel(Stream stream) {
 			return watchList.get(stream);
@@ -424,6 +423,19 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 					log.error("Error closing channel.");
 				}
 				watchList.remove(channel.getStream());
+			}
+		}
+		
+		public void close() throws IOException {
+			stop = true;
+			this.interrupt();
+			try {
+				this.join();
+			} catch (InterruptedException ex) {
+				log.error("Interrupted when waiting for thread.", ex);
+			}
+			for (Channel channel : watchList.values()) {
+				channel.close();
 			}
 		}
 	}
@@ -468,7 +480,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 *
 	 */
 	private class WatchThread extends ReaderThread {
-
+		private Map<File, Channel> channels = new HashMap<>();
 		private Set<File> observedDirectories = new HashSet<File>();
 		private WatchService watcher;
 
@@ -490,10 +502,11 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 						File traceFile = ((FileStream)stream).getFile();
 						File directory = traceFile.getParentFile();
 						if (!observedDirectories.contains(directory)) {
-							directory.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+							WatchKey key = directory.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY,
 									StandardWatchEventKinds.OVERFLOW);
 							observedDirectories.add(directory);
 						}
+						channels.put(traceFile, channel);
 						watchList.put(stream, channel);
 					}
 				}
@@ -525,7 +538,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 							Path absolutePath = directory.resolve(filename);
 							Channel channel;
 							synchronized (this) {
-								channel = watchList.get(absolutePath.toFile());
+								channel = channels.get(absolutePath.toFile());
 								if (channel != null) {
 									// we may also get notifications from
 									// unrelevant files
@@ -543,55 +556,63 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		}
 
 		public void close() throws IOException {
-			stop = true;
-			this.interrupt();
-			try {
-				this.join();
-			} catch (InterruptedException ex) {
-				log.error("Interrupted when waiting for thread.", ex);
-			}
+			super.close();
 			watcher.close();
-			for (Channel channel : watchList.values()) {
-				channel.close();
-			}
-		}
-
-		
+		}		
 	}
 
-	private WatchThread parser;
+	private WatchThread fileWatcher;
+	private SocketReaderThread socketWatcher;
 
 	public AbstractFileDataSource() throws IOException {
-		this.parser = new WatchThread();
-		this.parser.setDaemon(true);
+		this.fileWatcher = new WatchThread();
+		this.fileWatcher.setDaemon(true);
+		this.socketWatcher = new SocketReaderThread();
+		this.socketWatcher.setDaemon(true);
 	}
 
 	public void close() throws IOException {
-		if (this.parser != null) {
-			this.parser.close();
+		if (this.fileWatcher != null) {
+			this.fileWatcher.close();
 			try {
-				this.parser.join();
+				this.fileWatcher.join();
 			} catch (InterruptedException e) {
-				log.error("Error joining parser thread.", e);
+				log.error("Error joining fileWatcher thread.", e);
 			}
 		}
-		this.parser = null;
+		this.fileWatcher = null;
+		if (this.socketWatcher != null) {
+			this.socketWatcher.close();
+			try {
+				this.socketWatcher.join();
+			} catch (InterruptedException e) {
+				log.error("Error joining socketWatcher thread");
+			}
+		}
+		this.socketWatcher = null;
 	}
 
 	public List<TraceKey> addTrace(TraceConfiguration configuration) throws IOException {
-		if (parser == null) {
+		if (fileWatcher == null) {
 			throw new IllegalStateException();
 		}
 
-		Stream stream;
+		Channel channel;
 		if (configuration instanceof FileTraceConfiguration) {
 			FileTraceConfiguration fileTrace = (FileTraceConfiguration) configuration;
 			File inputFile = new File(fileTrace.getFile());
 			if (inputFile.exists() && inputFile.canRead()) {
-				stream = new FileStream(inputFile);
+				FileStream stream = new FileStream(inputFile);
+				// Open new channel if necessary		
+				channel = fileWatcher.getChannel(stream);
+				if (channel == null) {
+					channel = new Channel(stream);
+					fileWatcher.registerChannel(channel);
+				}
 			} else {
 				throw new FileNotFoundException(inputFile.toString());
 			}
+			
 		} else {
 			URI location;
 			try {
@@ -599,22 +620,21 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 				if (location.getScheme().equals("socket")) {
 					String host = location.getHost();
 					int port = location.getPort();
-					stream = new SocketStream(host, port);					
+					SocketStream stream = new SocketStream(host, port);
+					// Open new channel if necessary		
+					channel = socketWatcher.getChannel(stream);
+					if (channel == null) {
+						channel = new Channel(stream);
+						socketWatcher.registerChannel(channel);
+					}
 				} else {
 					log.error("Unkown scheme " + location.getScheme());
 					return Collections.emptyList();
-				}
+				}				
 			} catch (URISyntaxException e) {
 				log.error("Could not parse location URI.", e);
 				return Collections.emptyList();
 			}			
-		}
-		
-		// Open new channel if necessary		
-		Channel channel = parser.getChannel(stream);
-		if (channel == null) {
-			channel = new Channel(stream);
-			parser.registerChannel(channel);
 		}
 		List<TraceKey> keys = new LinkedList<TraceKey>();
 		for (TraceToEntityMapping mapping : configuration.getMappings()) {
@@ -627,8 +647,8 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	}
 
 	public void load() {
-		parser.start();
-		parser.poll();
+		fileWatcher.start();
+		fileWatcher.poll();
 	}
 
 	/**
