@@ -649,6 +649,8 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	public void load() {
 		fileWatcher.start();
 		fileWatcher.poll();
+		socketWatcher.start();
+		socketWatcher.poll();
 	}
 
 	/**
