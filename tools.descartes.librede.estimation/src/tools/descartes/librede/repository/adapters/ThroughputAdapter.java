@@ -39,10 +39,12 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
+import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.IncomingCallsSummationHandler;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.repository.rules.RuleScope;
 import tools.descartes.librede.units.RequestRate;
 
@@ -87,7 +89,16 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
 					.scope(new IncomingCallsScope())
-					.build(new IncomingCallsSummationHandler())
+					.build(new IncomingCallsSummationHandler()),
+				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.priority(100) // Always use this for background services!
+					.check(new RulePrecondition() {					
+						@Override
+						public boolean check(ModelEntity entity) {
+							return (entity instanceof Service) && ((Service)entity).isBackgroundService();
+						}
+					})
+					.build(new ConstantHandler<RequestRate>(1.0))
 				);
 	}
 
