@@ -185,6 +185,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			update();
 		}
 		
+		public TimeSeries getRawData() {
+			return data;
+		}
+		
 		public TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 			if (data != null) {
 				return UnitConverter.convertTo(data.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS)), unit.getDimension().getBaseUnit(), unit);
@@ -284,6 +288,25 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		rules.removeRule(rule);
 	}
 	
+	public <D extends Dimension> void append(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
+		this.append(m, unit, entity, observations, Aggregation.NONE, ZERO_SECONDS);
+	}
+	
+	public <D extends Dimension> void append(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
+		DataKey<D> key = new DataKey<D>(m, entity, aggregation);
+		DataEntry<D> entry = getEntry(key);
+		if (entry == null) {
+			this.setData(m, unit, entity, observations, aggregation, aggregationInterval);
+		} else {
+			TimeSeries existing = entry.getRawData();
+			TimeSeries newData = observations;
+			if (existing != null) {
+				newData = existing.append(observations);
+			}
+			this.setData(m, unit, entity, newData, aggregation, aggregationInterval);
+		}
+	}
+	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
 		this.setData(m, unit, entity, observations, Aggregation.NONE, ZERO_SECONDS);
 	}
@@ -306,7 +329,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug((existing ? "New" : "Replaced") + "time series entry " + entity + "/" + m + "/" + aggregation);
+			log.debug((existing ? "New" : "Replaced") + " time series entry " + entity + "/" + m + "/" + aggregation);
 		}
 	}
 	
@@ -395,7 +418,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (newEntry) {
 			addEntry(key, entry);
 		}
-		log.debug((newEntry ? "New" : "Replaced") + "derivation entry " + entity + "/" + metric + "/" + aggregation);
+		if (log.isDebugEnabled()) {
+			log.debug((newEntry ? "New" : "Replaced") + " derivation entry " + entity + "/" + metric + "/" + aggregation);
+		}
 	}
 	
 	@Override
