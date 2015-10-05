@@ -90,7 +90,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	private boolean useObservedUtilization;
 
 	private Query<Vector, Ratio> utilQuery;
-	private Query<Vector, Ratio> stealTimeQuery;
+	private Query<Vector, Ratio> contentionQuery;
 	private Query<Scalar, Time> responseTimeQuery;
 	private Query<Vector, RequestRate> throughputQuery;	
 	
@@ -163,9 +163,9 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		if (useObservedUtilization) {
 			utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE)
 					.forResources(finiteCapacityResources).average().using(repository);
-			// The steal time is the ratio of time a virtual CPU is waiting for a physical
+			// The contention is the ratio of time a virtual CPU is waiting for a physical
 			// CPU.
-			stealTimeQuery = QueryBuilder.select(StandardMetrics.STEAL_TIME).in(Ratio.NONE)
+			contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE)
 					.forResources(finiteCapacityResources).average().using(repository);
 		}
 
@@ -212,7 +212,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		result = result && checkQueryPrecondition(responseTimeQuery, messages);
 		result = result && checkQueryPrecondition(throughputQuery, messages);
 		if (useObservedUtilization) {
-			result = result && checkQueryPrecondition(stealTimeQuery, messages);
+			result = result && checkQueryPrecondition(contentionQuery, messages);
 			result = result && checkQueryPrecondition(utilQuery, messages);
 		}
 		return result;
@@ -323,8 +323,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
 			return 0.0; // there is no slow-down
 		} else {
-			if (stealTimeQuery != null) {
-				return stealTimeQuery.get(historicInterval).get(stealTimeQuery.indexOf(res_i));
+			if (contentionQuery != null) {
+				return contentionQuery.get(historicInterval).get(contentionQuery.indexOf(res_i));
 			} else {
 				// TODO: We need a complete MVA here since we do not have resource statistics here
 				return 0.0;
@@ -338,7 +338,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			return 0.0;
 		} else {
 			if (useObservedUtilization) {
-				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)) + S_i;
+				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
 			} else {
 				/*
 				 * Calculate the utilization using the utilization law.
@@ -591,7 +591,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		} else {
 			if (useObservedUtilization) {
 				return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(),
-						utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i))).add(S_i);
+						utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i)));
 			} else {
 				/*
 				 * Calculate the utilization using the utilization law.

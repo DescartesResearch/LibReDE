@@ -29,42 +29,33 @@ package tools.descartes.librede.repository.adapters;
 import java.util.Arrays;
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
+import tools.descartes.librede.repository.handlers.DeriveContentionHandler;
 import tools.descartes.librede.repository.rules.Rule;
-import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Ratio;
 
-public class StealTimeAdapter implements IMetricAdapter<Time> {
+public class ContentionAdapter implements IMetricAdapter<Ratio> {
 
 	@Override
 	public Interpolation getInterpolation() {
-		return Interpolation.LINEAR;
+		return Interpolation.PIECEWISE_CONSTANT;
 	}
 
 	@Override
-	public List<Rule<Time>> getDerivationRules() {
+	public List<Rule<Ratio>> getDerivationRules() {
 		return Arrays.asList(
-				Rule.rule(StandardMetrics.STEAL_TIME, Aggregation.SUM)
-					.requiring(Aggregation.SUM)
-					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM)),
-				Rule.rule(StandardMetrics.STEAL_TIME, Aggregation.SUM)
-					.check(new RulePrecondition() {						
-						@Override
-						public boolean check(ModelEntity entity) {
-							if (entity instanceof Resource) {
-								return ((Resource) entity).getChildResources().isEmpty();
-							}
-							return false;
-						}
-					})
-					.build(new ConstantHandler<Time>(0.0))
+				Rule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
+					.requiring(Aggregation.AVERAGE)
+					.build(new DefaultAggregationHandler<Ratio>(Aggregation.AVERAGE)),
+				Rule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.STEAL_TIME, Aggregation.SUM)
+					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
+					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)
+					.build(new DeriveContentionHandler())
 				);
 	}
 

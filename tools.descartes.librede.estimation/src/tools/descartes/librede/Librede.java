@@ -88,6 +88,7 @@ import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.repository.adapters.ArrivalRateAdapter;
 import tools.descartes.librede.repository.adapters.ArrivalsAdapter;
 import tools.descartes.librede.repository.adapters.BusyTimeAdapter;
+import tools.descartes.librede.repository.adapters.ContentionAdapter;
 import tools.descartes.librede.repository.adapters.DeparturesAdapter;
 import tools.descartes.librede.repository.adapters.IdleTimeAdapter;
 import tools.descartes.librede.repository.adapters.QueueLengthSeenOnArrivalAdapter;
@@ -127,6 +128,7 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVAL_RATE, new ArrivalRateAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS, new ArrivalsAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, new BusyTimeAdapter());
+		Registry.INSTANCE.registerMetric(StandardMetrics.CONTENTION, new ContentionAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, new DeparturesAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, new IdleTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.RESIDENCE_TIME, new ResidenceTimeAdapter());
