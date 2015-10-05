@@ -53,18 +53,7 @@ public class StealTimeAdapter implements IMetricAdapter<Time> {
 		return Arrays.asList(
 				Rule.rule(StandardMetrics.STEAL_TIME, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
-					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM)),
-				Rule.rule(StandardMetrics.STEAL_TIME, Aggregation.SUM)
-					.check(new RulePrecondition() {						
-						@Override
-						public boolean check(ModelEntity entity) {
-							if (entity instanceof Resource) {
-								return ((Resource) entity).getChildResources().isEmpty();
-							}
-							return false;
-						}
-					})
-					.build(new ConstantHandler<Time>(0.0))
+					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM))
 				);
 	}
 
