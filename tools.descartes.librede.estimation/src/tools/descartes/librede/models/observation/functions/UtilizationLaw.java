@@ -67,6 +67,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private final Query<Vector, RequestRate> throughputQuery;
 	private final Query<Scalar, Ratio> utilizationQuery;
+	private final Query<Scalar, Ratio> contentionQuery;
 	
 	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedIndices is updated later.
 	private final Indices varFocusedIndices; // the indices of the independent variables which is altered by this output function
@@ -115,6 +116,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		 */
 		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getAccessingServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
+		contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 	}
 	
 	/* (non-Javadoc)
@@ -125,6 +127,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		boolean result = true;
 		result = result && checkQueryPrecondition(throughputQuery, messages);
 		result = result && checkQueryPrecondition(utilizationQuery, messages);
+		result = result && checkQueryPrecondition(contentionQuery, messages);
 		return result;
 	}
 
@@ -134,7 +137,12 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	@Override
 	public Vector getIndependentVariables() {
 		Vector X = throughputQuery.get(historicInterval);
-		return variables.set(varFocusedIndices, X.times(1.0 / this.res_i.getNumberOfServers()));
+		// The contention factor specifies the slow down due to scheduling
+		// on an underlying resource. As a result the actually available resource
+		// time is lower, hence the utilization is higher
+		// U_i = X * ((1 + C_i) * D)
+		double C_i = contentionQuery.get(historicInterval).getValue();
+		return variables.set(varFocusedIndices, X.times(1.0 / this.res_i.getNumberOfServers())).times(1 + C_i);
 	}
 
 	/* (non-Javadoc)
