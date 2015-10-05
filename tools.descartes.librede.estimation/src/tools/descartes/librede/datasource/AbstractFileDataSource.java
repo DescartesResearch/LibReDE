@@ -55,6 +55,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -247,12 +248,14 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 				maxColumn = Math.max(filter.getTraceColumn(), maxColumn);
 			}
 			
-			// Check that the buffer array is large enough for this number
-			// of columns
-			if ((valuesBuffer == null) || (valuesBuffer[0].length < (maxColumn + 1))) {
-				valuesBuffer = new String[MAX_BUFFERED_LINES][maxColumn + 1];
+			synchronized(traces) {
+				// Check that the buffer array is large enough for this number
+				// of columns
+				if ((valuesBuffer == null) || (valuesBuffer[0].length < (maxColumn + 1))) {
+					valuesBuffer = new String[MAX_BUFFERED_LINES][maxColumn + 1];
+				}
+				traces.put(key, column);
 			}
-			traces.put(key, column);
 		}
 
 		/**
@@ -289,16 +292,17 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 								// Call subclasses to parse the line
 								if (!skipLine(input, line)) {
 									try {
-										timestampBuffer[lineCnt] = parse(input, line, valuesBuffer[lineCnt]);
-
-										lineCnt++;
-										if (lineCnt >= MAX_BUFFERED_LINES) {
-											// If MAX_BUFFERED_LINES is
-											// reached,
-											// we notify listeners of new
-											// data
-											notifySelector(MAX_BUFFERED_LINES);
-											lineCnt = 0;
+										synchronized(traces) {
+											timestampBuffer[lineCnt] = parse(input, line, valuesBuffer[lineCnt]);
+											lineCnt++;
+											if (lineCnt >= MAX_BUFFERED_LINES) {
+												// If MAX_BUFFERED_LINES is
+												// reached,
+												// we notify listeners of new
+												// data
+												notifySelector(MAX_BUFFERED_LINES);
+												lineCnt = 0;
+											}
 										}
 									} catch (ParseException e) {
 										// The error should be logged by the
@@ -326,7 +330,9 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 
 				if (lineCnt > 0) {
 					// Notify listeners of the remaining data
-					notifySelector(lineCnt);
+					synchronized(traces) {
+						notifySelector(lineCnt);
+					}
 				}
 				return true;
 			} catch (IOException e) {
@@ -379,7 +385,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 
 		private boolean applyFilters(List<TraceFilter> filters, String[] line) {
 			for (TraceFilter f : filters) {
-				if (!line[f.getTraceColumn()].equals(f.getValue())) {
+				if (!f.getValue().equals(line[f.getTraceColumn()])) {
 					return false;
 				}
 			}
@@ -441,13 +447,20 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	}
 	
 	private class SocketReaderThread extends ReaderThread {		
-		private Selector selector;
+		private final Selector selector;
+		private final Queue<Channel> newChannels = new LinkedList<>();
+		
+		public SocketReaderThread() throws IOException {
+			selector = Selector.open();
+		}
 		
 		public void registerChannel(Channel channel) throws IOException {
 			Stream stream = channel.getStream();
 			if (stream instanceof SocketStream) {
-				SocketChannel socket = ((SocketStream)stream).getSocket();
-				socket.register(selector, SelectionKey.OP_READ, channel);
+				synchronized (newChannels) {
+					newChannels.add(channel);
+				}
+				selector.wakeup();
 				watchList.put(stream, channel);
 			} else {
 				throw new IllegalArgumentException();
@@ -457,14 +470,29 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		@Override
 		public void run() {
 			try {
-				Selector selector = Selector.open();
 				while(!stop) {
+					synchronized (newChannels) {
+						while(!newChannels.isEmpty()) {
+							Channel cur = newChannels.poll();
+							SocketStream socketStream = (SocketStream)cur.getStream();
+							log.info("Open socket " + socketStream.getSocket().getRemoteAddress());
+							socketStream.getSocket().register(selector, SelectionKey.OP_CONNECT, cur);
+						}
+					}
+					
 					selector.select();
 					
 					for (SelectionKey key : selector.selectedKeys()) {
-						Channel curChannel = (Channel)key.attachment();
-						if (curChannel != null) {
-							readFromChannel(curChannel);
+						if (key.isReadable()) {
+							Channel curChannel = (Channel)key.attachment();
+							if (curChannel != null) {
+								readFromChannel(curChannel);
+							}
+						} else if(key.isConnectable()) {
+							if (((SocketChannel)key.channel()).finishConnect()) {
+								key.interestOps(SelectionKey.OP_READ);								
+								log.info("Connection to " + key.channel() + " established.");
+							}
 						}
 					}
 				}				
