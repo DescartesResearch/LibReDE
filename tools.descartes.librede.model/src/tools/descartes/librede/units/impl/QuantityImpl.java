@@ -327,7 +327,11 @@ public class QuantityImpl<D extends Dimension> extends MinimalEObjectImpl.Contai
 	 */
 	@Override
 	public int compareTo(Quantity<D> o) {
-		return Double.compare(value, o.getValue(unit));
+		if (o != null) {
+			return Double.compare(value, o.getValue(unit));
+		} else {
+			return -1;
+		}
 	}
 
 } //QuantityImpl
