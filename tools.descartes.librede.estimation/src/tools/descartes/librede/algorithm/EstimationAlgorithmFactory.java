@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
@@ -48,12 +47,6 @@ import tools.descartes.librede.registry.Registry;
 public class EstimationAlgorithmFactory {
 	
 	private static final Logger log = Logger.getLogger(EstimationAlgorithmFactory.class);
-	
-	private LibredeConfiguration configuration;
-	
-	public EstimationAlgorithmFactory(LibredeConfiguration configuration) {
-		this.configuration = configuration;
-	}
 	
 	/**
 	 * Automatically creates an instance for a specified subclass of estimation algorithms.
