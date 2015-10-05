@@ -288,7 +288,7 @@ public class Librede {
 	}
 	
 	public static LibredeResults runEstimation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {
-		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory(conf);
+		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory();
 		
 		LibredeResults results = new LibredeResults(conf.getEstimation().getApproaches().size(), 1);
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
@@ -317,7 +317,7 @@ public class Librede {
 	}
 	
 	public static LibredeResults runEstimationWithValidation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {
-		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory(conf);
+		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory();
 		
 		LibredeResults results = new LibredeResults(conf.getEstimation().getApproaches().size(), 1);
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
@@ -361,7 +361,7 @@ public class Librede {
 	}
 	
 	public static LibredeResults runEstimationWithCrossValidation(LibredeConfiguration conf, IMonitoringRepository repository) throws Exception {
-		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory(conf);
+		EstimationAlgorithmFactory algoFactory = new EstimationAlgorithmFactory();
 		
 		LibredeResults results = new LibredeResults(conf.getEstimation().getApproaches().size(), conf.getValidation().getValidationFolds());
 		for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
