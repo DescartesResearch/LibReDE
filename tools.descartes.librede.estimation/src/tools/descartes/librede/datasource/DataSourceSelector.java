@@ -82,7 +82,7 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 	private Quantity<Time> timeout = UnitsFactory.eINSTANCE.createQuantity(5, Time.MINUTES);
 
 	@Override
-	public void dataAvailable(IDataSource datasource, TraceEvent e) {
+	public synchronized void dataAvailable(IDataSource datasource, TraceEvent e) {
 		checkIsOpen();
 		Quantity<Time> oldLastestObservationTime = latestObservations.get(e.getKey());
 		Quantity<Time> newLatestObservationTime = e.getLastObservationTime();
@@ -96,8 +96,9 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 				maxLatestObservationTime = newLatestObservationTime;
 			}
 			minLatestObservationTime = maxLatestObservationTime;
-			for (Quantity<Time> time : latestObservations.values()) {
+			for (TraceKey curKey : latestObservations.keySet()) {
 				// check whether this trace is timed out
+				Quantity<Time> time = latestObservations.get(curKey);
 				if (!isTimeout(maxLatestObservationTime, time, e.getKey().getInterval())) {
 					if (minLatestObservationTime.getValue(Time.SECONDS) > time.getValue(Time.SECONDS)) {
 						minLatestObservationTime = time;
@@ -154,7 +155,7 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 	 * 
 	 * @return
 	 */
-	public Quantity<Time> getLatestObservationTime() {
+	public synchronized Quantity<Time> getLatestObservationTime() {
 		checkIsOpen();
 		return minLatestObservationTime;
 	}
