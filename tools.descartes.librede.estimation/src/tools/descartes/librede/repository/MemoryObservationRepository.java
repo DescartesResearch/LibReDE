@@ -299,20 +299,21 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			this.setData(m, unit, entity, observations, aggregation, aggregationInterval);
 		} else {
 			TimeSeries existing = entry.getRawData();
-			TimeSeries newData = observations;
+			// IMPORTANT: ensure that existing and new data have the same unit
+			TimeSeries newData = UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit());
 			if (existing != null) {
-				newData = existing.append(observations);
+				newData = existing.append(newData);
 			}
 			this.setData(m, unit, entity, newData, aggregation, aggregationInterval);
 		}
 	}
 	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
-		this.setData(m, unit, entity, observations, Aggregation.NONE, ZERO_SECONDS);
+		this.setData(m, unit, entity, UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit()), Aggregation.NONE, ZERO_SECONDS);
 	}
 	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
-		this.setData(m, unit, entity, aggregatedObservations, aggregation, aggregationInterval);
+		this.setData(m, unit, entity, UnitConverter.convertTo(aggregatedObservations, unit, m.getDimension().getBaseUnit()), aggregation, aggregationInterval);
 	}
 	
 	private <D extends Dimension> void setData(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
@@ -323,7 +324,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			entry = new DataEntry<>(key);
 		}
 		observations.setInterpolationMethod(Registry.INSTANCE.getMetricHandler(m).getInterpolation());
-		entry.setTimeSeries(UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit()), aggregationInterval);
+		entry.setTimeSeries(observations, aggregationInterval);
 		if (!existing) {
 			addEntry(key, entry);
 		}
@@ -376,12 +377,16 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 					// the activation of this rule.
 					DataEntry<?> entry = getEntry(dep.getMetric(), e, dep.getAggregation());
 					if ((entry == null) || (entry.data == null)) {
-						log.info("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
+						if (log.isDebugEnabled()) {
+							log.debug("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
+						}
 						return false;
 					}
 				} else {
 					if (!exists(dep.getMetric(), e, dep.getAggregation())) {
-						log.info("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
+						if (log.isDebugEnabled()) {
+							log.debug("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
+						}
 						return false;
 					}
 				}
