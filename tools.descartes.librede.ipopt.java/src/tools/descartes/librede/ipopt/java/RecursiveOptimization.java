@@ -55,6 +55,7 @@ import tools.descartes.librede.ipopt.java.backend.Eval_Jac_G_CB;
 import tools.descartes.librede.ipopt.java.backend.IpoptLibrary;
 import tools.descartes.librede.ipopt.java.backend.IpoptOptionKeyword;
 import tools.descartes.librede.ipopt.java.backend.IpoptOptionValue;
+import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
@@ -335,6 +336,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private DerivativeStructure calcObjectiveFunction(DerivativeStructure[] state) {
 		IObservationModel<?, ?> observationModel = getObservationModel();
 		int outputSize = observationModel.getOutputSize();
+		Vector outputWeights = observationModel.getOutputWeightsFunction().getOutputWheights();
 
 		// obj = sum((h_real - h_calc(x)) .^ 2)
 		DerivativeStructure obj = null;
@@ -349,10 +351,10 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 					}
 					if (o_real > 0) {
 	 					DerivativeStructure summand = o_calc.subtract(o_real).divide(o_real).pow(2);
-						obj = (obj == null) ? summand : obj.add(summand);
+						obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
 					} else {
 						DerivativeStructure summand = o_calc.pow(2);
-						obj = (obj == null) ? summand : obj.add(summand);
+						obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
 					}
 				}
 			}
