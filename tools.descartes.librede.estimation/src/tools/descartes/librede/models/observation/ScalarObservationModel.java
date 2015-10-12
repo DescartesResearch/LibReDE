@@ -37,9 +37,23 @@ import tools.descartes.librede.models.observation.functions.IOutputFunction;
 
 public class ScalarObservationModel<E extends IOutputFunction> implements IObservationModel<E, Scalar> {
 	
+	private static class DefaultOutputWeighting implements IOutputWeightingFunction {
+		@Override
+		public Vector getOutputWheights() {
+			return scalar(1);
+		}		
+	}
+	
+	private final IOutputWeightingFunction weights;
 	private final E outputFunction;
 	
 	public ScalarObservationModel(E outputFunction) {
+		this.weights = new DefaultOutputWeighting();
+		this.outputFunction = outputFunction;
+	}
+	
+	public ScalarObservationModel(E outputFunction, IOutputWeightingFunction weights) {
+		this.weights = weights;
 		this.outputFunction = outputFunction;
 	}
 	
@@ -71,6 +85,11 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 		ArrayList<E> temp = new ArrayList<E>(1);
 		temp.add(outputFunction);		
 		return temp.iterator();
+	}
+
+	@Override
+	public IOutputWeightingFunction getOutputWeightsFunction() {
+		return weights;
 	}
 
 }

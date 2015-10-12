@@ -32,15 +32,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 
 public class VectorObservationModel<E extends IOutputFunction> implements IObservationModel<E, Vector> {
+	
+	private class DefaultWeightingFunction implements IOutputWeightingFunction {
+		@Override
+		public Vector getOutputWheights() {
+			return LinAlg.ones(outputSize);
+		}		
+	}
 
-	private List<E> outputFunctions;
+	private final IOutputWeightingFunction weights;
+	private final List<E> outputFunctions;
 	private int outputSize;
 	
 	public VectorObservationModel() {
+		weights = new DefaultWeightingFunction();
+		outputFunctions = new ArrayList<E>();
+		outputSize = 0;
+	}
+
+	public VectorObservationModel(IOutputWeightingFunction weights) {
+		this.weights = weights;
 		outputFunctions = new ArrayList<E>();
 		outputSize = 0;
 	}
@@ -81,6 +97,11 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	@Override
 	public Iterator<E> iterator() {
 		return outputFunctions.iterator();
+	}
+
+	@Override
+	public IOutputWeightingFunction getOutputWeightsFunction() {
+		return weights;
 	}
 
 }

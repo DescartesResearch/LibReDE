@@ -39,4 +39,6 @@ public interface IObservationModel<E extends IOutputFunction, O extends Vector> 
 	
 	E getOutputFunction(int output);
 	
+	IOutputWeightingFunction getOutputWeightsFunction();
+	
 }
