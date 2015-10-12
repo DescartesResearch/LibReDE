@@ -191,6 +191,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			 * When calculating the utilization, we use the utilization law. 
 			 */
 			Set<Service> allServicesInScope = new HashSet<>();
+			allServicesInScope.add(cls_r);
 			for (Resource res : finiteCapacityResources) {
 				allServicesInScope.addAll(res.getAccessingServices());
 			}
@@ -253,7 +254,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 				C_i = getContention(historicInterval, res_i);
 			}
 			double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
-			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			double busyProp = 0.0;
 			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
 				int p = res_i.getNumberOfServers();
@@ -262,11 +262,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			
 			List<Service> accessingServices = accessedResources.get(res_i);
 			for (Service curService : accessingServices) {
+				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, curService));
 				double visits = 1;
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
-				rt += visits * (1 + C_i) * (D_ir + calculateQueueingTime(state, res_i, U_i, busyProp));
+				rt += visits * (1 + C_i) * (D_ir + calculateQueueingTime(D_ir, res_i, U_i, busyProp));
 			}			
 		}
 		return rt;
@@ -286,7 +287,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	 *            hypervisor)
 	 * @return
 	 */
-	private double calculateQueueingTime(Vector state, Resource res_i, double U_i, double P_q) {
+	private double calculateQueueingTime(double D_ir, Resource res_i, double U_i, double P_q) {
 		switch (res_i.getSchedulingStrategy()) {
 		case FCFS:
 			// TODO: implement FCFS
@@ -307,7 +308,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			 * 
 			 * E[T_q] = \frac{D_ir}{1 - U_i} * P_q
 			 */
-			double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
 			return (D_ir * P_q) / (1 - U_i);
 		case IS:
 			/*
@@ -557,7 +557,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		for (Resource res_i : accessedResources.keySet()) {
 			double C_i = getContention(historicInterval, res_i);
 			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X, C_i);
-			DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, cls_r)];
 			DerivativeStructure busyProp;
 			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
 				int p = res_i.getNumberOfServers();
@@ -568,11 +567,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 
 			List<Service> accessingServices = accessedResources.get(res_i);
 			for (Service curService : accessingServices) {
+				DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, curService)];
 				double visits = 1;
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
-				DerivativeStructure curRt = D_ir.add(calculateQueueingTime(state, res_i, U_i, busyProp)).multiply(1 + C_i).multiply(visits);
+				DerivativeStructure curRt = D_ir.add(calculateQueueingTime(D_ir, res_i, U_i, busyProp)).multiply(1 + C_i).multiply(visits);
 				if (rt == null) {
 					rt = curRt;
 				} else {
@@ -626,7 +626,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	 *            arrives.
 	 * @return
 	 */
-	private DerivativeStructure calculateQueueingTime(DerivativeStructure[] state, Resource res_i,
+	private DerivativeStructure calculateQueueingTime(DerivativeStructure D_ir, Resource res_i,
 			DerivativeStructure U_i, DerivativeStructure P_q) {
 		switch (res_i.getSchedulingStrategy()) {
 		case FCFS:
@@ -648,13 +648,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			 * 
 			 * E[T_q] = \frac{D_ir}{1 - U_i} * P_q
 			 */
-			DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, cls_r)];
 			return (D_ir.multiply(P_q)).divide(U_i.multiply(-1).add(1));
 		case IS:
 			/*
 			 * Infinite server: a job will never be forced to wait for service
 			 */
-			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
+			return new DerivativeStructure(D_ir.getFreeParameters(), D_ir.getOrder(), 0.0);
 		default:
 			throw new AssertionError("Unsupported scheduling strategy.");
 		}
