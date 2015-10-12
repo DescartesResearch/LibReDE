@@ -138,9 +138,14 @@ public class InvocationGraph {
 		}
 	}
 	
-	private static boolean[][] calculateReachabilities(int serviceCount, List<ExternalCall> externalCalls) {
+	private boolean[][] calculateReachabilities(int serviceCount, List<ExternalCall> externalCalls) {
 		// Use Warshall algorithm on a unweighted graph
-		boolean[][] reachability = new boolean[serviceCount][serviceCount];		
+		boolean[][] reachability = new boolean[serviceCount][serviceCount];
+		for (ExternalCall c: externalCalls) {
+			int idx1 = servicesToIdx.get(c.getService());
+			int idx2 = servicesToIdx.get(c.getCalledService());
+			reachability[idx1][idx2] = true;
+		}		
 		
 		for (int k = 0; k < serviceCount; k++) {
 			for (int i = 0; i < serviceCount; i++) {
