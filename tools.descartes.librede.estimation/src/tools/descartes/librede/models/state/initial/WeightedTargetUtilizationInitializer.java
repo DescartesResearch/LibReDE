@@ -91,9 +91,9 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 			}
 			
 			// distribute the observed response time evenly between the resource demands
-			double baseDemand = 0.0; 
-			if (tput.get(throughput.indexOf(curService)) > 0.0) {
-				double curRespTime = rt.get(respTime.indexOf(curService));
+			double baseDemand = 0.0;
+			double curRespTime = rt.get(respTime.indexOf(curService));
+			if (!Double.isNaN(curRespTime)) {
 				baseDemand = curRespTime / demands.size();
 			}
 			// No request was observed for this system services
@@ -105,13 +105,15 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 						visits = stateModel.getInvocationGraph().getInvocationCount(curService, curDemand.getService());
 					}
 					int stateVarIdx = stateModel.getStateVariableIndex(curDemand.getResource(), curDemand.getService());
-					if (initialState[stateVarIdx] > 0) {
-						// in a complex control graph a service may be called by different services
-						// as a workaround we always use the minimum of the calculated initial demands
-						// as a starting point. (The response time is an upper bound on the demands)
-						initialState[stateVarIdx] = Math.min(initialState[stateVarIdx], baseDemand / visits);
-					} else {
-						initialState[stateVarIdx] = baseDemand / visits;
+					if (visits > 0.0) {
+						if (initialState[stateVarIdx] > 0) {
+							// in a complex control graph a service may be called by different services
+							// as a workaround we always use the minimum of the calculated initial demands
+							// as a starting point. (The response time is an upper bound on the demands)
+							initialState[stateVarIdx] = Math.min(initialState[stateVarIdx], baseDemand / visits);
+						} else {
+							initialState[stateVarIdx] = baseDemand / visits;
+						}
 					}
 				}
 			}
