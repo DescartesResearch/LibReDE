@@ -226,7 +226,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	private class Channel implements Closeable {
 		private Quantity<Time> channelCurrentTime = ZERO;
 		private Stream input;
-		private String[][] valuesBuffer;
+		private String[][] valuesBuffer = new String[MAX_BUFFERED_LINES][0];
 		private byte[] buffer = new byte[BUFFER_SIZE];
 		private double[] timestampBuffer = new double[MAX_BUFFERED_LINES];
 		private Map<TraceKey, Integer> traces = new HashMap<TraceKey, Integer>();
@@ -251,7 +251,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			synchronized(traces) {
 				// Check that the buffer array is large enough for this number
 				// of columns
-				if ((valuesBuffer == null) || (valuesBuffer[0].length < (maxColumn + 1))) {
+				if (valuesBuffer[0].length < (maxColumn + 1)) {
 					valuesBuffer = new String[MAX_BUFFERED_LINES][maxColumn + 1];
 				}
 				traces.put(key, column);
