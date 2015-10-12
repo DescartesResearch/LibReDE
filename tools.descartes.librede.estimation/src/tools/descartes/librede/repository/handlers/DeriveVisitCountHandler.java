@@ -51,7 +51,11 @@ public class DeriveVisitCountHandler extends BaseDerivationHandler<RequestCount>
 		double outgoing = repository.aggregate(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, call, Aggregation.AVERAGE, start, end);
 		double incoming = repository.aggregate(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, call.getService(), Aggregation.AVERAGE, start, end);
 		
-		return outgoing / incoming;
+		if (incoming == 0.0) {
+			return 0.0;
+		} else {
+			return outgoing / incoming;
+		}
 	}
 
 }
