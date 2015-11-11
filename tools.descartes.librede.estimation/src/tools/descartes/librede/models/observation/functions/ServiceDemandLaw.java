@@ -83,6 +83,8 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	private Query<Vector, RequestRate> avgThroughputQuery;
 	private Query<Scalar, RequestRate> avgThroughputQueryCurrentService;
 	
+	private boolean multiClass = true;
+	
 	/**
 	 * Creates a new instance.
 	 * 
@@ -96,7 +98,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	public ServiceDemandLaw(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource,
 			Service service) {
-		this(stateModel, repository, resource, service, 0);
+		this(stateModel, repository, resource, service, 0, true);
 	}
 	
 	/**
@@ -107,23 +109,27 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 * @param service - the service for which the utilization is calculated
 	 * @param resource - the resource for which the utilization is calculated
 	 * @param historicInterval - specifies the number of intervals this function is behind in the past.
+	 * @param multiClass - flag indicating whether we have multiple workload classes
 	 * 
 	 * @throws {@link NullPointerException} if any parameter is null
 	 */
 	public ServiceDemandLaw(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource,
-			Service service, int historicInterval) {
+			Service service, int historicInterval, boolean multiClass) {
 		super(stateModel, resource, service, historicInterval);
 		
 		res_i = resource;
 		cls_r = service;
+		this.multiClass = multiClass;
 		
 		/*
 		 * IMPORTANT: The Service Demand Law is ignoring background services, as it has no information required to determine
 		 * the amount of background work relative to the user services.
 		 */
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-		avgResidenceTimeQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
+		if (multiClass) {
+			avgResidenceTimeQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
+		}
 		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
 	}
@@ -135,7 +141,9 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	public boolean isApplicable(List<String> messages) {
 		boolean result = true;
 		result = result && checkQueryPrecondition(utilizationQuery, messages);
-		result = result && checkQueryPrecondition(avgResidenceTimeQuery, messages);
+		if (multiClass) {
+			result = result && checkQueryPrecondition(avgResidenceTimeQuery, messages);
+		}
 		result = result && checkQueryPrecondition(avgThroughputQuery, messages);
 		return result;
 	}
@@ -149,9 +157,8 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		 * We only get the aggregate utilization of a resource. In order to apportion this utilization between
 		 * services, we assume R ~ D.
 		 */
-		Vector R = avgResidenceTimeQuery.get(historicInterval);
-		Vector X = avgThroughputQuery.get(historicInterval);
-		double R_r = R.get(avgResidenceTimeQuery.indexOf(cls_r));
+
+		Vector X = avgThroughputQuery.get(historicInterval);		
 		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
 		double U_i = utilizationQuery.get(historicInterval).getValue();
 		int p = res_i.getNumberOfServers();
@@ -160,7 +167,13 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 			// no request observed --> zero utilization due to that class
 			return 0.0;
 		} else {
-			return p * U_i * (R_r * X_r) / nansum(R.arrayMultipliedBy(X)).get(0);
+			if (multiClass) {
+				Vector R = avgResidenceTimeQuery.get(historicInterval);
+				double R_r = R.get(avgResidenceTimeQuery.indexOf(cls_r));
+				return p * U_i * (R_r * X_r) / nansum(R.arrayMultipliedBy(X)).get(0);
+			} else {
+				return p * U_i;
+			}
 		}
 	}
 
@@ -174,7 +187,11 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	
 	@Override
 	public boolean hasData() {
-		return avgResidenceTimeQuery.hasData(historicInterval) && avgThroughputQuery.hasData(historicInterval);
+		if (multiClass) {
+			return avgResidenceTimeQuery.hasData(historicInterval) && avgThroughputQuery.hasData(historicInterval);
+		} else {
+			return avgThroughputQuery.hasData(historicInterval);
+		}
 	}
 	
 
