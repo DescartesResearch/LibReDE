@@ -29,6 +29,7 @@ package tools.descartes.librede.repository.handlers;
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -49,11 +50,10 @@ public class DeriveContentionHandler extends BaseDerivationHandler<Ratio> {
 			log.trace("Derive contention from steal time");
 		}
 		if (aggregation == Aggregation.AVERAGE) {
+			Resource res = (Resource)entity;
+			double duration = end.getValue(Time.SECONDS) - start.getValue(Time.SECONDS);
 			double stealTime = repository.aggregate(StandardMetrics.STEAL_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			// The busy time of this resource is assumed to include the steal time
-			double busyTime = repository.aggregate(StandardMetrics.BUSY_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			double idleTime = repository.aggregate(StandardMetrics.IDLE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			return unit.convertFrom(stealTime / (busyTime + idleTime), Ratio.NONE);
+			return unit.convertFrom(stealTime / (res.getNumberOfServers() * duration), Ratio.NONE);
 		}
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}
