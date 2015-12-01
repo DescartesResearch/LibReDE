@@ -29,6 +29,7 @@ package tools.descartes.librede.repository.handlers;
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;
@@ -50,9 +51,10 @@ public class DeriveUtilizationHandler extends BaseDerivationHandler<Ratio> {
 			log.trace("Derive average utilization from busy time and idle time.");
 		}
 		if (aggregation == Aggregation.AVERAGE) {
+			Resource res = (Resource)entity;
+			double duration = end.getValue(Time.SECONDS) - start.getValue(Time.SECONDS);
 			double busy = repository.aggregate(StandardMetrics.BUSY_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			double idle = repository.aggregate(StandardMetrics.IDLE_TIME, Time.SECONDS, entity, Aggregation.SUM, start, end);
-			return unit.convertFrom(busy / (busy + idle), Ratio.NONE);
+			return unit.convertFrom(busy / (res.getNumberOfServers() * duration), Ratio.NONE);
 		}
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}
