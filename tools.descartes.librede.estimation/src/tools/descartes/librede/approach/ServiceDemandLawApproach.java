@@ -81,9 +81,10 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 	protected IObservationModel<?,?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
+		boolean multiClass = stateModel.getUserServices().size() > 1;
 		for (Resource resource : stateModel.getResources()) {
 			for (Service service : stateModel.getUserServices()) {
-				ServiceDemandLaw func = new ServiceDemandLaw(stateModel, cursor, resource, service);
+				ServiceDemandLaw func = new ServiceDemandLaw(stateModel, cursor, resource, service, 0, multiClass);
 				observationModel.addOutputFunction(func);
 			}
 		}

@@ -128,7 +128,8 @@ public class WeightedTargetUtilizationInitializer implements IStateInitializer {
 			List<Service> accessingServices = res.getAccessingServices();
 			double util = 0.0;
 			for (Service curService : accessingServices) {
-				util += tput.get(throughput.indexOf(curService));
+				int idx = stateModel.getStateVariableIndex(res, curService);
+				util += tput.get(throughput.indexOf(curService)) * initialState[idx];
 			}
 			util = util / res.getNumberOfServers();
 			//IMPORTANT: only scale the resource demands if util > 0, otherwise NaNs result

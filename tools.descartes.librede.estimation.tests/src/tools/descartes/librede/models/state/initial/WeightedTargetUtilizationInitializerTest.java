@@ -66,6 +66,66 @@ public class WeightedTargetUtilizationInitializerTest extends LibredeTest {
 		this.lowerUtil = lowerUtil;
 		this.upperUtil = upperUtil;
 	}
+	@Test
+	public void testInitializerWithSingleClassAndOneResource() {
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 1, 1);
+		generator.setDemands(vector(0.25));
+		generator.setLowerUtilizationBound(lowerUtil);
+		generator.setUpperUtilizationBound(upperUtil);
+		
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		generator.nextObservation();
+		cursor.next();
+		
+		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
+		Vector initialDemands = initializer.getInitialValue(generator.getStateModel());
+		assertThat(initialDemands.isEmpty()).isFalse();
+		
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		double util = initialDemands.dot(throughput);
+		assertThat(util).isEqualTo(0.5, offset(1e-9));
+	}
+	
+	@Test
+	public void testInitializerWithTwoClassesAndOneResource() {
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 2, 1);
+		generator.setDemands(vector(0.25, 0.4));
+		generator.setLowerUtilizationBound(lowerUtil);
+		generator.setUpperUtilizationBound(upperUtil);
+		
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		generator.nextObservation();
+		cursor.next();
+		
+		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
+		Vector initialDemands = initializer.getInitialValue(generator.getStateModel());
+		assertThat(initialDemands.isEmpty()).isFalse();
+		
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		double util = initialDemands.dot(throughput);
+		assertThat(util).isEqualTo(0.5, offset(1e-9));
+	}
+	
+	@Test
+	public void testInitializerWithTwoClassesAndOneResourceIncludingZeroDemand() {
+		ObservationDataGenerator generator = new ObservationDataGenerator(42, 2, 1);
+		generator.setDemands(vector(0.25, 0.0));
+		generator.setLowerUtilizationBound(lowerUtil);
+		generator.setUpperUtilizationBound(upperUtil);
+		
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
+		generator.nextObservation();
+		cursor.next();
+		
+		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
+		Vector initialDemands = initializer.getInitialValue(generator.getStateModel());
+		assertThat(initialDemands.isEmpty()).isFalse();
+		assertThat(initialDemands.get(1)).isZero();
+		
+		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		double util = initialDemands.dot(throughput);
+		assertThat(util).isEqualTo(0.5, offset(1e-9));
+	}
 
 	@Test
 	public void testInitializer() {
@@ -89,25 +149,6 @@ public class WeightedTargetUtilizationInitializerTest extends LibredeTest {
 		}
 	}
 	
-	@Test
-	public void testInitializerWithZero() {
-		ObservationDataGenerator generator = new ObservationDataGenerator(42, 2, 1);
-		generator.setDemands(vector(0.25, 0.0));
-		generator.setLowerUtilizationBound(lowerUtil);
-		generator.setUpperUtilizationBound(upperUtil);
-		
-		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
-		generator.nextObservation();
-		cursor.next();
-		
-		WeightedTargetUtilizationInitializer initializer = new WeightedTargetUtilizationInitializer(0.5, cursor);
-		Vector initialDemands = initializer.getInitialValue(generator.getStateModel());
-		assertThat(initialDemands.isEmpty()).isFalse();
-		assertThat(initialDemands.get(1)).isZero();
-		
-		Vector throughput = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
-		double util = initialDemands.dot(throughput);
-		assertThat(util).isEqualTo(0.5, offset(1e-9));
-	}
+	
 
 }

@@ -77,7 +77,7 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 			}
 		}
 		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
-		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, getEstimationWindow()));
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, getEstimationWindow()));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 

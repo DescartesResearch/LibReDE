@@ -385,7 +385,7 @@ public class TimeSeries implements Cloneable {
 
 	public double get(double timestamp, int column) {
 		double idx = interpolationSearch(timestamp);
-		if (idx <= -1 || idx >= timestamps.rows()) {
+		if (idx <= -1 || idx > (timestamps.rows() - 1)) {
 			return Double.NaN;
 		}
 		if (Math.floor(idx) != idx) {
