@@ -53,7 +53,6 @@ public class UtilizationAdapter implements IMetricAdapter<Ratio> {
 					.build(new DefaultAggregationHandler<Ratio>(Aggregation.AVERAGE)),
 				Rule.rule(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
-					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)
 					.build(new DeriveUtilizationHandler())
 				);
 	}
