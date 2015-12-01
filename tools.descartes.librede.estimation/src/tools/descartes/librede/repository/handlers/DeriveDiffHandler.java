@@ -53,7 +53,11 @@ public class DeriveDiffHandler<D extends Dimension> extends BaseDerivationHandle
 			TimeSeries cumSum = repository.select(metric, unit, entity, Aggregation.CUMULATIVE_SUM, start, end);			
 			double v1 = cumSum.get(start.getValue(Time.SECONDS), 0);
 			double v2 = cumSum.get(end.getValue(Time.SECONDS), 0);
-			return v2 - v1; // the values have the right unit, converted when read from repository
+			if (v2 >= v1) {
+				return v2 - v1; // the values have the right unit, converted when read from repository
+			} else {
+				return 0.0;
+			}
 		}
 		throw new IllegalArgumentException("Unexpected aggregation: " + aggregation);
 	}
