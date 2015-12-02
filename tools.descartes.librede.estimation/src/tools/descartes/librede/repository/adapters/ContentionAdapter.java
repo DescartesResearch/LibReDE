@@ -69,8 +69,6 @@ public class ContentionAdapter implements IMetricAdapter<Ratio> {
 					.build(new ConstantHandler<Ratio>(0.0)),
 				Rule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.STEAL_TIME, Aggregation.SUM)
-					.requiring(StandardMetrics.BUSY_TIME, Aggregation.SUM)
-					.requiring(StandardMetrics.IDLE_TIME, Aggregation.SUM)
 					.build(new DeriveContentionHandler())
 				);
 	}

@@ -231,5 +231,11 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 		}
 		return super.eIsSet(featureID);
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return getName() + "(" + getService().getName() + ")";
+	}
 
 } //ExternalCallImpl
