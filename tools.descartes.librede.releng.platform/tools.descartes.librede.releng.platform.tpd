@@ -8,7 +8,12 @@ location "http://download.eclipse.org/releases/luna" {
 location "http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/" {
 	org.apache.commons.collections
 	org.hamcrest
+	org.hamcrest.core
+	org.hamcrest.library
+	org.hamcrest.integration
+	org.hamcrest.text
 	org.mockito
+	org.objenesis
 	org.junit
 	org.kohsuke.args4j
 	org.apache.log4j
