@@ -32,7 +32,9 @@ import tools.descartes.librede.units.Dimension;
 
 /**
  * A data dependency describes the data requirement of a specific metric and
- * aggregation type.
+ * aggregation type for one or several model entities (e.g., services or
+ * resources). The scope defines the model entities for which data of a
+ * certain metric and aggregation is required. 
  * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  * @version 1.0
@@ -42,13 +44,22 @@ import tools.descartes.librede.units.Dimension;
  */
 public class DataDependency<D extends Dimension> {
 
+	private final RuleScope scope;
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
-
+	
 	public DataDependency(Metric<D> metric, Aggregation aggregation) {
-		super();
+		this(metric, aggregation, RuleScope.dynamicScope());		
+	}
+
+	public DataDependency(Metric<D> metric, Aggregation aggregation, RuleScope scope) {
+		this.scope = scope;
 		this.metric = metric;
 		this.aggregation = aggregation;
+	}
+	
+	public RuleScope getScope() {
+		return scope;
 	}
 
 	public Metric<D> getMetric() {

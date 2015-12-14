@@ -116,13 +116,16 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 					.priority(10)
 					.build(new AverageResponseTimeAggregationHandler()),
 				Rule.rule(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE)
-					.check(new ExternalCallPrecondition())
-					.scope(RuleScope.dynamicScope().include(
+					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE, 
+							RuleScope.dynamicScope().include(
 							ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS, 
 							ConfigurationPackage.Literals.EXTERNAL_CALL__CALLED_SERVICE)
 							)
+					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE, RuleScope.dynamicScope().include(
+							ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS, 
+							ConfigurationPackage.Literals.EXTERNAL_CALL__CALLED_SERVICE)
+							)
+					.check(new ExternalCallPrecondition())
 					.build(new DeriveResidenceTimeFromExternalCalls()),
 				Rule.rule(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)

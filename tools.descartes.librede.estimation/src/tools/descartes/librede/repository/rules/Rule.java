@@ -28,7 +28,6 @@ package tools.descartes.librede.repository.rules;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
@@ -42,7 +41,6 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	private final Aggregation aggregation;
 	private final List<DataDependency<?>> dependencies = new LinkedList<>();
 	private final List<RulePrecondition> preconditions = new LinkedList<>();
-	private RuleScope resolver = RuleScope.dynamicScope();
 	private int priority;
 		
 	private Rule(Metric<D> metric, Aggregation aggregation) {
@@ -65,13 +63,13 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		return this;
 	}
 	
-	public Rule<D> check(RulePrecondition precondition) {
-		addPrecondition(precondition);
+	public Rule<D> requiring(Metric<?> metric, Aggregation aggregation, RuleScope scope) {
+		addDependency(metric, aggregation);
 		return this;
 	}
 	
-	public Rule<D> scope(RuleScope resolver) {
-		setScope(resolver);
+	public Rule<D> check(RulePrecondition precondition) {
+		addPrecondition(precondition);
 		return this;
 	}
 	
@@ -129,8 +127,12 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		preconditions.add(precondition);
 	}
 
-	protected void addDependency(Metric<? extends Dimension> metric, Aggregation aggregation) {
-		dependencies.add(new DataDependency<>(metric, aggregation));
+	protected <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation) {
+		dependencies.add(new DataDependency<B>(metric, aggregation));
+	}
+	
+	protected <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation, RuleScope scope) {
+		dependencies.add(new DataDependency<B>(metric, aggregation, scope));
 	}
 
 	public Metric<D> getMetric() {
@@ -147,18 +149,6 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
-	}
-
-	public void setScope(RuleScope resolver) {
-		this.resolver = resolver;
-	}
-
-	public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
-		return resolver.getScopeSet(base);
-	}
-
-	public Set<? extends ModelEntity> getNotificationSet(ModelEntity changed) {
-		return resolver.getNotificationSet(changed);
 	}
 
 	public boolean applies(ModelEntity entity) {

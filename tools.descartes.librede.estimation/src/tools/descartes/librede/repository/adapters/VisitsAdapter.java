@@ -73,7 +73,11 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 					.priority(-100) //IMPORTANT: Use this only if nothing else is available
 					.build(new ConstantHandler<RequestCount>(1.0)),
 				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE, 
+							RuleScope.dynamicScope()
+							.include(ConfigurationPackage.Literals.TASK__SERVICE)
+							.include(ConfigurationPackage.Literals.SERVICE__TASKS)
+							)
 					.priority(0)
 					.check(new RulePrecondition() {
 						@Override
@@ -81,10 +85,6 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 							return entity instanceof ExternalCall;
 						}						
 					})
-					.scope(RuleScope.dynamicScope()
-							.include(ConfigurationPackage.Literals.TASK__SERVICE)
-							.include(ConfigurationPackage.Literals.SERVICE__TASKS)
-							)
 					.build(new DeriveVisitCountHandler())
 				);
 	}

@@ -46,8 +46,8 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
-import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.DataDependency;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulesConfig;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
@@ -345,15 +345,23 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			curListener.entryAdded(metric, entity, aggregation);
 		}
 		
+		Set<ModelEntity> notificationSet = new HashSet<>();
 		for (Rule<?> r : rules.getDerivationRules(metric, aggregation)) {
-			Set<? extends ModelEntity> entities = r.getNotificationSet(entity);
-			for (ModelEntity e : entities) {
+			// First we determine the entities that may be affected
+			// by the new entry (e.g., new data for a service, may also
+			// enable new derivations for external calls to this service)
+			for (DataDependency<?> dep : r.getDependencies()) {
+				notificationSet.addAll(dep.getScope().getNotificationSet(entity));
+			}			
+			
+			for (ModelEntity e : notificationSet) {
 				if (r.applies(e)) {
 					if (checkDependencies(r, e)) {
 						activateRule(r, e);
 					}
 				}
 			}
+			notificationSet.clear();
 		}
 	}
 	
@@ -365,9 +373,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	private boolean checkDependencies(Rule<?> rule, ModelEntity entity) {
-		Set<? extends ModelEntity> scopeEntities = rule.getScopeSet(entity);
-		for (ModelEntity e : scopeEntities) {
-			for (DataDependency<?> dep : rule.getDependencies()) {
+		for (DataDependency<?> dep : rule.getDependencies()) {
+			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
+			for (ModelEntity e : scopeEntities) {				
 				if (rule.getMetric().equals(dep.getMetric())
 						&& rule.getAggregation().equals(dep.getAggregation())
 						&& entity.equals(e)) {
@@ -397,9 +405,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	private List<DataEntry<?>> getRequiredEntries(Rule<?> rule, ModelEntity entity) {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
-		Set<? extends ModelEntity> scopeEntities = rule.getScopeSet(entity);
-		for (ModelEntity e : scopeEntities) {
-			for (DataDependency<?> dep : rule.getDependencies()) {
+		for (DataDependency<?> dep : rule.getDependencies()) {
+			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
+			for (ModelEntity e : scopeEntities) {
 				DataEntry<?> reqEntry = getEntry(dep.getMetric(), e, dep.getAggregation());
 				if (reqEntry != null) {
 					requiredEntries.add(reqEntry);

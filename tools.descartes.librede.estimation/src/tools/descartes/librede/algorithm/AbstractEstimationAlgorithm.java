@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede.algorithm;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +44,6 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.rules.IRuleActivationHandler;
 import tools.descartes.librede.repository.rules.Rule;
-import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.repository.rules.RuleScope;
 import tools.descartes.librede.units.Time;
 
@@ -56,24 +54,6 @@ import tools.descartes.librede.units.Time;
  *
  */
 public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler<Time> {
-	
-	private static class QueryScope implements RuleScope {
-		private final Set<ModelEntity> entities = new HashSet<ModelEntity>();
-		
-		public QueryScope(Query<?,?> query) {
-			entities.addAll(query.getEntities());
-		}
-
-		@Override
-		public Set<ModelEntity> getScopeSet(ModelEntity base) {
-			return entities;
-		}
-
-		@Override
-		public Set<ModelEntity> getNotificationSet(ModelEntity base) {
-			return Collections.singleton(base);
-		}		
-	}
 	
 	private static final Logger log = Logger.getLogger(AbstractEstimationAlgorithm.class);
 	
@@ -152,8 +132,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	
 	protected void addDependency(Query<?,?> query) {
 		Rule<Time> newRule = Rule.rule(StandardMetrics.RESOURCE_DEMAND, Aggregation.AVERAGE);
-		newRule.requiring(query.getMetric(), query.getAggregation());
-		newRule.scope(new QueryScope(query));
+		newRule.requiring(query.getMetric(), query.getAggregation(), RuleScope.fixedScope(query.getEntities()));
 		newRule.build(this);
 		dependencies.add(newRule);
 		unsatisfiedDependencies.add(newRule);

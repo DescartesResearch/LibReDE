@@ -64,9 +64,9 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 					.priority(0)
 					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES)),
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
-					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE,
+							RuleScope.dynamicScope().skipRoot().include(ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS))
 					.priority(0)
-					.scope(RuleScope.dynamicScope().skipRoot().include(ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS))
 					.build(new IncomingCallsSummationHandler()),
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(100) // Always use this for background services!
