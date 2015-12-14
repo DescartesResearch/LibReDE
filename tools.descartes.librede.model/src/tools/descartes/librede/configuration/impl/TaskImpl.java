@@ -28,9 +28,9 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.InternalEObject;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.Task;
@@ -74,8 +74,23 @@ public abstract class TaskImpl extends ModelEntityImpl implements Task {
 	 * @generated
 	 */
 	public Service getService() {
-		Service service = basicGetService();
-		return service != null && service.eIsProxy() ? (Service)eResolveProxy((InternalEObject)service) : service;
+		// TODO: implement this method to return the 'Service' container reference
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
+		switch (eContainerFeatureID()) {
+			case ConfigurationPackage.TASK__SERVICE:
+				return eInternalContainer().eInverseRemove(this, ConfigurationPackage.SERVICE__TASKS, Service.class, msgs);
+		}
+		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
 
 	/**
@@ -102,8 +117,7 @@ public abstract class TaskImpl extends ModelEntityImpl implements Task {
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ConfigurationPackage.TASK__SERVICE:
-				if (resolve) return getService();
-				return basicGetService();
+				return getService();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -117,7 +131,7 @@ public abstract class TaskImpl extends ModelEntityImpl implements Task {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case ConfigurationPackage.TASK__SERVICE:
-				return basicGetService() != null;
+				return getService() != null;
 		}
 		return super.eIsSet(featureID);
 	}

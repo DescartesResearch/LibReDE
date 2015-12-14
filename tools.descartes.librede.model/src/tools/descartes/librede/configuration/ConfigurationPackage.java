@@ -1284,7 +1284,7 @@ public interface ConfigurationPackage extends EPackage {
 	int TASK__NAME = MODEL_ENTITY__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Service</b></em>' reference.
+	 * The feature id for the '<em><b>Service</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1330,7 +1330,7 @@ public interface ConfigurationPackage extends EPackage {
 	int RESOURCE_DEMAND__NAME = TASK__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Service</b></em>' reference.
+	 * The feature id for the '<em><b>Service</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1385,7 +1385,7 @@ public interface ConfigurationPackage extends EPackage {
 	int EXTERNAL_CALL__NAME = TASK__NAME;
 
 	/**
-	 * The feature id for the '<em><b>Service</b></em>' reference.
+	 * The feature id for the '<em><b>Service</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2432,10 +2432,10 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getTask();
 
 	/**
-	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.Task#getService <em>Service</em>}'.
+	 * Returns the meta object for the container reference '{@link tools.descartes.librede.configuration.Task#getService <em>Service</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Service</em>'.
+	 * @return the meta object for the container reference '<em>Service</em>'.
 	 * @see tools.descartes.librede.configuration.Task#getService()
 	 * @see #getTask()
 	 * @generated
@@ -3196,7 +3196,7 @@ public interface ConfigurationPackage extends EPackage {
 		EClass TASK = eINSTANCE.getTask();
 
 		/**
-		 * The meta object literal for the '<em><b>Service</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Service</b></em>' container reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

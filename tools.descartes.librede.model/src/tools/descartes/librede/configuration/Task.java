@@ -48,16 +48,18 @@ package tools.descartes.librede.configuration;
 public interface Task extends ModelEntity {
 
 	/**
-	 * Returns the value of the '<em><b>Service</b></em>' reference.
+	 * Returns the value of the '<em><b>Service</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Service#getTasks <em>Tasks</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Service</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Service</em>' reference.
+	 * @return the value of the '<em>Service</em>' container reference.
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTask_Service()
-	 * @model required="true" transient="true" changeable="false" volatile="true" derived="true"
+	 * @see tools.descartes.librede.configuration.Service#getTasks
+	 * @model opposite="tasks" required="true" changeable="false" volatile="true" derived="true"
 	 * @generated
 	 */
 	Service getService();

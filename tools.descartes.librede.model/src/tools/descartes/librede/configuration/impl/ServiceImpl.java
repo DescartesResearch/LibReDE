@@ -34,13 +34,10 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -88,16 +85,6 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @ordered
 	 */
 	protected boolean backgroundService = BACKGROUND_SERVICE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getTasks() <em>Tasks</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTasks()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Task> tasks;
 
 	/**
 	 * The cached value of the '{@link #getIncomingCalls() <em>Incoming Calls</em>}' reference list.
@@ -154,10 +141,11 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @generated
 	 */
 	public EList<Task> getTasks() {
-		if (tasks == null) {
-			tasks = new EObjectContainmentEList<Task>(Task.class, this, ConfigurationPackage.SERVICE__TASKS);
-		}
-		return tasks;
+		// TODO: implement this method to return the 'Tasks' containment reference list
+		// Ensure that you remove @generated or mark it @generated NOT
+		// The list is expected to implement org.eclipse.emf.ecore.util.InternalEList and org.eclipse.emf.ecore.EStructuralFeature.Setting
+		// so it's likely that an appropriate subclass of org.eclipse.emf.ecore.util.EcoreEList should be used.
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -328,7 +316,7 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				return backgroundService != BACKGROUND_SERVICE_EDEFAULT;
 			case ConfigurationPackage.SERVICE__TASKS:
-				return tasks != null && !tasks.isEmpty();
+				return !getTasks().isEmpty();
 			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
 				return !getAccessedResources().isEmpty();
 			case ConfigurationPackage.SERVICE__INCOMING_CALLS:

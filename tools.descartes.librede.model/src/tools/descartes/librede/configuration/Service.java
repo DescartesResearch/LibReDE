@@ -83,6 +83,7 @@ public interface Service extends ModelEntity {
 	/**
 	 * Returns the value of the '<em><b>Tasks</b></em>' containment reference list.
 	 * The list contents are of type {@link tools.descartes.librede.configuration.Task}.
+	 * It is bidirectional and its opposite is '{@link tools.descartes.librede.configuration.Task#getService <em>Service</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Tasks</em>' containment reference list isn't clear,
@@ -91,7 +92,8 @@ public interface Service extends ModelEntity {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Tasks</em>' containment reference list.
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getService_Tasks()
-	 * @model containment="true"
+	 * @see tools.descartes.librede.configuration.Task#getService
+	 * @model opposite="service" containment="true"
 	 * @generated
 	 */
 	EList<Task> getTasks();
