@@ -30,11 +30,21 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 
+/**
+ * A data dependency describes the data requirement of a specific metric and
+ * aggregation type.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ * @version 1.0
+ *
+ * @param <D>
+ *            the dimension of the metric
+ */
 public class DataDependency<D extends Dimension> {
-	
+
 	private final Metric<D> metric;
-	private final Aggregation aggregation;	
-	
+	private final Aggregation aggregation;
+
 	public DataDependency(Metric<D> metric, Aggregation aggregation) {
 		super();
 		this.metric = metric;
