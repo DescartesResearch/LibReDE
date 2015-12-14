@@ -28,9 +28,13 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.Task;
@@ -74,9 +78,69 @@ public abstract class TaskImpl extends ModelEntityImpl implements Task {
 	 * @generated
 	 */
 	public Service getService() {
-		// TODO: implement this method to return the 'Service' container reference
-		// Ensure that you remove @generated or mark it @generated NOT
-		throw new UnsupportedOperationException();
+		if (eContainerFeatureID() != ConfigurationPackage.TASK__SERVICE) return null;
+		return (Service)eInternalContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetService(Service newService, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newService, ConfigurationPackage.TASK__SERVICE, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setService(Service newService) {
+		if (newService != eInternalContainer() || (eContainerFeatureID() != ConfigurationPackage.TASK__SERVICE && newService != null)) {
+			if (EcoreUtil.isAncestor(this, newService))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newService != null)
+				msgs = ((InternalEObject)newService).eInverseAdd(this, ConfigurationPackage.SERVICE__TASKS, Service.class, msgs);
+			msgs = basicSetService(newService, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TASK__SERVICE, newService, newService));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.TASK__SERVICE:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetService((Service)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.TASK__SERVICE:
+				return basicSetService(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -120,6 +184,36 @@ public abstract class TaskImpl extends ModelEntityImpl implements Task {
 				return getService();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case ConfigurationPackage.TASK__SERVICE:
+				setService((Service)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case ConfigurationPackage.TASK__SERVICE:
+				setService((Service)null);
+				return;
+		}
+		super.eUnset(featureID);
 	}
 
 	/**

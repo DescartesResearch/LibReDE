@@ -57,10 +57,21 @@ public interface Task extends ModelEntity {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Service</em>' container reference.
+	 * @see #setService(Service)
 	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTask_Service()
 	 * @see tools.descartes.librede.configuration.Service#getTasks
-	 * @model opposite="tasks" required="true" changeable="false" volatile="true" derived="true"
+	 * @model opposite="tasks" transient="false"
 	 * @generated
 	 */
 	Service getService();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.Task#getService <em>Service</em>}' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Service</em>' container reference.
+	 * @see #getService()
+	 * @generated
+	 */
+	void setService(Service value);
 } // Task

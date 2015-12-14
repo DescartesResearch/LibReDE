@@ -38,6 +38,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -86,6 +87,15 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 */
 	protected boolean backgroundService = BACKGROUND_SERVICE_EDEFAULT;
 
+	/**
+	 * The cached value of the '{@link #getTasks() <em>Tasks</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTasks()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Task> tasks;
 	/**
 	 * The cached value of the '{@link #getIncomingCalls() <em>Incoming Calls</em>}' reference list.
 	 * <!-- begin-user-doc -->
@@ -141,11 +151,10 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	 * @generated
 	 */
 	public EList<Task> getTasks() {
-		// TODO: implement this method to return the 'Tasks' containment reference list
-		// Ensure that you remove @generated or mark it @generated NOT
-		// The list is expected to implement org.eclipse.emf.ecore.util.InternalEList and org.eclipse.emf.ecore.EStructuralFeature.Setting
-		// so it's likely that an appropriate subclass of org.eclipse.emf.ecore.util.EcoreEList should be used.
-		throw new UnsupportedOperationException();
+		if (tasks == null) {
+			tasks = new EObjectContainmentWithInverseEList<Task>(Task.class, this, ConfigurationPackage.SERVICE__TASKS, ConfigurationPackage.TASK__SERVICE);
+		}
+		return tasks;
 	}
 
 	/**
@@ -214,6 +223,8 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case ConfigurationPackage.SERVICE__TASKS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getTasks()).basicAdd(otherEnd, msgs);
 			case ConfigurationPackage.SERVICE__INCOMING_CALLS:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getIncomingCalls()).basicAdd(otherEnd, msgs);
 		}
@@ -316,7 +327,7 @@ public class ServiceImpl extends ModelEntityImpl implements Service {
 			case ConfigurationPackage.SERVICE__BACKGROUND_SERVICE:
 				return backgroundService != BACKGROUND_SERVICE_EDEFAULT;
 			case ConfigurationPackage.SERVICE__TASKS:
-				return !getTasks().isEmpty();
+				return tasks != null && !tasks.isEmpty();
 			case ConfigurationPackage.SERVICE__ACCESSED_RESOURCES:
 				return !getAccessedResources().isEmpty();
 			case ConfigurationPackage.SERVICE__INCOMING_CALLS:

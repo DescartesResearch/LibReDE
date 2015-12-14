@@ -195,8 +195,7 @@
         eType="#//Service" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="true" eSuperTypes="#//ModelEntity">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="service" lowerBound="1"
-        eType="#//Service" changeable="false" volatile="true" transient="true" derived="true"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="service" eType="#//Service"
         eOpposite="#//Service/tasks"/>
   </eClassifiers>
 </ecore:EPackage>
