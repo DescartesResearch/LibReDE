@@ -27,16 +27,11 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
+import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.configuration.Task;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
@@ -86,32 +81,10 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 							return entity instanceof ExternalCall;
 						}						
 					})
-					.scope(new RuleScope() {
-						@Override
-						public Set<ModelEntity> getScopeSet(ModelEntity base) {
-							Set<ModelEntity> scope = new HashSet<ModelEntity>();
-							scope.add(base);
-							scope.add(((ExternalCall)base).getService());
-							return scope;
-						}
-						@Override
-						public Set<ModelEntity> getNotificationSet(ModelEntity base) {
-							if (base instanceof Service) {
-								Set<ModelEntity> ret = new HashSet<ModelEntity>();
-								ret.add(base);
-								List<Task> tasks = ((Service)base).getTasks();
-								for (Task t : tasks) {
-									if (t instanceof ExternalCall) {
-										ret.add(t);
-									}
-								}
-								return ret;
-							} else if (base instanceof ExternalCall) {
-								return getScopeSet(base);
-							}
-							return Collections.emptySet();
-						}						
-					})
+					.scope(RuleScope.dynamicScope()
+							.include(ConfigurationPackage.Literals.TASK__SERVICE)
+							.include(ConfigurationPackage.Literals.SERVICE__TASKS)
+							)
 					.build(new DeriveVisitCountHandler())
 				);
 	}

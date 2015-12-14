@@ -27,11 +27,9 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
+import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Service;
@@ -85,38 +83,6 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 		}		
 	}
 	
-	private static class ExternalCallScope implements RuleScope {
-		@Override
-		public Set<ModelEntity> getScopeSet(ModelEntity entity) {
-			Set<ModelEntity> entities = new HashSet<>();
-			entities.add(entity);
-
-			List<Task> tasks = ((Service)entity).getTasks();
-			for (Task t : tasks) {
-				if (t instanceof ExternalCall) {
-					ExternalCall call = (ExternalCall)t;
-					if (call.getCalledService() != null) {
-						entities.add(call);
-					}
-				}
-			}
-			return entities;
-		}
-
-		@Override
-		public Set<ModelEntity> getNotificationSet(ModelEntity base) {
-			Set<ModelEntity> entities = new HashSet<>();
-			entities.add(base);
-			if (base instanceof Service) {
-				List<ExternalCall> callees = ((Service)base).getIncomingCalls();
-				for (ExternalCall t : callees) {
-					entities.add(t.getService());
-				}
-			}
-			return entities;
-		}		
-	}
-	
 	@Override
 	public Interpolation getInterpolation() {
 		return Interpolation.LINEAR;
@@ -153,7 +119,10 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.check(new ExternalCallPrecondition())
-					.scope(new ExternalCallScope())
+					.scope(RuleScope.dynamicScope().include(
+							ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS, 
+							ConfigurationPackage.Literals.EXTERNAL_CALL__CALLED_SERVICE)
+							)
 					.build(new DeriveResidenceTimeFromExternalCalls()),
 				Rule.rule(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE)

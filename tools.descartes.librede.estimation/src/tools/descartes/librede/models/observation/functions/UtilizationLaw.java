@@ -120,6 +120,16 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	}
 	
 	/* (non-Javadoc)
+	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDependencies()
+	 */
+	@Override
+	protected void initDataDependencies() {
+		addDataDependency(throughputQuery);
+		addDataDependency(utilizationQuery);
+		addDataDependency(contentionQuery);
+	}
+	
+	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override

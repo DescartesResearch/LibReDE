@@ -26,14 +26,22 @@
  */
 package tools.descartes.librede.repository.rules;
 
+import java.util.Collection;
 import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 
-public interface RuleScope {
+public abstract class RuleScope {
 	
-	Set<? extends ModelEntity> getScopeSet(ModelEntity base);
+	public static DynamicScope dynamicScope() {
+		return new DynamicScope(true);
+	}
 	
-	Set<? extends ModelEntity> getNotificationSet(ModelEntity base);
+	public static FixedScope fixedScope(Collection<? extends ModelEntity> entities) {
+		return new FixedScope(entities);
+	}
 
+	public abstract Set<? extends ModelEntity> getScopeSet(ModelEntity base);
+	
+	public abstract Set<? extends ModelEntity> getNotificationSet(ModelEntity base);
 }

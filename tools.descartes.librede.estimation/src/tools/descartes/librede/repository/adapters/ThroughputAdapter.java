@@ -27,12 +27,9 @@
 package tools.descartes.librede.repository.adapters;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import tools.descartes.librede.configuration.ExternalCall;
+import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.metrics.Aggregation;
@@ -50,25 +47,6 @@ import tools.descartes.librede.units.RequestRate;
 
 public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 	
-	private static class IncomingCallsScope implements RuleScope {
-		@Override
-		public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
-			if (base instanceof Service) {
-				return new HashSet<>(((Service) base).getIncomingCalls());
-			} else {
-				return Collections.emptySet();
-			}
-		}
-
-		@Override
-		public Set<? extends ModelEntity> getNotificationSet(ModelEntity base) {
-			if (base instanceof ExternalCall) {
-				return Collections.singleton(((ExternalCall)base).getCalledService());
-			}
-			return Collections.emptySet();
-		}		
-	}
-
 	@Override
 	public Interpolation getInterpolation() {
 		return Interpolation.LINEAR;
@@ -88,7 +66,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
-					.scope(new IncomingCallsScope())
+					.scope(RuleScope.dynamicScope().skipRoot().include(ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS))
 					.build(new IncomingCallsSummationHandler()),
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(100) // Always use this for background services!

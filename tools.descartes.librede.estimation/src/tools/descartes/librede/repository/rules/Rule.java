@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede.repository.rules;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -38,26 +37,12 @@ import tools.descartes.librede.units.Dimension;
 
 public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	
-	static class DefaultScope implements RuleScope {
-
-		@Override
-		public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
-			return Collections.singleton(base);
-		}
-
-		@Override
-		public Set<? extends ModelEntity> getNotificationSet(ModelEntity changed) {
-			return Collections.singleton(changed);
-		}
-		
-	}
-	
 	private IRuleActivationHandler<D> handler;
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
 	private final List<DataDependency<?>> dependencies = new LinkedList<>();
 	private final List<RulePrecondition> preconditions = new LinkedList<>();
-	private RuleScope resolver = new DefaultScope();
+	private RuleScope resolver = RuleScope.dynamicScope();
 	private int priority;
 		
 	private Rule(Metric<D> metric, Aggregation aggregation) {
