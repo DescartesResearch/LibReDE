@@ -7,7 +7,7 @@ import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 
-public class FixedScope extends RuleScope {
+public class FixedScope extends DependencyScope {
 	
 	private final Set<ModelEntity> scope;
 	

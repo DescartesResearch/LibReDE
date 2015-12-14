@@ -63,7 +63,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		return this;
 	}
 	
-	public Rule<D> requiring(Metric<?> metric, Aggregation aggregation, RuleScope scope) {
+	public Rule<D> requiring(Metric<?> metric, Aggregation aggregation, DependencyScope scope) {
 		addDependency(metric, aggregation);
 		return this;
 	}
@@ -131,7 +131,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		dependencies.add(new DataDependency<B>(metric, aggregation));
 	}
 	
-	protected <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation, RuleScope scope) {
+	protected <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation, DependencyScope scope) {
 		dependencies.add(new DataDependency<B>(metric, aggregation, scope));
 	}
 

@@ -10,7 +10,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 
 import tools.descartes.librede.configuration.ModelEntity;
 
-public class DynamicScope extends RuleScope {
+public class DynamicScope extends DependencyScope {
 	private class ReferencePath {
 		private final EReference[] path;
 		

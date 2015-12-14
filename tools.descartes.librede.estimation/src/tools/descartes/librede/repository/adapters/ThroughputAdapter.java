@@ -42,7 +42,7 @@ import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.repository.rules.RuleScope;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestRate;
 
 public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
@@ -65,7 +65,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES)),
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE,
-							RuleScope.dynamicScope().skipRoot().include(ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS))
+							DependencyScope.dynamicScope().skipRoot().include(ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS))
 					.priority(0)
 					.build(new IncomingCallsSummationHandler()),
 				Rule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)

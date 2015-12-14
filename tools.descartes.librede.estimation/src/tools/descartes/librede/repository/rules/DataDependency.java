@@ -44,21 +44,21 @@ import tools.descartes.librede.units.Dimension;
  */
 public class DataDependency<D extends Dimension> {
 
-	private final RuleScope scope;
+	private final DependencyScope scope;
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
 	
 	public DataDependency(Metric<D> metric, Aggregation aggregation) {
-		this(metric, aggregation, RuleScope.dynamicScope());		
+		this(metric, aggregation, DependencyScope.dynamicScope());		
 	}
 
-	public DataDependency(Metric<D> metric, Aggregation aggregation, RuleScope scope) {
+	public DataDependency(Metric<D> metric, Aggregation aggregation, DependencyScope scope) {
 		this.scope = scope;
 		this.metric = metric;
 		this.aggregation = aggregation;
 	}
 	
-	public RuleScope getScope() {
+	public DependencyScope getScope() {
 		return scope;
 	}
 

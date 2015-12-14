@@ -44,7 +44,7 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.rules.IRuleActivationHandler;
 import tools.descartes.librede.repository.rules.Rule;
-import tools.descartes.librede.repository.rules.RuleScope;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.Time;
 
 /**
@@ -132,7 +132,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	
 	protected void addDependency(Query<?,?> query) {
 		Rule<Time> newRule = Rule.rule(StandardMetrics.RESOURCE_DEMAND, Aggregation.AVERAGE);
-		newRule.requiring(query.getMetric(), query.getAggregation(), RuleScope.fixedScope(query.getEntities()));
+		newRule.requiring(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities()));
 		newRule.build(this);
 		dependencies.add(newRule);
 		unsatisfiedDependencies.add(newRule);

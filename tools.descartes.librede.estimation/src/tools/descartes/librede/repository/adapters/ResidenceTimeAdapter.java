@@ -46,7 +46,7 @@ import tools.descartes.librede.repository.handlers.DeriveResidenceTimeFromExtern
 import tools.descartes.librede.repository.handlers.ThroughputWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.repository.rules.RuleScope;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.Time;
 
 public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
@@ -117,11 +117,11 @@ public class ResidenceTimeAdapter implements IMetricAdapter<Time> {
 					.build(new AverageResponseTimeAggregationHandler()),
 				Rule.rule(StandardMetrics.RESIDENCE_TIME, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.RESPONSE_TIME, Aggregation.AVERAGE, 
-							RuleScope.dynamicScope().include(
+							DependencyScope.dynamicScope().include(
 							ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS, 
 							ConfigurationPackage.Literals.EXTERNAL_CALL__CALLED_SERVICE)
 							)
-					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE, RuleScope.dynamicScope().include(
+					.requiring(StandardMetrics.VISITS, Aggregation.AVERAGE, DependencyScope.dynamicScope().include(
 							ConfigurationPackage.Literals.SERVICE__OUTGOING_CALLS, 
 							ConfigurationPackage.Literals.EXTERNAL_CALL__CALLED_SERVICE)
 							)

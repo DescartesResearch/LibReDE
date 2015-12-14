@@ -31,7 +31,7 @@ import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
 
-public abstract class RuleScope {
+public abstract class DependencyScope {
 	
 	public static DynamicScope dynamicScope() {
 		return new DynamicScope(true);

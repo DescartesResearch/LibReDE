@@ -42,7 +42,7 @@ import tools.descartes.librede.repository.handlers.DeriveVisitCountHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.repository.rules.RuleScope;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestCount;
 
 public class VisitsAdapter implements IMetricAdapter<RequestCount> {
@@ -74,7 +74,7 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 					.build(new ConstantHandler<RequestCount>(1.0)),
 				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE, 
-							RuleScope.dynamicScope()
+							DependencyScope.dynamicScope()
 							.include(ConfigurationPackage.Literals.TASK__SERVICE)
 							.include(ConfigurationPackage.Literals.SERVICE__TASKS)
 							)
