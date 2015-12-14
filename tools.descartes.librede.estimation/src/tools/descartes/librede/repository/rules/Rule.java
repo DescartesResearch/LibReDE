@@ -55,7 +55,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	private IRuleActivationHandler<D> handler;
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
-	private final List<RuleDependency<?>> dependencies = new LinkedList<>();
+	private final List<DataDependency<?>> dependencies = new LinkedList<>();
 	private final List<RulePrecondition> preconditions = new LinkedList<>();
 	private RuleScope resolver = new DefaultScope();
 	private int priority;
@@ -116,11 +116,11 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	public String toString() {
 		StringBuilder res = new StringBuilder("Derivation rule ");
 		res.append("*/").append(this.getMetric()).append("/").append(this.getAggregation());
-		List<RuleDependency<?>> dependencies = getDependencies();
+		List<DataDependency<?>> dependencies = getDependencies();
 		if (!dependencies.isEmpty()) {
 			res.append(" <- (");
 			boolean first = true;
-			for (RuleDependency<?> dep : dependencies) {
+			for (DataDependency<?> dep : dependencies) {
 				if (!first) {
 					res.append(",");
 				}
@@ -136,7 +136,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 		return res.toString();
 	}
 
-	public List<RuleDependency<?>> getDependencies() {
+	public List<DataDependency<?>> getDependencies() {
 		return dependencies;
 	}
 
@@ -145,7 +145,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	}
 
 	protected void addDependency(Metric<? extends Dimension> metric, Aggregation aggregation) {
-		dependencies.add(new RuleDependency<>(metric, aggregation));
+		dependencies.add(new DataDependency<>(metric, aggregation));
 	}
 
 	public Metric<D> getMetric() {

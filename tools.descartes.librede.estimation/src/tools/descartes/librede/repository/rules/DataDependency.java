@@ -30,12 +30,12 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 
-public class RuleDependency<D extends Dimension> {
+public class DataDependency<D extends Dimension> {
 	
 	private final Metric<D> metric;
 	private final Aggregation aggregation;	
 	
-	public RuleDependency(Metric<D> metric, Aggregation aggregation) {
+	public DataDependency(Metric<D> metric, Aggregation aggregation) {
 		super();
 		this.metric = metric;
 		this.aggregation = aggregation;

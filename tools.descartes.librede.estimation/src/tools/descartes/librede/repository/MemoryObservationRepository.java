@@ -47,7 +47,7 @@ import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
 import tools.descartes.librede.repository.rules.Rule;
-import tools.descartes.librede.repository.rules.RuleDependency;
+import tools.descartes.librede.repository.rules.DataDependency;
 import tools.descartes.librede.repository.rules.RulesConfig;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
@@ -367,7 +367,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private boolean checkDependencies(Rule<?> rule, ModelEntity entity) {
 		Set<? extends ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
-			for (RuleDependency<?> dep : rule.getDependencies()) {
+			for (DataDependency<?> dep : rule.getDependencies()) {
 				if (rule.getMetric().equals(dep.getMetric())
 						&& rule.getAggregation().equals(dep.getAggregation())
 						&& entity.equals(e)) {
@@ -399,7 +399,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
 		Set<? extends ModelEntity> scopeEntities = rule.getScopeSet(entity);
 		for (ModelEntity e : scopeEntities) {
-			for (RuleDependency<?> dep : rule.getDependencies()) {
+			for (DataDependency<?> dep : rule.getDependencies()) {
 				DataEntry<?> reqEntry = getEntry(dep.getMetric(), e, dep.getAggregation());
 				if (reqEntry != null) {
 					requiredEntries.add(reqEntry);

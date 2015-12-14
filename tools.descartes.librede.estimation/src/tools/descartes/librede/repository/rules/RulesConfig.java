@@ -56,7 +56,7 @@ public class RulesConfig {
 		if (rule.getDependencies().isEmpty()) {
 			defaultRules.add(rule);
 		} else {
-			for (RuleDependency<?> r : rule.getDependencies()) {
+			for (DataDependency<?> r : rule.getDependencies()) {
 				EnumMap<Aggregation, List<Rule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry == null) {
 					metricEntry = new EnumMap<>(Aggregation.class);
@@ -75,7 +75,7 @@ public class RulesConfig {
 	
 	public void removeRule(Rule<?> rule) {
 		if (derivationRules.contains(rule)) {
-			for (RuleDependency<?> r : rule.getDependencies()) {
+			for (DataDependency<?> r : rule.getDependencies()) {
 				EnumMap<Aggregation, List<Rule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry != null) {
 					List<Rule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
