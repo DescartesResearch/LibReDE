@@ -101,6 +101,15 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 	}
 	
 	/* (non-Javadoc)
+	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
+	 */
+	@Override
+	protected void initDataDependencies() {
+		addDataDependency(busyTimeQuery);
+		addDataDependency(sumDeparturesQuery);
+	}
+	
+	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override

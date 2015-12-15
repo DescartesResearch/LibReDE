@@ -200,6 +200,19 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
+	 */
+	@Override
+	protected void initDataDependencies() {
+		addDataDependency(responseTimeQuery);
+		addDataDependency(throughputQuery);
+		if (useObservedUtilization) {
+			addDataDependency(contentionQuery);
+			addDataDependency(utilQuery);
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

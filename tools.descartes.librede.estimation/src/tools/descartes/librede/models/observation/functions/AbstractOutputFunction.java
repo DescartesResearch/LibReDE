@@ -26,15 +26,24 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.Query;
+import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DataDependency;
+import tools.descartes.librede.units.Time;
 
 public abstract class AbstractOutputFunction implements IOutputFunction {
 	
+	private List<DataDependency<?>> dataDependencies = new ArrayList<>();
 	private final IStateModel<? extends IStateConstraint> stateModel;
 	protected final int historicInterval;
 
@@ -49,7 +58,12 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 	public IStateModel<? extends IStateConstraint> getStateModel() {
 		return stateModel;
 	}
-
+	
+	protected abstract void initDataDependencies();
+	
+	protected void addDataDependency(Query<?,?> query) {
+	}
+	
 	protected boolean checkQueryPrecondition(Query<?,?> query, List<String> messages) {
 		if (!query.isExecutable()) {
 			StringBuilder msg = new StringBuilder("FAILED DATA PRECONDITION: ");

@@ -102,6 +102,14 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	}
 	
 	/* (non-Javadoc)
+	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
+	 */
+	@Override
+	protected void initDataDependencies() {
+		addDataDependency(individualResidenceTimesQuery);		
+	}
+	
+	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
 	 */
 	@Override
