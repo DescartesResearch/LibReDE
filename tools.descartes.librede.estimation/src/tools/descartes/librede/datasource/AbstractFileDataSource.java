@@ -488,6 +488,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 						if (key.isReadable()) {
 							Channel curChannel = (Channel)key.attachment();
 							if (curChannel != null) {
+								log.info("Read newly available data from " +key.channel() + ".");
 								readFromChannel(curChannel);
 							}
 						} else if(key.isConnectable()) {
