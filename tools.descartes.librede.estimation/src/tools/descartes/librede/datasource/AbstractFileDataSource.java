@@ -491,9 +491,11 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 								readFromChannel(curChannel);
 							}
 						} else if(key.isConnectable()) {
-							if (((SocketChannel)key.channel()).finishConnect()) {
-								key.interestOps(SelectionKey.OP_READ);								
-								log.info("Connection to " + key.channel() + " established.");
+							SocketChannel curChannel = (SocketChannel)key.channel();
+							if (curChannel.finishConnect()) {
+								log.info("Connection to " + curChannel + " established.");								
+								curChannel.register(selector, SelectionKey.OP_READ, key.attachment());
+								key.cancel();
 							}
 						}
 					}
