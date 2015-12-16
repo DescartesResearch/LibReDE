@@ -71,6 +71,12 @@ public class DynamicScope extends DependencyScope {
 		return this;
 	}
 	
+	public DynamicScope include(EReference[] path, EReference[] oppositePath) {
+		includedPaths.add(new ReferencePath(path));
+		includedOppositePaths.add(new ReferencePath(oppositePath));
+		return this;
+	}
+	
 	public Set<? extends ModelEntity> getScopeSet(ModelEntity base) {
 		Set<ModelEntity> selectedEntities = new HashSet<>();
 		if (includeRoot) {
