@@ -30,10 +30,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -483,6 +481,10 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 					selector.select();
 					
 					for (SelectionKey key : selector.selectedKeys()) {
+						if (!key.isValid()) {
+							continue;
+						}
+						
 						if (key.isReadable()) {
 							Channel curChannel = (Channel)key.attachment();
 							if (curChannel != null) {
