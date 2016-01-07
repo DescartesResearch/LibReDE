@@ -27,23 +27,19 @@
 package tools.descartes.librede.models.observation.functions;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.DataDependency;
-import tools.descartes.librede.units.Time;
+import tools.descartes.librede.repository.rules.DependencyScope;
 
 public abstract class AbstractOutputFunction implements IOutputFunction {
 	
-	private List<DataDependency<?>> dataDependencies = new ArrayList<>();
+	private final List<DataDependency<?>> dataDependencies = new ArrayList<>();
 	private final IStateModel<? extends IStateConstraint> stateModel;
 	protected final int historicInterval;
 
@@ -62,6 +58,12 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 	protected abstract void initDataDependencies();
 	
 	protected void addDataDependency(Query<?,?> query) {
+		dataDependencies.add(new DataDependency<>(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities())));
+	}
+	
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		return Collections.unmodifiableList(dataDependencies);
 	}
 	
 	protected boolean checkQueryPrecondition(Query<?,?> query, List<String> messages) {
