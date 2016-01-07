@@ -40,6 +40,7 @@ import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction, MultivariateDifferentiableFunction {
 
@@ -119,6 +120,11 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	@Override
 	public DerivativeStructure value(DerivativeStructure[] state) {
 		return utilLaw.value(state);
+	}
+
+	@Override
+	public List<? extends DataDependency<?>> getDataDependencies() {
+		return utilLaw.getDataDependencies();
 	}
 
 }

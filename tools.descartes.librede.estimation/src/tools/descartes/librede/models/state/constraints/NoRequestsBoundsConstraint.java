@@ -26,12 +26,11 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
+import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
@@ -41,6 +40,8 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.repository.rules.DataDependency;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestRate;
 
 /**
@@ -118,6 +119,11 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	@Override
 	public ResourceDemand getStateVariable() {
 		return this.variable;
+	}
+
+	@Override
+	public List<? extends DataDependency<?>> getDataDependencies() {
+		return Collections.singletonList(new DataDependency<>(throughputQuery.getMetric(), throughputQuery.getAggregation(), DependencyScope.fixedScope(throughputQuery.getEntities())));
 	}
 
 }

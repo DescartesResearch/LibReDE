@@ -30,8 +30,9 @@ import java.util.List;
 
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IStateConstraint {
+public interface IStateConstraint extends IDependencyTarget {
 	
 	double getLowerBound();
 	

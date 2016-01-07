@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
+import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ResourceDemand;
@@ -33,6 +34,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, IDifferentiableFunction {
 
@@ -88,6 +90,11 @@ public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, ID
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
+	}
+
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		return Collections.emptyList();
 	}
 
 }
