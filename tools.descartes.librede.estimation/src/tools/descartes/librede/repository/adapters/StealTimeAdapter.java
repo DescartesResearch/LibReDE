@@ -37,7 +37,7 @@ import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.Time;
 
@@ -49,9 +49,9 @@ public class StealTimeAdapter implements IMetricAdapter<Time> {
 	}
 
 	@Override
-	public List<Rule<Time>> getDerivationRules() {
+	public List<DerivationRule<Time>> getDerivationRules() {
 		return Arrays.asList(
-				Rule.rule(StandardMetrics.STEAL_TIME, Aggregation.SUM)
+				DerivationRule.rule(StandardMetrics.STEAL_TIME, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
 					.build(new DefaultAggregationHandler<Time>(Aggregation.SUM))
 				);

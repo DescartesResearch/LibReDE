@@ -43,12 +43,12 @@ import tools.descartes.librede.metrics.Metric;
 public class RulesConfig {
 	private static final Logger log = Logger.getLogger(RulesConfig.class);
 	
-	private final Map<Metric<?>, EnumMap<Aggregation, List<Rule<?>>>> derivationRulesByDependency = new HashMap<>();
-	private final Set<Rule<?>> derivationRules = new TreeSet<>();
-	private final List<Rule<?>> defaultRules = new LinkedList<>();
+	private final Map<Metric<?>, EnumMap<Aggregation, List<DerivationRule<?>>>> derivationRulesByDependency = new HashMap<>();
+	private final Set<DerivationRule<?>> derivationRules = new TreeSet<>();
+	private final List<DerivationRule<?>> defaultRules = new LinkedList<>();
 	
 	
-	public void addRule(Rule<?> rule) {
+	public void addRule(DerivationRule<?> rule) {
 		if (log.isDebugEnabled()) {
 			log.debug("Add rule: " + rule);
 		}
@@ -57,12 +57,12 @@ public class RulesConfig {
 			defaultRules.add(rule);
 		} else {
 			for (DataDependency<?> r : rule.getDependencies()) {
-				EnumMap<Aggregation, List<Rule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
+				EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry == null) {
 					metricEntry = new EnumMap<>(Aggregation.class);
 					derivationRulesByDependency.put(r.getMetric(), metricEntry);
 				}
-				List<Rule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
+				List<DerivationRule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
 				if (aggregationEntry == null) {
 					aggregationEntry = new LinkedList<>();
 					metricEntry.put(r.getAggregation(), aggregationEntry);
@@ -73,12 +73,12 @@ public class RulesConfig {
 		}
 	}
 	
-	public void removeRule(Rule<?> rule) {
+	public void removeRule(DerivationRule<?> rule) {
 		if (derivationRules.contains(rule)) {
 			for (DataDependency<?> r : rule.getDependencies()) {
-				EnumMap<Aggregation, List<Rule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
+				EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry != null) {
-					List<Rule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
+					List<DerivationRule<?>> aggregationEntry = metricEntry.get(r.getAggregation());
 					aggregationEntry.remove(rule);
 				}
 			}
@@ -86,10 +86,10 @@ public class RulesConfig {
 		}
 	}
 	
-	public List<Rule<?>> getDerivationRules(Metric<?> metric, Aggregation aggregation) {
-		EnumMap<Aggregation, List<Rule<?>>> metricEntry = derivationRulesByDependency.get(metric);
+	public List<DerivationRule<?>> getDerivationRules(Metric<?> metric, Aggregation aggregation) {
+		EnumMap<Aggregation, List<DerivationRule<?>>> metricEntry = derivationRulesByDependency.get(metric);
 		if (metricEntry != null) {
-			List<Rule<?>> derivationEntry = metricEntry.get(aggregation);
+			List<DerivationRule<?>> derivationEntry = metricEntry.get(aggregation);
 			if (derivationEntry != null) {
 				return derivationEntry;
 			}
@@ -97,16 +97,16 @@ public class RulesConfig {
 		return Collections.emptyList();
 	}
 	
-	public List<Rule<?>> getDefaultDerivationRules() {
+	public List<DerivationRule<?>> getDefaultDerivationRules() {
 		return defaultRules;
 	}
 	
 	public void logConfigDump() {
-		for (Rule<?> d : defaultRules) {
+		for (DerivationRule<?> d : defaultRules) {
 			log.info(d.toString());
 		}
 		
-		for (Rule<?> d : derivationRules) {
+		for (DerivationRule<?> d : derivationRules) {
 			log.info(d.toString());
 		}
 	}

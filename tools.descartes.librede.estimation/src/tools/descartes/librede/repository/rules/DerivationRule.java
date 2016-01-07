@@ -34,7 +34,7 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 
-public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
+public class DerivationRule<D extends Dimension> implements Comparable<DerivationRule<D>> {
 	
 	private IRuleActivationHandler<D> handler;
 	private final Metric<D> metric;
@@ -43,52 +43,52 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	private final List<RulePrecondition> preconditions = new LinkedList<>();
 	private int priority;
 		
-	private Rule(Metric<D> metric, Aggregation aggregation) {
+	private DerivationRule(Metric<D> metric, Aggregation aggregation) {
 		this.metric = metric;
 		this.aggregation = aggregation;
 	}
 	
-	public Rule<D> requiring(Aggregation aggregation) {
+	public DerivationRule<D> requiring(Aggregation aggregation) {
 		addDependency(getMetric(), aggregation);
 		return this;
 	}
 	
-	public Rule<D> requiring(Metric<?> metric) {
+	public DerivationRule<D> requiring(Metric<?> metric) {
 		addDependency(metric, Aggregation.NONE);
 		return this;
 	}
 	
-	public Rule<D> requiring(Metric<?> metric, Aggregation aggregation) {
+	public DerivationRule<D> requiring(Metric<?> metric, Aggregation aggregation) {
 		addDependency(metric, aggregation);
 		return this;
 	}
 	
-	public Rule<D> requiring(Metric<?> metric, Aggregation aggregation, DependencyScope scope) {
+	public DerivationRule<D> requiring(Metric<?> metric, Aggregation aggregation, DependencyScope scope) {
 		addDependency(metric, aggregation);
 		return this;
 	}
 	
-	public Rule<D> check(RulePrecondition precondition) {
+	public DerivationRule<D> check(RulePrecondition precondition) {
 		addPrecondition(precondition);
 		return this;
 	}
 	
-	public Rule<D> priority(int priority) {
+	public DerivationRule<D> priority(int priority) {
 		setPriority(priority);
 		return this;
 	}
 	
-	public Rule<D> build(IRuleActivationHandler<D> handler) {
+	public DerivationRule<D> build(IRuleActivationHandler<D> handler) {
 		this.handler = handler;
 		return this;
 	}
 		
-	public static <D extends Dimension> Rule<D> rule(Metric<D> metric) {
-		return new Rule<D>(metric, Aggregation.NONE);
+	public static <D extends Dimension> DerivationRule<D> rule(Metric<D> metric) {
+		return new DerivationRule<D>(metric, Aggregation.NONE);
 	}
 	
-	public static <D extends Dimension> Rule<D> rule(Metric<D> metric, Aggregation aggregation) {
-		return new Rule<D>(metric, aggregation);
+	public static <D extends Dimension> DerivationRule<D> rule(Metric<D> metric, Aggregation aggregation) {
+		return new DerivationRule<D>(metric, aggregation);
 	}
 	
 	public IRuleActivationHandler<D> getDerivationHandler() {
@@ -161,7 +161,7 @@ public class Rule<D extends Dimension> implements Comparable<Rule<D>> {
 	}
 
 	@Override
-	public int compareTo(Rule<D> o) {
+	public int compareTo(DerivationRule<D> o) {
 		if (this == o) {
 			// rules are only equal if they point to the same instance.
 			return 0;

@@ -38,7 +38,7 @@ import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveContentionHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.Time;
@@ -51,12 +51,12 @@ public class ContentionAdapter implements IMetricAdapter<Ratio> {
 	}
 
 	@Override
-	public List<Rule<Ratio>> getDerivationRules() {
+	public List<DerivationRule<Ratio>> getDerivationRules() {
 		return Arrays.asList(
-				Rule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.build(new DefaultAggregationHandler<Ratio>(Aggregation.AVERAGE)),
-				Rule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {						
 						@Override
 						public boolean check(ModelEntity entity) {
@@ -67,7 +67,7 @@ public class ContentionAdapter implements IMetricAdapter<Ratio> {
 						}
 					})
 					.build(new ConstantHandler<Ratio>(0.0)),
-				Rule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.STEAL_TIME, Aggregation.SUM)
 					.build(new DeriveContentionHandler())
 				);

@@ -33,7 +33,7 @@ import tools.descartes.librede.repository.IMetricDerivationHandler;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.repository.rules.IRuleActivationHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -53,12 +53,12 @@ public abstract class BaseDerivationHandler<D extends Dimension> implements IMet
 	}
 	
 	@Override
-	public void activateRule(IMonitoringRepository repository, Rule<D> rule, ModelEntity entity) {
+	public void activateRule(IMonitoringRepository repository, DerivationRule<D> rule, ModelEntity entity) {
 		repository.insertDerivation(rule, this, entity);
 	}
 	
 	@Override
-	public void deactivateRule(IMonitoringRepository repository, Rule<D> rule, ModelEntity entity) {
+	public void deactivateRule(IMonitoringRepository repository, DerivationRule<D> rule, ModelEntity entity) {
 		 //TODO: implement someting for removal.
 	}
 }

@@ -32,8 +32,8 @@ import tools.descartes.librede.units.Dimension;
 
 public interface IRuleActivationHandler<D extends Dimension> {
 	
-	void activateRule(IMonitoringRepository repository, Rule<D> rule, ModelEntity entity);
+	void activateRule(IMonitoringRepository repository, DerivationRule<D> rule, ModelEntity entity);
 	
-	void deactivateRule(IMonitoringRepository repository, Rule<D> rule, ModelEntity entity);
+	void deactivateRule(IMonitoringRepository repository, DerivationRule<D> rule, ModelEntity entity);
 
 }

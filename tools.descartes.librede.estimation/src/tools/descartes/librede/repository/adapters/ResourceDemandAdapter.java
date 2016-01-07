@@ -31,7 +31,7 @@ import java.util.List;
 
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Time;
 
 public class ResourceDemandAdapter implements IMetricAdapter<Time> {
@@ -42,7 +42,7 @@ public class ResourceDemandAdapter implements IMetricAdapter<Time> {
 	}
 
 	@Override
-	public List<Rule<Time>> getDerivationRules() {
+	public List<DerivationRule<Time>> getDerivationRules() {
 		return Collections.emptyList();
 	}
 

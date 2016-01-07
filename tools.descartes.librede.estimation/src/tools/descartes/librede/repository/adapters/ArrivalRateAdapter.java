@@ -35,7 +35,7 @@ import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.RequestRate;
 
 public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
@@ -46,13 +46,13 @@ public class ArrivalRateAdapter implements IMetricAdapter<RequestRate> {
 	}
 
 	@Override
-	public List<Rule<RequestRate>> getDerivationRules() {
+	public List<DerivationRule<RequestRate>> getDerivationRules() {
 		return Arrays.asList(
-				Rule.rule(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(10)
 					.build(new TimeWeightedAggregationHandler<RequestRate>()),
-				Rule.rule(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.ARRIVAL_RATE, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.priority(0)
 					.build(new RequestRateAggregationHandler(StandardMetrics.ARRIVALS))

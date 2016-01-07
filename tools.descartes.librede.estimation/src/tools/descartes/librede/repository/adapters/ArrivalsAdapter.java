@@ -39,7 +39,7 @@ import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveArrivalsHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
@@ -52,34 +52,34 @@ public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 	}
 
 	@Override
-	public List<Rule<RequestCount>> getDerivationRules() {
+	public List<DerivationRule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.requiring(Aggregation.NONE)
 					.priority(0)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.requiring(Aggregation.SUM)
 					.priority(10)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.SUM)),
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.MINIMUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.MINIMUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.MAXIMUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.MAXIMUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.CUMULATIVE_SUM)
 					.requiring(Aggregation.NONE)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.requiring(Aggregation.CUMULATIVE_SUM)
 					.build(new DeriveDiffHandler<RequestCount>()),
-				Rule.rule(StandardMetrics.ARRIVALS)
+				DerivationRule.rule(StandardMetrics.ARRIVALS)
 					.requiring(StandardMetrics.RESPONSE_TIME)
 					.build(new DeriveArrivalsHandler()),
 				// If it is a background service, we assume that always one
 				// job is in the system
-				Rule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
+				DerivationRule.rule(StandardMetrics.ARRIVALS, Aggregation.SUM)
 					.check(new RulePrecondition() {				
 						@Override
 						public boolean check(ModelEntity entity) {

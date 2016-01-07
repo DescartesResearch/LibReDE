@@ -43,7 +43,7 @@ import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.rules.IRuleActivationHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.Time;
 
@@ -60,8 +60,8 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	private IStateModel<?> stateModel;
 	private IObservationModel<?, ?> observationModel;
 	private IRepositoryCursor cursor;
-	private final List<Rule<?>> dependencies = new LinkedList<Rule<?>>();
-	private final Set<Rule<?>> unsatisfiedDependencies = new HashSet<Rule<?>>();
+	private final List<DerivationRule<?>> dependencies = new LinkedList<DerivationRule<?>>();
+	private final Set<DerivationRule<?>> unsatisfiedDependencies = new HashSet<DerivationRule<?>>();
 	private boolean activated = false;
 	
 	@Override
@@ -71,7 +71,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 		this.observationModel = observationModel;
 		this.cursor = cursor;
 		initializeDependencies();
-		for (Rule<?> rule : dependencies) {
+		for (DerivationRule<?> rule : dependencies) {
 			cursor.getRepository().addRule(rule);
 		}
 	}
@@ -88,13 +88,13 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 
 	@Override
 	public void destroy() {
-		for (Rule<?> rule : dependencies) {
+		for (DerivationRule<?> rule : dependencies) {
 			cursor.getRepository().removeRule(rule);
 		}
 	}
 	
 	@Override
-	public void activateRule(IMonitoringRepository repository, Rule<Time> rule, ModelEntity entity) {
+	public void activateRule(IMonitoringRepository repository, DerivationRule<Time> rule, ModelEntity entity) {
 		if (unsatisfiedDependencies.contains(rule)) {
 			if (log.isDebugEnabled()) {
 				log.debug("Satisfied dependency rule: " + rule);
@@ -112,7 +112,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	}
 	
 	@Override
-	public void deactivateRule(IMonitoringRepository repository, Rule<Time> rule, ModelEntity entity) {
+	public void deactivateRule(IMonitoringRepository repository, DerivationRule<Time> rule, ModelEntity entity) {
 		if (!unsatisfiedDependencies.add(rule)) {
 			if (log.isDebugEnabled()) {
 				log.debug("Unsatisfied dependency rule: " + rule);
@@ -131,7 +131,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	}
 	
 	protected void addDependency(Query<?,?> query) {
-		Rule<Time> newRule = Rule.rule(StandardMetrics.RESOURCE_DEMAND, Aggregation.AVERAGE);
+		DerivationRule<Time> newRule = DerivationRule.rule(StandardMetrics.RESOURCE_DEMAND, Aggregation.AVERAGE);
 		newRule.requiring(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities()));
 		newRule.build(this);
 		dependencies.add(newRule);

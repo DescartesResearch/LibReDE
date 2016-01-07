@@ -40,7 +40,7 @@ import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveVisitCountHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
-import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestCount;
@@ -53,17 +53,17 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 	}
 
 	@Override
-	public List<Rule<RequestCount>> getDerivationRules() {
+	public List<DerivationRule<RequestCount>> getDerivationRules() {
 		return Arrays.asList(
-				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(Aggregation.NONE)
 					.priority(10)
 					.build(new DefaultAggregationHandler<RequestCount>(Aggregation.NONE)),
-				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(Aggregation.AVERAGE)
 					.priority(20)
 					.build(new TimeWeightedAggregationHandler<RequestCount>()),
-				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.check(new RulePrecondition() {				
 						@Override
 						public boolean check(ModelEntity entity) {
@@ -72,7 +72,7 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 					})
 					.priority(-100) //IMPORTANT: Use this only if nothing else is available
 					.build(new ConstantHandler<RequestCount>(1.0)),
-				Rule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
+				DerivationRule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE, 
 							DependencyScope.dynamicScope()
 							.include(ConfigurationPackage.Literals.TASK__SERVICE)
