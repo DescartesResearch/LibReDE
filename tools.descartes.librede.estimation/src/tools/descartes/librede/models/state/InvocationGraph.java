@@ -28,6 +28,7 @@ package tools.descartes.librede.models.state;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,9 +42,12 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.repository.rules.DataDependency;
+import tools.descartes.librede.repository.rules.DependencyScope;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 import tools.descartes.librede.units.RequestCount;
 
-public class InvocationGraph {
+public class InvocationGraph implements IDependencyTarget {
 	private final int historySize;
 	private final Query<Vector, RequestCount> visitCountQuery;
 	private final double[][][] invocations;
@@ -182,6 +186,15 @@ public class InvocationGraph {
 			calls.addAll(curService.getOutgoingCalls());
 		}
 		return calls;
+	}
+
+	@Override
+	public List<? extends DataDependency<?>> getDataDependencies() {
+		if (!externalCalls) {
+			return Collections.emptyList();
+		} else {
+			return Collections.singletonList(new DataDependency<>(visitCountQuery.getMetric(), visitCountQuery.getAggregation(), DependencyScope.fixedScope(visitCountQuery.getEntities())));
+		}
 	}
 
 }
