@@ -32,7 +32,6 @@ import static tools.descartes.librede.linalg.LinAlg.zeros;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,7 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.models.state.initial.IStateInitializer;
 import tools.descartes.librede.models.state.initial.PredefinedStateInitializer;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public class ConstantStateModel<C extends IStateConstraint> implements IStateModel<C> {
 	
@@ -325,6 +325,16 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 		ret.append("}");
 		return ret.toString();
+	}
+
+	@Override
+	public List<? extends DataDependency<?>> getDataDependencies() {
+		ArrayList<DataDependency<?>> deps = new ArrayList<>();
+		for (IStateConstraint constr : constraints) {
+			deps.addAll(constr.getDataDependencies());
+		}
+		deps.addAll(invocationGraph.getDataDependencies());
+		return Collections.unmodifiableList(deps);
 	}
 
 }

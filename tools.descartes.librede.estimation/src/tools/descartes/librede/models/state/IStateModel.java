@@ -35,8 +35,9 @@ import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IStateModel<C extends IStateConstraint> {
+public interface IStateModel<C extends IStateConstraint> extends IDependencyTarget {
 	
 	// Information about the structure of the state model
 	
