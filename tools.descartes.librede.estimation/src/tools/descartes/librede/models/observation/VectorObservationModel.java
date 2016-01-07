@@ -29,12 +29,14 @@ package tools.descartes.librede.models.observation;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public class VectorObservationModel<E extends IOutputFunction> implements IObservationModel<E, Vector> {
 	
@@ -102,6 +104,15 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	@Override
 	public IOutputWeightingFunction getOutputWeightsFunction() {
 		return weights;
+	}
+
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		List<DataDependency<?>> deps = new ArrayList<>();
+		for (IOutputFunction func : outputFunctions) {
+			deps.addAll(func.getDataDependencies());
+		}
+		return Collections.unmodifiableList(deps);
 	}
 
 }

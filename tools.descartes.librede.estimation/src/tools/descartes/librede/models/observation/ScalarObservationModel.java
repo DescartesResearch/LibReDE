@@ -30,10 +30,12 @@ import static tools.descartes.librede.linalg.LinAlg.scalar;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public class ScalarObservationModel<E extends IOutputFunction> implements IObservationModel<E, Scalar> {
 	
@@ -90,6 +92,11 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 	@Override
 	public IOutputWeightingFunction getOutputWeightsFunction() {
 		return weights;
+	}
+
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		return outputFunction.getDataDependencies();
 	}
 
 }

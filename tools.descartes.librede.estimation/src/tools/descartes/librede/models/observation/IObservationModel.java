@@ -28,8 +28,9 @@ package tools.descartes.librede.models.observation;
 
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IObservationModel<E extends IOutputFunction, O extends Vector> extends Iterable<E> {
+public interface IObservationModel<E extends IOutputFunction, O extends Vector> extends Iterable<E>, IDependencyTarget {
 	
 	int getOutputSize();
 	
