@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface IDependencyTarget {
 	
-	public List<DataDependency<?>> getDataDependencies();
+	public List<? extends DataDependency<?>> getDataDependencies();
 
 }
