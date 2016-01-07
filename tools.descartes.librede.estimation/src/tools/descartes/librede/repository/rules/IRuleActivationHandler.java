@@ -28,12 +28,11 @@ package tools.descartes.librede.repository.rules;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.repository.IMonitoringRepository;
-import tools.descartes.librede.units.Dimension;
 
-public interface IRuleActivationHandler<D extends Dimension> {
+public interface IRuleActivationHandler {
 	
-	void activateRule(IMonitoringRepository repository, DerivationRule<D> rule, ModelEntity entity);
+	void activateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity);
 	
-	void deactivateRule(IMonitoringRepository repository, DerivationRule<D> rule, ModelEntity entity);
+	void deactivateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity);
 
 }

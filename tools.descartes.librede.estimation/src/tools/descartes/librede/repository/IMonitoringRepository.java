@@ -35,6 +35,7 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -61,15 +62,15 @@ public interface IMonitoringRepository {
 	
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval);
 	
-	public <D extends Dimension> void insertDerivation(DerivationRule<D> t, IMetricDerivationHandler<D> handler, ModelEntity entity);
+	public <D extends Dimension> void insertDerivation(DerivationRule<D> t, ModelEntity entity);
 	
 	public void addListener(IMonitoringRepositoryListener listener);
 	
 	public void removeListener(IMonitoringRepositoryListener listener);
 	
-	public <D extends Dimension> void addRule(DerivationRule<D> rule);
+	public void addRule(Rule rule);
 	
-	public <D extends Dimension> void removeRule(DerivationRule<D> rule);
+	public void removeRule(Rule rule);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();

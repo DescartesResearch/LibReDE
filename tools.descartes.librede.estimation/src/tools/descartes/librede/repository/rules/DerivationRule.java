@@ -26,24 +26,24 @@
  */
 package tools.descartes.librede.repository.rules;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.repository.IMetricDerivationHandler;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.units.Dimension;
 
-public class DerivationRule<D extends Dimension> implements Comparable<DerivationRule<D>> {
-	
-	private IRuleActivationHandler<D> handler;
+public class DerivationRule<D extends Dimension> extends Rule implements Comparable<DerivationRule<D>>, IRuleActivationHandler {
+
+	private IMetricDerivationHandler<D> derivationHandler;
 	private final Metric<D> metric;
 	private final Aggregation aggregation;
-	private final List<DataDependency<?>> dependencies = new LinkedList<>();
-	private final List<RulePrecondition> preconditions = new LinkedList<>();
 	private int priority;
 		
 	private DerivationRule(Metric<D> metric, Aggregation aggregation) {
+		setActivationHandler(this);
 		this.metric = metric;
 		this.aggregation = aggregation;
 	}
@@ -78,9 +78,13 @@ public class DerivationRule<D extends Dimension> implements Comparable<Derivatio
 		return this;
 	}
 	
-	public DerivationRule<D> build(IRuleActivationHandler<D> handler) {
-		this.handler = handler;
+	public DerivationRule<D> build(IMetricDerivationHandler<D> handler) {
+		this.derivationHandler = handler;
 		return this;
+	}
+	
+	public IMetricDerivationHandler<D> getDerivationHandler() {
+		return derivationHandler;
 	}
 		
 	public static <D extends Dimension> DerivationRule<D> rule(Metric<D> metric) {
@@ -89,10 +93,6 @@ public class DerivationRule<D extends Dimension> implements Comparable<Derivatio
 	
 	public static <D extends Dimension> DerivationRule<D> rule(Metric<D> metric, Aggregation aggregation) {
 		return new DerivationRule<D>(metric, aggregation);
-	}
-	
-	public IRuleActivationHandler<D> getDerivationHandler() {
-		return handler;
 	}
 	
 	@Override
@@ -114,25 +114,9 @@ public class DerivationRule<D extends Dimension> implements Comparable<Derivatio
 		}
 		res.append(" {");
 		res.append("priority=").append(getPriority()).append(", ");
-		res.append("handler=").append(handler);
+		res.append("handler=").append(getDerivationHandler());
 		res.append("}");
 		return res.toString();
-	}
-
-	public List<DataDependency<?>> getDependencies() {
-		return dependencies;
-	}
-
-	protected void addPrecondition(RulePrecondition precondition) {
-		preconditions.add(precondition);
-	}
-
-	protected <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation) {
-		dependencies.add(new DataDependency<B>(metric, aggregation));
-	}
-	
-	protected <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation, DependencyScope scope) {
-		dependencies.add(new DataDependency<B>(metric, aggregation, scope));
 	}
 
 	public Metric<D> getMetric() {
@@ -149,15 +133,6 @@ public class DerivationRule<D extends Dimension> implements Comparable<Derivatio
 
 	public void setPriority(int priority) {
 		this.priority = priority;
-	}
-
-	public boolean applies(ModelEntity entity) {
-		for (RulePrecondition cond : preconditions) {
-			if (!cond.check(entity)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	@Override
@@ -180,6 +155,14 @@ public class DerivationRule<D extends Dimension> implements Comparable<Derivatio
 		}
 		return c;
 	}
-	
 
+	@Override
+	public void activateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
+		repository.insertDerivation(this, entity);		
+	}
+
+	@Override
+	public void deactivateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
+		//TODO: implement someting for removal.		
+	}
 }

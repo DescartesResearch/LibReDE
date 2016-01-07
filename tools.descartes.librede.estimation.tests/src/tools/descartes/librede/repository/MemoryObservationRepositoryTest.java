@@ -40,8 +40,10 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
+import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 
 public class MemoryObservationRepositoryTest extends LibredeTest {
@@ -108,5 +110,20 @@ public class MemoryObservationRepositoryTest extends LibredeTest {
 		assertThat(ts.isEmpty()).isTrue();
 	}
 	
-
+	@Test
+	public void testInsertDerivationSelfReferential() {
+		DerivationRule<RequestRate> selfRef = DerivationRule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE).requiring(StandardMetrics.THROUGHPUT, Aggregation.NONE);
+		repo.insertDerivation(selfRef, services[0]);
+		
+		assertThat(repo.exists(StandardMetrics.THROUGHPUT, services[0], Aggregation.AVERAGE)).isFalse();		
+	}
+	
+	@Test
+	public void testInsertDerivation() {
+		DerivationRule<Ratio> selfRef = DerivationRule.rule(StandardMetrics.UTILIZATION, Aggregation.AVERAGE).requiring(StandardMetrics.UTILIZATION, Aggregation.NONE);
+		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
+		repo.insertDerivation(selfRef, resources[0]);
+		
+		assertThat(repo.exists(StandardMetrics.UTILIZATION, resources[0], Aggregation.AVERAGE)).isTrue();		
+	}
 }

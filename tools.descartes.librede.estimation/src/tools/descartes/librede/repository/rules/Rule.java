@@ -24,29 +24,53 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.repository.handlers;
+package tools.descartes.librede.repository.rules;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.repository.IMetricDerivationHandler;
-import tools.descartes.librede.repository.IMonitoringRepository;
-import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.units.Dimension;
-import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.Unit;
 
-public abstract class BaseDerivationHandler<D extends Dimension> implements IMetricDerivationHandler<D> {
-	@Override
-	public double aggregate(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity,
-			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
-		throw new UnsupportedOperationException();
+public class Rule {
+	
+	private IRuleActivationHandler handler;
+	private final List<DataDependency<?>> dependencies = new LinkedList<>();
+	private final List<RulePrecondition> preconditions = new LinkedList<>();
+	
+	public List<DataDependency<?>> getDependencies() {
+		return dependencies;
+	}
+
+	protected void addPrecondition(RulePrecondition precondition) {
+		preconditions.add(precondition);
+	}
+
+	public <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation) {
+		dependencies.add(new DataDependency<B>(metric, aggregation));
 	}
 	
-	@Override
-	public TimeSeries derive(IMonitoringRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity,
-			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
-		throw new UnsupportedOperationException();
+	public <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation, DependencyScope scope) {
+		dependencies.add(new DataDependency<B>(metric, aggregation, scope));
 	}
+	
+	public IRuleActivationHandler getActivationHandler() {
+		return handler;
+	}
+	
+	public void setActivationHandler(IRuleActivationHandler handler) {
+		this.handler = handler;
+	}
+
+	public boolean applies(ModelEntity entity) {
+		for (RulePrecondition cond : preconditions) {
+			if (!cond.check(entity)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

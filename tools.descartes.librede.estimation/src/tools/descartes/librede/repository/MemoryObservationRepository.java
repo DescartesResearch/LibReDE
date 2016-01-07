@@ -48,6 +48,7 @@ import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
 import tools.descartes.librede.repository.rules.DataDependency;
 import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
 import tools.descartes.librede.repository.rules.RulesConfig;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
@@ -154,6 +155,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		
 		public Quantity<Time> getEndTime() {
 			return endTime;
+		}
+		
+		public DataKey<D> getKey() {
+			return key;
 		}
 		
 		public void setDerivationRule(DerivationRule<D> rule, IMetricDerivationHandler<D> handler, List<DataEntry<?>> requiredEntries) {
@@ -279,12 +284,12 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	}
 	
 	@Override
-	public <D extends Dimension> void addRule(DerivationRule<D> rule) {
+	public void addRule(Rule rule) {
 		rules.addRule(rule);		
 	}
 	
 	@Override
-	public <D extends Dimension> void removeRule(DerivationRule<D> rule) {
+	public void removeRule(Rule rule) {
 		rules.removeRule(rule);
 	}
 	
@@ -346,7 +351,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		
 		Set<ModelEntity> notificationSet = new HashSet<>();
-		for (DerivationRule<?> r : rules.getDerivationRules(metric, aggregation)) {
+		for (Rule r : rules.getDerivationRules(metric, aggregation)) {
 			// First we determine the entities that may be affected
 			// by the new entry (e.g., new data for a service, may also
 			// enable new derivations for external calls to this service)
@@ -365,38 +370,22 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 	}
 	
-	private <D extends Dimension> void activateRule(DerivationRule<D> rule, ModelEntity entity) {
+	private <D extends Dimension> void activateRule(Rule rule, ModelEntity entity) {
 		if (log.isDebugEnabled()) {
-			log.debug("DerivationRule " + rule + " for entity " + entity + " is activated.");
+			log.debug("Rule " + rule + " for entity " + entity + " is activated.");
 		}
-		rule.getDerivationHandler().activateRule(this, rule, entity);
+		rule.getActivationHandler().activateRule(this, rule, entity);
 	}
 	
-	private boolean checkDependencies(DerivationRule<?> rule, ModelEntity entity) {
+	private boolean checkDependencies(Rule rule, ModelEntity entity) {
 		for (DataDependency<?> dep : rule.getDependencies()) {
 			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
 			for (ModelEntity e : scopeEntities) {				
-				if (rule.getMetric().equals(dep.getMetric())
-						&& rule.getAggregation().equals(dep.getAggregation())
-						&& entity.equals(e)) {
-					// self-referential rules are only allowed if the associated
-					// entry contains actual (non-derived) monitoring data.
-					// Otherwise, we may replace rules which triggered 
-					// the activation of this rule.
-					DataEntry<?> entry = getEntry(dep.getMetric(), e, dep.getAggregation());
-					if ((entry == null) || (entry.data == null)) {
-						if (log.isDebugEnabled()) {
-							log.debug("DerivationRule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
-						}
-						return false;
+				if (!exists(dep.getMetric(), e, dep.getAggregation())) {
+					if (log.isDebugEnabled()) {
+						log.debug("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
 					}
-				} else {
-					if (!exists(dep.getMetric(), e, dep.getAggregation())) {
-						if (log.isDebugEnabled()) {
-							log.debug("DerivationRule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
-						}
-						return false;
-					}
+					return false;
 				}
 			}
 		}
@@ -407,17 +396,18 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
 		for (DataDependency<?> dep : rule.getDependencies()) {
 			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
-			for (ModelEntity e : scopeEntities) {
+			for (ModelEntity e : scopeEntities) {				
 				DataEntry<?> reqEntry = getEntry(dep.getMetric(), e, dep.getAggregation());
-				if (reqEntry != null) {
-					requiredEntries.add(reqEntry);
+				if (reqEntry == null) {
+					throw new NoMonitoringDataException(dep.getMetric(), dep.getAggregation(), entity);
 				}
+				requiredEntries.add(reqEntry);
 			}
 		}
 		return requiredEntries;
 	}
 	
-	public <D extends Dimension> void insertDerivation(DerivationRule<D> t, IMetricDerivationHandler<D> handler, ModelEntity entity) {
+	public <D extends Dimension> void insertDerivation(DerivationRule<D> t, ModelEntity entity) {
 		Metric<D> metric = t.getMetric();
 		Aggregation aggregation = t.getAggregation();
 
@@ -427,12 +417,30 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (newEntry) {
 			entry = new DataEntry<D>(key);
 		}
-		entry.setDerivationRule(t, handler, getRequiredEntries(t, entity));
-		if (newEntry) {
-			addEntry(key, entry);
-		}
-		if (log.isDebugEnabled()) {
-			log.debug((newEntry ? "New" : "Replaced") + " derivation entry " + entity + "/" + metric + "/" + aggregation);
+		
+		try {
+			List<DataEntry<?>> requiredEntries = getRequiredEntries(t, entity);
+			// self-referential rules are only allowed if the associated
+			// entry contains actual (non-derived) monitoring data.
+			// Otherwise, we may replace rules which triggered 
+			// the activation of this rule.
+			for (DataEntry<?> curEntry : requiredEntries) {
+				if (key.equals(curEntry.getKey()) && (curEntry.getRawData() == null)) {
+					if (log.isDebugEnabled()) {
+						log.debug("Derivation entry " + entity + "/" + metric + "/" + aggregation +" not updated due to self-referential check failure.");
+					}
+					return; // abort this insert operation
+				}
+			}
+			entry.setDerivationRule(t, t.getDerivationHandler(), requiredEntries);
+			if (newEntry) {
+				addEntry(key, entry);
+			}
+			if (log.isDebugEnabled()) {
+				log.debug((newEntry ? "New" : "Replaced") + " derivation entry " + entity + "/" + metric + "/" + aggregation);
+			}
+		} catch(NoMonitoringDataException ex) {
+			log.warn("Could not initiliaze derivation entry.", ex);
 		}
 	}
 	
@@ -561,7 +569,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		if (log.isDebugEnabled()) {
 			log.debug("Register default handlers for metrics");
 		}
-		for (DerivationRule<?> rule : rules.getDefaultDerivationRules()) {
+		for (Rule rule : rules.getDefaultDerivationRules()) {
 			for (Resource resource : workload.getResources()) {
 				if (rule.applies(resource)) {
 					activateRule(rule, resource);

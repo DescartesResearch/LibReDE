@@ -35,17 +35,14 @@ import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.exceptions.InitializationException;
-import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.rules.IRuleActivationHandler;
-import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.DependencyScope;
-import tools.descartes.librede.units.Time;
+import tools.descartes.librede.repository.rules.IRuleActivationHandler;
+import tools.descartes.librede.repository.rules.Rule;
 
 /**
  * This abstract class provides standard implementations for some of the methods in {@link IEstimationAlgorithm}.
@@ -53,15 +50,15 @@ import tools.descartes.librede.units.Time;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler<Time> {
+public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler {
 	
 	private static final Logger log = Logger.getLogger(AbstractEstimationAlgorithm.class);
 	
 	private IStateModel<?> stateModel;
 	private IObservationModel<?, ?> observationModel;
 	private IRepositoryCursor cursor;
-	private final List<DerivationRule<?>> dependencies = new LinkedList<DerivationRule<?>>();
-	private final Set<DerivationRule<?>> unsatisfiedDependencies = new HashSet<DerivationRule<?>>();
+	private final List<Rule> dependencies = new LinkedList<Rule>();
+	private final Set<Rule> unsatisfiedDependencies = new HashSet<Rule>();
 	private boolean activated = false;
 	
 	@Override
@@ -71,7 +68,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 		this.observationModel = observationModel;
 		this.cursor = cursor;
 		initializeDependencies();
-		for (DerivationRule<?> rule : dependencies) {
+		for (Rule rule : dependencies) {
 			cursor.getRepository().addRule(rule);
 		}
 	}
@@ -88,13 +85,13 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 
 	@Override
 	public void destroy() {
-		for (DerivationRule<?> rule : dependencies) {
+		for (Rule rule : dependencies) {
 			cursor.getRepository().removeRule(rule);
 		}
 	}
 	
 	@Override
-	public void activateRule(IMonitoringRepository repository, DerivationRule<Time> rule, ModelEntity entity) {
+	public void activateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
 		if (unsatisfiedDependencies.contains(rule)) {
 			if (log.isDebugEnabled()) {
 				log.debug("Satisfied dependency rule: " + rule);
@@ -112,7 +109,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	}
 	
 	@Override
-	public void deactivateRule(IMonitoringRepository repository, DerivationRule<Time> rule, ModelEntity entity) {
+	public void deactivateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
 		if (!unsatisfiedDependencies.add(rule)) {
 			if (log.isDebugEnabled()) {
 				log.debug("Unsatisfied dependency rule: " + rule);
@@ -131,9 +128,9 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	}
 	
 	protected void addDependency(Query<?,?> query) {
-		DerivationRule<Time> newRule = DerivationRule.rule(StandardMetrics.RESOURCE_DEMAND, Aggregation.AVERAGE);
-		newRule.requiring(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities()));
-		newRule.build(this);
+		Rule newRule = new Rule();
+		newRule.addDependency(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities()));
+		newRule.setActivationHandler(this);
 		dependencies.add(newRule);
 		unsatisfiedDependencies.add(newRule);
 	}
