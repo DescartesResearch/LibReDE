@@ -27,6 +27,7 @@
 package tools.descartes.librede.repository.rules;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import tools.descartes.librede.configuration.ModelEntity;
@@ -39,6 +40,10 @@ public abstract class DependencyScope {
 	
 	public static FixedScope fixedScope(Collection<? extends ModelEntity> entities) {
 		return new FixedScope(entities);
+	}
+	
+	public static FixedScope fixedScope(ModelEntity entity) {
+		return new FixedScope(Collections.singletonList(entity));
 	}
 
 	public abstract Set<? extends ModelEntity> getScopeSet(ModelEntity base);
