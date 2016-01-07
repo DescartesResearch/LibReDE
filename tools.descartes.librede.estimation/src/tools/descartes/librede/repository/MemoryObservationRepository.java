@@ -260,7 +260,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
-		log.info("Set up in-memory observaiton repository");
+		log.info("Set up in-memory observation repository");
 		for (Metric<?> m : Registry.INSTANCE.getMetrics()) {
 			registerRules(m);			
 		}
