@@ -333,7 +333,9 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		for (IStateConstraint constr : constraints) {
 			deps.addAll(constr.getDataDependencies());
 		}
-		deps.addAll(invocationGraph.getDataDependencies());
+		if (invocationGraph != null) {
+			deps.addAll(invocationGraph.getDataDependencies());
+		}
 		return Collections.unmodifiableList(deps);
 	}
 
