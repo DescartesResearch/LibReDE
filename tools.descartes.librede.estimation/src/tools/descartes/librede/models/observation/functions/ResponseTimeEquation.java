@@ -167,6 +167,8 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			// CPU.
 			contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE)
 					.forResources(finiteCapacityResources).average().using(repository);
+			addDataDependency(contentionQuery);
+			addDataDependency(utilQuery);
 		}
 
 		int maxParallel = 1;
@@ -182,9 +184,12 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service)
 				.average().using(repository);
+		addDataDependency(responseTimeQuery);
+
 		if (useObservedUtilization) {
 			throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
 					.forServices(cls_r).average().using(repository);
+			addDataDependency(throughputQuery);
 		} else {
 			/*
 			 * IMPORTANT: Query throughput for all services accessing resources in scope.
@@ -197,19 +202,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			}
 			throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
 					.forServices(allServicesInScope).average().using(repository);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
-		addDataDependency(responseTimeQuery);
-		addDataDependency(throughputQuery);
-		if (useObservedUtilization) {
-			addDataDependency(contentionQuery);
-			addDataDependency(utilQuery);
+			addDataDependency(throughputQuery);
 		}
 	}
 	

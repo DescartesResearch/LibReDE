@@ -49,17 +49,10 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 		
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
 		queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL).in(RequestCount.REQUESTS).forResource(resource).average().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
 		addDataDependency(responseTimeQuery);
 		addDataDependency(queueLengthQuery);
 	}
-
+	
 	@Override
 	public double getObservedOutput() {
 		return responseTimeQuery.get(historicInterval).getValue();

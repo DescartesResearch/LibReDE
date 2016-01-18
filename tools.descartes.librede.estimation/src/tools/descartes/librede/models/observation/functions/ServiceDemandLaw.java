@@ -125,23 +125,14 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		 * the amount of background work relative to the user services.
 		 */
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
+		addDataDependency(utilizationQuery);
 		if (multiClass) {
 			avgResidenceTimeQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
+			addDataDependency(avgResidenceTimeQuery);
 		}
 		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
-		addDataDependency(utilizationQuery);
 		addDataDependency(avgThroughputQuery);
-		if (multiClass) {
-			addDataDependency(avgResidenceTimeQuery);
-		}
 	}
 	
 	/* (non-Javadoc)

@@ -96,13 +96,6 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 		
 		busyTimeQuery = QueryBuilder.select(StandardMetrics.BUSY_TIME).in(Time.SECONDS).forResource(res_i).sum().using(repository);
 		sumDeparturesQuery = QueryBuilder.select(StandardMetrics.DEPARTURES).in(RequestCount.REQUESTS).forService(service).sum().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
 		addDataDependency(busyTimeQuery);
 		addDataDependency(sumDeparturesQuery);
 	}

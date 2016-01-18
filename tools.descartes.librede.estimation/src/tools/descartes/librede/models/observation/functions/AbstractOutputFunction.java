@@ -55,8 +55,6 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 		return stateModel;
 	}
 	
-	protected abstract void initDataDependencies();
-	
 	protected void addDataDependency(Query<?,?> query) {
 		dataDependencies.add(new DataDependency<>(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities())));
 	}

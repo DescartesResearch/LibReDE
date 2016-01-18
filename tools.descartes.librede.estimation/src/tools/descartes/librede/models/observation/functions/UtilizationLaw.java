@@ -115,13 +115,6 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getAccessingServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 		contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
 		addDataDependency(throughputQuery);
 		addDataDependency(utilizationQuery);
 		addDataDependency(contentionQuery);
