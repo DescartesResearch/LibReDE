@@ -27,12 +27,15 @@
 package tools.descartes.librede.bayesplusplus;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
-import static tools.descartes.librede.linalg.LinAlg.mean;
+import static tools.descartes.librede.linalg.LinAlg.nanmean;
 import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeMatrix;
+import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
+
+import com.sun.jna.Pointer;
+
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import tools.descartes.librede.bayesplusplus.backend.FCallback;
@@ -50,8 +53,6 @@ import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.IRepositoryCursor;
-
-import com.sun.jna.Pointer;
 
 @Component(displayName="Extended Kalman Filter")
 public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
@@ -326,7 +327,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 */
 	@Override
 	public Vector estimate() throws EstimationException {
-		return mean(estimates);
+		return nanmean(estimates);
 	}
 	
 	/*
