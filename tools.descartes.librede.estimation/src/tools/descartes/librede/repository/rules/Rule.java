@@ -26,15 +26,41 @@
  */
 package tools.descartes.librede.repository.rules;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.units.Dimension;
 
 public class Rule {
+	
+	public class Status {
+		private final boolean active;
+		private final List<DataDependency<?>.Status> dependenciesStatus;
+		
+		public Status(boolean active, List<DataDependency<?>.Status> dependenciesStatus) {
+			this.active = active;
+			this.dependenciesStatus = Collections.unmodifiableList(dependenciesStatus);
+		}
+		
+		public boolean isActive() {
+			return active;
+		}
+		
+		public List<DataDependency<?>.Status> getDependenciesStatus() {
+			return dependenciesStatus;
+		}
+	}
+	
+	private static final Logger log = Logger.getLogger(Rule.class);
 	
 	private IRuleActivationHandler handler;
 	private final List<DataDependency<?>> dependencies = new LinkedList<>();
@@ -46,6 +72,10 @@ public class Rule {
 
 	protected void addPrecondition(RulePrecondition precondition) {
 		preconditions.add(precondition);
+	}
+	
+	public void addDependencies(Collection<DataDependency<?>> newDependencies) {
+		dependencies.addAll(newDependencies);
 	}
 
 	public <B extends Dimension> void addDependency(Metric<B> metric, Aggregation aggregation) {
@@ -63,6 +93,25 @@ public class Rule {
 	public void setActivationHandler(IRuleActivationHandler handler) {
 		this.handler = handler;
 	}
+	
+	public void checkStatus(IMonitoringRepository repository, ModelEntity target) {
+		boolean active = true;
+		if (applies(target)) {
+			List<DataDependency<?>.Status> dependenciesStatus = new ArrayList<>(dependencies.size());
+			for (DataDependency<?> dep : getDependencies()) {
+				DataDependency<?>.Status depStatus = dep.checkStatus(repository, target);
+				active = active && depStatus.isResolved();
+				dependenciesStatus.add(depStatus);
+			}
+			
+			if (active) {
+				if (log.isDebugEnabled()) {
+					log.debug("Rule " + this + " for entity " + target + " is activated.");
+				}
+				handler.activateRule(repository, this, target);
+			}
+		}
+	}
 
 	public boolean applies(ModelEntity entity) {
 		for (RulePrecondition cond : preconditions) {
@@ -72,5 +121,4 @@ public class Rule {
 		}
 		return true;
 	}
-
 }

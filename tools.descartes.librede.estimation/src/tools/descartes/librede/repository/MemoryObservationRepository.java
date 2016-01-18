@@ -348,48 +348,21 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 		for (IMonitoringRepositoryListener curListener : listeners) {
 			curListener.entryAdded(metric, entity, aggregation);
-		}
+		}		
+		Set<ModelEntity> notificationSet = new HashSet<>();		
 		
-		Set<ModelEntity> notificationSet = new HashSet<>();
 		for (Rule r : rules.getDerivationRules(metric, aggregation)) {
 			// First we determine the entities that may be affected
 			// by the new entry (e.g., new data for a service, may also
 			// enable new derivations for external calls to this service)
 			for (DataDependency<?> dep : r.getDependencies()) {
 				notificationSet.addAll(dep.getScope().getNotificationSet(entity));
-			}			
-			
+			}
 			for (ModelEntity e : notificationSet) {
-				if (r.applies(e)) {
-					if (checkDependencies(r, e)) {
-						activateRule(r, e);
-					}
-				}
+				r.checkStatus(this, e);
 			}
 			notificationSet.clear();
 		}
-	}
-	
-	private <D extends Dimension> void activateRule(Rule rule, ModelEntity entity) {
-		if (log.isDebugEnabled()) {
-			log.debug("Rule " + rule + " for entity " + entity + " is activated.");
-		}
-		rule.getActivationHandler().activateRule(this, rule, entity);
-	}
-	
-	private boolean checkDependencies(Rule rule, ModelEntity entity) {
-		for (DataDependency<?> dep : rule.getDependencies()) {
-			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
-			for (ModelEntity e : scopeEntities) {				
-				if (!exists(dep.getMetric(), e, dep.getAggregation())) {
-					if (log.isDebugEnabled()) {
-						log.debug("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
-					}
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 	
 	private List<DataEntry<?>> getRequiredEntries(DerivationRule<?> rule, ModelEntity entity) {
@@ -571,14 +544,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		for (Rule rule : rules.getDefaultDerivationRules()) {
 			for (Resource resource : workload.getResources()) {
-				if (rule.applies(resource)) {
-					activateRule(rule, resource);
-				}
+				rule.checkStatus(this, resource);
 			}
 			for (Service service : workload.getServices()) {
-				if (rule.applies(service)) {
-					activateRule(rule, service);
-				}
+				rule.checkStatus(this, service);
 			}
 		}
 	}
