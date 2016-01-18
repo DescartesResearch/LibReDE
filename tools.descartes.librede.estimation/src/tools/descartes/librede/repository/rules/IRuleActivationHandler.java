@@ -31,8 +31,8 @@ import tools.descartes.librede.repository.IMonitoringRepository;
 
 public interface IRuleActivationHandler {
 	
-	void activateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity);
+	void activateRule(IMonitoringRepository repository, Rule.Status ruleStatus, ModelEntity target);
 	
-	void deactivateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity);
+	void deactivateRule(IMonitoringRepository repository, Rule.Status ruleStatus, ModelEntity target);
 
 }

@@ -157,12 +157,12 @@ public class DerivationRule<D extends Dimension> extends Rule implements Compara
 	}
 
 	@Override
-	public void activateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
+	public void activateRule(IMonitoringRepository repository, Rule.Status rule, ModelEntity entity) {
 		repository.insertDerivation(this, entity);		
 	}
 
 	@Override
-	public void deactivateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
+	public void deactivateRule(IMonitoringRepository repository, Rule.Status rule, ModelEntity entity) {
 		//TODO: implement someting for removal.		
 	}
 }

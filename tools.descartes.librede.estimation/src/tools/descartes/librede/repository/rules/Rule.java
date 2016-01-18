@@ -58,6 +58,10 @@ public class Rule {
 		public List<DataDependency<?>.Status> getDependenciesStatus() {
 			return dependenciesStatus;
 		}
+		
+		public Rule getRule() {
+			return Rule.this;
+		}
 	}
 	
 	private static final Logger log = Logger.getLogger(Rule.class);
@@ -104,11 +108,17 @@ public class Rule {
 				dependenciesStatus.add(depStatus);
 			}
 			
+			Rule.Status status = new Rule.Status(active, dependenciesStatus);
 			if (active) {
 				if (log.isDebugEnabled()) {
 					log.debug("Rule " + this + " for entity " + target + " is activated.");
 				}
-				handler.activateRule(repository, this, target);
+				handler.activateRule(repository, status, target);
+			} else {
+				if (log.isDebugEnabled()) {
+					log.debug("Rule " + this + " for entity " + target + " is deactivated.");
+				}
+				handler.deactivateRule(repository, status, target);
 			}
 		}
 	}
