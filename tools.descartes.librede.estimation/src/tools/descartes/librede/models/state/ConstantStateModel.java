@@ -328,7 +328,7 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
+	public List<DataDependency<?>> getDataDependencies() {
 		ArrayList<DataDependency<?>> deps = new ArrayList<>();
 		for (IStateConstraint constr : constraints) {
 			deps.addAll(constr.getDataDependencies());

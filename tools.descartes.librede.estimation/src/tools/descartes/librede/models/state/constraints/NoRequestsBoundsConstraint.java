@@ -122,8 +122,8 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
-		return Collections.singletonList(new DataDependency<>(throughputQuery.getMetric(), throughputQuery.getAggregation(), DependencyScope.fixedScope(throughputQuery.getEntities())));
+	public List<DataDependency<?>> getDataDependencies() {
+		return Collections.<DataDependency<?>>singletonList(new DataDependency<>(throughputQuery.getMetric(), throughputQuery.getAggregation(), DependencyScope.fixedScope(throughputQuery.getEntities())));
 	}
 
 }

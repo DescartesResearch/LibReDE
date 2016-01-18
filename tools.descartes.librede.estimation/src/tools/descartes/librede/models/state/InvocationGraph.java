@@ -189,11 +189,11 @@ public class InvocationGraph implements IDependencyTarget {
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
+	public List<DataDependency<?>> getDataDependencies() {
 		if (!externalCalls) {
 			return Collections.emptyList();
 		} else {
-			return Collections.singletonList(new DataDependency<>(visitCountQuery.getMetric(), visitCountQuery.getAggregation(), DependencyScope.fixedScope(visitCountQuery.getEntities())));
+			return Collections.<DataDependency<?>>singletonList(new DataDependency<>(visitCountQuery.getMetric(), visitCountQuery.getAggregation(), DependencyScope.fixedScope(visitCountQuery.getEntities())));
 		}
 	}
 

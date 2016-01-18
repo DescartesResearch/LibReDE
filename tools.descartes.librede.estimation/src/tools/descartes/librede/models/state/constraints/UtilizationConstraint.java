@@ -123,7 +123,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
+	public List<DataDependency<?>> getDataDependencies() {
 		return utilLaw.getDataDependencies();
 	}
 
