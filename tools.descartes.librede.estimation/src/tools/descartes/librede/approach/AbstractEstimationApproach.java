@@ -102,8 +102,14 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 		for (IStateModel<?> sm : stateModels) {
 			IObservationModel<?, ?> om = deriveObservationModel(sm, cursor);
 			IEstimationAlgorithm algo = getEstimationAlgorithm(algorithmFactory);
-			algo.initialize(sm, om, cursor, estimationWindow);
-			algorithms.add(algo);
+			if(algo==null){
+				log.error("Could not initialize apporach");
+				throw new InitializationException("Could not initialize approach" + Registry.INSTANCE.getDisplayName(getClass()));
+			}else{
+				algo.initialize(sm, om, cursor, estimationWindow);
+				algorithms.add(algo);
+			}
+			
 		}
 	}
 	
