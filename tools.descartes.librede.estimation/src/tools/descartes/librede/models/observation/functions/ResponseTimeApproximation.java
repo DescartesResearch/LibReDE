@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -109,16 +107,6 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		addDataDependency(individualResidenceTimesQuery);		
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(individualResidenceTimesQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
 	 */

@@ -29,8 +29,6 @@ package tools.descartes.librede.models.observation.functions;
 import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Scalar;
@@ -129,18 +127,6 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		addDataDependency(contentionQuery);
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(throughputQuery, messages);
-		result = result && checkQueryPrecondition(utilizationQuery, messages);
-		result = result && checkQueryPrecondition(contentionQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.ILinearOutputFunction#getIndependentVariables()
 	 */

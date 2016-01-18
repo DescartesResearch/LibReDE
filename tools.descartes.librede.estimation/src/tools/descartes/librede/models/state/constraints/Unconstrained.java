@@ -55,11 +55,6 @@ public final class Unconstrained implements IStateConstraint {
 	}
 
 	@Override
-	public boolean isApplicable(List<String> messages) {
-		return true;
-	}
-
-	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		// Do nothing		
 	}

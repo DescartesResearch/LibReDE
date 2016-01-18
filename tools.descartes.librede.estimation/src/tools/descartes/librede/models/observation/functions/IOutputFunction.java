@@ -26,14 +26,10 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.List;
-
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.repository.rules.IDependencyTarget;
 
 public interface IOutputFunction extends IDependencyTarget {
-	
-	boolean isApplicable(List<String> messages);
 	
 	boolean hasData();
 	

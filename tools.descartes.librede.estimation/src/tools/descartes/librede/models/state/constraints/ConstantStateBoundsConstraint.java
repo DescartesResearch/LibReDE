@@ -83,11 +83,6 @@ public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, ID
 	}
 
 	@Override
-	public boolean isApplicable(List<String> messages) {
-		return true;
-	}
-
-	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
 	}

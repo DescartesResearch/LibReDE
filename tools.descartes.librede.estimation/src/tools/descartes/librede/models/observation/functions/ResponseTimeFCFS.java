@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -60,14 +58,6 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 	protected void initDataDependencies() {
 		addDataDependency(responseTimeQuery);
 		addDataDependency(queueLengthQuery);
-	}
-
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(responseTimeQuery, messages);
-		result = result && checkQueryPrecondition(queueLengthQuery, messages);
-		return result;
 	}
 
 	@Override

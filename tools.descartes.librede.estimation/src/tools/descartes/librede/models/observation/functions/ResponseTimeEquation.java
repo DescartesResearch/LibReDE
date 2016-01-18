@@ -218,25 +218,6 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 	 * 
 	 * @see
 	 * tools.descartes.librede.models.observation.functions.IOutputFunction#
-	 * isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(responseTimeQuery, messages);
-		result = result && checkQueryPrecondition(throughputQuery, messages);
-		if (useObservedUtilization) {
-			result = result && checkQueryPrecondition(contentionQuery, messages);
-			result = result && checkQueryPrecondition(utilQuery, messages);
-		}
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.functions.IOutputFunction#
 	 * getObservedOutput()
 	 */
 	@Override

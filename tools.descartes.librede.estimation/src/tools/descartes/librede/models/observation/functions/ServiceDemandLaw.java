@@ -28,8 +28,6 @@ package tools.descartes.librede.models.observation.functions;
 
 import static tools.descartes.librede.linalg.LinAlg.nansum;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -146,20 +144,6 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(utilizationQuery, messages);
-		if (multiClass) {
-			result = result && checkQueryPrecondition(avgResidenceTimeQuery, messages);
-		}
-		result = result && checkQueryPrecondition(avgThroughputQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */
