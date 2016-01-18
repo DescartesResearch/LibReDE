@@ -42,12 +42,13 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.InvocationGraph;
-import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 @Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
@@ -58,6 +59,7 @@ public class ResponseTimeValidator implements IValidator {
 	private MatrixBuilder predictedRespTimes;
 	private MatrixBuilder observedRespTimes;
 	private ConstantStateModel<Unconstrained> stateModel;
+	private final List<DataDependency<?>> dependencies = new ArrayList<>();
 	
 	@Override
 	public void initialize(WorkloadDescription workload,
@@ -76,7 +78,9 @@ public class ResponseTimeValidator implements IValidator {
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
-			respEq.add(new ResponseTimeEquation(stateModel, cursor, srv, false));
+			ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false);
+			dependencies.addAll(rt.getDataDependencies());
+			respEq.add(rt);
 			this.services.add(srv);
 		}
 		allErrors = MatrixBuilder.create(stateModel.getUserServices().size());	
@@ -95,11 +99,9 @@ public class ResponseTimeValidator implements IValidator {
 		double[] actual = new double[respEq.size()];
 		int i = 0;
 		for (ResponseTimeEquation cur : respEq) {
-			if (cur.isApplicable(new ArrayList<String>())) {
-				real[i] = cur.getObservedOutput();
-				actual[i] = cur.getCalculatedOutput(state);
-				relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
-			}
+			real[i] = cur.getObservedOutput();
+			actual[i] = cur.getCalculatedOutput(state);
+			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
 			i++;				
 		}
 		allErrors.addRow(relErr);
@@ -131,5 +133,10 @@ public class ResponseTimeValidator implements IValidator {
 			return LinAlg.empty();
 		}
 		return LinAlg.mean(matrix);
+	}
+	
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		return dependencies;
 	}
 }
