@@ -62,11 +62,17 @@ public interface IEstimationAlgorithm {
 	 *            estimation algorithm. (estimationWindow >= 1)
 	 * @throws InitializationException
 	 */
-	void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel,
-			IRepositoryCursor cursor,
-			int estimationWindow)
-			throws InitializationException;
+	void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel, IRepositoryCursor cursor,
+			int estimationWindow) throws InitializationException;
+
+	/**
+	 * An algorithm is applicable if all data dependencies are resolved
+	 * successfully (i.e., the data is available), and all preconditions are
+	 * fulfilled.
+	 * 
+	 * @return a boolean indicating whether an algorithm is currently applicable
+	 */
+	boolean isApplicable();
 
 	/**
 	 * This method is called to update the internal state of the estimator after
@@ -98,12 +104,14 @@ public interface IEstimationAlgorithm {
 	void destroy();
 
 	/**
-	 * @return the state model associated with this instance of the estimation algorithm.
+	 * @return the state model associated with this instance of the estimation
+	 *         algorithm.
 	 */
 	IStateModel<?> getStateModel();
 
 	/**
-	 * @return the observation model associated with this instance of the estimation algorithm.
+	 * @return the observation model associated with this instance of the
+	 *         estimation algorithm.
 	 */
 	IObservationModel<?, ?> getObservationModel();
 

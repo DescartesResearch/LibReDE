@@ -34,6 +34,7 @@ import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.DataDependency;
 import tools.descartes.librede.repository.rules.IRuleActivationHandler;
 import tools.descartes.librede.repository.rules.Rule;
 
@@ -51,7 +52,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	private IObservationModel<?, ?> observationModel;
 	private IRepositoryCursor cursor;
 	private Rule activationRule = new Rule();
-	private boolean activated = false;
+	private boolean activated = true;
 	
 	@Override
 	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
@@ -80,7 +81,8 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 		cursor.getRepository().removeRule(activationRule);
 	}
 	
-	public boolean isActive() {
+	@Override
+	public boolean isApplicable() {
 		return activated;
 	}
 	
@@ -95,7 +97,27 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	@Override
 	public void deactivateRule(IMonitoringRepository repository, Rule.Status rule, ModelEntity entity) {
 		if (activated) {
-			log.info("Deactivated algorithm: " + stateModel);
+			StringBuilder message = new StringBuilder("Deactivated algorithm: ");
+			message.append(stateModel.toString()).append("\n");			
+			for (DataDependency<?>.Status depStatus : rule.getDependenciesStatus()) {
+				if (!depStatus.isResolved()) {
+					message.append("    Missing dependency: ");
+					message.append(depStatus.getDependency().getMetric().getName());
+					message.append("(").append(depStatus.getDependency().getAggregation()).append(")");
+					message.append(" for entities ");
+					boolean first = true;
+					for (ModelEntity missing : depStatus.getMissingEntities()) {
+						if (first) {
+							first = false;
+						} else {
+							message.append(", ");
+						}
+						message.append(missing.getName());
+					}
+					message.append("\n");
+				}
+			}
+			log.info(message);
 			activated = false;
 		}
 	}
