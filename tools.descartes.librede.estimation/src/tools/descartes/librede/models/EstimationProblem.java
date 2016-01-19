@@ -24,48 +24,35 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.algorithm;
+package tools.descartes.librede.models;
 
-import org.apache.log4j.Logger;
-
-import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.Rule;
 
 /**
- * This abstract class provides standard implementations for some of the methods in {@link IEstimationAlgorithm}.
- * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm {
+public class EstimationProblem extends Rule {
+
+	private final IStateModel<?> stateModel;
+	private final IObservationModel<?, ?> observationModel;
 	
-	protected final Logger log = Logger.getLogger(getClass());
-	
-	private IStateModel<?> stateModel;
-	private IObservationModel<?, ?> observationModel;
-	private IRepositoryCursor cursor;
-	
-	@Override
-	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
-			IRepositoryCursor cursor, int estimationWindow) throws InitializationException {
+	public EstimationProblem(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel) {
 		this.stateModel = stateModel;
 		this.observationModel = observationModel;
-		this.cursor = cursor;
+		
+		addDependencies(stateModel.getDataDependencies());
+		addDependencies(observationModel.getDataDependencies());
 	}
-
-	@Override
+	
 	public IStateModel<?> getStateModel() {
 		return stateModel;
 	}
 
-	@Override
 	public IObservationModel<?, ?> getObservationModel() {
 		return observationModel;
 	}
 
-	@Override
-	public void destroy() {
-	}	
 }

@@ -66,15 +66,6 @@ public interface IEstimationAlgorithm {
 			int estimationWindow) throws InitializationException;
 
 	/**
-	 * An algorithm is applicable if all data dependencies are resolved
-	 * successfully (i.e., the data is available), and all preconditions are
-	 * fulfilled.
-	 * 
-	 * @return a boolean indicating whether an algorithm is currently applicable
-	 */
-	boolean isApplicable();
-
-	/**
 	 * This method is called to update the internal state of the estimator after
 	 * new measurement data points are available.
 	 * 
