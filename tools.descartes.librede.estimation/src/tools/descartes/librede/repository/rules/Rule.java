@@ -110,14 +110,8 @@ public class Rule {
 			
 			Rule.Status status = new Rule.Status(active, dependenciesStatus);
 			if (active) {
-				if (log.isDebugEnabled()) {
-					log.debug("Rule " + this + " for entity " + target + " is activated.");
-				}
 				handler.activateRule(repository, status, target);
 			} else {
-				if (log.isDebugEnabled()) {
-					log.debug("Rule " + this + " for entity " + target + " is deactivated.");
-				}
 				handler.deactivateRule(repository, status, target);
 			}
 		}
