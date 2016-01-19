@@ -46,7 +46,7 @@ import tools.descartes.librede.repository.rules.Rule;
  */
 public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler {
 	
-	private static final Logger log = Logger.getLogger(AbstractEstimationAlgorithm.class);
+	protected final Logger log = Logger.getLogger(getClass());
 	
 	private IStateModel<?> stateModel;
 	private IObservationModel<?, ?> observationModel;
@@ -98,13 +98,14 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	public void deactivateRule(IMonitoringRepository repository, Rule.Status rule, ModelEntity entity) {
 		if (activated) {
 			StringBuilder message = new StringBuilder("Deactivated algorithm: ");
-			message.append(stateModel.toString()).append("\n");			
+			message.append(stateModel.toString());
+			message.append("\n    Reasons:");
 			for (DataDependency<?>.Status depStatus : rule.getDependenciesStatus()) {
 				if (!depStatus.isResolved()) {
-					message.append("    Missing dependency: ");
+					message.append("\n    - Observation data of metric ");
 					message.append(depStatus.getDependency().getMetric().getName());
 					message.append("(").append(depStatus.getDependency().getAggregation()).append(")");
-					message.append(" for entities ");
+					message.append(" is missing for entities ");
 					boolean first = true;
 					for (ModelEntity missing : depStatus.getMissingEntities()) {
 						if (first) {
@@ -114,7 +115,6 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 						}
 						message.append(missing.getName());
 					}
-					message.append("\n");
 				}
 			}
 			log.info(message);
