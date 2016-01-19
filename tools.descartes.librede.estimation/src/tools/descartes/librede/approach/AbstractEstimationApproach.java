@@ -67,7 +67,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 			if (!algorithmInstances.containsKey(problem)) {
 				IEstimationAlgorithm algorithm = getEstimationAlgorithm(algorithmFactory);
 				try {
-					algorithm.initialize(problem.getStateModel(), problem.getObservationModel(), cursor, estimationWindow);
+					algorithm.initialize(problem, cursor, estimationWindow);
 					algorithmInstances.put(problem, algorithm);
 					log.info("Initialized estimation problem: " + problem.getStateModel());
 				} catch (InitializationException e) {

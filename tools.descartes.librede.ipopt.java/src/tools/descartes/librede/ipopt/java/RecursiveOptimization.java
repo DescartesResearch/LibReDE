@@ -55,13 +55,12 @@ import tools.descartes.librede.ipopt.java.backend.Eval_Jac_G_CB;
 import tools.descartes.librede.ipopt.java.backend.IpoptLibrary;
 import tools.descartes.librede.ipopt.java.backend.IpoptOptionKeyword;
 import tools.descartes.librede.ipopt.java.backend.IpoptOptionValue;
-import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -272,20 +271,17 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.MAX_ITER.toNativeString(), 300);
 	}
 	
-	
-	
 	/* (non-Javadoc)
-	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, tools.descartes.librede.repository.IRepositoryCursor, int)
+	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.EstimationProblem, tools.descartes.librede.repository.IRepositoryCursor, int)
 	 */
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, 
+	public void initialize(EstimationProblem problem, 
 			IRepositoryCursor cursor,
 			int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, cursor, estimationWindow);
-		initStateConstraints(stateModel.getConstraints());
+		super.initialize(problem, cursor, estimationWindow);
+		initStateConstraints(problem.getStateModel().getConstraints());
 		
-		this.stateSize = stateModel.getStateSize(); // number of variables
+		this.stateSize = problem.getStateModel().getStateSize(); // number of variables
 		this.constraintCount = nonlinearConstraints.size() + linearConstraints.size(); // number of constraints g(x)
 		
 		allocateNativeMemory();

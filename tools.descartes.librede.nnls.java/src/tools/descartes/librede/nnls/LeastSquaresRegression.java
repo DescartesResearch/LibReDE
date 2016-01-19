@@ -30,25 +30,26 @@ import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+
+import com.sun.jna.Memory;
+import com.sun.jna.ptr.DoubleByReference;
+import com.sun.jna.ptr.IntByReference;
+
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.linalg.Algebra;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import cern.colt.matrix.DoubleFactory2D;
-import cern.colt.matrix.DoubleMatrix2D;
-import cern.colt.matrix.linalg.Algebra;
-
-import com.sun.jna.Memory;
-import com.sun.jna.ptr.DoubleByReference;
-import com.sun.jna.ptr.IntByReference;
 
 /**
  * This class implements Least-Squares (NNLS) algorithm.
@@ -73,13 +74,12 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 
 
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?,?> observationModel, 
+	public void initialize(EstimationProblem problem, 
 			IRepositoryCursor cursor,
 			int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, cursor, estimationWindow);
+		super.initialize(problem, cursor, estimationWindow);
 		
-		independentVariables = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
+		independentVariables = matrix(estimationWindow, problem.getStateModel().getStateSize(), Double.NaN);
 		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);
 		numObservations = 0;
 	}

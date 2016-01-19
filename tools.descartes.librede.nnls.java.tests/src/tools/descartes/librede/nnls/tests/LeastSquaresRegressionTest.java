@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.ScalarObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
@@ -71,7 +72,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0)));
 
 		LeastSquaresRegression optim = new LeastSquaresRegression();
-		optim.initialize(stateModel, observationModel, cursor, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -111,7 +112,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(generator.getStateModel(), cursor, workload.getResources().get(0)));
 		
 		LeastSquaresRegression optim = new LeastSquaresRegression();
-		optim.initialize(stateModel, observationModel, cursor, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 

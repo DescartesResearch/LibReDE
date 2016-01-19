@@ -36,20 +36,18 @@ import tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
-import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.UnitsFactory;
 
 public class ZhangKalmanFilterTest extends LibredeTest {
 	
@@ -88,7 +86,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		observationModel.addOutputFunction(new UtilizationLaw(stateModel, generator.getCursor(), workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
-		filter.initialize(stateModel, observationModel, generator.getCursor(), 1);
+		filter.initialize(new EstimationProblem(stateModel, observationModel), generator.getCursor(), 1);
 		
 		long start = System.nanoTime();	
 		
@@ -132,7 +130,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		observationModel.addOutputFunction(new UtilizationLaw(stateModel, generator.getCursor(), workload.getResources().get(0)));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
-		filter.initialize(stateModel, observationModel, generator.getCursor(), 1);
+		filter.initialize(new EstimationProblem(stateModel, observationModel), generator.getCursor(), 1);
 		
 		long start = System.nanoTime();	
 		

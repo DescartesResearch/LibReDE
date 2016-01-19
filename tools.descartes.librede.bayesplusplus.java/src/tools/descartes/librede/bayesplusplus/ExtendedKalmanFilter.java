@@ -46,9 +46,8 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
-import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
@@ -275,14 +274,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, tools.descartes.librede.repository.IRepositoryCursor, int)
 	 */
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, 
+	public void initialize(EstimationProblem problem, 
 			IRepositoryCursor cursor,
 			int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, cursor, estimationWindow);
+		super.initialize(problem, cursor, estimationWindow);
 		
-		this.stateSize = stateModel.getStateSize();
-		this.outputSize = observationModel.getOutputSize();
+		this.stateSize = problem.getStateModel().getStateSize();
+		this.outputSize = problem.getObservationModel().getOutputSize();
 		
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
 		this.stateCovarianceBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);

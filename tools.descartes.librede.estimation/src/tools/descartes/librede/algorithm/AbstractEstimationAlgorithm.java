@@ -29,6 +29,7 @@ package tools.descartes.librede.algorithm;
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -48,10 +49,10 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	private IRepositoryCursor cursor;
 	
 	@Override
-	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
+	public void initialize(EstimationProblem problem,
 			IRepositoryCursor cursor, int estimationWindow) throws InitializationException {
-		this.stateModel = stateModel;
-		this.observationModel = observationModel;
+		this.stateModel = problem.getStateModel();
+		this.observationModel = problem.getObservationModel();
 		this.cursor = cursor;
 	}
 

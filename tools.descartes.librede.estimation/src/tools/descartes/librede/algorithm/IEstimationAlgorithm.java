@@ -29,6 +29,7 @@ package tools.descartes.librede.algorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -49,10 +50,8 @@ public interface IEstimationAlgorithm {
 	 * This function needs to be called before any other method in this
 	 * interface.
 	 * 
-	 * @param stateModel
-	 *            an instance of IStateModel
-	 * @param observationModel
-	 *            an instance of IObservationModel
+	 * @param problem
+	 *            an instance of EstimationProblem
 	 * @param cursor
 	 *            an instance of IRepositoryCursor
 	 * @param estimationWindow
@@ -62,7 +61,7 @@ public interface IEstimationAlgorithm {
 	 *            estimation algorithm. (estimationWindow >= 1)
 	 * @throws InitializationException
 	 */
-	void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel, IRepositoryCursor cursor,
+	void initialize(EstimationProblem problem, IRepositoryCursor cursor,
 			int estimationWindow) throws InitializationException;
 
 	/**
