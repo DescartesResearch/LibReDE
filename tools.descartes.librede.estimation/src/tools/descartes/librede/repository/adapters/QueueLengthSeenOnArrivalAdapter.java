@@ -29,13 +29,17 @@ package tools.descartes.librede.repository.adapters;
 import java.util.Arrays;
 import java.util.List;
 
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
+import tools.descartes.librede.repository.handlers.DeriveQueueLengthHandler;
 import tools.descartes.librede.repository.handlers.ThroughputWeightedAggregationHandler;
 import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestCount;
 
 public class QueueLengthSeenOnArrivalAdapter implements IMetricAdapter<RequestCount> {	
@@ -62,7 +66,30 @@ public class QueueLengthSeenOnArrivalAdapter implements IMetricAdapter<RequestCo
 					.requiring(Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.priority(0)
-					.build(new ThroughputWeightedAggregationHandler<RequestCount>())
+					.build(new ThroughputWeightedAggregationHandler<RequestCount>()),
+				DerivationRule.rule(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL, Aggregation.AVERAGE)
+					.requiring(StandardMetrics.UTILIZATION, Aggregation.AVERAGE)
+					.check(new RulePrecondition() {						
+						@Override
+						public boolean check(ModelEntity entity) {
+							if (!(entity instanceof Resource)) {
+								return false;
+							}
+							Resource res = (Resource)entity;
+							switch (res.getSchedulingStrategy()) {
+							case PS:
+							case UNKOWN:
+							case IS:
+								return true;
+							case FCFS:
+								// The derivation is only valid for single-class queues
+								return (res.getAccessingServices().size() == 1);
+							}
+							return false;
+						}
+					})
+					.priority(-10)
+					.build(new DeriveQueueLengthHandler())
 				);
 	}
 
