@@ -47,6 +47,7 @@ import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
@@ -86,14 +87,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 
 		@Override
 		public Pointer execute(Pointer x) {
-			Vector currentState = nativeVector(stateSize, x);
+			State currentState = new State(getStateModel(), nativeVector(stateSize, x), 1);
 
-			Vector nextState = getStateModel().step(currentState);
-			Matrix jacobi = JacobiMatrixBuilder.calculateOfState(getStateModel(), currentState);
-			toNative(jacobiBuffer, jacobi);
+			State nextState = getStateModel().step(currentState);
+			toNative(jacobiBuffer, nextState.getStateJacobiMatrix());
 			BayesPlusPlusLibrary.set_Fx(nativeStateModel, jacobiBuffer, stateSize);
 
-			toNative(stateBuffer, nextState);
+			toNative(stateBuffer, nextState.getVector());
 			return stateBuffer;
 		}
 	}

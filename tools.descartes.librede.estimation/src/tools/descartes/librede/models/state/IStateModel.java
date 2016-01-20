@@ -33,7 +33,7 @@ import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.rules.IDependencyTarget;
 
@@ -61,9 +61,7 @@ public interface IStateModel<C extends IStateConstraint> extends IDependencyTarg
 	
 	List<C> getConstraints();
 	
-	Vector step(Vector currentState);
-	
-	List<IDifferentiableFunction> getStateDerivatives();
+	State step(State currentState);
 	
 	Vector getInitialState();
 	

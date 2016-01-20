@@ -96,7 +96,7 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 	@Override
 	public void update() throws EstimationException {
 
-		getStateModel().step(empty());
+		getStateModel().step(null);
 		
 		final Vector output = getObservationModel().getObservedOutput();
 

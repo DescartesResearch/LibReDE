@@ -30,14 +30,12 @@ import static tools.descartes.librede.linalg.LinAlg.horzcat;
 import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vertcat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
 public final class JacobiMatrixBuilder {
@@ -65,16 +63,6 @@ public final class JacobiMatrixBuilder {
 			} else {
 				throw new IllegalStateException("Constraint function cannot be derived.");
 			}
-		}		
-		
-		return vertcat(dev);		
-	}
-	
-	public static Matrix calculateOfState(IStateModel<?> stateModel, Vector x) {
-		List<IDifferentiableFunction> functions = stateModel.getStateDerivatives();
-		Vector[] dev = new Vector[functions.size()];		
-		for (int i = 0; i < dev.length; i++) {
-			dev[i] = functions.get(i).getFirstDerivatives(x);
 		}		
 		
 		return vertcat(dev);		

@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede.nnls;
 
-import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
@@ -66,6 +65,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	private Matrix independentVariables;
 	private Vector dependentVariables;
 	private int numObservations;
+	private int outputSize;
 
 	private final int SIZE_OF_DOUBLE = 8;
 	private final int SIZE_OF_INT = 8;
@@ -79,8 +79,10 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 			int estimationWindow) throws InitializationException {
 		super.initialize(problem, cursor, estimationWindow);
 		
-		independentVariables = matrix(estimationWindow, problem.getStateModel().getStateSize(), Double.NaN);
-		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);
+		outputSize = problem.getObservationModel().getOutputSize();
+		
+		independentVariables = matrix(estimationWindow * outputSize, problem.getStateModel().getStateSize(), Double.NaN);
+		dependentVariables = (Vector)matrix(estimationWindow * outputSize, 1, Double.NaN);
 		numObservations = 0;
 	}
 
@@ -170,14 +172,13 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	
 	@Override
 	public void update() throws EstimationException {
-		getStateModel().step(empty());
+		getStateModel().step(null);
 		
-		outputFunction = getCastedObservationModel().getOutputFunction(0);
-		
-		numObservations++;
-		
-		dependentVariables = dependentVariables.circshift(1).set(0, outputFunction.getObservedOutput());
-		independentVariables = independentVariables.circshift(1).setRow(0, outputFunction.getIndependentVariables());
+		for (ILinearOutputFunction function : getCastedObservationModel()) {
+			dependentVariables = dependentVariables.circshift(1).set(0, function.getObservedOutput());
+			independentVariables = independentVariables.circshift(1).setRow(0, function.getIndependentVariables());
+		}		
+		numObservations++;		
 	}
 
 	@Override
@@ -186,7 +187,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 		if (numObservations < MIN_SIZE_OF_ESTIMATION) {
 			return LinAlg.zeros(getStateModel().getStateSize());
 		} else if (numObservations < dependentVariables.rows()) {
-			return nnls(independentVariables.rows(range(0, numObservations)), dependentVariables.rows(range(0, numObservations)));
+			return nnls(independentVariables.rows(range(0, numObservations * outputSize)), dependentVariables.rows(range(0, numObservations * outputSize)));
 		} else {
 			return nnls(independentVariables, dependentVariables);
 		}

@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede.ipopt.java;
 
-import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.nanmean;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
@@ -316,7 +315,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		}
 		
 		if (initialized) {
-			getStateModel().step(empty());
+			getStateModel().step(null);
 			
 			Vector estimate = solve();
 			

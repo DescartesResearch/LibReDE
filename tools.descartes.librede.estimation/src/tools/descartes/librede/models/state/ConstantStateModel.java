@@ -43,10 +43,9 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Indices;
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.models.state.initial.IStateInitializer;
@@ -93,28 +92,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 	}
 	
-	private class ConstantFunction implements IDifferentiableFunction {
-		
-		private final Vector firstDev;
-		private final Vector secondDev;
-		
-		public ConstantFunction(int stateSize, int varIdx) {
-			firstDev = zeros(stateSize).set(varIdx, 1.0);
-			secondDev = zeros(stateSize);
-		}
-
-		@Override
-		public Vector getFirstDerivatives(Vector x) {
-			return firstDev;
-		}
-
-		@Override
-		public Matrix getSecondDerivatives(Vector x) {
-			return secondDev;
-		}
-		
-	}
-	
 	private final int stateSize;
 	private final List<Service> userServices;
 	private final List<Service> backgroundServices;
@@ -127,7 +104,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	private final List<Indices> resStateVarIndices;
 	private final List<C> constraints;
 	private final IStateInitializer stateInitializer;
-	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
 	private final InvocationGraph invocationGraph;
 	
 	private ConstantStateModel(List<ResourceDemand> variables, List<C> constraints, IStateInitializer stateInitializer, InvocationGraph graph) {
@@ -197,10 +173,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			throw new IllegalArgumentException("State initializer must not be null.");
 		}
 		this.stateInitializer = stateInitializer;
-	
-		for (int a = 0; a < stateSize; a++) {
-			derivatives.add(new ConstantFunction(stateSize, a));
-		}
 	}
 	
 	public static Builder<Unconstrained> unconstrainedModelBuilder() {
@@ -217,11 +189,10 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public Vector step(Vector state) {
+	public State step(State state) {
 		if (invocationGraph != null) {
 			invocationGraph.step();
-		}
-		
+		}		
 		return state;
 	}
 	
@@ -261,11 +232,6 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	@Override
 	public List<C> getConstraints() {
 		return Collections.unmodifiableList(constraints);
-	}
-
-	@Override
-	public List<IDifferentiableFunction> getStateDerivatives() {
-		return derivatives;
 	}
 	
 	@Override
@@ -338,5 +304,4 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 		return Collections.unmodifiableList(deps);
 	}
-
 }
