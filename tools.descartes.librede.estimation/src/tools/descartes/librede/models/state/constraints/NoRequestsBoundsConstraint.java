@@ -30,11 +30,9 @@ import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
@@ -51,7 +49,7 @@ import tools.descartes.librede.units.RequestRate;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDifferentiableFunction {
+public class NoRequestsBoundsConstraint implements IStateBoundsConstraint {
 	
 	private Query<Scalar, RequestRate> throughputQuery;	
 	private final double lowerBound;	
@@ -87,16 +85,6 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
-	}
-
-	@Override
-	public Vector getFirstDerivatives(Vector x) {
-		return null;
-	}
-
-	@Override
-	public Matrix getSecondDerivatives(Vector x) {
-		return null;
 	}
 
 	@Override

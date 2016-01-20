@@ -30,13 +30,11 @@ import java.util.Collections;
 import java.util.List;
 
 import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.rules.DataDependency;
 
-public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, IDifferentiableFunction {
+public class ConstantStateBoundsConstraint implements IStateBoundsConstraint {
 
 	// the state variable to which the bounds apply to
 	private final ResourceDemand variable;
@@ -70,16 +68,6 @@ public class ConstantStateBoundsConstraint implements IStateBoundsConstraint, ID
 	@Override
 	public double getUpperBound() {
 		return upper;
-	}
-
-	@Override
-	public Vector getFirstDerivatives(Vector x) {		
-		return null;
-	}
-
-	@Override
-	public Matrix getSecondDerivatives(Vector x) {
-		return null;
 	}
 
 	@Override

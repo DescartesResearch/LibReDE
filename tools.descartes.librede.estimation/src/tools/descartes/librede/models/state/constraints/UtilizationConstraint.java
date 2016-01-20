@@ -34,15 +34,13 @@ import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
 
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.rules.DataDependency;
 
-public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction, MultivariateDifferentiableFunction {
+public class UtilizationConstraint implements ILinearStateConstraint, MultivariateDifferentiableFunction {
 
 	private final Resource res_i;
 	
@@ -80,16 +78,6 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 		return utilLaw.getCalculatedOutput(state);
 	}
 
-	@Override
-	public Vector getFirstDerivatives(Vector x) {
-		return utilLaw.getFirstDerivatives(x);
-	}
-
-	@Override
-	public Matrix getSecondDerivatives(Vector x) {
-		return utilLaw.getSecondDerivatives(x);
-	}
-	
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.utilLaw = new UtilizationLaw(model, cursor, res_i, historicInterval);
