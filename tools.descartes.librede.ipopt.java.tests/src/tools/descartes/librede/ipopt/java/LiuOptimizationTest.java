@@ -39,6 +39,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
@@ -127,7 +128,7 @@ public class LiuOptimizationTest extends LibredeTest {
 //		generator.setDemands(demands);
 		generator.setRandomDemands();
 		generator.setUpperUtilizationBound(0.9);
-		Vector demands = generator.getDemands();
+		State demands = generator.getDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 5);
@@ -177,7 +178,7 @@ public class LiuOptimizationTest extends LibredeTest {
 
 			Vector estimates = optim.estimate();
 			
-			assertThat(estimates).isEqualTo(demands, offset(0.001));
+			assertThat(estimates).isEqualTo(demands.getVector(), offset(0.001));
 			
 //			System.out.println(i + ": " + estimates);
 		}

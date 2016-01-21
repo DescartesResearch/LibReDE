@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
 import org.apache.log4j.Logger;
 
 import com.sun.jna.Pointer;
@@ -57,12 +56,14 @@ import tools.descartes.librede.ipopt.java.backend.IpoptOptionValue;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.variables.OutputVariable;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
@@ -131,6 +132,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private Pointer x; /* double[stateSize] : initial and solution vector */
 	private DoubleByReference objRef; /* current objective value of optimization */
 
+	private State currentState;
+	
 	// Caches the difference between observed and calculated response time
 	protected DerivativeStructure obj;
 	
@@ -328,7 +331,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 		return nanmean(estimationBuffer);
 	}
 	
-	private DerivativeStructure calcObjectiveFunction(DerivativeStructure[] state) {
+	private DerivativeStructure calcObjectiveFunction(State state) {
 		IObservationModel<?, ?> observationModel = getObservationModel();
 		int outputSize = observationModel.getOutputSize();
 		Vector outputWeights = observationModel.getOutputWeightsFunction().getOutputWheights();
@@ -339,45 +342,39 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 			IOutputFunction func = observationModel.getOutputFunction(i);
 			if (func.hasData()) {
 				double o_real = func.getObservedOutput();
-				if (func instanceof MultivariateDifferentiableFunction) {
-					DerivativeStructure o_calc = ((MultivariateDifferentiableFunction)func).value(state);
-					if (Double.isNaN(o_calc.getValue()) || Double.isNaN(o_real)){
-						System.out.println("Blub");
-					}
-					if (o_real > 0) {
-	 					DerivativeStructure summand = o_calc.subtract(o_real).divide(o_real).pow(2);
-						obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
-					} else {
-						DerivativeStructure summand = o_calc.pow(2);
-						obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
-					}
+				OutputVariable o_calc = func.getCalculatedOutput(state);
+				if (Double.isNaN(o_calc.getValue()) || Double.isNaN(o_real)){
+					System.out.println("Blub");
+				}
+				if (o_real > 0) {
+ 					DerivativeStructure summand = o_calc.getDerivativeStructure().subtract(o_real).divide(o_real).pow(2);
+					obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
+				} else {
+					DerivativeStructure summand = o_calc.getDerivativeStructure().pow(2);
+					obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
 				}
 			}
 		}
 		if (obj == null) {
 			log.warn("No input data available for estimation.");
-			obj = new DerivativeStructure(state.length, state[0].getOrder());
+			obj = new DerivativeStructure(state.getStateSize(), state.getDerivationOrder());
 		}
 		return obj;
 	}
 
 	public void updateObjectiveFunction(Vector x) {
-		DerivativeStructure[] state = DifferentiationUtils.createDerivativeStructures(x, 2);
+		currentState = new State(getStateModel(), x, 2);
 	
-		obj = calcObjectiveFunction(state);
+		obj = calcObjectiveFunction(currentState);
 		
 		int i = 0;
 		for (; i < linearConstraints.size(); i++) {
 			ILinearStateConstraint c = linearConstraints.get(i);
-			if (c instanceof MultivariateDifferentiableFunction) {
-				constraintValues[i] = ((MultivariateDifferentiableFunction)c).value(state);
-			}
+			constraintValues[i] = c.getValue(currentState).getDerivativeStructure();
 		}
 		for (int j = 0; j < nonlinearConstraints.size(); j++, i++) {
 			IStateConstraint c = linearConstraints.get(j);
-			if (c instanceof MultivariateDifferentiableFunction) {
-				constraintValues[i] = ((MultivariateDifferentiableFunction)c).value(state);
-			}
+			constraintValues[i] = c.getValue(currentState).getDerivativeStructure();
 		}
 	}
 
@@ -430,21 +427,13 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private class G implements Eval_G_CB {
 		@Override
 		public boolean eval_g(int n, Pointer x, boolean new_x, int m, Pointer g, Pointer user_data) {
-			Vector current = nativeVector(stateSize, x);
 			if (new_x) {
-				updateObjectiveFunction(current);
+				updateObjectiveFunction(nativeVector(stateSize, x));
 			}
 			
-			int i = 0;
-			for (ILinearStateConstraint c : linearConstraints) {
-				g.setDouble(i, c.getValue(current));
-				i++;
+			for (int i = 0; i < constraintValues.length; i++) {
+				g.setDouble(i, constraintValues[i].getValue());
 			}
-			for (IStateConstraint c : nonlinearConstraints) {
-				g.setDouble(i, c.getValue(current));
-				i++;
-			}
-			
 			return true;
 		}
 	}

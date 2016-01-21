@@ -39,6 +39,7 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
@@ -125,7 +126,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		//generator.setDemands(demands);
 		generator.setRandomDemands();
 		generator.setUpperUtilizationBound(0.9);
-		Vector demands = generator.getDemands();
+		State demands = generator.getDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
 		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 1);
