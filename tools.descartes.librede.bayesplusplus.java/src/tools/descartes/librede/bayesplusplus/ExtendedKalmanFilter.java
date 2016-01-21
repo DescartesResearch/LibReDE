@@ -67,7 +67,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		public Pointer execute(Pointer x) {
 			Vector currentState = nativeVector(stateSize, x);
 
-			Vector nextObservation = getObservationModel().getCalculatedOutput(currentState);
+			Vector nextObservation = getObservationModel().getCalculatedOutput(new State(getStateModel(), currentState, 1));
 
 			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(getObservationModel(), currentState);
 			toNative(jacobiBuffer, jacobi);

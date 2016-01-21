@@ -35,6 +35,7 @@ import java.util.List;
 
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.repository.rules.DataDependency;
 
@@ -83,10 +84,10 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
-	public Vector getCalculatedOutput(Vector state) {
+	public Vector getCalculatedOutput(State state) {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = outputFunctions.get(i).getCalculatedOutput(state);
+			temp[i] = outputFunctions.get(i).getCalculatedOutput(state.getVector());
 		}
 		return vector(temp);
 	}
@@ -114,5 +115,4 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 		}
 		return Collections.unmodifiableList(deps);
 	}
-
 }

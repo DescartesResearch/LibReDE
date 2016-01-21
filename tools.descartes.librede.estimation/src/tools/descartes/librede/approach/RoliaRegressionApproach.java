@@ -36,7 +36,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.ScalarObservationModel;
+import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
@@ -69,8 +69,10 @@ public class RoliaRegressionApproach extends AbstractEstimationApproach {
 	@Override
 	protected IObservationModel<?, ?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		UtilizationLaw func = new UtilizationLaw(stateModel, cursor, stateModel.getResources().toArray(new Resource[1])[0]);	
-		return new ScalarObservationModel<ILinearOutputFunction>(func);
+		UtilizationLaw func = new UtilizationLaw(stateModel, cursor, stateModel.getResources().toArray(new Resource[1])[0]);
+		VectorObservationModel<ILinearOutputFunction> om = new VectorObservationModel<>();
+		om.addOutputFunction(func);
+		return om;
 	}
 
 	@Override
