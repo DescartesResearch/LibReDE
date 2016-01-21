@@ -87,7 +87,7 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	public Vector getCalculatedOutput(State state) {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = outputFunctions.get(i).getCalculatedOutput(state.getVector());
+			temp[i] = outputFunctions.get(i).getCalculatedOutput(state).getValue();
 		}
 		return vector(temp);
 	}

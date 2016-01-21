@@ -52,6 +52,7 @@ Export-Package: tools.descartes.librede;uses:="tools.descartes.librede.repositor
    tools.descartes.librede.linalg,
    tools.descartes.librede.models.state",
  tools.descartes.librede.models.state.initial;uses:="tools.descartes.librede.repository,tools.descartes.librede.linalg,tools.descartes.librede.models.state",
+ tools.descartes.librede.models.variables,
  tools.descartes.librede.registry;
   uses:="tools.descartes.librede.repository,
    tools.descartes.librede.units,

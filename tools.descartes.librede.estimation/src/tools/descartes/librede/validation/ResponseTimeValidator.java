@@ -40,6 +40,7 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
@@ -94,13 +95,14 @@ public class ResponseTimeValidator implements IValidator {
 	}
 	
 	public void predict(Vector state) {
+		State x = new State(stateModel, state);
 		double[] relErr = new double[respEq.size()];
 		double[] real = new double[respEq.size()];
 		double[] actual = new double[respEq.size()];
 		int i = 0;
 		for (ResponseTimeEquation cur : respEq) {
 			real[i] = cur.getObservedOutput();
-			actual[i] = cur.getCalculatedOutput(state);
+			actual[i] = cur.getCalculatedOutput(x).getValue();
 			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
 			i++;				
 		}

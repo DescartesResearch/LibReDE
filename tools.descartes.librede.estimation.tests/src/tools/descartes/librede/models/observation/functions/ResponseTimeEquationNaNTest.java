@@ -47,6 +47,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
@@ -66,7 +67,7 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 	private IRepositoryCursor cursor;
 	private Service service1;
 	private Service service2;
-	private Vector state;
+	private State state;
 	private boolean useObservedUtilization;
 	private int numServers;
 	
@@ -108,8 +109,8 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 	@Test
 	public void testGetCalculatedOutput() {
 		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service1).average().using(cursor);
-		assertThat(law1.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
-		assertThat(law2.getCalculatedOutput(state)).isZero();
+		assertThat(law1.getCalculatedOutput(state).getValue()).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law2.getCalculatedOutput(state).getValue()).isZero();
 	}
 
 	@Test
@@ -117,7 +118,7 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 		Vector diff1 = Differentiation.diff1(law1, state);
 		Matrix diff2 = Differentiation.diff2(law1, state);
 		
-		DerivativeStructure s = law1.value(DifferentiationUtils.createDerivativeStructures(state, 2));
+		DerivativeStructure s = law1.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}

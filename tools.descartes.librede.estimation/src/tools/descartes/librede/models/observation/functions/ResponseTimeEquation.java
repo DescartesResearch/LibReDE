@@ -26,9 +26,6 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import static tools.descartes.librede.linalg.LinAlg.matrix;
-import static tools.descartes.librede.linalg.LinAlg.vector;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,21 +35,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.variables.OutputVariable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -78,8 +72,7 @@ import tools.descartes.librede.units.Time;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  * @version 1.0
  */
-public class ResponseTimeEquation extends AbstractOutputFunction
-		implements IDifferentiableFunction, MultivariateDifferentiableFunction {
+public class ResponseTimeEquation extends AbstractOutputFunction {
 
 	private final ErlangCEquation[] erlangC;
 
@@ -219,93 +212,93 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 		return (rt != rt) ? 0.0 : rt;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.functions.IOutputFunction#
-	 * getCalculatedOutput(tools.descartes.librede.linalg.Vector)
-	 */
-	@Override
-	public double getCalculatedOutput(Vector state) {
-		double rt = 0.0;
-		Vector X = throughputQuery.get(historicInterval);
-		if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
-			// no request observed in this interval
-			return 0.0;
-		}
-
-		for (Resource res_i : accessedResources.keySet()) {
-			double C_i = 0.0;
-			if (useObservedUtilization) {
-				C_i = getContention(historicInterval, res_i);
-			}
-			double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
-			double busyProp = 0.0;
-			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
-				int p = res_i.getNumberOfServers();
-				busyProp = erlangC[p].calculateValue(U_i);
-			}
-			
-			List<Service> accessingServices = accessedResources.get(res_i);
-			for (Service curService : accessingServices) {
-				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, curService));
-				double visits = 1;
-				if (!curService.equals(cls_r)) {
-					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
-				}
-				rt += visits * (1 + C_i) * (D_ir + calculateQueueingTime(D_ir, res_i, U_i, busyProp));
-			}			
-		}
-		return rt;
-	}
-
-	/**
-	 * @param state
-	 * @param res_i
-	 *            - the resource i
-	 * @param U_i
-	 *            - the utilization of resource i
-	 * @param P_q
-	 *            - the probability that all servers are occupied when a new job
-	 *            arrives.
-	 * @param S_i
-	 *            a slow down factor for the processing (e.g., CPU contention in
-	 *            hypervisor)
-	 * @return
-	 */
-	private double calculateQueueingTime(double D_ir, Resource res_i, double U_i, double P_q) {
-		switch (res_i.getSchedulingStrategy()) {
-		case FCFS:
-			// TODO: implement FCFS
-		case PS:
-		case UNKOWN:
-			/*
-			 * The mean queue length of a single-class, multi-server queue is
-			 * 
-			 * E[T_q] = \frac{1}{\lambda} * \frac{U_i}{1 - U_i} * P_q
-			 * 
-			 * (see Harchol-Balter,
-			 * "Performance Modeling and Design of Computer Systems", p. 262)
-			 * 
-			 * For PS scheduling (in contrast to FCFS) this also holds for
-			 * multi-class queues.
-			 * 
-			 * This formula can be reformulated to
-			 * 
-			 * E[T_q] = \frac{D_ir}{1 - U_i} * P_q
-			 */
-			return (D_ir * P_q) / (1 - U_i);
-		case IS:
-			/*
-			 * Infinite server: a job will never be forced to wait for service
-			 */
-			return 0.0;
-		default:
-			throw new AssertionError("Unsupported scheduling strategy.");
-		}
-	}
-	
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see
+//	 * tools.descartes.librede.models.observation.functions.IOutputFunction#
+//	 * getCalculatedOutput(tools.descartes.librede.linalg.Vector)
+//	 */
+//	@Override
+//	public double getCalculatedOutput(Vector state) {
+//		double rt = 0.0;
+//		Vector X = throughputQuery.get(historicInterval);
+//		if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
+//			// no request observed in this interval
+//			return 0.0;
+//		}
+//
+//		for (Resource res_i : accessedResources.keySet()) {
+//			double C_i = 0.0;
+//			if (useObservedUtilization) {
+//				C_i = getContention(historicInterval, res_i);
+//			}
+//			double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
+//			double busyProp = 0.0;
+//			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
+//				int p = res_i.getNumberOfServers();
+//				busyProp = erlangC[p].calculateValue(U_i);
+//			}
+//			
+//			List<Service> accessingServices = accessedResources.get(res_i);
+//			for (Service curService : accessingServices) {
+//				double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, curService));
+//				double visits = 1;
+//				if (!curService.equals(cls_r)) {
+//					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
+//				}
+//				rt += visits * (1 + C_i) * (D_ir + calculateQueueingTime(D_ir, res_i, U_i, busyProp));
+//			}			
+//		}
+//		return rt;
+//	}
+//
+//	/**
+//	 * @param state
+//	 * @param res_i
+//	 *            - the resource i
+//	 * @param U_i
+//	 *            - the utilization of resource i
+//	 * @param P_q
+//	 *            - the probability that all servers are occupied when a new job
+//	 *            arrives.
+//	 * @param S_i
+//	 *            a slow down factor for the processing (e.g., CPU contention in
+//	 *            hypervisor)
+//	 * @return
+//	 */
+//	private double calculateQueueingTime(double D_ir, Resource res_i, double U_i, double P_q) {
+//		switch (res_i.getSchedulingStrategy()) {
+//		case FCFS:
+//			// TODO: implement FCFS
+//		case PS:
+//		case UNKOWN:
+//			/*
+//			 * The mean queue length of a single-class, multi-server queue is
+//			 * 
+//			 * E[T_q] = \frac{1}{\lambda} * \frac{U_i}{1 - U_i} * P_q
+//			 * 
+//			 * (see Harchol-Balter,
+//			 * "Performance Modeling and Design of Computer Systems", p. 262)
+//			 * 
+//			 * For PS scheduling (in contrast to FCFS) this also holds for
+//			 * multi-class queues.
+//			 * 
+//			 * This formula can be reformulated to
+//			 * 
+//			 * E[T_q] = \frac{D_ir}{1 - U_i} * P_q
+//			 */
+//			return (D_ir * P_q) / (1 - U_i);
+//		case IS:
+//			/*
+//			 * Infinite server: a job will never be forced to wait for service
+//			 */
+//			return 0.0;
+//		default:
+//			throw new AssertionError("Unsupported scheduling strategy.");
+//		}
+//	}
+//	
 	private double getContention(int historicInterval, Resource res_i) {
 		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
 			return 0.0; // there is no slow-down
@@ -318,243 +311,238 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 			}
 		}
 	}
-
-	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X, double C_i) {
-		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
-			// the resource has infinite capacity --> utilization is always zero
-			return 0.0;
-		} else {
-			if (useObservedUtilization) {
-				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
-			} else {
-				/*
-				 * Calculate the utilization using the utilization law.
-				 */
-				double U_i = 0;
-				for (Service curService : res_i.getAccessingServices()) {
-					int idx = throughputQuery.indexOf(curService);
-					U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
-				}
-				return U_i / res_i.getNumberOfServers() + C_i;
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#
-	 * getFirstDerivatives(tools.descartes.librede.linalg.Vector)
-	 */
-	@Override
-	public Vector getFirstDerivatives(final Vector state) {
-		return vector(state.rows(), new VectorFunction() {
-			@Override
-			public double cell(int row) {
-				/*
-				 * This function calculates the derivatives of the response time
-				 * equation i.e. cell(row = \frac{df}{dx_{row}} where x is the
-				 * vector of resource demands The following indexes are used: i
-				 * - index of the resource corresponding to x_{row} s - index of
-				 * the service corresponding to x_{row}
-				 */
-				Resource res_i = getStateModel().getResourceDemand(row).getResource();
-				Service cls_s = getStateModel().getResourceDemand(row).getService();
-
-				// get current throughput data
-				Vector X = throughputQuery.get(historicInterval);
-				double C_i = getContention(historicInterval, res_i);
-				double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
-
-				// TODO: also include invocation counts?
-				double dev = 0.0;
-				if (cls_r.equals(cls_s)) {
-					dev += 1.0;
-				}
-				return (1 + C_i) * (dev + getFirstDerivationOfQueueingTime(state, res_i, cls_s, X, U_i));
-			}
-		});
-	}
-
-	private double getFirstDerivationOfQueueingTime(final Vector state, Resource res_i, Service cls_s, Vector X,
-			double U_i) throws AssertionError {
-		switch (res_i.getSchedulingStrategy()) {
-		case FCFS:
-			// TODO: implement FCFS
-		case PS:
-		case UNKOWN:
-			/*
-			 * When calculating derivatives, we need to distinguish between two
-			 * cases: 1. We use the observed utilization -> it is a linear
-			 * function with simple derivation 2. We use the utilization law to
-			 * calculate the utilization -> quotient rule needs to be applied
-			 */
-			int k = res_i.getNumberOfServers();
-			double P_q = erlangC[k].calculateValue(U_i);
-			double beta = 1 - U_i;
-			double dev = 0.0;
-
-			/*
-			 * Calculate: (D_ir * \frac{P_q}{1 - U_i})'
-			 */
-			if (cls_s.equals(cls_r)) {
-				dev += P_q / beta;
-			}
-			if (!useObservedUtilization) {
-				// In case of non-rectangular state models we may hit this case
-				// Then D_ir == 0 --> we can skip this part
-				if (getStateModel().containsStateVariable(res_i, cls_r)) {
-					double X_s = X.get(throughputQuery.indexOf(cls_s));
-					/*
-					 * Important: Consider the number of servers for calculating
-					 * the derivation of U
-					 */
-					double devU = X_s / k;
-					double devP_q = erlangC[k].calculateFirstDerivative(U_i, devU);
-					/*
-					 * U_i and P_q are also functions of the state. Therefore,
-					 * we need to apply the quotient rule. The first addend of
-					 * the quotient rule has already been calculated above.
-					 * 
-					 * u = D_ir v = \frac{P_q}{1 - U_i}
-					 * 
-					 */
-					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-					dev += D_ir * deriveQueueingFactor(beta, devU, P_q, devP_q);
-				}
-			}
-			return dev;
-		case IS:
-			return 1.0;
-		default:
-			throw new AssertionError("Unsupported scheduling strategy.");
-		}
-	}
-
-	/*
-	 * Calculates: F_q = (\frac{P_q}{beta})' with beta = 1 - U_i
-	 */
-	private double deriveQueueingFactor(double beta, double devU, double P_q, double devP_q) {
-		return (devP_q / beta + (P_q * devU) / (beta * beta));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#
-	 * getSecondDerivatives(tools.descartes.librede.linalg.Vector)
-	 */
-	@Override
-	public Matrix getSecondDerivatives(final Vector state) {
-		return matrix(state.rows(), state.rows(), new MatrixFunction() {
-			@Override
-			public double cell(int row, int column) {
-				/*
-				 * This function calculates the second partial derivative of the
-				 * response time equation i.e. cell(row, column) =
-				 * \frac{df}{dx_{row}dx_{column}} where x is the vector of
-				 * resource demands. The following indexes are used: i - index
-				 * of the resource corresponding to x_{row} s - index of the
-				 * service corresponding to x_{row} j - index of the resource
-				 * corresponding to x_{column} t - index of the service
-				 * corresponding to x_{column}
-				 */
-				Resource res_i = getStateModel().getResourceDemand(row).getResource();
-				Service cls_s = getStateModel().getResourceDemand(row).getService();
-				Resource res_j = getStateModel().getResourceDemand(column).getResource();
-				Service cls_t = getStateModel().getResourceDemand(column).getService();
-
-				// if resources of x_{row} and x_{column} do not match the
-				// second
-				// derivative is zero
-				// if we use observed utilization it is only a linear function
-				// -> second
-				// derivative is zero
-				if (!useObservedUtilization && res_i.equals(res_j)) {
-					return getSecondDerivationOfWaitingTime(state, res_i, cls_s, cls_t);
-				}
-				return 0.0;
-			}
-
-			private double getSecondDerivationOfWaitingTime(final Vector state, Resource res_i, Service cls_s,
-					Service cls_t) throws AssertionError {
-				/*
-				 * Calculates two step derivation: d_xis * d_xit (D_ir *
-				 * \frac{P_q}{1 - U_i})
-				 */
-
-				// get current throughput data
-				Vector X = throughputQuery.get(historicInterval);
-				double X_s = X.get(throughputQuery.indexOf(cls_s));
-				double X_t = X.get(throughputQuery.indexOf(cls_t));
-
-				double C_i = getContention(historicInterval, res_i);
-				double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
-				int k = res_i.getNumberOfServers();
-
-				switch (res_i.getSchedulingStrategy()) {
-				case FCFS:
-					// TODO: implement FCFS scheduling
-				case PS:
-				case UNKOWN:
-					double P_q = erlangC[k].calculateValue(U_i);
-					double devsU = X_s / k;
-					double devtU = X_t / k;
-					double devsP_q = erlangC[k].calculateFirstDerivative(U_i, devsU);
-					double devtP_q = erlangC[k].calculateFirstDerivative(U_i, devtU);
-					double devsdevtP_q = erlangC[k].calculateSecondDerivative(U_i, devsU);
-
-					double beta = 1 - U_i;
-					double dev = 0.0;
-					if (getStateModel().containsStateVariable(res_i, cls_r)) {
-						double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
-						dev = (1 + C_i) * D_ir * (devsdevtP_q / beta + (devsP_q * devtU + devtP_q * devsU) / (beta * beta)
-								+ (P_q * 2 * devsU * devtU) / (beta * beta * beta));
-					}
-					if (cls_r.equals(cls_s)) {
-						dev += deriveQueueingFactor(beta, devtU, P_q, devtP_q);
-					}
-					if (cls_r.equals(cls_t)) {
-						dev += deriveQueueingFactor(beta, devsU, P_q, devsP_q);
-					}
-					return (1 + C_i) * dev;
-				case IS:
-					return 0.0;
-				default:
-					throw new AssertionError("Unsupported scheduling strategy.");
-				}
-			}
-		});
-	}
-
-	@Override
-	public double value(double[] x) {
-		return getCalculatedOutput(vector(x));
-	}
+//
+//	private double getUtilization(int historicInterval, Resource res_i, Vector state, Vector X, double C_i) {
+//		if (res_i.getSchedulingStrategy() == SchedulingStrategy.IS) {
+//			// the resource has infinite capacity --> utilization is always zero
+//			return 0.0;
+//		} else {
+//			if (useObservedUtilization) {
+//				return utilQuery.get(historicInterval).get(utilQuery.indexOf(res_i));
+//			} else {
+//				/*
+//				 * Calculate the utilization using the utilization law.
+//				 */
+//				double U_i = 0;
+//				for (Service curService : res_i.getAccessingServices()) {
+//					int idx = throughputQuery.indexOf(curService);
+//					U_i += state.get(getStateModel().getStateVariableIndex(res_i, curService)) * X.get(idx);
+//				}
+//				return U_i / res_i.getNumberOfServers() + C_i;
+//			}
+//		}
+//	}
+//
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#
+//	 * getFirstDerivatives(tools.descartes.librede.linalg.Vector)
+//	 */
+//	@Override
+//	public Vector getFirstDerivatives(final Vector state) {
+//		return vector(state.rows(), new VectorFunction() {
+//			@Override
+//			public double cell(int row) {
+//				/*
+//				 * This function calculates the derivatives of the response time
+//				 * equation i.e. cell(row = \frac{df}{dx_{row}} where x is the
+//				 * vector of resource demands The following indexes are used: i
+//				 * - index of the resource corresponding to x_{row} s - index of
+//				 * the service corresponding to x_{row}
+//				 */
+//				Resource res_i = getStateModel().getResourceDemand(row).getResource();
+//				Service cls_s = getStateModel().getResourceDemand(row).getService();
+//
+//				// get current throughput data
+//				Vector X = throughputQuery.get(historicInterval);
+//				double C_i = getContention(historicInterval, res_i);
+//				double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
+//
+//				// TODO: also include invocation counts?
+//				double dev = 0.0;
+//				if (cls_r.equals(cls_s)) {
+//					dev += 1.0;
+//				}
+//				return (1 + C_i) * (dev + getFirstDerivationOfQueueingTime(state, res_i, cls_s, X, U_i));
+//			}
+//		});
+//	}
+//
+//	private double getFirstDerivationOfQueueingTime(final Vector state, Resource res_i, Service cls_s, Vector X,
+//			double U_i) throws AssertionError {
+//		switch (res_i.getSchedulingStrategy()) {
+//		case FCFS:
+//			// TODO: implement FCFS
+//		case PS:
+//		case UNKOWN:
+//			/*
+//			 * When calculating derivatives, we need to distinguish between two
+//			 * cases: 1. We use the observed utilization -> it is a linear
+//			 * function with simple derivation 2. We use the utilization law to
+//			 * calculate the utilization -> quotient rule needs to be applied
+//			 */
+//			int k = res_i.getNumberOfServers();
+//			double P_q = erlangC[k].calculateValue(U_i);
+//			double beta = 1 - U_i;
+//			double dev = 0.0;
+//
+//			/*
+//			 * Calculate: (D_ir * \frac{P_q}{1 - U_i})'
+//			 */
+//			if (cls_s.equals(cls_r)) {
+//				dev += P_q / beta;
+//			}
+//			if (!useObservedUtilization) {
+//				// In case of non-rectangular state models we may hit this case
+//				// Then D_ir == 0 --> we can skip this part
+//				if (getStateModel().containsStateVariable(res_i, cls_r)) {
+//					double X_s = X.get(throughputQuery.indexOf(cls_s));
+//					/*
+//					 * Important: Consider the number of servers for calculating
+//					 * the derivation of U
+//					 */
+//					double devU = X_s / k;
+//					double devP_q = erlangC[k].calculateFirstDerivative(U_i, devU);
+//					/*
+//					 * U_i and P_q are also functions of the state. Therefore,
+//					 * we need to apply the quotient rule. The first addend of
+//					 * the quotient rule has already been calculated above.
+//					 * 
+//					 * u = D_ir v = \frac{P_q}{1 - U_i}
+//					 * 
+//					 */
+//					double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+//					dev += D_ir * deriveQueueingFactor(beta, devU, P_q, devP_q);
+//				}
+//			}
+//			return dev;
+//		case IS:
+//			return 1.0;
+//		default:
+//			throw new AssertionError("Unsupported scheduling strategy.");
+//		}
+//	}
+//
+//	/*
+//	 * Calculates: F_q = (\frac{P_q}{beta})' with beta = 1 - U_i
+//	 */
+//	private double deriveQueueingFactor(double beta, double devU, double P_q, double devP_q) {
+//		return (devP_q / beta + (P_q * devU) / (beta * beta));
+//	}
+//
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see tools.descartes.librede.models.diff.IDifferentiableFunction#
+//	 * getSecondDerivatives(tools.descartes.librede.linalg.Vector)
+//	 */
+//	@Override
+//	public Matrix getSecondDerivatives(final Vector state) {
+//		return matrix(state.rows(), state.rows(), new MatrixFunction() {
+//			@Override
+//			public double cell(int row, int column) {
+//				/*
+//				 * This function calculates the second partial derivative of the
+//				 * response time equation i.e. cell(row, column) =
+//				 * \frac{df}{dx_{row}dx_{column}} where x is the vector of
+//				 * resource demands. The following indexes are used: i - index
+//				 * of the resource corresponding to x_{row} s - index of the
+//				 * service corresponding to x_{row} j - index of the resource
+//				 * corresponding to x_{column} t - index of the service
+//				 * corresponding to x_{column}
+//				 */
+//				Resource res_i = getStateModel().getResourceDemand(row).getResource();
+//				Service cls_s = getStateModel().getResourceDemand(row).getService();
+//				Resource res_j = getStateModel().getResourceDemand(column).getResource();
+//				Service cls_t = getStateModel().getResourceDemand(column).getService();
+//
+//				// if resources of x_{row} and x_{column} do not match the
+//				// second
+//				// derivative is zero
+//				// if we use observed utilization it is only a linear function
+//				// -> second
+//				// derivative is zero
+//				if (!useObservedUtilization && res_i.equals(res_j)) {
+//					return getSecondDerivationOfWaitingTime(state, res_i, cls_s, cls_t);
+//				}
+//				return 0.0;
+//			}
+//
+//			private double getSecondDerivationOfWaitingTime(final Vector state, Resource res_i, Service cls_s,
+//					Service cls_t) throws AssertionError {
+//				/*
+//				 * Calculates two step derivation: d_xis * d_xit (D_ir *
+//				 * \frac{P_q}{1 - U_i})
+//				 */
+//
+//				// get current throughput data
+//				Vector X = throughputQuery.get(historicInterval);
+//				double X_s = X.get(throughputQuery.indexOf(cls_s));
+//				double X_t = X.get(throughputQuery.indexOf(cls_t));
+//
+//				double C_i = getContention(historicInterval, res_i);
+//				double U_i = getUtilization(historicInterval, res_i, state, X, C_i);
+//				int k = res_i.getNumberOfServers();
+//
+//				switch (res_i.getSchedulingStrategy()) {
+//				case FCFS:
+//					// TODO: implement FCFS scheduling
+//				case PS:
+//				case UNKOWN:
+//					double P_q = erlangC[k].calculateValue(U_i);
+//					double devsU = X_s / k;
+//					double devtU = X_t / k;
+//					double devsP_q = erlangC[k].calculateFirstDerivative(U_i, devsU);
+//					double devtP_q = erlangC[k].calculateFirstDerivative(U_i, devtU);
+//					double devsdevtP_q = erlangC[k].calculateSecondDerivative(U_i, devsU);
+//
+//					double beta = 1 - U_i;
+//					double dev = 0.0;
+//					if (getStateModel().containsStateVariable(res_i, cls_r)) {
+//						double D_ir = state.get(getStateModel().getStateVariableIndex(res_i, cls_r));
+//						dev = (1 + C_i) * D_ir * (devsdevtP_q / beta + (devsP_q * devtU + devtP_q * devsU) / (beta * beta)
+//								+ (P_q * 2 * devsU * devtU) / (beta * beta * beta));
+//					}
+//					if (cls_r.equals(cls_s)) {
+//						dev += deriveQueueingFactor(beta, devtU, P_q, devtP_q);
+//					}
+//					if (cls_r.equals(cls_t)) {
+//						dev += deriveQueueingFactor(beta, devsU, P_q, devsP_q);
+//					}
+//					return (1 + C_i) * dev;
+//				case IS:
+//					return 0.0;
+//				default:
+//					throw new AssertionError("Unsupported scheduling strategy.");
+//				}
+//			}
+//		});
+//	}
 
 	@Override
-	public DerivativeStructure value(DerivativeStructure[] state) {
+	public OutputVariable getCalculatedOutput(State state) {
 		Vector X = throughputQuery.get(historicInterval);
 		if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
 			// no request observed in this interval
-			return new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
+			return new OutputVariable(state, 0.0);
 		}
 
 		DerivativeStructure rt = null;
 		for (Resource res_i : accessedResources.keySet()) {
 			double C_i = getContention(historicInterval, res_i);
-			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state, X, C_i);
+			DerivativeStructure U_i = getUtilization(historicInterval, res_i, state.getDerivativeStructure(), X, C_i);
 			DerivativeStructure busyProp;
 			if (res_i.getSchedulingStrategy() != SchedulingStrategy.IS) {
 				int p = res_i.getNumberOfServers();
 				busyProp = erlangC[p].value(U_i);
 			} else {
-				busyProp = new DerivativeStructure(state[0].getFreeParameters(), state[0].getOrder(), 0.0);
+				busyProp = new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), 0.0);
 			}
 
 			List<Service> accessingServices = accessedResources.get(res_i);
 			for (Service curService : accessingServices) {
-				DerivativeStructure D_ir = state[getStateModel().getStateVariableIndex(res_i, curService)];
+				DerivativeStructure D_ir = state.getVariable(res_i, curService).getDerivativeStructure();
 				double visits = 1;
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
@@ -567,7 +555,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction
 				}
 			}
 		}
-		return rt;
+		return new OutputVariable(state, rt);
 	}
 
 	private DerivativeStructure getUtilization(int historicInterval, Resource res_i, DerivativeStructure[] state,

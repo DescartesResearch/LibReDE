@@ -46,6 +46,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
@@ -54,7 +55,6 @@ import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.UnitsFactory;
 
 @RunWith(Parameterized.class)
 public class ResponseTimeEquationTest extends LibredeTest {
@@ -65,7 +65,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 	private ResponseTimeEquation law;
 	private IRepositoryCursor cursor;
 	private Service service;
-	private Vector state;
+	private State state;
 	private boolean useObservedUtilization;
 	private int numServers;
 	
@@ -104,7 +104,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 	@Test
 	public void testGetCalculatedOutput() {
 		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(cursor);
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law.getCalculatedOutput(state).getValue()).isEqualTo(resp.execute().getValue(), offset(1e-9));
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class ResponseTimeEquationTest extends LibredeTest {
 		Vector diff1 = Differentiation.diff1(law, state);
 		Matrix diff2 = Differentiation.diff2(law, state);
 		
-		DerivativeStructure s = law.value(DifferentiationUtils.createDerivativeStructures(state, 2));
+		DerivativeStructure s = law.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}

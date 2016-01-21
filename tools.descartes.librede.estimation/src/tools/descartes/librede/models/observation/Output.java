@@ -24,18 +24,30 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.observation.functions;
+package tools.descartes.librede.models.observation;
+
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.variables.OutputVariable;
-import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IOutputFunction extends IDependencyTarget {
+public class Output {
 	
-	boolean hasData();
+	private final DerivativeStructure value;
 	
-	double getObservedOutput();
+	public Output(State state, double value) {
+		this.value = new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), value);
+	}
 	
-	OutputVariable getCalculatedOutput(State state);
+	public Output(State state, double[] derivatives) {
+		this.value = new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), derivatives);
+	}
 	
+	public Output(State state, DerivativeStructure derivatives) {
+		this.value = derivatives;
+	}
+	
+	public double getDouble() {
+		return value.getValue();
+	}
+
 }

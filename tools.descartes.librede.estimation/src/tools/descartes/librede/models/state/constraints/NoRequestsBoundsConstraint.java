@@ -31,9 +31,10 @@ import java.util.List;
 
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.variables.Variable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -75,11 +76,11 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint {
 	}
 
 	@Override
-	public double getValue(Vector state) {
+	public Variable getValue(State state) {
 		if (stateModel == null) {
 			throw new IllegalStateException();
 		}
-		return state.get(stateModel.getStateVariableIndex(variable.getResource(), variable.getService()));
+		return state.getVariable(variable.getResource(), variable.getService());
 	}
 
 	@Override

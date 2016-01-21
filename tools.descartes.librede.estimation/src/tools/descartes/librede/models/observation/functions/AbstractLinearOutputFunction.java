@@ -26,48 +26,25 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-
 import org.apache.commons.math3.analysis.differentiation.DSCompiler;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
 
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.variables.OutputVariable;
 
-public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction, IDifferentiableFunction, MultivariateDifferentiableFunction {
+public abstract class AbstractLinearOutputFunction extends AbstractOutputFunction implements ILinearOutputFunction {
 	
 	protected AbstractLinearOutputFunction(IStateModel<? extends IStateConstraint> stateModel, int historicInterval) {
 		super(stateModel, historicInterval);
 	}
 	
 	@Override
-	public double getCalculatedOutput(Vector state) {
-		return getIndependentVariables().dot(state);
-	}
-
-	@Override
-	public Vector getFirstDerivatives(Vector state) {
-		return getIndependentVariables();
-	}
-
-	@Override
-	public Matrix getSecondDerivatives(Vector state) {
-		return zeros(state.rows(), state.rows());
-	}
-	
-	@Override
-	public double value(double[] x) {
-		return getCalculatedOutput(vector(x));
-	}
-	
-	@Override
-	public DerivativeStructure value(DerivativeStructure[] x) {
-		if (x.length > 0) {
+	public OutputVariable getCalculatedOutput(State state) {
+		if (state.getStateSize() > 0) {
+			DerivativeStructure[] x = state.getDerivativeStructure();
 			// Important: linear combination in MathArray (used by DerivativeStructure) seems to be buggy in version 3.2
 			// Therefore we calculate it manually (this implementation is optimized for speed not accuracy)
 			DSCompiler c = DSCompiler.getCompiler(x.length, x[0].getOrder());
@@ -75,14 +52,17 @@ public abstract class AbstractLinearOutputFunction extends AbstractOutputFunctio
 			double[] derivatives = new double[c.getSize()];
 			int[] orders = new int[x.length];
 			double value = 0.0;
+			boolean derive = c.getOrder() > 0;
 			for (int i = 0; i < x.length; i++) {
 				orders[i]++;
 				value += x[i].getValue() * factors.get(i);
-				derivatives[c.getPartialDerivativeIndex(orders)] = factors.get(i);
+				if (derive) {
+					derivatives[c.getPartialDerivativeIndex(orders)] = factors.get(i);
+				}
 				orders[i]--;
 			}
 			derivatives[0] = value;
-			return new DerivativeStructure(x.length, x[0].getOrder(), derivatives);
+			return new OutputVariable(state, derivatives);
 		}
 		throw new IllegalArgumentException();
 	}

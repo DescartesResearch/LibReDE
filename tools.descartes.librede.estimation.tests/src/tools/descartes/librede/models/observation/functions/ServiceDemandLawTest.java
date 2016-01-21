@@ -31,6 +31,7 @@ import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,6 +41,8 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -58,7 +61,7 @@ public class ServiceDemandLawTest extends LibredeTest {
 	private ObservationDataGenerator generator;
 	private ServiceDemandLaw law;
 	private IRepositoryCursor cursor;
-	private Vector state;
+	private State state;
 	
 	private Resource resource;
 	private Service service;
@@ -95,9 +98,9 @@ public class ServiceDemandLawTest extends LibredeTest {
 	@Test
 	public void testGetCalculatedOutput() {
 		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
-		double expected = x * state.get(generator.getStateModel().getStateVariableIndex(resource, service));
+		double expected = x * state.getVariable(resource, service).getValue();
 		
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
+		assertThat(law.getCalculatedOutput(state).getValue()).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
@@ -105,17 +108,15 @@ public class ServiceDemandLawTest extends LibredeTest {
 		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
 		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
 	}
-
+	
 	@Test
-	public void testGetFirstDerivatives() {
-		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
-	}
-
-	@Test
-	public void testGetSecondDerivatives() {
-		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
+	public void testGetDerivatives() {
+		Vector diff1 = Differentiation.diff1(law, state);
+		Matrix diff2 = Differentiation.diff2(law, state);
+		
+		DerivativeStructure s = law.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
+		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
+		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
 
 }

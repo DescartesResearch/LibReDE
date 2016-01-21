@@ -26,21 +26,17 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
-import static tools.descartes.librede.linalg.LinAlg.vector;
-
 import java.util.List;
 
-import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-import org.apache.commons.math3.analysis.differentiation.MultivariateDifferentiableFunction;
-
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.variables.Variable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.rules.DataDependency;
 
-public class UtilizationConstraint implements ILinearStateConstraint, MultivariateDifferentiableFunction {
+public class UtilizationConstraint implements ILinearStateConstraint {
 
 	private final Resource res_i;
 	
@@ -71,7 +67,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, Multivaria
 	}
 
 	@Override
-	public double getValue(Vector state) {
+	public Variable getValue(State state) {
 		if (utilLaw == null) {
 			throw new IllegalStateException();
 		}
@@ -81,16 +77,6 @@ public class UtilizationConstraint implements ILinearStateConstraint, Multivaria
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.utilLaw = new UtilizationLaw(model, cursor, res_i, historicInterval);
-	}
-
-	@Override
-	public double value(double[] state) {
-		return getValue(vector(state));
-	}
-
-	@Override
-	public DerivativeStructure value(DerivativeStructure[] state) {
-		return utilLaw.value(state);
 	}
 
 	@Override

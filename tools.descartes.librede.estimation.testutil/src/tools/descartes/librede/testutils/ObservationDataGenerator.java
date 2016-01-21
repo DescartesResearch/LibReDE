@@ -48,6 +48,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.functions.ErlangCEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
@@ -197,8 +198,8 @@ public class ObservationDataGenerator {
 		this.workloadMixVariation = workloadMixVariation;
 	}	
 
-	public Vector getDemands() {
-		return demands;
+	public State getDemands() {
+		return new State(stateModel, demands);
 	}
 	
 	public WorkloadDescription getWorkloadDescription() {

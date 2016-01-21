@@ -43,6 +43,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -61,7 +62,7 @@ public class UtilizationLawTest extends LibredeTest {
 	private ObservationDataGenerator generator;
 	private UtilizationLaw law;
 	private IRepositoryCursor cursor;
-	private Vector state;
+	private State state;
 	private Resource resource;
 
 	@Before
@@ -89,7 +90,7 @@ public class UtilizationLawTest extends LibredeTest {
 				return generator.getStateModel().getStateVariableIndex(resource, generator.getStateModel().getUserServices().get(row));
 			}
 		});
-		Vector expectedVarVector = zeros(state.rows()).set(idx, x);
+		Vector expectedVarVector = zeros(state.getStateSize()).set(idx, x);
 		
 		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}
@@ -103,17 +104,15 @@ public class UtilizationLawTest extends LibredeTest {
 	@Test
 	public void testGetCalculatedOutput() {
 		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
+		assertThat(law.getCalculatedOutput(state).getValue()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
 	public void testGetDerivatives() {
 		Vector diff1 = Differentiation.diff1(law, state);
 		Matrix diff2 = Differentiation.diff2(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff1, offset(1e-4));
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff2, offset(1e-4));
 		
-		DerivativeStructure s = law.value(DifferentiationUtils.createDerivativeStructures(state, 2));
+		DerivativeStructure s = law.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}

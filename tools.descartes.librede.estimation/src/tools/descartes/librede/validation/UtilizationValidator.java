@@ -38,6 +38,7 @@ import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
@@ -90,13 +91,14 @@ public class UtilizationValidator implements IValidator {
 	
 	@Override
 	public void predict(Vector state) {
+		State x = new State(stateModel, state);
 		double[] relErr = new double[utilLaw.size()];
 		double[] actualUtil = new double[utilLaw.size()];
 		double[] realUtil = new double[utilLaw.size()];
 		int i = 0;
 		for (UtilizationLaw cur : utilLaw) {
 			realUtil[i] = cur.getObservedOutput();
-			actualUtil[i] = cur.getCalculatedOutput(state);
+			actualUtil[i] = cur.getCalculatedOutput(x).getValue();
 			relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
 			i++;
 		}

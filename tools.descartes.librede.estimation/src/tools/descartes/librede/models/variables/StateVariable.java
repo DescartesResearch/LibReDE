@@ -31,17 +31,21 @@ import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import tools.descartes.librede.models.State;
 
 public class StateVariable extends Variable {
+	
+	private final int index;
 
-	public StateVariable(State state, double value) {
-		super(state, value);
+	public StateVariable(State state, double value, int stateIdx) {
+		super(state, getDerivativeStructure(state, value, stateIdx));
+		this.index = stateIdx;
 	}
 	
-	public StateVariable(State state, double[] derivatives) {
-		super(state, derivatives);
+	private static DerivativeStructure getDerivativeStructure(State state, double value, int stateIdx) {
+		// IMPORTANT: if we need derivatives, set first derivative to one
+		if (state.getDerivationOrder() == 0) {
+			return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), value);
+		} else {
+			return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), stateIdx, value);
+		}
 	}
-	
-	public StateVariable(State state, DerivativeStructure derivatives) {
-		super(state, derivatives);
-	}
-	
+
 }

@@ -31,15 +31,18 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.variables.StateVariable;
 
 public class State {
 	
-	private final DerivativeStructure[] state;
+	private final StateVariable[] state;
 	private final int order;
 	private final IStateModel<?> stateModel;
 	
@@ -49,10 +52,10 @@ public class State {
 	
 	public State(IStateModel<?> stateModel, Vector state, int order) {
 		this.stateModel = stateModel;
-		this.state = new DerivativeStructure[state.rows()];
+		this.state = new StateVariable[state.rows()];
 		this.order = order;
 		for (int i = 0; i < this.state.length; i++) {
-			this.state[i] = new DerivativeStructure(this.state.length, order, state.get(i));
+			this.state[i] = new StateVariable(this, state.get(i), i);
 		}
 	}
 	
@@ -62,12 +65,16 @@ public class State {
 			@Override
 			public double cell(int row, int column) {
 				orders[column] = 1;
-				double value = state[row].getPartialDerivative(orders);
+				double value = state[row].getDerivativeStructure().getPartialDerivative(orders);
 				orders[column] = 0;
 				return value;
 			}
 		});
 		return jacobi;
+	}
+	
+	public StateVariable getVariable(Resource res, Service service) {
+		return state[stateModel.getStateVariableIndex(res, service)];
 	}
 	
 	public Vector getVector() {
@@ -78,5 +85,25 @@ public class State {
 			}
 		});
 		return vec;
+	}
+	
+	public DerivativeStructure[] getDerivativeStructure() {
+		DerivativeStructure[] ret = new DerivativeStructure[state.length];
+		for (int i = 0; i < state.length; i++) {
+			ret[i] = state[i].getDerivativeStructure();
+		}
+		return ret;
+	}
+	
+	public int getDerivationOrder() {
+		return order;
+	}
+	
+	public int getStateSize() {
+		return stateModel.getStateSize();
+	}
+	
+	public IStateModel<?> getStateModel() {
+		return stateModel;
 	}
 }

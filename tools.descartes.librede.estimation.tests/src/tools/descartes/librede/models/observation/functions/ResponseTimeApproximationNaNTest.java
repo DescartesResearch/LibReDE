@@ -32,6 +32,7 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,6 +42,8 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
@@ -54,7 +57,7 @@ public class ResponseTimeApproximationNaNTest extends LibredeTest {
 	
 	private ObservationDataGenerator generator;
 	private ResponseTimeApproximation law;
-	private Vector state;
+	private State state;
 	
 	private Resource resource;
 	private Service service;
@@ -90,19 +93,16 @@ public class ResponseTimeApproximationNaNTest extends LibredeTest {
 
 	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state)).isZero();
+		assertThat(law.getCalculatedOutput(state).getValue()).isZero();
 	}
-
+	
 	@Test
-	public void testGetFirstDerivatives() {
-		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
+	public void testGetDerivatives() {
+		Vector diff1 = Differentiation.diff1(law, state);
+		Matrix diff2 = Differentiation.diff2(law, state);
+		
+		DerivativeStructure s = law.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
+		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
+		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
-
-	@Test
-	public void testGetSecondDerivatives() {
-		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
-	}
-
 }
