@@ -95,7 +95,7 @@ public class ScalarObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
+	public List<DataDependency<?>> getDataDependencies() {
 		return outputFunction.getDataDependencies();
 	}
 

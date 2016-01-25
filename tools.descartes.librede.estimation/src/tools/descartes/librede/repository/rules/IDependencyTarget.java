@@ -30,6 +30,6 @@ import java.util.List;
 
 public interface IDependencyTarget {
 	
-	public List<? extends DataDependency<?>> getDataDependencies();
+	public List<DataDependency<?>> getDataDependencies();
 
 }

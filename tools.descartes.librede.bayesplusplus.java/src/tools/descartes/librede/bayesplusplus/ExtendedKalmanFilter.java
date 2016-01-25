@@ -27,12 +27,15 @@
 package tools.descartes.librede.bayesplusplus;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
-import static tools.descartes.librede.linalg.LinAlg.mean;
+import static tools.descartes.librede.linalg.LinAlg.nanmean;
 import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeMatrix;
+import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
+
+import com.sun.jna.Pointer;
+
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import tools.descartes.librede.bayesplusplus.backend.FCallback;
@@ -43,15 +46,12 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
-import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.IRepositoryCursor;
-
-import com.sun.jna.Pointer;
 
 @Component(displayName="Extended Kalman Filter")
 public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
@@ -274,14 +274,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, tools.descartes.librede.repository.IRepositoryCursor, int)
 	 */
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, 
+	public void initialize(EstimationProblem problem, 
 			IRepositoryCursor cursor,
 			int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, cursor, estimationWindow);
+		super.initialize(problem, cursor, estimationWindow);
 		
-		this.stateSize = stateModel.getStateSize();
-		this.outputSize = observationModel.getOutputSize();
+		this.stateSize = problem.getStateModel().getStateSize();
+		this.outputSize = problem.getObservationModel().getOutputSize();
 		
 		this.stateBuffer = NativeHelper.allocateDoubleArray(stateSize);
 		this.stateCovarianceBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
@@ -326,7 +325,7 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 */
 	@Override
 	public Vector estimate() throws EstimationException {
-		return mean(estimates);
+		return nanmean(estimates);
 	}
 	
 	/*

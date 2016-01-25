@@ -29,6 +29,7 @@ Export-Package: tools.descartes.librede;uses:="tools.descartes.librede.repositor
  tools.descartes.librede.exceptions,
  tools.descartes.librede.export;uses:="tools.descartes.librede.repository",
  tools.descartes.librede.export.csv;uses:="tools.descartes.librede.export,tools.descartes.librede.repository",
+ tools.descartes.librede.models,
  tools.descartes.librede.models.diff;
   uses:="tools.descartes.librede.models.state.constraints,
    tools.descartes.librede.models.observation.functions,

@@ -40,9 +40,9 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
@@ -82,15 +82,14 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 	}
 
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, 
+	public void initialize(EstimationProblem problem, 
 			IRepositoryCursor cursor,
 			int estimationWindow)
 			throws InitializationException {
-		super.initialize(stateModel, observationModel, cursor, estimationWindow);
+		super.initialize(problem, cursor, estimationWindow);
 		
 		// Fill with NaN. NaN values are ignored by the aggregation function.
-		this.buffer = matrix(estimationWindow, stateModel.getStateSize(),
+		this.buffer = matrix(estimationWindow, problem.getStateModel().getStateSize(),
 				Double.NaN);
 	}
 

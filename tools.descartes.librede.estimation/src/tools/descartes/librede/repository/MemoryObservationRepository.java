@@ -29,12 +29,14 @@ package tools.descartes.librede.repository;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
@@ -262,15 +264,25 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private final WorkloadDescription workload;
 	private Quantity<Time> currentTime;
 	private final Set<IMonitoringRepositoryListener> listeners = new HashSet<>();
+	private final Set<ModelEntity> entities = new HashSet<>();
 	
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
+		collectEntities();
 		log.info("Set up in-memory observation repository");
 		for (Metric<?> m : Registry.INSTANCE.getMetrics()) {
 			registerRules(m);			
 		}
 		rules.logConfigDump();
-		registerDefaultHandlers();
+	}
+	
+	private void collectEntities() {
+		for (Iterator<?> it = EcoreUtil.getAllContents(workload, true); it.hasNext(); ) {
+			Object cur = it.next();
+			if (cur instanceof ModelEntity) {
+				entities.add((ModelEntity) cur);
+			}
+		}
 	}
 	
 	@Override
@@ -285,7 +297,11 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	
 	@Override
 	public void addRule(Rule rule) {
-		rules.addRule(rule);		
+		rules.addRule(rule);
+		
+		// Check whether this rule can be directly activated
+		// (if all data dependencies are available)
+		checkRules(Collections.singletonList(rule), entities);
 	}
 	
 	@Override
@@ -348,48 +364,33 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 		for (IMonitoringRepositoryListener curListener : listeners) {
 			curListener.entryAdded(metric, entity, aggregation);
-		}
+		}		
+		checkRules(rules.getDerivationRules(metric, aggregation), Collections.singleton(entity));
+	}
+	
+	private void checkRules(List<Rule> rules, Set<ModelEntity> entities) {
+		Set<ModelEntity> notificationSet = new HashSet<>();		
 		
-		Set<ModelEntity> notificationSet = new HashSet<>();
-		for (Rule r : rules.getDerivationRules(metric, aggregation)) {
-			// First we determine the entities that may be affected
-			// by the new entry (e.g., new data for a service, may also
-			// enable new derivations for external calls to this service)
-			for (DataDependency<?> dep : r.getDependencies()) {
-				notificationSet.addAll(dep.getScope().getNotificationSet(entity));
-			}			
-			
-			for (ModelEntity e : notificationSet) {
-				if (r.applies(e)) {
-					if (checkDependencies(r, e)) {
-						activateRule(r, e);
+		for (Rule r : rules) {
+			for (ModelEntity curEntity : entities) {
+				if (r.getDependencies().isEmpty()) {
+					// this is a default rule without dependencies
+					// it is always activated
+					r.checkStatus(this, curEntity);
+				} else {
+					// First we determine the entities that may be affected
+					// by the new entry (e.g., new data for a service, may also
+					// enable new derivations for external calls to this service)
+					for (DataDependency<?> dep : r.getDependencies()) {
+						notificationSet.addAll(dep.getScope().getNotificationSet(curEntity));
 					}
-				}
-			}
-			notificationSet.clear();
-		}
-	}
-	
-	private <D extends Dimension> void activateRule(Rule rule, ModelEntity entity) {
-		if (log.isDebugEnabled()) {
-			log.debug("Rule " + rule + " for entity " + entity + " is activated.");
-		}
-		rule.getActivationHandler().activateRule(this, rule, entity);
-	}
-	
-	private boolean checkDependencies(Rule rule, ModelEntity entity) {
-		for (DataDependency<?> dep : rule.getDependencies()) {
-			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
-			for (ModelEntity e : scopeEntities) {				
-				if (!exists(dep.getMetric(), e, dep.getAggregation())) {
-					if (log.isDebugEnabled()) {
-						log.debug("Rule " + rule + " not applicable: " + e + "/" + dep.getMetric() + "/" + dep.getAggregation() + " is missing.");
+					for (ModelEntity e : notificationSet) {
+						r.checkStatus(this, e);
 					}
-					return false;
+					notificationSet.clear();
 				}
 			}
 		}
-		return true;
 	}
 	
 	private List<DataEntry<?>> getRequiredEntries(DerivationRule<?> rule, ModelEntity entity) {
@@ -561,25 +562,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 	private <D extends Dimension> void registerRules(Metric<D> m) {
 		List<DerivationRule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
 		for (DerivationRule<D> r : derivationRules) {
-			rules.addRule(r);
-		}
-	}
-	
-	private void registerDefaultHandlers() {
-		if (log.isDebugEnabled()) {
-			log.debug("Register default handlers for metrics");
-		}
-		for (Rule rule : rules.getDefaultDerivationRules()) {
-			for (Resource resource : workload.getResources()) {
-				if (rule.applies(resource)) {
-					activateRule(rule, resource);
-				}
-			}
-			for (Service service : workload.getServices()) {
-				if (rule.applies(service)) {
-					activateRule(rule, service);
-				}
-			}
+			addRule(r);
 		}
 	}
 	

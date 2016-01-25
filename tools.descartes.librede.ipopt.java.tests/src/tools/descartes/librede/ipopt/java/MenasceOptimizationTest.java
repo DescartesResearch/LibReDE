@@ -38,6 +38,7 @@ import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
@@ -91,7 +92,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, cursor, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -152,7 +153,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, cursor, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 

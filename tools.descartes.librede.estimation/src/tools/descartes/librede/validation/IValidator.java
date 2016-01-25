@@ -33,8 +33,9 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IValidator {
+public interface IValidator extends IDependencyTarget {
 	
 	void initialize(WorkloadDescription workload, IRepositoryCursor cursor);
 	

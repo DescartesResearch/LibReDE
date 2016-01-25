@@ -28,8 +28,6 @@ package tools.descartes.librede.models.observation.functions;
 
 import static tools.descartes.librede.linalg.LinAlg.nansum;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -127,39 +125,16 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 		 * the amount of background work relative to the user services.
 		 */
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
+		addDataDependency(utilizationQuery);
 		if (multiClass) {
 			avgResidenceTimeQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
+			addDataDependency(avgResidenceTimeQuery);
 		}
 		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
 		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
-		addDataDependency(utilizationQuery);
 		addDataDependency(avgThroughputQuery);
-		if (multiClass) {
-			addDataDependency(avgResidenceTimeQuery);
-		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(utilizationQuery, messages);
-		if (multiClass) {
-			result = result && checkQueryPrecondition(avgResidenceTimeQuery, messages);
-		}
-		result = result && checkQueryPrecondition(avgThroughputQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */

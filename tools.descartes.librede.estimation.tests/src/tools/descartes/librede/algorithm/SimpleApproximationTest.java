@@ -28,7 +28,6 @@ package tools.descartes.librede.algorithm;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static org.junit.Assert.*;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
@@ -41,7 +40,7 @@ import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
@@ -86,7 +85,7 @@ public class SimpleApproximationTest extends LibredeTest {
 		}
 		
 		algorithm = new SimpleApproximation(Aggregation.AVERAGE);
-		algorithm.initialize(stateModel, model, cursor, 60);
+		algorithm.initialize(new EstimationProblem(stateModel, model), cursor, 60);
 		
 		long start = System.nanoTime();
 
@@ -115,7 +114,7 @@ public class SimpleApproximationTest extends LibredeTest {
 		}
 		
 		algorithm = new SimpleApproximation(Aggregation.AVERAGE);
-		algorithm.initialize(stateModel, model, cursor, 60);		
+		algorithm.initialize(new EstimationProblem(stateModel, model), cursor, 60);		
 		
 		long start = System.nanoTime();
 

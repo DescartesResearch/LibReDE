@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -98,28 +96,10 @@ public class ServiceDemandLaw2 extends AbstractDirectOutputFunction {
 		
 		busyTimeQuery = QueryBuilder.select(StandardMetrics.BUSY_TIME).in(Time.SECONDS).forResource(res_i).sum().using(repository);
 		sumDeparturesQuery = QueryBuilder.select(StandardMetrics.DEPARTURES).in(RequestCount.REQUESTS).forService(service).sum().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
 		addDataDependency(busyTimeQuery);
 		addDataDependency(sumDeparturesQuery);
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(busyTimeQuery, messages);
-		result = result && checkQueryPrecondition(sumDeparturesQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#getObservedOutput()
 	 */

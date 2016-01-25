@@ -91,23 +91,6 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 	
 	@Override
-	public boolean isApplicable(List<String> messages) {
-		//TODO: check for throughput data availability
-//		if (!throughputQuery.hasData()) {
-//			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
-//			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
-//			msg.append("entities = { ");
-//			for(ModelEntity entity : throughputQuery.getEntities()) {
-//				msg.append(entity.getName()).append(" ");
-//			}
-//			msg.append(" } ");
-//			messages.add(msg.toString());
-//			return false;
-//		}
-		return true;
-	}
-
-	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.utilLaw = new UtilizationLaw(model, cursor, res_i, historicInterval);
 	}
@@ -123,7 +106,7 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
+	public List<DataDependency<?>> getDataDependencies() {
 		return utilLaw.getDataDependencies();
 	}
 

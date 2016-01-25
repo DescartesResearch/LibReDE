@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -89,36 +87,21 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 		switch(aggregation) {
 		case AVERAGE:
 			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).average().using(repository);
+			addDataDependency(individualResidenceTimesQuery);
 			break;
 		case MAXIMUM:
 			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).max().using(repository);
+			addDataDependency(individualResidenceTimesQuery);
 			break;
 		case MINIMUM:
 			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).min().using(repository);
+			addDataDependency(individualResidenceTimesQuery);
 			break;
 		default:
 			throw new IllegalArgumentException();
 		}		
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
-		addDataDependency(individualResidenceTimesQuery);		
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(individualResidenceTimesQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.IDirectOutputFunction#getFactor()
 	 */

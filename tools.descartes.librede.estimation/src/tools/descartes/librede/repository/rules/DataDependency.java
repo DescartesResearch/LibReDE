@@ -26,8 +26,14 @@
  */
 package tools.descartes.librede.repository.rules;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.units.Dimension;
 
 /**
@@ -43,6 +49,26 @@ import tools.descartes.librede.units.Dimension;
  *            the dimension of the metric
  */
 public class DataDependency<D extends Dimension> {
+	
+	public class Status {
+		private final Set<? extends ModelEntity> missingEntities;
+		
+		public Status(Set<? extends ModelEntity> missingEntities) {
+			this.missingEntities = Collections.unmodifiableSet(missingEntities);
+		}
+		
+		public DataDependency<D> getDependency() {
+			return DataDependency.this;
+		}
+		
+		public boolean isResolved() {
+			return missingEntities.isEmpty();
+		}
+		
+		public Set<? extends ModelEntity> getMissingEntities() {
+			return missingEntities;
+		}
+	}
 
 	private final DependencyScope scope;
 	private final Metric<D> metric;
@@ -68,5 +94,16 @@ public class DataDependency<D extends Dimension> {
 
 	public Aggregation getAggregation() {
 		return aggregation;
+	}
+	
+	public Status checkStatus(IMonitoringRepository repository, ModelEntity target) {
+		Set<? extends ModelEntity> scopeEntities = scope.getScopeSet(target);
+		Set<ModelEntity> entitiesWithMissingData = new HashSet<>();
+		for (ModelEntity e : scopeEntities) {				
+			if (!repository.exists(metric, e, aggregation)) {
+				entitiesWithMissingData.add(e);
+			}
+		}
+		return new Status(entitiesWithMissingData);
 	}
 }

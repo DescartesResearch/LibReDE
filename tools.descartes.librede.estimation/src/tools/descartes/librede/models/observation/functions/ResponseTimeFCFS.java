@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
@@ -51,25 +49,10 @@ public class ResponseTimeFCFS extends AbstractDirectOutputFunction {
 		
 		responseTimeQuery = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service).average().using(repository);
 		queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL).in(RequestCount.REQUESTS).forResource(resource).average().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDataDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
 		addDataDependency(responseTimeQuery);
 		addDataDependency(queueLengthQuery);
 	}
-
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(responseTimeQuery, messages);
-		result = result && checkQueryPrecondition(queueLengthQuery, messages);
-		return result;
-	}
-
+	
 	@Override
 	public double getObservedOutput() {
 		return responseTimeQuery.get(historicInterval).getValue();

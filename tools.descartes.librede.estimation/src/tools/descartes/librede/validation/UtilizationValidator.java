@@ -45,10 +45,12 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 @Component(displayName = "Utilization Law Validator")
 public class UtilizationValidator implements IValidator {
 	
+	private final List<DataDependency<?>> dependencies = new ArrayList<>();
 	private List<ModelEntity> resources;
 	private List<UtilizationLaw> utilLaw;
 	private MatrixBuilder allErrors;
@@ -70,7 +72,9 @@ public class UtilizationValidator implements IValidator {
 		this.resources = new ArrayList<ModelEntity>();
 		for (Resource res : stateModel.getResources()) {
 			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
-				utilLaw.add(new UtilizationLaw(stateModel, cursor, res));
+				UtilizationLaw law = new UtilizationLaw(stateModel, cursor, res);
+				dependencies.addAll(law.getDataDependencies());
+				utilLaw.add(law);
 				resources.add(res);
 			}
 		}
@@ -124,6 +128,11 @@ public class UtilizationValidator implements IValidator {
 			return LinAlg.empty();
 		}
 		return LinAlg.mean(matrix);
+	}
+	
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		return dependencies;
 	}
 
 }

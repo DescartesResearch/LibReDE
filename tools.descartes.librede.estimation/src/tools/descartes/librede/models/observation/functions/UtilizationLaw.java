@@ -29,8 +29,6 @@ package tools.descartes.librede.models.observation.functions;
 import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Scalar;
@@ -117,30 +115,11 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getAccessingServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
 		contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-	}
-	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.AbstractOutputFunction#initDependencies()
-	 */
-	@Override
-	protected void initDataDependencies() {
 		addDataDependency(throughputQuery);
 		addDataDependency(utilizationQuery);
 		addDataDependency(contentionQuery);
 	}
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.observation.functions.IOutputFunction#isApplicable()
-	 */
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		boolean result = true;
-		result = result && checkQueryPrecondition(throughputQuery, messages);
-		result = result && checkQueryPrecondition(utilizationQuery, messages);
-		result = result && checkQueryPrecondition(contentionQuery, messages);
-		return result;
-	}
-
 	/* (non-Javadoc)
 	 * @see tools.descartes.librede.models.observation.functions.ILinearOutputFunction#getIndependentVariables()
 	 */

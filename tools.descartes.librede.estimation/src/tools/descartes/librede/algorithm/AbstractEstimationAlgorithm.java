@@ -26,23 +26,13 @@
  */
 package tools.descartes.librede.algorithm;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.rules.DependencyScope;
-import tools.descartes.librede.repository.rules.IRuleActivationHandler;
-import tools.descartes.librede.repository.rules.Rule;
 
 /**
  * This abstract class provides standard implementations for some of the methods in {@link IEstimationAlgorithm}.
@@ -50,27 +40,20 @@ import tools.descartes.librede.repository.rules.Rule;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm, IRuleActivationHandler {
+public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm {
 	
-	private static final Logger log = Logger.getLogger(AbstractEstimationAlgorithm.class);
+	protected final Logger log = Logger.getLogger(getClass());
 	
 	private IStateModel<?> stateModel;
 	private IObservationModel<?, ?> observationModel;
 	private IRepositoryCursor cursor;
-	private final List<Rule> dependencies = new LinkedList<Rule>();
-	private final Set<Rule> unsatisfiedDependencies = new HashSet<Rule>();
-	private boolean activated = false;
 	
 	@Override
-	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
+	public void initialize(EstimationProblem problem,
 			IRepositoryCursor cursor, int estimationWindow) throws InitializationException {
-		this.stateModel = stateModel;
-		this.observationModel = observationModel;
+		this.stateModel = problem.getStateModel();
+		this.observationModel = problem.getObservationModel();
 		this.cursor = cursor;
-		initializeDependencies();
-		for (Rule rule : dependencies) {
-			cursor.getRepository().addRule(rule);
-		}
 	}
 
 	@Override
@@ -85,54 +68,5 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 
 	@Override
 	public void destroy() {
-		for (Rule rule : dependencies) {
-			cursor.getRepository().removeRule(rule);
-		}
-	}
-	
-	@Override
-	public void activateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
-		if (unsatisfiedDependencies.contains(rule)) {
-			if (log.isDebugEnabled()) {
-				log.debug("Satisfied dependency rule: " + rule);
-			}
-			unsatisfiedDependencies.remove(rule);
-			if (unsatisfiedDependencies.isEmpty()) {
-				activateAlgorithm();
-			}
-		}
-	}
-	
-	private void activateAlgorithm() {
-		log.info("Activated state model: " + stateModel);
-		activated = true;
-	}
-	
-	@Override
-	public void deactivateRule(IMonitoringRepository repository, Rule rule, ModelEntity entity) {
-		if (!unsatisfiedDependencies.add(rule)) {
-			if (log.isDebugEnabled()) {
-				log.debug("Unsatisfied dependency rule: " + rule);
-			}
-			if (activated) {
-				deactivateAlgorithm();
-			}
-		}				
-	}
-	
-	private void deactivateAlgorithm() {
-		activated = false;
-	}
-	
-	protected void initializeDependencies() {
-	}
-	
-	protected void addDependency(Query<?,?> query) {
-		Rule newRule = new Rule();
-		newRule.addDependency(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities()));
-		newRule.setActivationHandler(this);
-		dependencies.add(newRule);
-		unsatisfiedDependencies.add(newRule);
-	}
-	
+	}	
 }

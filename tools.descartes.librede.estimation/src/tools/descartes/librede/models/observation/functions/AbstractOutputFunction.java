@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.Query;
@@ -55,8 +54,6 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 		return stateModel;
 	}
 	
-	protected abstract void initDataDependencies();
-	
 	protected void addDataDependency(Query<?,?> query) {
 		dataDependencies.add(new DataDependency<>(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities())));
 	}
@@ -65,19 +62,5 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 	public List<DataDependency<?>> getDataDependencies() {
 		return Collections.unmodifiableList(dataDependencies);
 	}
-	
-	protected boolean checkQueryPrecondition(Query<?,?> query, List<String> messages) {
-		if (!query.isExecutable()) {
-			StringBuilder msg = new StringBuilder("FAILED DATA PRECONDITION: ");
-			msg.append("metric = ").append(query.getMetric().toString()).append(" ");
-			msg.append("entities = { ");
-			for(ModelEntity entity : query.getEntities()) {
-				msg.append(entity.getName()).append(" ");
-			}
-			msg.append(" } ");
-			messages.add(msg.toString());
-			return false;
-		}
-		return true;
-	}
+
 }

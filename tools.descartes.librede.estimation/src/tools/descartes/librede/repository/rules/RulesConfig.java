@@ -29,11 +29,11 @@ package tools.descartes.librede.repository.rules;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -44,7 +44,7 @@ public class RulesConfig {
 	private static final Logger log = Logger.getLogger(RulesConfig.class);
 	
 	private final Map<Metric<?>, EnumMap<Aggregation, List<Rule>>> derivationRulesByDependency = new HashMap<>();
-	private final Set<Rule> derivationRules = new TreeSet<>();
+	private final Set<Rule> derivationRules = new HashSet<>();
 	private final List<Rule> defaultRules = new LinkedList<>();
 	
 	

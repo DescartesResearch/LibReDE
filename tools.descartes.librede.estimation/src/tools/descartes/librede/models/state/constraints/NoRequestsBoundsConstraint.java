@@ -29,7 +29,6 @@ package tools.descartes.librede.models.state.constraints;
 import java.util.Collections;
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Scalar;
@@ -86,22 +85,6 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	}
 
 	@Override
-	public boolean isApplicable(List<String> messages) {
-		if (!throughputQuery.isExecutable()) {
-			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
-			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
-			msg.append("entities = { ");
-			for(ModelEntity entity : throughputQuery.getEntities()) {
-				msg.append(entity.getName()).append(" ");
-			}
-			msg.append(" } ");
-			messages.add(msg.toString());
-			return false;
-		}
-		return true;
-	}
-
-	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.stateModel = model;
 	}
@@ -122,8 +105,8 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint, IDiff
 	}
 
 	@Override
-	public List<? extends DataDependency<?>> getDataDependencies() {
-		return Collections.singletonList(new DataDependency<>(throughputQuery.getMetric(), throughputQuery.getAggregation(), DependencyScope.fixedScope(throughputQuery.getEntities())));
+	public List<DataDependency<?>> getDataDependencies() {
+		return Collections.<DataDependency<?>>singletonList(new DataDependency<>(throughputQuery.getMetric(), throughputQuery.getAggregation(), DependencyScope.fixedScope(throughputQuery.getEntities())));
 	}
 
 }

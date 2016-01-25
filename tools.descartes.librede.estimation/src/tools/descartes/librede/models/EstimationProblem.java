@@ -24,20 +24,35 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.state.constraints;
+package tools.descartes.librede.models;
 
-import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.repository.rules.IDependencyTarget;
+import tools.descartes.librede.repository.rules.Rule;
 
-public interface IStateConstraint extends IDependencyTarget {
+/**
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
+public class EstimationProblem extends Rule {
+
+	private final IStateModel<?> stateModel;
+	private final IObservationModel<?, ?> observationModel;
 	
-	double getLowerBound();
+	public EstimationProblem(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel) {
+		this.stateModel = stateModel;
+		this.observationModel = observationModel;
+		
+		addDependencies(stateModel.getDataDependencies());
+		addDependencies(observationModel.getDataDependencies());
+	}
 	
-	double getUpperBound();
-	
-	double getValue(Vector state);
-	
-	void setStateModel(IStateModel<? extends IStateConstraint> model);
-	
+	public IStateModel<?> getStateModel() {
+		return stateModel;
+	}
+
+	public IObservationModel<?, ?> getObservationModel() {
+		return observationModel;
+	}
+
 }

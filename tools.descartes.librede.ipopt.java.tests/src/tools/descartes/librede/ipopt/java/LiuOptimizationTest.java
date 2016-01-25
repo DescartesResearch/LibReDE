@@ -38,13 +38,14 @@ import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
@@ -52,8 +53,6 @@ import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.UnitsFactory;
 
 public class LiuOptimizationTest extends LibredeTest {
 
@@ -97,7 +96,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, cursor, 1);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 1);
 
 		long start = System.nanoTime();
 
@@ -166,7 +165,7 @@ public class LiuOptimizationTest extends LibredeTest {
 		}
 		
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, cursor, 1);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 1);
 
 		long start = System.nanoTime();
 

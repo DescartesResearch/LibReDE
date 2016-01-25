@@ -60,7 +60,6 @@ import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.ui.MarkerHelper;
-import org.eclipse.emf.common.ui.ViewerPane;
 import org.eclipse.emf.common.ui.editor.ProblemEditorPart;
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.common.util.BasicDiagnostic;
@@ -129,7 +128,6 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.PropertySheet;
 import org.eclipse.ui.views.properties.PropertySheetPage;
 
-import tools.descartes.librede.Librede;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.EstimationFormPage;
 import tools.descartes.librede.configuration.editor.forms.MasterDetailsFormPage;
@@ -702,7 +700,8 @@ public class ConfigurationEditor
 						// Try to select the items in the current content viewer of the editor.
 						//
 						if (currentViewer != null) {
-							currentViewer.setSelection(new StructuredSelection(theSelection.toArray()), true);
+							// Comment it out because it causes Issue #2
+							//currentViewer.setSelection(new StructuredSelection(theSelection.toArray()), true);
 						}
 					}
 				};
