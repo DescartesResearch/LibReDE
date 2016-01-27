@@ -26,20 +26,16 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
-import java.util.Collections;
-import java.util.List;
-
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.variables.Variable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.rules.DataDependency;
-import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestRate;
 
 /**
@@ -50,7 +46,7 @@ import tools.descartes.librede.units.RequestRate;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public class NoRequestsBoundsConstraint implements IStateBoundsConstraint {
+public class NoRequestsBoundsConstraint extends AbstractDependencyTarget implements IStateBoundsConstraint {
 	
 	private Query<Scalar, RequestRate> throughputQuery;	
 	private final double lowerBound;	
@@ -63,6 +59,7 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint {
 		this.upperBound = upperBound;
 		this.variable = demand;
 		this.throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(demand.getService()).average().using(cursor);
+		addDataDependency(throughputQuery);
 	}
 
 	@Override
@@ -92,10 +89,4 @@ public class NoRequestsBoundsConstraint implements IStateBoundsConstraint {
 	public ResourceDemand getStateVariable() {
 		return this.variable;
 	}
-
-	@Override
-	public List<DataDependency<?>> getDataDependencies() {
-		return Collections.<DataDependency<?>>singletonList(new DataDependency<>(throughputQuery.getMetric(), throughputQuery.getAggregation(), DependencyScope.fixedScope(throughputQuery.getEntities())));
-	}
-
 }

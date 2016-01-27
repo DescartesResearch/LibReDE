@@ -26,19 +26,12 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.rules.DataDependency;
-import tools.descartes.librede.repository.rules.DependencyScope;
 
-public abstract class AbstractOutputFunction implements IOutputFunction {
+public abstract class AbstractOutputFunction extends AbstractDependencyTarget implements IOutputFunction {
 	
-	private final List<DataDependency<?>> dataDependencies = new ArrayList<>();
 	private final IStateModel<? extends IStateConstraint> stateModel;
 	protected final int historicInterval;
 
@@ -54,13 +47,4 @@ public abstract class AbstractOutputFunction implements IOutputFunction {
 		return stateModel;
 	}
 	
-	protected void addDataDependency(Query<?,?> query) {
-		dataDependencies.add(new DataDependency<>(query.getMetric(), query.getAggregation(), DependencyScope.fixedScope(query.getEntities())));
-	}
-	
-	@Override
-	public List<DataDependency<?>> getDataDependencies() {
-		return Collections.unmodifiableList(dataDependencies);
-	}
-
 }

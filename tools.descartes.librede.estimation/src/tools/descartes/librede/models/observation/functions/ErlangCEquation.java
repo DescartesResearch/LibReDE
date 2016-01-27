@@ -35,8 +35,9 @@ import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiabl
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.AbstractDependencyTarget;
 
-public class ErlangCEquation implements UnivariateDifferentiableFunction {
+public class ErlangCEquation extends AbstractDependencyTarget implements UnivariateDifferentiableFunction {
 	
 	// The degree of the polynomials used to approximate the Erlang-C function
 	// A degree of 6 seems to be acceptable for k <= 15 for (tested with matlab)

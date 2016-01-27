@@ -26,17 +26,15 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.observation.functions.UtilizationLaw;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.variables.Variable;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.rules.DataDependency;
 
-public class UtilizationConstraint implements ILinearStateConstraint {
+public class UtilizationConstraint extends AbstractDependencyTarget implements ILinearStateConstraint {
 
 	private final Resource res_i;
 	
@@ -77,11 +75,7 @@ public class UtilizationConstraint implements ILinearStateConstraint {
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		this.utilLaw = new UtilizationLaw(model, cursor, res_i, historicInterval);
-	}
-
-	@Override
-	public List<DataDependency<?>> getDataDependencies() {
-		return utilLaw.getDataDependencies();
+		addDataDependencies(this.utilLaw);
 	}
 
 }
