@@ -166,7 +166,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 
 			Vector estimates = optim.estimate();
 			
-//			assertThat(estimates).isEqualTo(demands, offset(0.001));
+			assertThat(estimates).isEqualTo(demands.getVector(), offset(0.001));
 			
 //			System.out.println(i + ": " + estimates);
 		}
