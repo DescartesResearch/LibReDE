@@ -9,7 +9,7 @@ import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.Query;
 
-public class ConstantValue extends LinearModelEquation {
+public class ConstantValue extends ModelEquation {
 	
 	private final Query<Scalar, ?> query;
 	
@@ -32,6 +32,11 @@ public class ConstantValue extends LinearModelEquation {
 	@Override
 	public boolean hasData() {
 		return query.hasData();
+	}
+	
+	@Override
+	public boolean isLinear() {
+		return true;
 	}
 
 }

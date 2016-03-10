@@ -110,17 +110,14 @@ public class ResidenceTimeEquation extends ModelEquation {
 		return D_ir.add(T_q).multiply(1 + C_i);
 	}
 
-	// public Vector getLinearResidenceTimeFactors(State state) {
-	// Vector factors = waitingTime.getLinearWaitingTimeFactors(cls_r, state);
-	// double C_i = contentionQuery.get(historicInterval).getValue();
-	// factors = factors.set(state.getStateModel().getStateVariableIndex(res_i,
-	// cls_r), state.getVariable(res_i, cls_r).getValue() + 1);
-	// return factors.times(1 + C_i);
-	// }
-
 	@Override
 	public boolean hasData() {
 		return waitingTime.hasData();
+	}
+	
+	@Override
+	public boolean isLinear() {
+		return waitingTime.isLinear();
 	}
 
 }

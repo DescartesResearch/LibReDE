@@ -50,7 +50,7 @@ import tools.descartes.librede.units.RequestRate;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public class UtilizationFunction extends LinearModelEquation {
+public class UtilizationFunction extends ModelEquation {
 
 	// The resource of which the utilization is returned
 	private final Resource res_i;
@@ -115,139 +115,9 @@ public class UtilizationFunction extends LinearModelEquation {
 		return throughputQuery.hasData();
 	}
 
-//	/**
-//	 * This is an implementation of {@code UtilizationFunction} that returns the
-//	 * currently observed utilization.
-//	 * 
-//	 * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
-//	 *
-//	 */
-//	private static class ObservedUtilizationFunction extends UtilizationFunction {
-//
-//		private final Query<Scalar, Ratio> utilQuery;
-//
-//		/**
-//		 * Constructor.
-//		 * 
-//		 * @param cursor
-//		 * @param resource
-//		 * @param historicInterval
-//		 */
-//		public ObservedUtilizationFunction(IRepositoryCursor cursor, Resource resource, int historicInterval) {
-//			super(cursor, resource, historicInterval);
-//			this.utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource)
-//					.average().using(cursor);
-//			addDataDependency(utilQuery);
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.functions.helper.
-//		 * UtilizationFunction#getUtilization(tools.descartes.librede.models.
-//		 * State)
-//		 */
-//		@Override
-//		public DerivativeStructure getUtilization(State state) {
-//			return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), getValue());
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.functions.helper.
-//		 * UtilizationFunction#getValue(tools.descartes.librede.models.State)
-//		 */
-//		@Override
-//		public double getValue() {
-//			return utilQuery.get(historicInterval).getValue();
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.functions.helper.
-//		 * UtilizationFunction#isConstant()
-//		 */
-//		@Override
-//		public boolean isConstant() {
-//			return true;
-//		}
-//	}
-//
-//	/**
-//	 * This is an implementation of {@code UtilizationFunction} that returns a
-//	 * calculated utilization using the Utilization Law.
-//	 * 
-//	 * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
-//	 *
-//	 */
-//	private static class CalculatedUtilizationFunction extends UtilizationFunction {
-//
-//		private final Query<Scalar, Ratio> contentionQuery;
-//		private final Query<Vector, RequestRate> throughputQuery;
-//
-//		/**
-//		 * Constructor
-//		 * 
-//		 * @param cursor
-//		 * @param resource
-//		 * @param historicInterval
-//		 */
-//		public CalculatedUtilizationFunction(IRepositoryCursor cursor, Resource resource, int historicInterval) {
-//			super(cursor, resource, historicInterval);
-//			this.throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
-//					.forServices(res_i.getAccessingServices()).average().using(cursor);
-//			addDataDependency(throughputQuery);
-//			this.contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i)
-//					.average().using(cursor);
-//			addDataDependency(contentionQuery);
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.queueingmodel.
-//		 * IModelEquation#getValue(tools.descartes.librede.models.State)
-//		 */
-//		@Override
-//		public DerivativeStructure getValue(State state) {
-//			/*
-//			 * Calculate the utilization using the utilization law.
-//			 */
-//
-//			DerivativeStructure U_i = new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), 0.0);
-//			for (Service curService : res_i.getAccessingServices()) {
-//				int idx = throughputQuery.indexOf(curService);
-//				U_i = U_i.add(state.getVariable(res_i, curService).getDerivativeStructure().multiply(X.get(idx)));
-//			}
-//			return U_i.divide(res_i.getNumberOfServers()).add(C_i);
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.queueingmodel.
-//		 * ILinearModelEquation#getFactors()
-//		 */
-//		@Override
-//		public Vector getFactors() {
-//			// sorted according to state variable ordering
-//			double C_i = contentionQuery.get(historicInterval).getValue();
-//			Vector X = throughputQuery.get(historicInterval);
-//			return X;
-//		}
-//
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.functions.helper.
-//		 * UtilizationFunction#isConstant()
-//		 */
-//		@Override
-//		public boolean isConstant() {
-//			return false;
-//		}
-//	}
+	@Override
+	public boolean isLinear() {
+		return true;
+	}
 
 }

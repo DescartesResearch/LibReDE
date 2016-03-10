@@ -60,7 +60,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	protected final Resource res_i;
 	protected final ErlangCEquation erlangC;
 	protected final int historicInterval;
-	protected final LinearModelEquation utilization;
+	protected final ModelEquation utilization;
 
 	/**
 	 * Use {@code WaitingTimeEquation#create(IRepositoryCursor, Resource, int)}
@@ -72,7 +72,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	 * @param utilization
 	 */
 	private WaitingTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
-			Service service, Resource resource, int historicInterval, LinearModelEquation utilization) {
+			Service service, Resource resource, int historicInterval, ModelEquation utilization) {
 		super(stateModel, historicInterval);
 		this.cls_r = service;
 		this.res_i = resource;
@@ -100,7 +100,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	 * @return a new {@code WaitingTimeEquation} instance
 	 */
 	public static WaitingTimeEquation create(IStateModel<? extends IStateConstraint> stateModel,
-			IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, LinearModelEquation utilization) {
+			IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, ModelEquation utilization) {
 		if (isProductForm(resource)) {
 			return new WaitingTimeEquationProductForm(stateModel, cursor, service, resource, historicInterval, utilization);
 		} else {
@@ -114,7 +114,12 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	
 	@Override
 	public boolean hasData() {
-		return true;
+		return utilization.hasData();
+	}
+	
+	@Override
+	public boolean isLinear() {
+		return (utilization instanceof ConstantValue);
 	}
 
 	/**
@@ -149,7 +154,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 		 */
 		public WaitingTimeEquationProductForm(IStateModel<? extends IStateConstraint> stateModel,
 				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval,
-				LinearModelEquation utilization) {
+				ModelEquation utilization) {
 			super(stateModel, cursor, service, resource, historicInterval, utilization);
 		}
 
@@ -166,7 +171,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 			case PS:
 			case UNKOWN:
 				DerivativeStructure D_ir = state.getVariable(res_i, cls_r).getDerivativeStructure();
-				return D_ir.multiply(getWaitingTimeFactor(cls_r, state));
+				return D_ir.multiply(getWaitingTimeFactor(state));
 			case IS:
 				/*
 				 * Infinite server: a job will never be forced to wait for
@@ -178,7 +183,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 			}
 		}
 
-		private DerivativeStructure getWaitingTimeFactor(Service service, State state) {
+		private DerivativeStructure getWaitingTimeFactor(State state) {
 			switch (res_i.getSchedulingStrategy()) {
 			case FCFS:
 			case PS:
@@ -254,7 +259,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 		 * @param utilization
 		 */
 		public WaitingTimeEquationMultiClassFCFS(IStateModel<? extends IStateConstraint> stateModel,
-				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, LinearModelEquation utilization) {
+				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, ModelEquation utilization) {
 			super(stateModel, cursor, service, resource, historicInterval, utilization);
 			queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL)
 					.in(RequestCount.REQUESTS).forResourceDemands(resource.getDemands()).average().using(cursor);

@@ -25,14 +25,15 @@ import tools.descartes.librede.units.RequestRate;
 
 public class ResponseTimeEquation extends ModelEquation {
 	
-	protected final Service cls_r;
-	protected final List<Service> usedServices;
-	protected final Map<Resource, List<Service>> accessedResources;
-	protected final Map<Resource, Map<Service, ResidenceTimeEquation>> residenceTimeEquations;
+	private final Service cls_r;
+	private final List<Service> usedServices;
+	private final Map<Resource, List<Service>> accessedResources;
+	private final Map<Resource, Map<Service, ResidenceTimeEquation>> residenceTimeEquations;
 	
-	protected final Query<Scalar, RequestRate> throughputQuery;
+	private final Query<Scalar, RequestRate> throughputQuery;
 
-	protected InvocationGraph invocations;
+	private InvocationGraph invocations;
+	private final boolean linear;
 
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
 			Service service, boolean useObservedUtilization, int historicInterval) {
@@ -40,6 +41,7 @@ public class ResponseTimeEquation extends ModelEquation {
 		
 		cls_r = service;
 		this.invocations = stateModel.getInvocationGraph();
+		this.linear = useObservedUtilization;
 
 		// This equation is based on the end-to-end response time
 		// therefore its scope includes all directly and indirectly
@@ -54,7 +56,7 @@ public class ResponseTimeEquation extends ModelEquation {
 				residenceTimeEquations.put(res, currentMap);
 			}
 
-			LinearModelEquation utilFunction;
+			ModelEquation utilFunction;
 			if (useObservedUtilization) {
 				Query<Scalar, ?> utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res).average().using(cursor);
 				utilFunction = new ConstantValue(getStateModel(), historicInterval, utilQuery);
@@ -112,6 +114,11 @@ public class ResponseTimeEquation extends ModelEquation {
 			}
 		}
 		return ret;
+	}
+	
+	@Override
+	public boolean isLinear() {
+		return linear;
 	}
 	
 	
