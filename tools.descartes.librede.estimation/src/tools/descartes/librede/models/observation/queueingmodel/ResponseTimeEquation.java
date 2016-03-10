@@ -20,7 +20,6 @@ import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 
 public class ResponseTimeEquation extends ModelEquation {
@@ -56,8 +55,7 @@ public class ResponseTimeEquation extends ModelEquation {
 
 			ModelEquation utilFunction;
 			if (useObservedUtilization) {
-				Query<Scalar, ?> utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res).average().using(cursor);
-				utilFunction = new ConstantValue(getStateModel(), historicInterval, utilQuery);
+				utilFunction = new UtilizationValue(getStateModel(), cursor, res, historicInterval);
 			} else {
 				utilFunction = new UtilizationLawEquation(getStateModel(), cursor, res, historicInterval);
 			}

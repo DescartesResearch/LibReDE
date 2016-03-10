@@ -1,7 +1,6 @@
 package tools.descartes.librede.models.observation.queueingmodel;
 
 import static tools.descartes.librede.linalg.LinAlg.nansum;
-import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
@@ -46,7 +45,7 @@ import tools.descartes.librede.units.Time;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  * @version 1.0
  */
-public class ServiceDemandLawEquation extends ModelEquation {
+public class ServiceDemandLawEquation extends DemandValue {
 
 	private Resource res_i;
 	private Service cls_r;
@@ -57,9 +56,6 @@ public class ServiceDemandLawEquation extends ModelEquation {
 
 	private boolean multiClass = true;
 	
-	private final Vector zerosBuffer;
-	private final int variableIdx;
-
 	/**
 	 * Creates a new instance.
 	 * 
@@ -102,7 +98,7 @@ public class ServiceDemandLawEquation extends ModelEquation {
 	 */
 	public ServiceDemandLawEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
 			Resource resource, Service service, int historicInterval, boolean multiClass) {
-		super(stateModel, historicInterval);
+		super(stateModel, resource, service, historicInterval);
 
 		res_i = resource;
 		cls_r = service;
@@ -124,9 +120,6 @@ public class ServiceDemandLawEquation extends ModelEquation {
 		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND)
 				.forServices(stateModel.getUserServices()).average().using(repository);
 		addDataDependency(avgThroughputQuery);
-		
-		this.zerosBuffer = zeros(stateModel.getStateSize());
-		this.variableIdx = stateModel.getStateVariableIndex(res_i, cls_r);
 	}
 
 	/*
@@ -162,11 +155,6 @@ public class ServiceDemandLawEquation extends ModelEquation {
 		}
 	}
 	
-	@Override
-	public Vector getFactors() {
-		return zerosBuffer.set(variableIdx, getConstantValue());
-	}
-
 	@Override
 	public boolean hasData() {
 		if (multiClass) {

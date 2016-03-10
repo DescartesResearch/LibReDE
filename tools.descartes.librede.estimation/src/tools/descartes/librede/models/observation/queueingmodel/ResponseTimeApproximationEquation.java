@@ -1,11 +1,8 @@
 package tools.descartes.librede.models.observation.queueingmodel;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.state.IStateModel;
@@ -22,14 +19,11 @@ import tools.descartes.librede.units.Time;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  * @version 1.0
  */
-public class ResponseTimeApproximationEquation extends ModelEquation {
+public class ResponseTimeApproximationEquation extends DemandValue {
 
 	private final Service cls_r;
 
 	private final Query<Scalar, Time> individualResidenceTimesQuery;
-
-	private final Vector zerosBuffer;
-	private final int variableIdx;
 
 	/**
 	 * Creates a new instance.
@@ -80,12 +74,9 @@ public class ResponseTimeApproximationEquation extends ModelEquation {
 	public ResponseTimeApproximationEquation(IStateModel<? extends IStateConstraint> stateModel,
 			IRepositoryCursor repository, Resource resource, Service service, Aggregation aggregation,
 			int historicInterval) {
-		super(stateModel, historicInterval);
+		super(stateModel, resource, service, historicInterval);
 
 		cls_r = service;
-
-		this.zerosBuffer = zeros(stateModel.getStateSize());
-		this.variableIdx = stateModel.getStateVariableIndex(resource, cls_r);
 
 		switch (aggregation) {
 		case AVERAGE:
@@ -121,18 +112,6 @@ public class ResponseTimeApproximationEquation extends ModelEquation {
 		// We did not observe a request in this interval
 		// therefore, we approximate the demand with zero
 		return (rt != rt) ? 0.0 : rt;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
-	 * getFactors()
-	 */
-	@Override
-	public Vector getFactors() {
-		return zerosBuffer.set(variableIdx, getConstantValue());
 	}
 
 	/*
