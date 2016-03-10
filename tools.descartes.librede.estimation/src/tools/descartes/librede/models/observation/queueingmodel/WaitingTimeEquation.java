@@ -26,6 +26,9 @@
  */
 package tools.descartes.librede.models.observation.queueingmodel;
 
+import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.LinAlg.zeros;
+
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
 import tools.descartes.librede.configuration.Resource;
@@ -143,6 +146,8 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	 *
 	 */
 	private static class WaitingTimeEquationProductForm extends WaitingTimeEquation {
+		
+		private final Vector zeroBuffer;
 
 		/**
 		 * Constructor.
@@ -156,6 +161,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval,
 				ModelEquation utilization) {
 			super(stateModel, cursor, service, resource, historicInterval, utilization);
+			zeroBuffer = zeros(stateModel.getStateSize());
 		}
 
 		/*
@@ -181,6 +187,18 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 			default:
 				throw new AssertionError("Unsupported scheduling strategy.");
 			}
+		}
+		
+		@Override
+		public Vector getFactors() {
+			if (!isLinear()) {
+				throw new IllegalStateException();
+			}
+			
+			int idx = getStateModel().getStateVariableIndex(res_i, cls_r);
+			double U_i = utilization.getFactors().get(0);
+			double P_q = erlangC.value(U_i);
+			return zeroBuffer.set(idx, P_q / (1 - U_i));
 		}
 
 		private DerivativeStructure getWaitingTimeFactor(State state) {
@@ -294,26 +312,27 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 			return T_q.multiply(P_q.divide(res_i.getNumberOfServers()));
 		}
 
-//		/*
-//		 * (non-Javadoc)
-//		 * 
-//		 * @see tools.descartes.librede.models.observation.functions.helper.
-//		 * WaitingTimeEquation#getLinearWaitingTimeFactors(tools.descartes.
-//		 * librede.configuration.Service, tools.descartes.librede.models.State)
-//		 */
-//		@Override
-//		public Vector getLinearWaitingTimeFactors(Service service, State state) {
-//			Vector Q_ir = queueLengthQuery.get(historicInterval);
-//			double[] factorsBuffer = new double[state.getStateSize()];
-//			for (int i = 0; i < Q_ir.rows(); i++) {
-//				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
-//				int stateIdx = state.getStateModel().getStateVariableIndex(res_i, curDemand.getService());
-//				factorsBuffer[stateIdx] = Q_ir.get(i);
-//			}
-//			Vector factors = vector(factorsBuffer);
-//			double U_i = utilization.getFactors().get(0);
-//			double P_q = erlangC.calculateValue(U_i);
-//			return factors.times(P_q / res_i.getNumberOfServers());
-//		}
+
+		/* (non-Javadoc)
+		 * @see tools.descartes.librede.models.observation.queueingmodel.ModelEquation#getFactors()
+		 */
+		@Override
+		public Vector getFactors() {
+			if (!isLinear()) {
+				throw new IllegalStateException();
+			}
+			
+			Vector Q_ir = queueLengthQuery.get(historicInterval);
+			double[] factorsBuffer = new double[getStateModel().getStateSize()];
+			for (int i = 0; i < Q_ir.rows(); i++) {
+				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
+				int stateIdx = getStateModel().getStateVariableIndex(res_i, curDemand.getService());
+				factorsBuffer[stateIdx] = Q_ir.get(i);
+			}
+			Vector factors = vector(factorsBuffer);
+			double U_i = utilization.getFactors().get(0);
+			double P_q = erlangC.calculateValue(U_i);
+			return factors.times(P_q / res_i.getNumberOfServers());
+		}
 	}
 }

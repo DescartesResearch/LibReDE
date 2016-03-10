@@ -33,7 +33,6 @@ public class ResponseTimeEquation extends ModelEquation {
 	private final Query<Scalar, RequestRate> throughputQuery;
 
 	private InvocationGraph invocations;
-	private final boolean linear;
 
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
 			Service service, boolean useObservedUtilization, int historicInterval) {
@@ -41,7 +40,6 @@ public class ResponseTimeEquation extends ModelEquation {
 		
 		cls_r = service;
 		this.invocations = stateModel.getInvocationGraph();
-		this.linear = useObservedUtilization;
 
 		// This equation is based on the end-to-end response time
 		// therefore its scope includes all directly and indirectly
@@ -118,7 +116,7 @@ public class ResponseTimeEquation extends ModelEquation {
 	
 	@Override
 	public boolean isLinear() {
-		return linear;
+		return false;
 	}
 	
 	

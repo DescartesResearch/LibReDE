@@ -31,6 +31,7 @@ import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
@@ -110,11 +111,27 @@ public class ResidenceTimeEquation extends ModelEquation {
 		return D_ir.add(T_q).multiply(1 + C_i);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * getFactors()
+	 */
+	@Override
+	public Vector getFactors() {
+		Vector factors = waitingTime.getFactors();
+		int idx = getStateModel().getStateVariableIndex(res_i, cls_r);
+		factors = factors.set(idx, factors.get(idx) + 1);
+		double C_i = contentionQuery.get(historicInterval).getValue();
+		return factors.times(C_i);
+	}
+
 	@Override
 	public boolean hasData() {
 		return waitingTime.hasData();
 	}
-	
+
 	@Override
 	public boolean isLinear() {
 		return waitingTime.isLinear();
