@@ -8,7 +8,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
-public abstract class DemandValue extends ConstantValue {
+public abstract class DemandValue extends FixedValue {
 
 	private final Vector zerosBuffer;
 	private final int variableIdx;

@@ -10,7 +10,7 @@ import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.units.Ratio;
 
-public class UtilizationValue extends ConstantValue {
+public class UtilizationValue extends FixedValue {
 
 	private final Query<Scalar, Ratio> utilQuery;
 

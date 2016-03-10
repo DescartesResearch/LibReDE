@@ -1,38 +1,25 @@
 package tools.descartes.librede.models.observation.queueingmodel;
 
-import static tools.descartes.librede.linalg.LinAlg.scalar;
-
-import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 
-public abstract class ConstantValue extends ModelEquation {
+public class ConstantValue extends FixedValue {
 	
-	public ConstantValue(IStateModel<? extends IStateConstraint> stateModel, int historicInterval) {
-		super(stateModel, historicInterval);
-	}
-
-	@Override
-	public Vector getFactors() {
-		return scalar(getConstantValue());
+	public final double constant;
+	
+	public ConstantValue(IStateModel<? extends IStateConstraint> stateModel, double constant) {
+		super(stateModel, -1);
+		this.constant = constant;
 	}
 	
 	@Override
-	public DerivativeStructure getValue(State state) {
-		return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), getConstantValue());
+	public double getConstantValue() {
+		return constant;
 	}
 
 	@Override
-	public boolean isLinear() {
+	public boolean hasData() {
 		return true;
 	}
 	
-	@Override
-	public boolean isConstant() {
-		return true;
-	}
-
 }
