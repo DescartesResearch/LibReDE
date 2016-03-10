@@ -109,6 +109,17 @@ public abstract class UtilizationFunction extends AbstractDependencyTarget {
 	public abstract DerivativeStructure getUtilization(State state);
 
 	/**
+	 * @return a constant value of the current utilization.
+	 */
+	public abstract double getValue();
+
+	/**
+	 * @return a boolean indicating whether this function is constant or the
+	 *         utilization depends on the current state vector.
+	 */
+	public abstract boolean isConstant();
+
+	/**
 	 * This is an implementation of {@code UtilizationFunction} that returns the
 	 * currently observed utilization.
 	 * 
@@ -142,8 +153,29 @@ public abstract class UtilizationFunction extends AbstractDependencyTarget {
 		 */
 		@Override
 		public DerivativeStructure getUtilization(State state) {
-			return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(),
-					utilQuery.get(historicInterval).getValue());
+			return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), getValue());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tools.descartes.librede.models.observation.functions.helper.
+		 * UtilizationFunction#getValue(tools.descartes.librede.models.State)
+		 */
+		@Override
+		public double getValue() {
+			return utilQuery.get(historicInterval).getValue();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tools.descartes.librede.models.observation.functions.helper.
+		 * UtilizationFunction#isConstant()
+		 */
+		@Override
+		public boolean isConstant() {
+			return true;
 		}
 	}
 
@@ -197,6 +229,30 @@ public abstract class UtilizationFunction extends AbstractDependencyTarget {
 				U_i = U_i.add(state.getVariable(res_i, curService).getDerivativeStructure().multiply(X.get(idx)));
 			}
 			return U_i.divide(res_i.getNumberOfServers()).add(C_i);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tools.descartes.librede.models.observation.functions.helper.
+		 * UtilizationFunction#getValue(tools.descartes.librede.models.State)
+		 */
+		@Override
+		public double getValue() {
+			// this function depends on the state and cannot provide a constant
+			// value.
+			throw new UnsupportedOperationException();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tools.descartes.librede.models.observation.functions.helper.
+		 * UtilizationFunction#isConstant()
+		 */
+		@Override
+		public boolean isConstant() {
+			return false;
 		}
 	}
 

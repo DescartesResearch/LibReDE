@@ -31,6 +31,7 @@ import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
@@ -89,8 +90,7 @@ public class ResidenceTimeEquation extends AbstractDependencyTarget {
 		addDataDependencies(waitingTime);
 
 		// The contention is the ratio of time a virtual CPU is waiting for a
-		// physical
-		// CPU.
+		// physical CPU.
 		contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average()
 				.using(cursor);
 		addDataDependency(contentionQuery);
@@ -106,6 +106,17 @@ public class ResidenceTimeEquation extends AbstractDependencyTarget {
 		DerivativeStructure T_q = waitingTime.getAverageWaitingTime(cls_r, state);
 		double C_i = contentionQuery.get(historicInterval).getValue();
 		return D_ir.add(T_q).multiply(1 + C_i);
+	}
+	
+	public Vector getLinearResidenceTimeFactors(State state) {
+		Vector factors = waitingTime.getLinearWaitingTimeFactors(cls_r, state);
+		double C_i = contentionQuery.get(historicInterval).getValue();
+		factors = factors.set(state.getStateModel().getStateVariableIndex(res_i, cls_r), state.getVariable(res_i, cls_r).getValue() + 1);
+		return factors.times(1 + C_i);
+	}
+	
+	public boolean isLinear() {
+		return waitingTime.isLinear();
 	}
 
 }

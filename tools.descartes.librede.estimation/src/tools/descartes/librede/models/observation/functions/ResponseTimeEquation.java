@@ -73,15 +73,15 @@ import tools.descartes.librede.units.Time;
  */
 public class ResponseTimeEquation extends AbstractOutputFunction {
 
-	private final Service cls_r;
-	private final List<Service> usedServices;
-	private final Map<Resource, List<Service>> accessedResources;
-	private final Map<Resource, Map<Service, ResidenceTimeEquation>> residenceTimeEquations;
+	protected final Service cls_r;
+	protected final List<Service> usedServices;
+	protected final Map<Resource, List<Service>> accessedResources;
+	protected final Map<Resource, Map<Service, ResidenceTimeEquation>> residenceTimeEquations;
 
-	private final Query<Scalar, Time> responseTimeQuery;
-	private final Query<Scalar, RequestRate> throughputQuery;
+	protected final Query<Scalar, Time> responseTimeQuery;
+	protected final Query<Scalar, RequestRate> throughputQuery;
 
-	private InvocationGraph invocations;
+	protected InvocationGraph invocations;
 
 	/**
 	 * Creates a new instance.
@@ -234,4 +234,41 @@ public class ResponseTimeEquation extends AbstractOutputFunction {
 		boolean ret = responseTimeQuery.hasData(historicInterval) && throughputQuery.hasData(historicInterval);
 		return ret;
 	}
+	
+//	public static class LinearVariant extends ResponseTimeEquation implements ILinearOutputFunction {
+//
+//		public LinearVariant(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor repository,
+//				Service service) {
+//			super(stateModel, repository, service, true);
+//		}
+//
+//		@Override
+//		public Vector getIndependentVariables() {
+//			Vector X = throughputQuery.get(historicInterval);
+//			if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
+//				// no request observed in this interval
+//				return zeros(getStateModel().getStateSize());
+//			}
+//
+//			Vector result = zeros(getStateModel().getStateSize());
+//			for (Resource res_i : accessedResources.keySet()) {
+//				Map<Service, ResidenceTimeEquation> accessingServices = residenceTimeEquations.get(res_i);
+//				for (Service curService : accessingServices.keySet()) {
+//					double visits = 1;
+//					if (!curService.equals(cls_r)) {
+//						visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
+//					}
+//					ResidenceTimeEquation R_ir = accessingServices.get(curService);
+//					DerivativeStructure curRt = R_ir.getLinearResidenceTimeFactors(state).multiply(visits);
+//					if (rt == null) {
+//						rt = curRt;
+//					} else {
+//						rt = rt.add(curRt);
+//					}
+//				}
+//			}
+//			return result;
+//		}
+//		
+//	}
 }

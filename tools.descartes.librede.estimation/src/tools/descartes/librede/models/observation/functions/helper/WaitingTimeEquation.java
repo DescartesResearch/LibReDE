@@ -26,6 +26,9 @@
  */
 package tools.descartes.librede.models.observation.functions.helper;
 
+import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.LinAlg.zeros;
+
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
 import tools.descartes.librede.configuration.Resource;
@@ -119,6 +122,12 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	 */
 	public abstract DerivativeStructure getAverageWaitingTime(Service service, State state);
 
+	public abstract Vector getLinearWaitingTimeFactors(Service service, State state);
+	
+	public boolean isLinear() {
+		return utilization.isConstant();
+	}
+
 	/**
 	 * 
 	 * @param resource
@@ -167,6 +176,37 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 			case FCFS:
 			case PS:
 			case UNKOWN:
+				DerivativeStructure D_ir = state.getVariable(res_i, service).getDerivativeStructure();
+				return D_ir.multiply(getWaitingTimeFactor(service, state));
+			case IS:
+				/*
+				 * Infinite server: a job will never be forced to wait for
+				 * service
+				 */
+				return new DerivativeStructure(state.getStateSize(), state.getDerivationOrder(), 0.0);
+			default:
+				throw new AssertionError("Unsupported scheduling strategy.");
+			}
+		}
+
+		@Override
+		public Vector getLinearWaitingTimeFactors(Service service, State state) {
+			if (!utilization.isConstant()) {
+				// This is not a linear function.
+				throw new IllegalStateException();
+			}
+
+			int idx = state.getStateModel().getStateVariableIndex(res_i, service);
+			DerivativeStructure waitingTimeFactor = getWaitingTimeFactor(service, state);
+			Vector factors = zeros(state.getStateSize());
+			return factors.set(idx, waitingTimeFactor.getValue());
+		}
+
+		private DerivativeStructure getWaitingTimeFactor(Service service, State state) {
+			switch (res_i.getSchedulingStrategy()) {
+			case FCFS:
+			case PS:
+			case UNKOWN:
 				/*
 				 * The mean queue length of a single-class, multi-server queue
 				 * is
@@ -184,10 +224,9 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 				 * 
 				 * E[T_q] = \frac{D_ir}{1 - U_i} * P_q
 				 */
-				DerivativeStructure D_ir = state.getVariable(res_i, service).getDerivativeStructure();
 				DerivativeStructure U_i = utilization.getUtilization(state);
 				DerivativeStructure P_q = erlangC.value(U_i);
-				return (D_ir.multiply(P_q)).divide(U_i.multiply(-1).add(1));
+				return P_q.divide(U_i.multiply(-1).add(1));
 			case IS:
 				/*
 				 * Infinite server: a job will never be forced to wait for
@@ -204,6 +243,24 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	 * This implementation use information on the queue length of individual
 	 * workload classes to calculate the waiting time for multi-class FCFS
 	 * queues.
+	 * 
+	 * Since FCFS is known to result in non-product form queueing networks, we
+	 * need to use an approximation. Franks [1] has evaluated different
+	 * evaluation schemes and proposes to use the following equation (slightly
+	 * adapted for our needs):
+	 * 
+	 * W_{i,r} = \frac{PB_{r}}{m_{r}} \sum_{s=1}^{N} D_{i,s} * Q_{i,s}
+	 * 
+	 * where
+	 * <ul>
+	 * <li>W_{i,r} is the waiting time of requests of service r at resource i
+	 * </li>
+	 * <li>PB_{r} is the probability that all servers or resource r are busy
+	 * </li>
+	 * <li>N is the number of workload classes</li>
+	 * <li>D_{i,s} is the resource demand of service s at resource i</li>
+	 * <li>Q_{i,s} is the queue length of service s at resource i</li>
+	 * </ul>
 	 * 
 	 * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
 	 *
@@ -256,7 +313,33 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 			 * Therefore we multiply the waiting time with the busy probability
 			 * of the resource.
 			 */
-			return T_q.multiply(P_q);
+			return T_q.multiply(P_q.divide(res_i.getNumberOfServers()));
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see tools.descartes.librede.models.observation.functions.helper.
+		 * WaitingTimeEquation#getLinearWaitingTimeFactors(tools.descartes.
+		 * librede.configuration.Service, tools.descartes.librede.models.State)
+		 */
+		@Override
+		public Vector getLinearWaitingTimeFactors(Service service, State state) {
+			if (!utilization.isConstant()) {
+				// this is not a linear function.
+				throw new IllegalStateException();
+			}
+			Vector Q_ir = queueLengthQuery.get(historicInterval);
+			double[] factorsBuffer = new double[state.getStateSize()];
+			for (int i = 0; i < Q_ir.rows(); i++) {
+				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
+				int stateIdx = state.getStateModel().getStateVariableIndex(res_i, curDemand.getService());
+				factorsBuffer[stateIdx] = Q_ir.get(i);
+			}
+			Vector factors = vector(factorsBuffer);
+			double U_i = utilization.getValue();
+			double P_q = erlangC.calculateValue(U_i);
+			return factors.times(P_q / res_i.getNumberOfServers());
 		}
 	}
 }
