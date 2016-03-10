@@ -40,9 +40,10 @@ import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.InvocationGraph;
@@ -59,7 +60,7 @@ public class MenasceOptimizationTest extends LibredeTest {
 
 	private static final int ITERATIONS = 100;
 
-	private VectorObservationModel<IOutputFunction> observationModel;
+	private VectorObservationModel observationModel;
 	private ConstantStateModel<IStateConstraint> stateModel;
 
 	@Before
@@ -88,9 +89,10 @@ public class MenasceOptimizationTest extends LibredeTest {
 		}
 		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 1));
 		stateModel = builder.build();
-		
-		observationModel = new VectorObservationModel<>();
-		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false));
+
+		observationModel = new VectorObservationModel();
+		ResponseTimeEquation funcRt = new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false, 0);
+		observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, workload.getServices().get(0), 0), funcRt));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
 		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
@@ -148,9 +150,10 @@ public class MenasceOptimizationTest extends LibredeTest {
 		stateModel = builder.build();
 		
 
-		observationModel = new VectorObservationModel<>();
-		for (Service service : workload.getServices()) {		
-			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, service, false));
+		observationModel = new VectorObservationModel();
+		for (Service service : workload.getServices()) {
+			ResponseTimeEquation funcRt = new ResponseTimeEquation(stateModel, cursor, service, false, 0);
+			observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, service, 0), funcRt));
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();

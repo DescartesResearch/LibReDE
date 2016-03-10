@@ -26,7 +26,6 @@
  */
 package tools.descartes.librede.approach;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -41,10 +40,12 @@ import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeValue;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -82,8 +83,8 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 	}
 
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+	protected IObservationModel<?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel observationModel = new VectorObservationModel();
 		for (int i = 0; i < getEstimationWindow(); i++) {
 			for (Service service : stateModel.getUserServices()) {
 				// Current assumption is that services which are not called by others
@@ -92,13 +93,13 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 				// The remaining services are referenced from these system entry services.
 				if (service.getIncomingCalls().isEmpty()) {
 					ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, true, i);
-					observationModel.addOutputFunction(func);
+					observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, service, i), func));
 				}
 			}
 			for (Resource resource : stateModel.getResources()) {
 				if (resource.getSchedulingStrategy() != SchedulingStrategy.IS) {
-					UtilizationLaw func = new UtilizationLaw(stateModel, cursor, resource, i);
-					observationModel.addOutputFunction(func);
+					UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, resource, i);
+					observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, resource, i), func));
 				}
 			}
 		}

@@ -59,7 +59,7 @@ import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
 import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
@@ -332,14 +332,14 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	}
 	
 	private DerivativeStructure calcObjectiveFunction(State state) {
-		IObservationModel<?, ?> observationModel = getObservationModel();
+		IObservationModel<?> observationModel = getObservationModel();
 		int outputSize = observationModel.getOutputSize();
 		Vector outputWeights = observationModel.getOutputWeightsFunction().getOutputWheights();
 
 		// obj = sum((h_real - h_calc(x)) .^ 2)
 		DerivativeStructure obj = null;
 		for (int i = 0; i < outputSize; i++) {
-			IOutputFunction func = observationModel.getOutputFunction(i);
+			OutputFunction func = observationModel.getOutputFunction(i);
 			if (func.hasData()) {
 				double o_real = func.getObservedOutput();
 				OutputVariable o_calc = func.getCalculatedOutput(state);

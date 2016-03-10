@@ -42,9 +42,10 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -84,11 +85,11 @@ public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 	
-	protected IObservationModel<IOutputFunction,Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+	protected IObservationModel<Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel observationModel = new VectorObservationModel();
 		for (Service service : stateModel.getUserServices()) {
-			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, false);
-			observationModel.addOutputFunction(func);
+			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, false, 0);
+			observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, service, 0), func));
 		}
 		return observationModel;
 	}
