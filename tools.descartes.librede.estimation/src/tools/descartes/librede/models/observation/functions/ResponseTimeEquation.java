@@ -161,7 +161,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction {
 			for (Service serv : res.getAccessingServices()) {
 				WaitingTimeEquation waitingTime = WaitingTimeEquation.create(getStateModel(), repository, serv, res, historicInterval,
 						utilFunction);
-				currentMap.put(serv, new ResidenceTimeEquation(repository, serv, res, historicInterval, waitingTime));
+				currentMap.put(serv, new ResidenceTimeEquation(stateModel, repository, serv, res, historicInterval, waitingTime));
 			}
 		}
 
@@ -204,7 +204,7 @@ public class ResponseTimeEquation extends AbstractOutputFunction {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
 				ResidenceTimeEquation R_ir = accessingServices.get(curService);
-				DerivativeStructure curRt = R_ir.getResidenceTime(state).multiply(visits);
+				DerivativeStructure curRt = R_ir.getValue(state).multiply(visits);
 				if (rt == null) {
 					rt = curRt;
 				} else {

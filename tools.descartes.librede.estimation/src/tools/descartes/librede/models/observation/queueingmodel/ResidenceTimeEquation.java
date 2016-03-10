@@ -32,8 +32,9 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -56,9 +57,8 @@ import tools.descartes.librede.units.Ratio;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public class ResidenceTimeEquation extends AbstractDependencyTarget {
+public class ResidenceTimeEquation extends ModelEquation {
 
-	private final int historicInterval;
 	private final Service cls_r;
 	private final Resource res_i;
 	private final WaitingTimeEquation waitingTime;
@@ -67,6 +67,7 @@ public class ResidenceTimeEquation extends AbstractDependencyTarget {
 	/**
 	 * Constructor.
 	 * 
+	 * @param stateModel
 	 * @param cursor
 	 *            the position in the monitoring data
 	 * @param service
@@ -80,9 +81,9 @@ public class ResidenceTimeEquation extends AbstractDependencyTarget {
 	 *            a reference to a {@code WaitingTimeEquation} to calculate
 	 *            W_{i,r}
 	 */
-	public ResidenceTimeEquation(IRepositoryCursor cursor, Service service, Resource resource, int historicInterval,
-			WaitingTimeEquation waitingTime) {
-		this.historicInterval = historicInterval;
+	public ResidenceTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
+			Service service, Resource resource, int historicInterval, WaitingTimeEquation waitingTime) {
+		super(stateModel, historicInterval);
 		this.cls_r = service;
 		this.res_i = resource;
 		this.waitingTime = waitingTime;
@@ -95,23 +96,31 @@ public class ResidenceTimeEquation extends AbstractDependencyTarget {
 		addDataDependency(contentionQuery);
 	}
 
-	/**
-	 * @param state
-	 *            the current state of the system
-	 * @return a {@code DerivativeStructure} containing the residence time
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * getValue(tools.descartes.librede.models.State)
 	 */
-	public DerivativeStructure getResidenceTime(State state) {
+	public DerivativeStructure getValue(State state) {
 		DerivativeStructure D_ir = state.getVariable(res_i, cls_r).getDerivativeStructure();
 		DerivativeStructure T_q = waitingTime.getValue(state);
 		double C_i = contentionQuery.get(historicInterval).getValue();
 		return D_ir.add(T_q).multiply(1 + C_i);
 	}
-	
-//	public Vector getLinearResidenceTimeFactors(State state) {
-//		Vector factors = waitingTime.getLinearWaitingTimeFactors(cls_r, state);
-//		double C_i = contentionQuery.get(historicInterval).getValue();
-//		factors = factors.set(state.getStateModel().getStateVariableIndex(res_i, cls_r), state.getVariable(res_i, cls_r).getValue() + 1);
-//		return factors.times(1 + C_i);
-//	}
-	
+
+	// public Vector getLinearResidenceTimeFactors(State state) {
+	// Vector factors = waitingTime.getLinearWaitingTimeFactors(cls_r, state);
+	// double C_i = contentionQuery.get(historicInterval).getValue();
+	// factors = factors.set(state.getStateModel().getStateVariableIndex(res_i,
+	// cls_r), state.getVariable(res_i, cls_r).getValue() + 1);
+	// return factors.times(1 + C_i);
+	// }
+
+	@Override
+	public boolean hasData() {
+		return waitingTime.hasData();
+	}
+
 }
