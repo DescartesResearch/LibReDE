@@ -32,14 +32,14 @@ import static tools.descartes.librede.linalg.LinAlg.transpose;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.models.observation.OutputFunction;
 
 public final class JacobiMatrixBuilder {
 	
-	public static Matrix calculateOfObservationModel(IObservationModel<?, ?> observationModel, Vector x) {
+	public static Matrix calculateOfObservationModel(IObservationModel<?> observationModel, Vector x) {
 		Vector[] dev = new Vector[observationModel.getOutputSize()];
 		for (int i = 0; i < dev.length; i++) {
-			IOutputFunction f = observationModel.getOutputFunction(i);
+			OutputFunction f = observationModel.getOutputFunction(i);
 			if (f instanceof IDifferentiableFunction) {
 				dev[i] = ((IDifferentiableFunction)f).getFirstDerivatives(x);
 			} else {

@@ -131,7 +131,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 	protected abstract List<IStateModel<?>> deriveStateModels(
 			WorkloadDescription workload, IRepositoryCursor cursor);
 
-	protected abstract IObservationModel<?, ?> deriveObservationModel(
+	protected abstract IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor);
 
 	protected abstract IEstimationAlgorithm getEstimationAlgorithm(
@@ -164,7 +164,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 		problems = new LinkedList<>();		
 		
 		for (IStateModel<?> sm : stateModels) {
-			IObservationModel<?, ?> om = deriveObservationModel(sm, cursor);
+			IObservationModel<?> om = deriveObservationModel(sm, cursor);
 			EstimationProblem prob = new EstimationProblem(sm, om);
 			prob.setActivationHandler(activationListener);
 			problems.add(prob);

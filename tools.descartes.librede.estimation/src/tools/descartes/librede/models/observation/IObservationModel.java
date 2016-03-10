@@ -28,10 +28,9 @@ package tools.descartes.librede.models.observation;
 
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IObservationModel<E extends IOutputFunction, O extends Vector> extends Iterable<E>, IDependencyTarget {
+public interface IObservationModel<O extends Vector> extends Iterable<OutputFunction>, IDependencyTarget {
 	
 	int getOutputSize();
 	
@@ -39,7 +38,7 @@ public interface IObservationModel<E extends IOutputFunction, O extends Vector> 
 	
 	O getCalculatedOutput(State state);
 	
-	E getOutputFunction(int output);
+	OutputFunction getOutputFunction(int output);
 	
 	IOutputWeightingFunction getOutputWeightsFunction();
 	

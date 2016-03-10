@@ -37,9 +37,9 @@ import tools.descartes.librede.repository.rules.Rule;
 public class EstimationProblem extends Rule {
 
 	private final IStateModel<?> stateModel;
-	private final IObservationModel<?, ?> observationModel;
+	private final IObservationModel<?> observationModel;
 	
-	public EstimationProblem(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel) {
+	public EstimationProblem(IStateModel<?> stateModel, IObservationModel<?> observationModel) {
 		this.stateModel = stateModel;
 		this.observationModel = observationModel;
 		
@@ -51,7 +51,7 @@ public class EstimationProblem extends Rule {
 		return stateModel;
 	}
 
-	public IObservationModel<?, ?> getObservationModel() {
+	public IObservationModel<?> getObservationModel() {
 		return observationModel;
 	}
 

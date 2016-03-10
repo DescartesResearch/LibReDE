@@ -103,6 +103,6 @@ public interface IEstimationAlgorithm {
 	 * @return the observation model associated with this instance of the
 	 *         estimation algorithm.
 	 */
-	IObservationModel<?, ?> getObservationModel();
+	IObservationModel<?> getObservationModel();
 
 }

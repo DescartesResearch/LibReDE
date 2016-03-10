@@ -36,10 +36,9 @@ import java.util.List;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.repository.rules.DataDependency;
 
-public class VectorObservationModel<E extends IOutputFunction> implements IObservationModel<E, Vector> {
+public class VectorObservationModel implements IObservationModel<Vector> {
 	
 	private class DefaultWeightingFunction implements IOutputWeightingFunction {
 		@Override
@@ -49,22 +48,22 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	private final IOutputWeightingFunction weights;
-	private final List<E> outputFunctions;
+	private final List<OutputFunction> outputFunctions;
 	private int outputSize;
 	
 	public VectorObservationModel() {
 		weights = new DefaultWeightingFunction();
-		outputFunctions = new ArrayList<E>();
+		outputFunctions = new ArrayList<>();
 		outputSize = 0;
 	}
 
 	public VectorObservationModel(IOutputWeightingFunction weights) {
 		this.weights = weights;
-		outputFunctions = new ArrayList<E>();
+		outputFunctions = new ArrayList<>();
 		outputSize = 0;
 	}
 	
-	public void addOutputFunction(E function) {
+	public void addOutputFunction(OutputFunction function) {
 		outputFunctions.add(function);
 		outputSize++;
 	}
@@ -93,12 +92,12 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	}
 
 	@Override
-	public E getOutputFunction(int output) {
+	public OutputFunction getOutputFunction(int output) {
 		return outputFunctions.get(output);
 	}
 	
 	@Override
-	public Iterator<E> iterator() {
+	public Iterator<OutputFunction> iterator() {
 		return outputFunctions.iterator();
 	}
 
@@ -110,7 +109,7 @@ public class VectorObservationModel<E extends IOutputFunction> implements IObser
 	@Override
 	public List<DataDependency<?>> getDataDependencies() {
 		List<DataDependency<?>> deps = new ArrayList<>();
-		for (IOutputFunction func : outputFunctions) {
+		for (OutputFunction func : outputFunctions) {
 			deps.addAll(func.getDataDependencies());
 		}
 		return Collections.unmodifiableList(deps);

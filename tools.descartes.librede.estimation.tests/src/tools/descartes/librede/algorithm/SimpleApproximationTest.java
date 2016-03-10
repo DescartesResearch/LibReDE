@@ -41,10 +41,11 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
-import tools.descartes.librede.models.observation.functions.ServiceDemandLaw;
+import tools.descartes.librede.models.observation.queueingmodel.ConstantValue;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeApproximationEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ServiceDemandLawEquation;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -79,9 +80,10 @@ public class SimpleApproximationTest extends LibredeTest {
 	@Test
 	public void testSDL() throws EstimationException, InitializationException {
 		IStateModel<Unconstrained> stateModel = generator.getStateModel();
-		VectorObservationModel<IDirectOutputFunction> model = new VectorObservationModel<>();
+		VectorObservationModel model = new VectorObservationModel();
 		for (Service service : generator.getStateModel().getAllServices()) {
-			model.addOutputFunction(new ServiceDemandLaw(stateModel, cursor, stateModel.getResources().get(0), service));
+			ServiceDemandLawEquation sdl = new ServiceDemandLawEquation(stateModel, cursor, stateModel.getResources().get(0), service);
+			model.addOutputFunction(new OutputFunction(sdl, new ConstantValue(stateModel, 1.0)));
 		}
 		
 		algorithm = new SimpleApproximation(Aggregation.AVERAGE);
@@ -108,9 +110,10 @@ public class SimpleApproximationTest extends LibredeTest {
 	@Test
 	public void testRespApprox() throws EstimationException, InitializationException {
 		IStateModel<Unconstrained> stateModel = generator.getStateModel();
-		VectorObservationModel<IDirectOutputFunction> model = new VectorObservationModel<>();
+		VectorObservationModel model = new VectorObservationModel();
 		for (Service service : generator.getStateModel().getAllServices()) {
-			model.addOutputFunction(new ResponseTimeApproximation(stateModel, cursor, stateModel.getResources().get(0), service, Aggregation.AVERAGE));
+			ResponseTimeApproximationEquation rt = new ResponseTimeApproximationEquation(stateModel, cursor, stateModel.getResources().get(0), service, Aggregation.AVERAGE);
+			model.addOutputFunction(new OutputFunction(rt, new ConstantValue(stateModel, 1.0)));
 		}
 		
 		algorithm = new SimpleApproximation(Aggregation.AVERAGE);

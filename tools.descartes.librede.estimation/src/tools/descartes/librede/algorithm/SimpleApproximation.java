@@ -156,7 +156,7 @@ public class SimpleApproximation extends AbstractEstimationAlgorithm {
 	 * Helper function to cast the observation model to the expected type.
 	 */
 	@SuppressWarnings("unchecked")
-	private IObservationModel<IDirectOutputFunction, Vector> getCastedObservationModel() {
-		return (IObservationModel<IDirectOutputFunction, Vector>) getObservationModel();
+	private IObservationModel<Vector> getCastedObservationModel() {
+		return (IObservationModel<Vector>) getObservationModel();
 	}
 }

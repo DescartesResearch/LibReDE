@@ -45,7 +45,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	protected final Logger log = Logger.getLogger(getClass());
 	
 	private IStateModel<?> stateModel;
-	private IObservationModel<?, ?> observationModel;
+	private IObservationModel<?> observationModel;
 	private IRepositoryCursor cursor;
 	
 	@Override
@@ -62,7 +62,7 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	}
 
 	@Override
-	public IObservationModel<?, ?> getObservationModel() {
+	public IObservationModel<?> getObservationModel() {
 		return observationModel;
 	}
 

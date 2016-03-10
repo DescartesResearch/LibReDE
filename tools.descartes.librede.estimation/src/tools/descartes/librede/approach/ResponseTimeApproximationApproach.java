@@ -40,9 +40,11 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
+import tools.descartes.librede.models.observation.queueingmodel.ConstantValue;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeApproximationEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -76,13 +78,13 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 	}
 	
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(
+	protected IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		Resource resource = stateModel.getResources().toArray(new Resource[1])[0];
-		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
+		VectorObservationModel observationModel = new VectorObservationModel();
 		for (Service service : stateModel.getUserServices()) {
-			ResponseTimeApproximation func = new ResponseTimeApproximation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
-			observationModel.addOutputFunction(func);
+			ResponseTimeApproximationEquation func = new ResponseTimeApproximationEquation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
+			observationModel.addOutputFunction(new OutputFunction(func, new ConstantValue(stateModel, 1.0)));
 		}
 		return observationModel;
 	}

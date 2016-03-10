@@ -40,9 +40,10 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
-import tools.descartes.librede.models.observation.functions.ServiceDemandLaw;
+import tools.descartes.librede.models.observation.queueingmodel.ConstantValue;
+import tools.descartes.librede.models.observation.queueingmodel.ServiceDemandLawEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -78,14 +79,14 @@ public class ServiceDemandLawApproach extends AbstractEstimationApproach {
 	}
 	
 	@Override
-	protected IObservationModel<?,?> deriveObservationModel(
+	protected IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
+		VectorObservationModel observationModel = new VectorObservationModel();
 		boolean multiClass = stateModel.getUserServices().size() > 1;
 		for (Resource resource : stateModel.getResources()) {
 			for (Service service : stateModel.getUserServices()) {
-				ServiceDemandLaw func = new ServiceDemandLaw(stateModel, cursor, resource, service, 0, multiClass);
-				observationModel.addOutputFunction(func);
+				ServiceDemandLawEquation observedOutput = new ServiceDemandLawEquation(stateModel, cursor, resource, service, 0, multiClass);
+				observationModel.addOutputFunction(new OutputFunction(observedOutput, new ConstantValue(stateModel, 1.0)));
 			}
 		}
 		return observationModel;
