@@ -26,9 +26,6 @@
  */
 package tools.descartes.librede.models.observation.queueingmodel;
 
-import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
 import tools.descartes.librede.configuration.Resource;
@@ -37,8 +34,9 @@ import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -56,8 +54,9 @@ import tools.descartes.librede.units.RequestCount;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
+public abstract class WaitingTimeEquation extends ModelEquation {
 
+	protected final Service cls_r;
 	protected final Resource res_i;
 	protected final ErlangCEquation erlangC;
 	protected final int historicInterval;
@@ -72,8 +71,10 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	 * @param historicInterval
 	 * @param utilization
 	 */
-	private WaitingTimeEquation(IRepositoryCursor cursor, Resource resource, int historicInterval,
-			LinearModelEquation utilization) {
+	private WaitingTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
+			Service service, Resource resource, int historicInterval, LinearModelEquation utilization) {
+		super(stateModel, historicInterval);
+		this.cls_r = service;
 		this.res_i = resource;
 		this.historicInterval = historicInterval;
 		this.erlangC = new ErlangCEquation(resource.getNumberOfServers());
@@ -98,31 +99,24 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	 *            utilization of the resource.
 	 * @return a new {@code WaitingTimeEquation} instance
 	 */
-	public static WaitingTimeEquation create(IRepositoryCursor cursor, Resource resource, int historicInterval,
-			LinearModelEquation utilization) {
+	public static WaitingTimeEquation create(IStateModel<? extends IStateConstraint> stateModel,
+			IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, LinearModelEquation utilization) {
 		if (isProductForm(resource)) {
-			return new WaitingTimeEquationProductForm(cursor, resource, historicInterval, utilization);
+			return new WaitingTimeEquationProductForm(stateModel, cursor, service, resource, historicInterval, utilization);
 		} else {
 			if (resource.getSchedulingStrategy() == SchedulingStrategy.FCFS) {
-				return new WaitingTimeEquationMultiClassFCFS(cursor, resource, historicInterval, utilization);
+				return new WaitingTimeEquationMultiClassFCFS(stateModel, cursor, service, resource, historicInterval,
+						utilization);
 			}
 			throw new IllegalArgumentException();
 		}
 	}
-
-	/**
-	 * Calculates the average waiting time of a service at the resource.
-	 * 
-	 * @param service
-	 *            the service for which to determine the waiting time
-	 * @param state
-	 *            the current state of the system
-	 * @return a {@code DerivativeStructure} containing the waiting time
-	 */
-	public abstract DerivativeStructure getAverageWaitingTime(Service service, State state);
-
-	public abstract Vector getLinearWaitingTimeFactors(Service service, State state);
 	
+	@Override
+	public boolean hasData() {
+		return true;
+	}
+
 	/**
 	 * 
 	 * @param resource
@@ -153,26 +147,26 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 		 * @param historicInterval
 		 * @param utilization
 		 */
-		public WaitingTimeEquationProductForm(IRepositoryCursor cursor, Resource resource, int historicInterval,
+		public WaitingTimeEquationProductForm(IStateModel<? extends IStateConstraint> stateModel,
+				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval,
 				LinearModelEquation utilization) {
-			super(cursor, resource, historicInterval, utilization);
+			super(stateModel, cursor, service, resource, historicInterval, utilization);
 		}
 
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see tools.descartes.librede.models.observation.functions.helper.
-		 * WaitingTimeEquation#getAverageWaitingTime(tools.descartes.librede.
-		 * configuration.Service, tools.descartes.librede.models.State)
+		 * @see tools.descartes.librede.models.observation.queueingmodel.
+		 * ModelEquation#getValue(tools.descartes.librede.models.State)
 		 */
 		@Override
-		public DerivativeStructure getAverageWaitingTime(Service service, State state) {
+		public DerivativeStructure getValue(State state) {
 			switch (res_i.getSchedulingStrategy()) {
 			case FCFS:
 			case PS:
 			case UNKOWN:
-				DerivativeStructure D_ir = state.getVariable(res_i, service).getDerivativeStructure();
-				return D_ir.multiply(getWaitingTimeFactor(service, state));
+				DerivativeStructure D_ir = state.getVariable(res_i, cls_r).getDerivativeStructure();
+				return D_ir.multiply(getWaitingTimeFactor(cls_r, state));
 			case IS:
 				/*
 				 * Infinite server: a job will never be forced to wait for
@@ -182,14 +176,6 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 			default:
 				throw new AssertionError("Unsupported scheduling strategy.");
 			}
-		}
-
-		@Override
-		public Vector getLinearWaitingTimeFactors(Service service, State state) {
-			int idx = state.getStateModel().getStateVariableIndex(res_i, service);
-			DerivativeStructure waitingTimeFactor = getWaitingTimeFactor(service, state);
-			Vector factors = zeros(state.getStateSize());
-			return factors.set(idx, waitingTimeFactor.getValue());
 		}
 
 		private DerivativeStructure getWaitingTimeFactor(Service service, State state) {
@@ -267,23 +253,20 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 		 * @param historicInterval
 		 * @param utilization
 		 */
-		public WaitingTimeEquationMultiClassFCFS(IRepositoryCursor cursor, Resource resource, int historicInterval,
-				LinearModelEquation utilization) {
-			super(cursor, resource, historicInterval, utilization);
+		public WaitingTimeEquationMultiClassFCFS(IStateModel<? extends IStateConstraint> stateModel,
+				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, LinearModelEquation utilization) {
+			super(stateModel, cursor, service, resource, historicInterval, utilization);
 			queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL)
 					.in(RequestCount.REQUESTS).forResourceDemands(resource.getDemands()).average().using(cursor);
 			addDataDependency(queueLengthQuery);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see tools.descartes.librede.models.observation.functions.helper.
-		 * WaitingTimeEquation#getAverageWaitingTime(tools.descartes.librede.
-		 * configuration.Service, tools.descartes.librede.models.State)
+
+		/* (non-Javadoc)
+		 * @see tools.descartes.librede.models.observation.queueingmodel.ModelEquation#getValue(tools.descartes.librede.models.State)
 		 */
 		@Override
-		public DerivativeStructure getAverageWaitingTime(Service service, State state) {
+		public DerivativeStructure getValue(State state) {
 			Vector Q_ir = queueLengthQuery.get(historicInterval);
 			/*
 			 * The mean queue length depends on the current queue length of all
@@ -306,26 +289,26 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 			return T_q.multiply(P_q.divide(res_i.getNumberOfServers()));
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see tools.descartes.librede.models.observation.functions.helper.
-		 * WaitingTimeEquation#getLinearWaitingTimeFactors(tools.descartes.
-		 * librede.configuration.Service, tools.descartes.librede.models.State)
-		 */
-		@Override
-		public Vector getLinearWaitingTimeFactors(Service service, State state) {
-			Vector Q_ir = queueLengthQuery.get(historicInterval);
-			double[] factorsBuffer = new double[state.getStateSize()];
-			for (int i = 0; i < Q_ir.rows(); i++) {
-				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
-				int stateIdx = state.getStateModel().getStateVariableIndex(res_i, curDemand.getService());
-				factorsBuffer[stateIdx] = Q_ir.get(i);
-			}
-			Vector factors = vector(factorsBuffer);
-			double U_i = utilization.getFactors().get(0);
-			double P_q = erlangC.calculateValue(U_i);
-			return factors.times(P_q / res_i.getNumberOfServers());
-		}
+//		/*
+//		 * (non-Javadoc)
+//		 * 
+//		 * @see tools.descartes.librede.models.observation.functions.helper.
+//		 * WaitingTimeEquation#getLinearWaitingTimeFactors(tools.descartes.
+//		 * librede.configuration.Service, tools.descartes.librede.models.State)
+//		 */
+//		@Override
+//		public Vector getLinearWaitingTimeFactors(Service service, State state) {
+//			Vector Q_ir = queueLengthQuery.get(historicInterval);
+//			double[] factorsBuffer = new double[state.getStateSize()];
+//			for (int i = 0; i < Q_ir.rows(); i++) {
+//				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
+//				int stateIdx = state.getStateModel().getStateVariableIndex(res_i, curDemand.getService());
+//				factorsBuffer[stateIdx] = Q_ir.get(i);
+//			}
+//			Vector factors = vector(factorsBuffer);
+//			double U_i = utilization.getFactors().get(0);
+//			double P_q = erlangC.calculateValue(U_i);
+//			return factors.times(P_q / res_i.getNumberOfServers());
+//		}
 	}
 }

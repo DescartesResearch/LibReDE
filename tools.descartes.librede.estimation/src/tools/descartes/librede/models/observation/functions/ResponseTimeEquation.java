@@ -157,9 +157,10 @@ public class ResponseTimeEquation extends AbstractOutputFunction {
 			} else {
 				utilFunction = new UtilizationFunction(getStateModel(), repository, res, historicInterval);
 			}
-			WaitingTimeEquation waitingTime = WaitingTimeEquation.create(repository, res, historicInterval,
-					utilFunction);
+			
 			for (Service serv : res.getAccessingServices()) {
+				WaitingTimeEquation waitingTime = WaitingTimeEquation.create(getStateModel(), repository, serv, res, historicInterval,
+						utilFunction);
 				currentMap.put(serv, new ResidenceTimeEquation(repository, serv, res, historicInterval, waitingTime));
 			}
 		}
