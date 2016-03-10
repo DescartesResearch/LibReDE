@@ -28,15 +28,11 @@ package tools.descartes.librede.models.observation.functions;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeApproximationEquation;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.units.Time;
 
 /**
  * This output function approximates the resource demands with the observed response times (min, max, or mean) of a service.
@@ -46,9 +42,7 @@ import tools.descartes.librede.units.Time;
  */
 public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	
-	private final Service cls_r;
-	
-	private final Query<Scalar, Time> individualResidenceTimesQuery;
+	private final ResponseTimeApproximationEquation rtApprox;
 	
 	/**
 	 * Creates a new instance.
@@ -82,24 +76,7 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 			Service service, Aggregation aggregation, int historicInterval) {
 		super(stateModel, resource, service, historicInterval);
 		
-		cls_r = service;
-		
-		switch(aggregation) {
-		case AVERAGE:
-			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).average().using(repository);
-			addDataDependency(individualResidenceTimesQuery);
-			break;
-		case MAXIMUM:
-			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).max().using(repository);
-			addDataDependency(individualResidenceTimesQuery);
-			break;
-		case MINIMUM:
-			individualResidenceTimesQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forService(cls_r).min().using(repository);
-			addDataDependency(individualResidenceTimesQuery);
-			break;
-		default:
-			throw new IllegalArgumentException();
-		}		
+		this.rtApprox = new ResponseTimeApproximationEquation(stateModel, repository, resource, service, aggregation, historicInterval);
 	}
 	
 	/* (non-Javadoc)
@@ -107,12 +84,6 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getFactor() {
-		double rt = individualResidenceTimesQuery.get(historicInterval).getValue();
-		if (rt != rt) {
-			// We did not observe a request in this interval
-			// --> R = 0.0 * D 
-			return 0.0;
-		}
 		// approximate response times directly with resource demands --> R = 1.0 * D
 		return 1.0;
 	}
@@ -122,15 +93,12 @@ public class ResponseTimeApproximation extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		double rt = individualResidenceTimesQuery.get(historicInterval).getValue();
-		// We did not observe a request in this interval
-		// therefore, we approximate the demand with zero
-		return (rt != rt) ? 0.0 : rt;
+		return rtApprox.getConstantValue();
 	}
 	
 	@Override
 	public boolean hasData() {
-		return individualResidenceTimesQuery.hasData(historicInterval);
+		return rtApprox.hasData();
 	}
 
 }

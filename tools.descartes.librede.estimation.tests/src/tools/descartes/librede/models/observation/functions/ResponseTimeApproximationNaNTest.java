@@ -83,7 +83,7 @@ public class ResponseTimeApproximationNaNTest extends LibredeTest {
 	
 	@Test
 	public void testGetFactor() {
-		assertThat(law.getFactor()).isZero();
+		assertThat(law.getFactor()).isEqualTo(1.0);
 	}
 
 	@Test
