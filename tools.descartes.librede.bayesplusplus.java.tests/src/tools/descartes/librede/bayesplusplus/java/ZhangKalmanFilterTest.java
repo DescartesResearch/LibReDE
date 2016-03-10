@@ -37,10 +37,12 @@ import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeValue;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.InvocationGraph;
@@ -53,7 +55,7 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 	
 	private static final int ITERATIONS = 1000;
 	
-	private VectorObservationModel<IOutputFunction> observationModel;
+	private VectorObservationModel observationModel;
 	private ConstantStateModel<Unconstrained> stateModel;
 
 	@Before
@@ -81,9 +83,11 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), generator.getCursor(), 1));
 		stateModel = builder.build();
 		
-		observationModel = new VectorObservationModel<>();		
-		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, generator.getCursor(), workload.getServices().get(0), false));
-		observationModel.addOutputFunction(new UtilizationLaw(stateModel, generator.getCursor(), workload.getResources().get(0)));
+		observationModel = new VectorObservationModel();
+		ResponseTimeEquation funcRt = new ResponseTimeEquation(stateModel, generator.getCursor(), workload.getServices().get(0), false, 0);
+		observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, generator.getCursor(), workload.getServices().get(0), 0), funcRt));
+		UtilizationLawEquation funcUtil = new UtilizationLawEquation(stateModel, generator.getCursor(), workload.getResources().get(0), 0);
+		observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, generator.getCursor(), workload.getResources().get(0), 0), funcUtil));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(new EstimationProblem(stateModel, observationModel), generator.getCursor(), 1);
@@ -123,11 +127,13 @@ public class ZhangKalmanFilterTest extends LibredeTest {
 		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), generator.getCursor(), 1));
 		stateModel = builder.build();
 		
-		observationModel = new VectorObservationModel<>();
+		observationModel = new VectorObservationModel();
 		for (int i = 0; i < 5; i++) {
-			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, generator.getCursor(), workload.getServices().get(i), false));
+			ResponseTimeEquation funcRt = new ResponseTimeEquation(stateModel, generator.getCursor(), workload.getServices().get(i), false, 0);
+			observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, generator.getCursor(), workload.getServices().get(i), 0), funcRt));
 		}
-		observationModel.addOutputFunction(new UtilizationLaw(stateModel, generator.getCursor(), workload.getResources().get(0)));
+		UtilizationLawEquation funcUtil = new UtilizationLawEquation(stateModel, generator.getCursor(), workload.getResources().get(0), 0);
+		observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, generator.getCursor(), workload.getResources().get(0), 0), funcUtil));
 		
 		ExtendedKalmanFilter filter = new ExtendedKalmanFilter();
 		filter.initialize(new EstimationProblem(stateModel, observationModel), generator.getCursor(), 1);

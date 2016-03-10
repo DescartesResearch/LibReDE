@@ -36,9 +36,10 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -71,12 +72,12 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 	}
 
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(
+	protected IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+		VectorObservationModel observationModel = new VectorObservationModel();
 		for (Resource res : stateModel.getResources()) {
-			UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
-			observationModel.addOutputFunction(func);
+			UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, res, 0);
+			observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, res, 0), func));
 		}
 		return observationModel;
 	}
