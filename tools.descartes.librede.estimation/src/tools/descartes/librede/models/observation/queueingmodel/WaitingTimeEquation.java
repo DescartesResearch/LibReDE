@@ -61,7 +61,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	protected final Resource res_i;
 	protected final ErlangCEquation erlangC;
 	protected final int historicInterval;
-	protected final UtilizationFunction utilization;
+	protected final LinearModelEquation utilization;
 
 	/**
 	 * Use {@code WaitingTimeEquation#create(IRepositoryCursor, Resource, int)}
@@ -73,7 +73,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	 * @param utilization
 	 */
 	private WaitingTimeEquation(IRepositoryCursor cursor, Resource resource, int historicInterval,
-			UtilizationFunction utilization) {
+			LinearModelEquation utilization) {
 		this.res_i = resource;
 		this.historicInterval = historicInterval;
 		this.erlangC = new ErlangCEquation(resource.getNumberOfServers());
@@ -94,12 +94,12 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 	 *            the monitoring interval for which to calculate the waiting
 	 *            time (0 == current interval)
 	 * @param utilization
-	 *            a {@code UtilizationFunction} instance to calculate the
+	 *            a {@code LinearModelEquation} instance to calculate the
 	 *            utilization of the resource.
 	 * @return a new {@code WaitingTimeEquation} instance
 	 */
 	public static WaitingTimeEquation create(IRepositoryCursor cursor, Resource resource, int historicInterval,
-			UtilizationFunction utilization) {
+			LinearModelEquation utilization) {
 		if (isProductForm(resource)) {
 			return new WaitingTimeEquationProductForm(cursor, resource, historicInterval, utilization);
 		} else {
@@ -123,10 +123,6 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 
 	public abstract Vector getLinearWaitingTimeFactors(Service service, State state);
 	
-	public boolean isLinear() {
-		return utilization.isConstant();
-	}
-
 	/**
 	 * 
 	 * @param resource
@@ -158,7 +154,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 		 * @param utilization
 		 */
 		public WaitingTimeEquationProductForm(IRepositoryCursor cursor, Resource resource, int historicInterval,
-				UtilizationFunction utilization) {
+				LinearModelEquation utilization) {
 			super(cursor, resource, historicInterval, utilization);
 		}
 
@@ -190,11 +186,6 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 
 		@Override
 		public Vector getLinearWaitingTimeFactors(Service service, State state) {
-			if (!utilization.isConstant()) {
-				// This is not a linear function.
-				throw new IllegalStateException();
-			}
-
 			int idx = state.getStateModel().getStateVariableIndex(res_i, service);
 			DerivativeStructure waitingTimeFactor = getWaitingTimeFactor(service, state);
 			Vector factors = zeros(state.getStateSize());
@@ -223,7 +214,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 				 * 
 				 * E[T_q] = \frac{D_ir}{1 - U_i} * P_q
 				 */
-				DerivativeStructure U_i = utilization.getUtilization(state);
+				DerivativeStructure U_i = utilization.getValue(state);
 				DerivativeStructure P_q = erlangC.value(U_i);
 				return P_q.divide(U_i.multiply(-1).add(1));
 			case IS:
@@ -277,7 +268,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 		 * @param utilization
 		 */
 		public WaitingTimeEquationMultiClassFCFS(IRepositoryCursor cursor, Resource resource, int historicInterval,
-				UtilizationFunction utilization) {
+				LinearModelEquation utilization) {
 			super(cursor, resource, historicInterval, utilization);
 			queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL)
 					.in(RequestCount.REQUESTS).forResourceDemands(resource.getDemands()).average().using(cursor);
@@ -305,7 +296,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 				DerivativeStructure D_ir = state.getVariable(res_i, curDemand.getService()).getDerivativeStructure();
 				T_q = T_q.add(D_ir.multiply(Q_ir.get(i)));
 			}
-			DerivativeStructure U_i = utilization.getUtilization(state);
+			DerivativeStructure U_i = utilization.getValue(state);
 			DerivativeStructure P_q = erlangC.value(U_i);
 			/*
 			 * We need to wait only in cases where all servers are busy.
@@ -324,10 +315,6 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 		 */
 		@Override
 		public Vector getLinearWaitingTimeFactors(Service service, State state) {
-			if (!utilization.isConstant()) {
-				// this is not a linear function.
-				throw new IllegalStateException();
-			}
 			Vector Q_ir = queueLengthQuery.get(historicInterval);
 			double[] factorsBuffer = new double[state.getStateSize()];
 			for (int i = 0; i < Q_ir.rows(); i++) {
@@ -336,7 +323,7 @@ public abstract class WaitingTimeEquation extends AbstractDependencyTarget {
 				factorsBuffer[stateIdx] = Q_ir.get(i);
 			}
 			Vector factors = vector(factorsBuffer);
-			double U_i = utilization.getValue();
+			double U_i = utilization.getFactors().get(0);
 			double P_q = erlangC.calculateValue(U_i);
 			return factors.times(P_q / res_i.getNumberOfServers());
 		}

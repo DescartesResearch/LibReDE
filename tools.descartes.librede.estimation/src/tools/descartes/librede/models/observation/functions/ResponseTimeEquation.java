@@ -40,6 +40,8 @@ import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.observation.queueingmodel.ConstantValue;
+import tools.descartes.librede.models.observation.queueingmodel.LinearModelEquation;
 import tools.descartes.librede.models.observation.queueingmodel.ResidenceTimeEquation;
 import tools.descartes.librede.models.observation.queueingmodel.UtilizationFunction;
 import tools.descartes.librede.models.observation.queueingmodel.WaitingTimeEquation;
@@ -50,6 +52,7 @@ import tools.descartes.librede.models.variables.OutputVariable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 
@@ -147,8 +150,13 @@ public class ResponseTimeEquation extends AbstractOutputFunction {
 				residenceTimeEquations.put(res, currentMap);
 			}
 
-			UtilizationFunction utilFunction = UtilizationFunction.create(repository, res, historicInterval,
-					!useObservedUtilization);
+			LinearModelEquation utilFunction;
+			if (useObservedUtilization) {
+				Query<Scalar, ?> utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res).average().using(repository);
+				utilFunction = new ConstantValue(getStateModel(), historicInterval, utilQuery);
+			} else {
+				utilFunction = new UtilizationFunction(getStateModel(), repository, res, historicInterval);
+			}
 			WaitingTimeEquation waitingTime = WaitingTimeEquation.create(repository, res, historicInterval,
 					utilFunction);
 			for (Service serv : res.getAccessingServices()) {

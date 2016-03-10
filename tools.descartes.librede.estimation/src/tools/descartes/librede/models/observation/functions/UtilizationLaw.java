@@ -26,22 +26,17 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import static tools.descartes.librede.linalg.LinAlg.indices;
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationFunction;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.units.Ratio;
-import tools.descartes.librede.units.RequestRate;
 
 /**
  * This output function implements the Utilization Law:
@@ -63,13 +58,10 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private Resource res_i;
 	
-	private final Query<Vector, RequestRate> throughputQuery;
 	private final Query<Scalar, Ratio> utilizationQuery;
-	private final Query<Scalar, Ratio> contentionQuery;
-	
-	private final Vector variables; // vector of independent variables which is by default set to zero. The range varFocusedIndices is updated later.
-	private final Indices varFocusedIndices; // the indices of the independent variables which is altered by this output function
 
+	private final UtilizationFunction utilEquation;
+	
 	/**
 	 * Creates a new instance.
 	 * 
@@ -100,24 +92,14 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		
 		this.res_i = resource;
 		
-		variables = zeros(stateModel.getStateSize());
-		varFocusedIndices = indices(resource.getAccessingServices().size(), new VectorFunction() {
-			@Override
-			public double cell(int row) {
-				return stateModel.getStateVariableIndex(resource, resource.getAccessingServices().get(row));
-			}
-		});
+		this.utilEquation = new UtilizationFunction(stateModel, repository, resource, historicInterval);
 		
 		/*
 		 * IMPORTANT: we query the throughput for all services (including background services). For background services
 		 * the repository should by default return 1 as throughput (i.e. constant background work).
 		 */
-		throughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(resource.getAccessingServices()).average().using(repository);
 		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-		contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-		addDataDependency(throughputQuery);
 		addDataDependency(utilizationQuery);
-		addDataDependency(contentionQuery);
 	}
 	
 	/* (non-Javadoc)
@@ -125,13 +107,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	 */
 	@Override
 	public Vector getIndependentVariables() {
-		Vector X = throughputQuery.get(historicInterval);
-		// The contention factor specifies the slow down due to scheduling
-		// on an underlying resource. As a result the actually available resource
-		// time is lower, hence the utilization is higher
-		// U_i = X * ((1 + C_i) * D)
-		double C_i = contentionQuery.get(historicInterval).getValue();
-		return variables.set(varFocusedIndices, X.times(1.0 / this.res_i.getNumberOfServers())).times(1 + C_i);
+		return utilEquation.getFactors();
 	}
 
 	/* (non-Javadoc)
@@ -144,6 +120,6 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	@Override
 	public boolean hasData() {
-		return throughputQuery.hasData(historicInterval) && utilizationQuery.hasData(historicInterval);
+		return utilEquation.hasData() && utilizationQuery.hasData(historicInterval);
 	}
 }

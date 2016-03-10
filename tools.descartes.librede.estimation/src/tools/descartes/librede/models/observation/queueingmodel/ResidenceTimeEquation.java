@@ -115,8 +115,4 @@ public class ResidenceTimeEquation extends AbstractDependencyTarget {
 		return factors.times(1 + C_i);
 	}
 	
-	public boolean isLinear() {
-		return waitingTime.isLinear();
-	}
-
 }
