@@ -42,7 +42,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.observation.functions.ErlangCEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ErlangCEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;

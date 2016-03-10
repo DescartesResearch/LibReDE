@@ -32,6 +32,7 @@ import static org.fest.assertions.api.Assertions.offset;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Test;
 
+import tools.descartes.librede.models.observation.queueingmodel.ErlangCEquation;
 import tools.descartes.librede.testutils.LibredeTest;
 
 public class ErlangCEquationTest extends LibredeTest {
