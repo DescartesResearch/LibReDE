@@ -48,7 +48,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
+import tools.descartes.librede.models.variables.OutputVariable;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
@@ -65,15 +65,24 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 
 		@Override
 		public Pointer execute(Pointer x) {
-			Vector currentState = nativeVector(stateSize, x);
+			State currentState = new State(getStateModel(), nativeVector(stateSize, x), 1);
 
-			Vector nextObservation = getObservationModel().getCalculatedOutput(new State(getStateModel(), currentState, 1));
-
-			Matrix jacobi = JacobiMatrixBuilder.calculateOfObservationModel(getObservationModel(), currentState);
-			toNative(jacobiBuffer, jacobi);
+			double[] value = new double[outputSize];
+			double[][] jacobi = new double[outputSize][stateSize];
+			int[] idx = new int[stateSize];
+			for (int i = 0; i < outputSize; i++) {
+				OutputVariable v = getObservationModel().getOutputFunction(i).getCalculatedOutput(currentState);
+				value[i] = v.getDerivativeStructure().getValue();
+				for (int j = 0; j < stateSize; j++) {
+					idx[j] = 1;
+					jacobi[i][j] = v.getDerivativeStructure().getPartialDerivative(idx);
+					idx[j] = 0;
+				}
+			}
+			toNative(jacobiBuffer, matrix(jacobi));
 			BayesPlusPlusLibrary.set_Hx(nativeObservationModel, jacobiBuffer, stateSize, outputSize);
 
-			toNative(outputBuffer, nextObservation);
+			toNative(outputBuffer, vector(value));
 			return outputBuffer;
 		}
 
