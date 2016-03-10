@@ -36,9 +36,10 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -67,11 +68,13 @@ public class RoliaRegressionApproach extends AbstractEstimationApproach {
 	}
 
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(
+	protected IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		UtilizationLaw func = new UtilizationLaw(stateModel, cursor, stateModel.getResources().toArray(new Resource[1])[0]);
-		VectorObservationModel<ILinearOutputFunction> om = new VectorObservationModel<>();
-		om.addOutputFunction(func);
+		VectorObservationModel om = new VectorObservationModel();
+		for (Resource resource : stateModel.getResources()) {
+			UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, resource, 0);
+			om.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, resource, 0), func));
+		}		
 		return om;
 	}
 

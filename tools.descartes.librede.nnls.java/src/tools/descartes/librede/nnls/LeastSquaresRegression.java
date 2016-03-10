@@ -45,6 +45,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
 import tools.descartes.librede.registry.Component;
@@ -174,7 +175,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	public void update() throws EstimationException {
 		getStateModel().step(null);
 		
-		for (ILinearOutputFunction function : getCastedObservationModel()) {
+		for (OutputFunction function : getCastedObservationModel()) {
 			dependentVariables = dependentVariables.circshift(1).set(0, function.getObservedOutput());
 			independentVariables = independentVariables.circshift(1).setRow(0, function.getIndependentVariables());
 		}		
@@ -199,7 +200,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	}
 	
 	@SuppressWarnings("unchecked" )
-	private IObservationModel<ILinearOutputFunction, Vector> getCastedObservationModel() {
-		return (IObservationModel<ILinearOutputFunction, Vector>) getObservationModel();
+	private IObservationModel<Vector> getCastedObservationModel() {
+		return (IObservationModel<Vector>) getObservationModel();
 	}
 }

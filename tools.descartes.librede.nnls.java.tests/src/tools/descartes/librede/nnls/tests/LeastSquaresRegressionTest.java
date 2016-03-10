@@ -36,9 +36,10 @@ import org.junit.Test;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationValue;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -51,7 +52,7 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 
 	private static final int ITERATIONS = 100;
 
-	private VectorObservationModel<ILinearOutputFunction> observationModel;
+	private VectorObservationModel observationModel;
 
 	@Before
 	public void setUp() throws Exception {
@@ -69,8 +70,9 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		IStateModel<?> stateModel = generator.getStateModel();
-		observationModel = new VectorObservationModel<ILinearOutputFunction>();
-		observationModel.addOutputFunction(new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0)));
+		observationModel = new VectorObservationModel();
+		UtilizationLawEquation law = new UtilizationLawEquation(stateModel, cursor, stateModel.getResources().get(0), 0);
+		observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, stateModel.getResources().get(0), 0), law));
 		
 		LeastSquaresRegression optim = new LeastSquaresRegression();
 		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
@@ -110,8 +112,9 @@ public class LeastSquaresRegressionTest extends LibredeTest {
 		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
 		IStateModel<?> stateModel = generator.getStateModel();
-		observationModel = new VectorObservationModel<ILinearOutputFunction>();
-		observationModel.addOutputFunction(new UtilizationLaw(generator.getStateModel(), cursor, workload.getResources().get(0)));
+		observationModel = new VectorObservationModel();
+		UtilizationLawEquation law = new UtilizationLawEquation(stateModel, cursor, stateModel.getResources().get(0), 0);
+		observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, stateModel.getResources().get(0), 0), law));
 
 		LeastSquaresRegression optim = new LeastSquaresRegression();
 		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
