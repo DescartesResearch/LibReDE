@@ -50,7 +50,7 @@ import tools.descartes.librede.units.RequestRate;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public class UtilizationFunction extends ModelEquation {
+public class UtilizationLawEquation extends ModelEquation {
 
 	// The resource of which the utilization is returned
 	private final Resource res_i;
@@ -76,7 +76,7 @@ public class UtilizationFunction extends ModelEquation {
 	 *            A flag indicated whether to use observed or calculated
 	 *            utilization values
 	 */
-	public UtilizationFunction(final IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
+	public UtilizationLawEquation(final IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
 			Resource resource, int historicInterval) {
 		super(stateModel, historicInterval);
 		this.res_i = resource;

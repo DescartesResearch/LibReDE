@@ -61,7 +61,7 @@ public class ResponseTimeEquation extends ModelEquation {
 				Query<Scalar, ?> utilQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res).average().using(cursor);
 				utilFunction = new ConstantValue(getStateModel(), historicInterval, utilQuery);
 			} else {
-				utilFunction = new UtilizationFunction(getStateModel(), cursor, res, historicInterval);
+				utilFunction = new UtilizationLawEquation(getStateModel(), cursor, res, historicInterval);
 			}
 			
 			for (Service serv : res.getAccessingServices()) {

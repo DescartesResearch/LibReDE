@@ -30,7 +30,7 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.models.observation.queueingmodel.UtilizationFunction;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -60,7 +60,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 	
 	private final Query<Scalar, Ratio> utilizationQuery;
 
-	private final UtilizationFunction utilEquation;
+	private final UtilizationLawEquation utilEquation;
 	
 	/**
 	 * Creates a new instance.
@@ -92,7 +92,7 @@ public class UtilizationLaw extends AbstractLinearOutputFunction {
 		
 		this.res_i = resource;
 		
-		this.utilEquation = new UtilizationFunction(stateModel, repository, resource, historicInterval);
+		this.utilEquation = new UtilizationLawEquation(stateModel, repository, resource, historicInterval);
 		
 		/*
 		 * IMPORTANT: we query the throughput for all services (including background services). For background services
