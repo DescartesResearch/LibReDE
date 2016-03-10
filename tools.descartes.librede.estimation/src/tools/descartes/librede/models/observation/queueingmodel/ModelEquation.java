@@ -63,6 +63,12 @@ public abstract class ModelEquation extends AbstractDependencyTarget {
 		throw new UnsupportedOperationException();
 	}
 	
+	public  double getConstantValue() {
+		throw new UnsupportedOperationException();
+	}
+	
+	public abstract boolean isConstant();
+	
 	public abstract boolean isLinear();
 	
 	public abstract boolean hasData();

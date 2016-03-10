@@ -120,6 +120,12 @@ public class ResponseTimeEquation extends ModelEquation {
 	}
 	
 	
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
+	
+	
 	/**
 	 * Collects all accessed resources of the given services.
 	 * 

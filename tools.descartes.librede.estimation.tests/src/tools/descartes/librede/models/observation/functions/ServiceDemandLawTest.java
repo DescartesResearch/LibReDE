@@ -92,21 +92,19 @@ public class ServiceDemandLawTest extends LibredeTest {
 		
 		Vector xVec = x.execute();
 		Vector rVec = r.execute();
-		assertThat(law.getObservedOutput()).isEqualTo(xVec.get(x.indexOf(service)) * rVec.get(r.indexOf(service)) * util / xVec.dot(rVec), offset(1e-9));
+		assertThat(law.getObservedOutput()).isEqualTo(xVec.get(x.indexOf(service)) * rVec.get(r.indexOf(service)) * util / (xVec.dot(rVec) * xVec.get(x.indexOf(service))), offset(1e-9));
 	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
-		double expected = x * state.getVariable(resource, service).getValue();
+		double expected = state.getVariable(resource, service).getValue();
 		
 		assertThat(law.getCalculatedOutput(state).getValue()).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
 	public void testGetFactor() {
-		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
-		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
+		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
 	}
 	
 	@Test

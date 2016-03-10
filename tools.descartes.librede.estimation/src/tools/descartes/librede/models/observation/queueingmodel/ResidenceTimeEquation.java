@@ -135,6 +135,11 @@ public class ResidenceTimeEquation extends ModelEquation {
 	@Override
 	public boolean isLinear() {
 		return waitingTime.isLinear();
+	}	
+	
+	@Override
+	public boolean isConstant() {
+		return false;
 	}
 
 }

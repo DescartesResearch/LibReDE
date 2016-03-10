@@ -123,6 +123,11 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	@Override
 	public boolean isLinear() {
 		return (utilization instanceof ConstantValue);
+	}	
+	
+	@Override
+	public boolean isConstant() {
+		return false;
 	}
 
 	/**

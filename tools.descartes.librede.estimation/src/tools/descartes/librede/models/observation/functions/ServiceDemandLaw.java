@@ -26,21 +26,12 @@
  */
 package tools.descartes.librede.models.observation.functions;
 
-import static tools.descartes.librede.linalg.LinAlg.nansum;
-
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.observation.queueingmodel.ServiceDemandLawEquation;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.units.Ratio;
-import tools.descartes.librede.units.RequestRate;
-import tools.descartes.librede.units.Time;
 
 /**
  * This output function describes the relationship between the per-service utilization and the resource demands. 
@@ -73,15 +64,7 @@ import tools.descartes.librede.units.Time;
  */
 public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	
-	private Resource res_i;
-	private Service cls_r;
-	
-	private Query<Scalar, Ratio> utilizationQuery;
-	private Query<Vector, Time> avgResidenceTimeQuery;
-	private Query<Vector, RequestRate> avgThroughputQuery;
-	private Query<Scalar, RequestRate> avgThroughputQueryCurrentService;
-	
-	private boolean multiClass = true;
+	private final ServiceDemandLawEquation sdl;
 	
 	/**
 	 * Creates a new instance.
@@ -116,23 +99,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 			Service service, int historicInterval, boolean multiClass) {
 		super(stateModel, resource, service, historicInterval);
 		
-		res_i = resource;
-		cls_r = service;
-		this.multiClass = multiClass;
-		
-		/*
-		 * IMPORTANT: The Service Demand Law is ignoring background services, as it has no information required to determine
-		 * the amount of background work relative to the user services.
-		 */
-		utilizationQuery = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(res_i).average().using(repository);
-		addDataDependency(utilizationQuery);
-		if (multiClass) {
-			avgResidenceTimeQuery = QueryBuilder.select(StandardMetrics.RESIDENCE_TIME).in(Time.SECONDS).forServices(stateModel.getUserServices()).average().using(repository);
-			addDataDependency(avgResidenceTimeQuery);
-		}
-		avgThroughputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(stateModel.getUserServices()).average().using(repository);
-		avgThroughputQueryCurrentService = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(repository);
-		addDataDependency(avgThroughputQuery);
+		sdl = new ServiceDemandLawEquation(stateModel, repository, resource, service, historicInterval, multiClass);
 	}
 	
 	/* (non-Javadoc)
@@ -140,28 +107,7 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getObservedOutput() {
-		/*
-		 * We only get the aggregate utilization of a resource. In order to apportion this utilization between
-		 * services, we assume R ~ D.
-		 */
-
-		Vector X = avgThroughputQuery.get(historicInterval);		
-		double X_r = X.get(avgThroughputQuery.indexOf(cls_r));
-		double U_i = utilizationQuery.get(historicInterval).getValue();
-		int p = res_i.getNumberOfServers();
-		
-		if (X_r == 0) {
-			// no request observed --> zero utilization due to that class
-			return 0.0;
-		} else {
-			if (multiClass) {
-				Vector R = avgResidenceTimeQuery.get(historicInterval);
-				double R_r = R.get(avgResidenceTimeQuery.indexOf(cls_r));
-				return p * U_i * (R_r * X_r) / nansum(R.arrayMultipliedBy(X)).get(0);
-			} else {
-				return p * U_i;
-			}
-		}
+		return sdl.getConstantValue();
 	}
 
 	/* (non-Javadoc)
@@ -169,16 +115,12 @@ public class ServiceDemandLaw extends AbstractDirectOutputFunction {
 	 */
 	@Override
 	public double getFactor() {
-		return avgThroughputQueryCurrentService.get(historicInterval).getValue();
+		return 1.0;
 	}
 	
 	@Override
 	public boolean hasData() {
-		if (multiClass) {
-			return avgResidenceTimeQuery.hasData(historicInterval) && avgThroughputQuery.hasData(historicInterval);
-		} else {
-			return avgThroughputQuery.hasData(historicInterval);
-		}
+		return sdl.hasData();
 	}
 	
 

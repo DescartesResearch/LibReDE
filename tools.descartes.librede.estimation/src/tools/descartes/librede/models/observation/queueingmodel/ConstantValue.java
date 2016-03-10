@@ -38,5 +38,10 @@ public class ConstantValue extends ModelEquation {
 	public boolean isLinear() {
 		return true;
 	}
+	
+	@Override
+	public boolean isConstant() {
+		return true;
+	}
 
 }

@@ -41,15 +41,12 @@ import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
@@ -95,8 +92,7 @@ public class ServiceDemandLawNaNTest extends LibredeTest {
 	
 	@Test
 	public void testGetFactor() {
-		double x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forService(service).average().using(cursor).execute().getValue();
-		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
+		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
 	}
 
 	@Test

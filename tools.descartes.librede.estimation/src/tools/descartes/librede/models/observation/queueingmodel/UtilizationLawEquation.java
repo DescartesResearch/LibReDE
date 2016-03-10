@@ -119,5 +119,10 @@ public class UtilizationLawEquation extends ModelEquation {
 	public boolean isLinear() {
 		return true;
 	}
+		
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
 
 }
