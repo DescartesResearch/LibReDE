@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<librede:LibredeConfiguration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:librede="http://www.descartes-research.net/librede/configuration/1.0">
+  <workloadDescription>
+    <resources name="host1" demands="//@workloadDescription/@services.0/@tasks.0 //@workloadDescription/@services.1/@tasks.0 //@workloadDescription/@services.2/@tasks.0"/>
+    <services name="WC0">
+      <tasks xsi:type="librede:ResourceDemand" name="WC0" resource="//@workloadDescription/@resources.0"/>
+    </services>
+    <services name="WC1">
+      <tasks xsi:type="librede:ResourceDemand" resource="//@workloadDescription/@resources.0"/>
+    </services>
+    <services name="WC2">
+      <tasks xsi:type="librede:ResourceDemand" resource="//@workloadDescription/@resources.0"/>
+    </services>
+  </workloadDescription>
+  <input>
+    <dataSources name="Primary Data Source" type="tools.descartes.librede.datasource.csv.CsvDataSource"/>
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="C:\Users\Veronika\Desktop\example1\experiment1_WC0_RESPONSE_TIME.csv">
+      <metric href="librede:metrics#RESPONSE_TIME"/>
+      <mappings entity="//@workloadDescription/@services.0"/>
+      <unit href="librede:units#SECONDS"/>
+      <interval value="0.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+    </observations>
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="C:\Users\Veronika\Desktop\example1\experiment1_WC1_RESPONSE_TIME.csv">
+      <metric href="librede:metrics#RESPONSE_TIME"/>
+      <mappings entity="//@workloadDescription/@services.1"/>
+      <unit href="librede:units#SECONDS"/>
+      <interval value="0.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+    </observations>
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="C:\Users\Veronika\Desktop\example1\experiment1_WC2_RESPONSE_TIME.csv">
+      <metric href="librede:metrics#RESPONSE_TIME"/>
+      <mappings entity="//@workloadDescription/@services.2"/>
+      <unit href="librede:units#SECONDS"/>
+      <interval value="0.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+    </observations>
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" aggregation="AVERAGE" file="C:\Users\Veronika\Desktop\example1\host1_CPU_UTILIZATION.csv">
+      <metric href="librede:metrics#UTILIZATION"/>
+      <mappings entity="//@workloadDescription/@resources.0"/>
+      <unit href="librede:units#NONE"/>
+      <interval value="30.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+    </observations>
+  </input>
+  <estimation window="60">
+    <approaches type="tools.descartes.librede.approach.ServiceDemandLawApproach"/>
+    <approaches type="tools.descartes.librede.approach.ResponseTimeApproximationApproach"/>
+    <approaches type="tools.descartes.librede.approach.WangKalmanFilterApproach"/>
+    <approaches type="tools.descartes.librede.approach.RoliaRegressionApproach"/>
+    <approaches type="tools.descartes.librede.approach.ZhangKalmanFilterApproach"/>
+    <approaches type="tools.descartes.librede.approach.MenasceOptimizationApproach"/>
+    <algorithms type="tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter"/>
+    <algorithms type="tools.descartes.librede.nnls.LeastSquaresRegression"/>
+    <algorithms type="tools.descartes.librede.ipopt.java.RecursiveOptimization"/>
+    <algorithms type="tools.descartes.librede.algorithm.SimpleApproximation"/>
+    <stepSize value="60.0">
+      <unit href="librede:units#SECONDS"/>
+    </stepSize>
+    <startTimestamp value="1.370087520718E9">
+      <unit href="librede:units#SECONDS"/>
+    </startTimestamp>
+    <endTimestamp value="1.370090939129E9">
+      <unit href="librede:units#SECONDS"/>
+    </endTimestamp>
+  </estimation>
+  <output>
+    <exporters name="Default" type="tools.descartes.librede.export.csv.CsvExporter">
+      <parameters name="OutputDirectory" value="C:\Users\Veronika\Desktop\example1\output"/>
+      <parameters name="FileName" value="estimates"/>
+    </exporters>
+  </output>
+  <validation validationFolds="5" validateEstimates="true">
+    <validators type="tools.descartes.librede.validation.ResponseTimeValidator"/>
+    <validators type="tools.descartes.librede.validation.UtilizationValidator"/>
+  </validation>
+</librede:LibredeConfiguration>

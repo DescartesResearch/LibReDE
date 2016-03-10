@@ -47,6 +47,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
@@ -193,7 +194,8 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 							IEstimationAlgorithm a = algorithmInstances.get(currentProblem);
 							if (a == null) {
 								// should only happen if initilization logic is incorrect.
-								throw new IllegalStateException();
+								log.error("Could not initialize apporach");
+								throw new EstimationException("Could not initialize approach" + Registry.INSTANCE.getDisplayName(getClass()));
 							}
 							try {
 								a.update();
@@ -223,7 +225,8 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 							IEstimationAlgorithm a = algorithmInstances.get(currentProblem);
 							if (a == null) {
 								// should only happen if initilization logic is incorrect.
-								throw new IllegalStateException();
+								log.error("Could not initialize apporach");
+								throw new EstimationException("Could not initialize approach" + Registry.INSTANCE.getDisplayName(getClass()));
 							}
 
 							try {
