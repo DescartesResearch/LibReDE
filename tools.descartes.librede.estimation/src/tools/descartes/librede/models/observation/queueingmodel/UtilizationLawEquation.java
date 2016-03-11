@@ -44,11 +44,20 @@ import tools.descartes.librede.units.Ratio;
 import tools.descartes.librede.units.RequestRate;
 
 /**
- * This class can be used to obtain the utilization of a resource.
+ * This equation implements the Utilization Law:
  * 
+ * U_{i} = \sum_{r = 1}^{N} X_{r} * D_{i,r}
+ * 
+ * with
+ * <ul>
+ * 	<li>U_{i} is the utilization of resource i
+ * 	<li>N is the number of services</li>
+ *  <li>D_{i,r} is the resource demand of resource i and service r</li>
+ *  <li>X_{r} is the throughput of service r</li>
+ * </ul>
  * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
- *
+ * @version 1.0
  */
 public class UtilizationLawEquation extends ModelEquation {
 
