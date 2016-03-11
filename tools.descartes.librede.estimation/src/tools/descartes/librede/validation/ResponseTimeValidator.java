@@ -41,7 +41,8 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -55,6 +56,7 @@ import tools.descartes.librede.repository.rules.DataDependency;
 public class ResponseTimeValidator implements IValidator {
 	
 	private List<ModelEntity> services;
+	private List<ResponseTimeValue> respObservation;
 	private List<ResponseTimeEquation> respEq;
 	private MatrixBuilder allErrors;
 	private MatrixBuilder predictedRespTimes;
@@ -79,9 +81,12 @@ public class ResponseTimeValidator implements IValidator {
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
-			ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false);
+			ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, srv, 0);
+			ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false, 0);
 			dependencies.addAll(rt.getDataDependencies());
+			dependencies.addAll(rtValue.getDataDependencies());
 			respEq.add(rt);
+			respObservation.add(rtValue);
 			this.services.add(srv);
 		}
 		allErrors = MatrixBuilder.create(stateModel.getUserServices().size());	
@@ -99,12 +104,10 @@ public class ResponseTimeValidator implements IValidator {
 		double[] relErr = new double[respEq.size()];
 		double[] real = new double[respEq.size()];
 		double[] actual = new double[respEq.size()];
-		int i = 0;
-		for (ResponseTimeEquation cur : respEq) {
-			real[i] = cur.getObservedOutput();
-			actual[i] = cur.getCalculatedOutput(x).getValue();
+		for (int i = 0; i < respEq.size(); i++) {
+			real[i] = respObservation.get(i).getConstantValue();
+			actual[i] = respEq.get(i).getValue(x).getValue();
 			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
-			i++;				
 		}
 		allErrors.addRow(relErr);
 		predictedRespTimes.addRow(actual);
