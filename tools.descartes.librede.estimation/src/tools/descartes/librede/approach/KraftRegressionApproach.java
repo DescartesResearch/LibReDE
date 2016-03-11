@@ -1,0 +1,93 @@
+/**
+ * ==============================================
+ *  LibReDE : Library for Resource Demand Estimation
+ * ==============================================
+ *
+ * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ *
+ * Project Info:   http://www.descartes-research.net/
+ *
+ * All rights reserved. This software is made available under the terms of the
+ * Eclipse Public License (EPL) v1.0 as published by the Eclipse Foundation
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * This software is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License (EPL)
+ * for more details.
+ *
+ * You should have received a copy of the Eclipse Public License (EPL)
+ * along with this software; if not visit http://www.eclipse.org or write to
+ * Eclipse Foundation, Inc., 308 SW First Avenue, Suite 110, Portland, 97204 USA
+ * Email: license (at) eclipse.org
+ *
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
+ * in the United States and other countries.]
+ */
+package tools.descartes.librede.approach;
+
+import java.util.Collections;
+import java.util.List;
+
+import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.algorithm.ILeastSquaresRegressionAlgorithm;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
+import tools.descartes.librede.models.observation.VectorObservationModel;
+import tools.descartes.librede.models.observation.equations.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.equations.ResponseTimeValue;
+import tools.descartes.librede.models.state.ConstantStateModel;
+import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.registry.Component;
+import tools.descartes.librede.repository.IRepositoryCursor;
+
+/**
+ * This class implements the linear regression based approach described in the following paper:
+ * 
+ * Kraft, Stephan, et al. "Estimating service resource consumption from response time measurements." 
+ * Proceedings of the Fourth International ICST Conference on Performance Evaluation Methodologies and Tools. 
+ * ICST (Institute for Computer Sciences, Social-Informatics and Telecommunications Engineering), 2009.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ */
+@Component(displayName = "Least-squares Regression using Queue Lengths and Response Times")
+public class KraftRegressionApproach extends AbstractEstimationApproach {
+
+	@Override
+	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
+		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+		for (Resource res : workload.getResources()) {
+			for (ResourceDemand demand : res.getDemands()) {				
+				builder.addVariable(demand);
+			}
+		}
+		return Collections.<IStateModel<?>>singletonList(builder.build());
+	}
+
+	@Override
+	protected IObservationModel<?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel om = new VectorObservationModel();
+		for (Service curService : stateModel.getUserServices()) {
+			for (Resource curResource : curService.getAccessedResources()) {
+				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, curService, 0);
+				ResponseTimeEquation rtEquation = new ResponseTimeEquation(stateModel, cursor, curService, true, 0);
+				
+				om.addOutputFunction(new OutputFunction(rtValue, rtEquation));
+			}
+		}
+		return om;		
+	}
+
+	@Override
+	protected IEstimationAlgorithm getEstimationAlgorithm(EstimationAlgorithmFactory factory) {
+		return factory.createInstance(ILeastSquaresRegressionAlgorithm.class);
+	}
+
+}
