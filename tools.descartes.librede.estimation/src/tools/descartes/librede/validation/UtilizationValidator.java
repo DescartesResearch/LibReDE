@@ -39,7 +39,8 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
@@ -53,7 +54,8 @@ public class UtilizationValidator implements IValidator {
 	
 	private final List<DataDependency<?>> dependencies = new ArrayList<>();
 	private List<ModelEntity> resources;
-	private List<UtilizationLaw> utilLaw;
+	private List<UtilizationValue> utilObservation;
+	private List<UtilizationLawEquation> utilLaw;
 	private MatrixBuilder allErrors;
 	private MatrixBuilder predictedUtilization;
 	private MatrixBuilder observedUtilization;
@@ -69,13 +71,17 @@ public class UtilizationValidator implements IValidator {
 		}
 		stateModel = builder.build(); 
 		
-		this.utilLaw = new ArrayList<UtilizationLaw>();
+		this.utilObservation = new ArrayList<>();
+		this.utilLaw = new ArrayList<UtilizationLawEquation>();
 		this.resources = new ArrayList<ModelEntity>();
 		for (Resource res : stateModel.getResources()) {
 			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
-				UtilizationLaw law = new UtilizationLaw(stateModel, cursor, res);
+				UtilizationValue util = new UtilizationValue(stateModel, cursor, res, 0);
+				UtilizationLawEquation law = new UtilizationLawEquation(stateModel, cursor, res, 0);
 				dependencies.addAll(law.getDataDependencies());
+				dependencies.addAll(util.getDataDependencies());
 				utilLaw.add(law);
+				utilObservation.add(util);
 				resources.add(res);
 			}
 		}
@@ -95,12 +101,10 @@ public class UtilizationValidator implements IValidator {
 		double[] relErr = new double[utilLaw.size()];
 		double[] actualUtil = new double[utilLaw.size()];
 		double[] realUtil = new double[utilLaw.size()];
-		int i = 0;
-		for (UtilizationLaw cur : utilLaw) {
-			realUtil[i] = cur.getObservedOutput();
-			actualUtil[i] = cur.getCalculatedOutput(x).getValue();
+		for (int i = 0; i < utilLaw.size(); i++) {
+			realUtil[i] = utilObservation.get(i).getConstantValue();
+			actualUtil[i] = utilLaw.get(i).getValue(x).getValue();
 			relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
-			i++;
 		}
 		allErrors.addRow(relErr);
 		predictedUtilization.addRow(actualUtil);
