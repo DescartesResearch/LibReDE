@@ -78,6 +78,7 @@ public class ResponseTimeValidator implements IValidator {
 		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
 		this.stateModel = builder.build(); 
 		
+		this.respObservation = new ArrayList<>();
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
