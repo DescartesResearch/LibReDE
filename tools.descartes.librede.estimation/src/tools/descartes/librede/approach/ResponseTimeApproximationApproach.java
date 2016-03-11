@@ -42,7 +42,6 @@ import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
 import tools.descartes.librede.models.observation.queueingmodel.ConstantValue;
 import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeApproximationEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
@@ -55,7 +54,7 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 @Component(displayName = "Approximation with Response Times")
 public class ResponseTimeApproximationApproach extends AbstractEstimationApproach {
 	
-	private static final Logger log = Logger.getLogger(ResponseTimeApproximation.class);
+	private static final Logger log = Logger.getLogger(ResponseTimeApproximationApproach.class);
 	
 	public static final String NAME = "ResponseTimeApproximation";
 	
