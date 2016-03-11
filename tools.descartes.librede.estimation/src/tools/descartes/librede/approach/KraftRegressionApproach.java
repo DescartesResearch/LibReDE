@@ -44,6 +44,7 @@ import tools.descartes.librede.models.observation.equations.ResponseTimeValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -68,6 +69,7 @@ public class KraftRegressionApproach extends AbstractEstimationApproach {
 				builder.addVariable(demand);
 			}
 		}
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, getEstimationWindow()));
 		return Collections.<IStateModel<?>>singletonList(builder.build());
 	}
 
@@ -75,12 +77,10 @@ public class KraftRegressionApproach extends AbstractEstimationApproach {
 	protected IObservationModel<?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel om = new VectorObservationModel();
 		for (Service curService : stateModel.getUserServices()) {
-			for (Resource curResource : curService.getAccessedResources()) {
-				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, curService, 0);
-				ResponseTimeEquation rtEquation = new ResponseTimeEquation(stateModel, cursor, curService, true, 0);
-				
-				om.addOutputFunction(new OutputFunction(rtValue, rtEquation));
-			}
+			ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, curService, 0);
+			ResponseTimeEquation rtEquation = new ResponseTimeEquation(stateModel, cursor, curService, true, 0);
+			
+			om.addOutputFunction(new OutputFunction(rtValue, rtEquation));
 		}
 		return om;		
 	}
