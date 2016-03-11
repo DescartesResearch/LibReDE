@@ -184,7 +184,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 		// when the sample size is small
 		if (numObservations < MIN_SIZE_OF_ESTIMATION) {
 			return LinAlg.zeros(getStateModel().getStateSize());
-		} else if (numObservations < dependentVariables.rows()) {
+		} else if ((numObservations * outputSize) < dependentVariables.rows()) {
 			return nnls(independentVariables.rows(range(0, numObservations * outputSize)), dependentVariables.rows(range(0, numObservations * outputSize)));
 		} else {
 			return nnls(independentVariables, dependentVariables);
