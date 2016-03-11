@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.observation.queueingmodel;
+package tools.descartes.librede.models.observation.equations;
 
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
@@ -172,7 +172,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see tools.descartes.librede.models.observation.queueingmodel.
+		 * @see tools.descartes.librede.models.observation.equations.
 		 * ModelEquation#getValue(tools.descartes.librede.models.State)
 		 */
 		@Override
@@ -291,7 +291,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 
 
 		/* (non-Javadoc)
-		 * @see tools.descartes.librede.models.observation.queueingmodel.ModelEquation#getValue(tools.descartes.librede.models.State)
+		 * @see tools.descartes.librede.models.observation.equations.ModelEquation#getValue(tools.descartes.librede.models.State)
 		 */
 		@Override
 		public DerivativeStructure getValue(State state) {
@@ -319,7 +319,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 
 
 		/* (non-Javadoc)
-		 * @see tools.descartes.librede.models.observation.queueingmodel.ModelEquation#getFactors()
+		 * @see tools.descartes.librede.models.observation.equations.ModelEquation#getFactors()
 		 */
 		@Override
 		public Vector getFactors() {

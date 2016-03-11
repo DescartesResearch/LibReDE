@@ -13,7 +13,7 @@ Import-Package: org.apache.commons.math3.analysis.differentiation;version="3.2.0
  tools.descartes.librede.linalg.testutil,
  tools.descartes.librede.models,
  tools.descartes.librede.models.observation,
- tools.descartes.librede.models.observation.queueingmodel,
+ tools.descartes.librede.models.observation.equations,
  tools.descartes.librede.models.state.initial,
  tools.descartes.librede.repository,
  tools.descartes.librede.testutils,

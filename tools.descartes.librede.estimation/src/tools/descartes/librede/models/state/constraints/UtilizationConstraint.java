@@ -29,7 +29,7 @@ package tools.descartes.librede.models.state.constraints;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.variables.ConstraintVariable;
 import tools.descartes.librede.models.variables.Variable;

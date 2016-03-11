@@ -36,7 +36,7 @@ import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.queueingmodel.ModelEquation;
+import tools.descartes.librede.models.observation.equations.ModelEquation;
 import tools.descartes.librede.models.state.IStateModel;
 
 public class Differentiation {

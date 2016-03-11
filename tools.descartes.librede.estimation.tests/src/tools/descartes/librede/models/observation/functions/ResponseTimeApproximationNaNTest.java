@@ -44,7 +44,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
-import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeApproximationEquation;
+import tools.descartes.librede.models.observation.equations.ResponseTimeApproximationEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;

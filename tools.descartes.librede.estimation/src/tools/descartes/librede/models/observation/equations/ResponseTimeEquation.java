@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.observation.queueingmodel;
+package tools.descartes.librede.models.observation.equations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -143,7 +143,7 @@ public class ResponseTimeEquation extends ModelEquation {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * getValue(tools.descartes.librede.models.State)
 	 */
 	@Override
@@ -178,7 +178,7 @@ public class ResponseTimeEquation extends ModelEquation {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * hasData()
 	 */
 	@Override
@@ -201,7 +201,7 @@ public class ResponseTimeEquation extends ModelEquation {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * isConstant()
 	 */
 	@Override

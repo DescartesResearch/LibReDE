@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.observation.queueingmodel;
+package tools.descartes.librede.models.observation.equations;
 
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
@@ -129,7 +129,7 @@ public class ResponseTimeApproximationEquation extends DemandValue {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * getConstantValue()
 	 */
 	@Override
@@ -144,7 +144,7 @@ public class ResponseTimeApproximationEquation extends DemandValue {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * hasData()
 	 */
 	@Override
@@ -156,7 +156,7 @@ public class ResponseTimeApproximationEquation extends DemandValue {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * isConstant()
 	 */
 	@Override
@@ -168,7 +168,7 @@ public class ResponseTimeApproximationEquation extends DemandValue {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * isLinear()
 	 */
 	@Override

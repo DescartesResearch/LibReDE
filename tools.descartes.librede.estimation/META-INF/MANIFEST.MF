@@ -37,6 +37,7 @@ Export-Package: tools.descartes.librede;uses:="tools.descartes.librede.repositor
    tools.descartes.librede.models.observation,
    tools.descartes.librede.models.state",
  tools.descartes.librede.models.observation;uses:="tools.descartes.librede.linalg",
+ tools.descartes.librede.models.observation.equations,
  tools.descartes.librede.models.observation.functions;
   uses:="tools.descartes.librede.repository,
    tools.descartes.librede.models.diff,
@@ -44,7 +45,6 @@ Export-Package: tools.descartes.librede;uses:="tools.descartes.librede.repositor
    tools.descartes.librede.linalg,
    tools.descartes.librede.models.state,
    tools.descartes.librede.metrics",
- tools.descartes.librede.models.observation.queueingmodel,
  tools.descartes.librede.models.state;uses:="tools.descartes.librede.configuration,tools.descartes.librede.linalg,tools.descartes.librede.models.state.initial",
  tools.descartes.librede.models.state.constraints;
   uses:="tools.descartes.librede.repository,

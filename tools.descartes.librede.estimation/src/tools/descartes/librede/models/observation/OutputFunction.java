@@ -29,8 +29,8 @@ package tools.descartes.librede.models.observation;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.queueingmodel.FixedValue;
-import tools.descartes.librede.models.observation.queueingmodel.ModelEquation;
+import tools.descartes.librede.models.observation.equations.FixedValue;
+import tools.descartes.librede.models.observation.equations.ModelEquation;
 import tools.descartes.librede.models.variables.OutputVariable;
 
 public class OutputFunction extends AbstractDependencyTarget {

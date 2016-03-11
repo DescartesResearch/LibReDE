@@ -43,7 +43,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
-import tools.descartes.librede.models.observation.queueingmodel.ServiceDemandLawEquation;
+import tools.descartes.librede.models.observation.equations.ServiceDemandLawEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;

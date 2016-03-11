@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.observation.queueingmodel;
+package tools.descartes.librede.models.observation.equations;
 
 import org.apache.commons.math3.analysis.differentiation.DSCompiler;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;

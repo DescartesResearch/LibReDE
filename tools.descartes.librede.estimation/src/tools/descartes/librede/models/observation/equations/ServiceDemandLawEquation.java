@@ -24,7 +24,7 @@
  * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
  * in the United States and other countries.]
  */
-package tools.descartes.librede.models.observation.queueingmodel;
+package tools.descartes.librede.models.observation.equations;
 
 import static tools.descartes.librede.linalg.LinAlg.nansum;
 
@@ -152,7 +152,7 @@ public class ServiceDemandLawEquation extends DemandValue {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * getConstantValue()
 	 */
 	@Override

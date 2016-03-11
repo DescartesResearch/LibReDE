@@ -45,7 +45,7 @@ import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
-import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;

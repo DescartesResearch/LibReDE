@@ -49,7 +49,7 @@ import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.queueingmodel.ErlangCEquation;
+import tools.descartes.librede.models.observation.equations.ErlangCEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
