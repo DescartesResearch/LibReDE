@@ -26,6 +26,8 @@
  */
 package tools.descartes.librede.models.observation.equations;
 
+import static tools.descartes.librede.linalg.LinAlg.zeros;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -142,8 +144,7 @@ public class ResponseTimeEquation extends ModelEquation {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.equations.ModelEquation#
+	 * @see tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * getValue(tools.descartes.librede.models.State)
 	 */
 	@Override
@@ -177,8 +178,36 @@ public class ResponseTimeEquation extends ModelEquation {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.equations.ModelEquation#
+	 * @see tools.descartes.librede.models.observation.equations.ModelEquation#
+	 * getFactors()
+	 */
+	@Override
+	public Vector getFactors() {
+		Vector rt = zeros(getStateModel().getStateSize());
+		Vector X = throughputQuery.get(historicInterval);
+		if (X.get(throughputQuery.indexOf(cls_r)) == 0.0) {
+			// no request observed in this interval
+			return rt;
+		}
+
+		for (Resource res_i : accessedResources.keySet()) {
+			Map<Service, ResidenceTimeEquation> accessingServices = residenceTimeEquations.get(res_i);
+			for (Service curService : accessingServices.keySet()) {
+				double visits = 1;
+				if (!curService.equals(cls_r)) {
+					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
+				}
+				ResidenceTimeEquation R_ir = accessingServices.get(curService);
+				rt = rt.plus(R_ir.getFactors().times(visits));
+			}
+		}
+		return rt;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * hasData()
 	 */
 	@Override
@@ -200,8 +229,7 @@ public class ResponseTimeEquation extends ModelEquation {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.equations.ModelEquation#
+	 * @see tools.descartes.librede.models.observation.equations.ModelEquation#
 	 * isConstant()
 	 */
 	@Override
