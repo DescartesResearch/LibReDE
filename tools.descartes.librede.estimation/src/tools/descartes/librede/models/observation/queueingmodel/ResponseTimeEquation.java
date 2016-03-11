@@ -48,21 +48,60 @@ import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.units.RequestRate;
 
+/**
+ * This output function describes the relationship between the mean response
+ * time and the resource demands. It implements the following equation:
+ * 
+ * R_{r} = \sum_{i = 1}{K} \frac{D_{i,r}}{1 - \sum_{v = 1}^{N} X_{v} * D{i,v}}
+ * 
+ * with
+ * <ul>
+ * <li>R_{r} is the response time of service r</li>
+ * <li>K is the number of resources</li>
+ * <li>N is the number of services</li>
+ * <li>D_{i,r} is the resource demand of resource i and service r</li>
+ * <li>X_{r} is the throughput of service r</li>
+ * </ul>
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ * @version 1.0
+ */
 public class ResponseTimeEquation extends ModelEquation {
-	
+
 	private final Service cls_r;
 	private final List<Service> usedServices;
 	private final Map<Resource, List<Service>> accessedResources;
 	private final Map<Resource, Map<Service, ResidenceTimeEquation>> residenceTimeEquations;
-	
+
 	private final Query<Scalar, RequestRate> throughputQuery;
 
 	private InvocationGraph invocations;
 
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param stateModel
+	 *            - the description of the state
+	 * @param repository
+	 *            - a view of the repository with current measurement data
+	 * @param service
+	 *            - the service for which the response time is calculated
+	 * @param useObservedUtilization
+	 *            - a flag whether to use observed utilization values or
+	 *            calculated
+	 * @param historicInterval
+	 *            - specifies the number of intervals this function is behind in
+	 *            the past.
+	 * 
+	 * @throws NullPointerException
+	 *             if any parameter is null
+	 * @throws IllegalArgumentException
+	 *             if the list of services or resources is empty
+	 */
 	public ResponseTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
 			Service service, boolean useObservedUtilization, int historicInterval) {
 		super(stateModel, historicInterval);
-		
+
 		cls_r = service;
 		this.invocations = stateModel.getInvocationGraph();
 
@@ -85,11 +124,12 @@ public class ResponseTimeEquation extends ModelEquation {
 			} else {
 				utilFunction = new UtilizationLawEquation(getStateModel(), cursor, res, historicInterval);
 			}
-			
+
 			for (Service serv : res.getAccessingServices()) {
-				WaitingTimeEquation waitingTime = WaitingTimeEquation.create(getStateModel(), cursor, serv, res, historicInterval,
-						utilFunction);
-				currentMap.put(serv, new ResidenceTimeEquation(stateModel, cursor, serv, res, historicInterval, waitingTime));
+				WaitingTimeEquation waitingTime = WaitingTimeEquation.create(getStateModel(), cursor, serv, res,
+						historicInterval, utilFunction);
+				currentMap.put(serv,
+						new ResidenceTimeEquation(stateModel, cursor, serv, res, historicInterval, waitingTime));
 			}
 		}
 
@@ -98,7 +138,14 @@ public class ResponseTimeEquation extends ModelEquation {
 		addDataDependency(throughputQuery);
 
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * getValue(tools.descartes.librede.models.State)
+	 */
 	@Override
 	public DerivativeStructure getValue(State state) {
 		Vector X = throughputQuery.get(historicInterval);
@@ -126,7 +173,14 @@ public class ResponseTimeEquation extends ModelEquation {
 		}
 		return rt;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * hasData()
+	 */
 	@Override
 	public boolean hasData() {
 		boolean ret = throughputQuery.hasData(historicInterval);
@@ -137,19 +191,24 @@ public class ResponseTimeEquation extends ModelEquation {
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public boolean isLinear() {
 		return false;
 	}
-	
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * tools.descartes.librede.models.observation.queueingmodel.ModelEquation#
+	 * isConstant()
+	 */
 	@Override
 	public boolean isConstant() {
 		return false;
 	}
-	
-	
+
 	/**
 	 * Collects all accessed resources of the given services.
 	 * 

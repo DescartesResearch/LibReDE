@@ -49,6 +49,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
+import tools.descartes.librede.models.observation.queueingmodel.ResponseTimeEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.Query;
 import tools.descartes.librede.repository.QueryBuilder;
@@ -91,8 +92,8 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 		service1 = generator.getWorkloadDescription().getServices().get(0);
 		service2 = generator.getWorkloadDescription().getServices().get(1);
 		
-		law1 = new ResponseTimeEquation(generator.getStateModel(), cursor, service1, useObservedUtilization);
-		law2 = new ResponseTimeEquation(generator.getStateModel(), cursor, service2, useObservedUtilization);
+		law1 = new ResponseTimeEquation(generator.getStateModel(), cursor, service1, useObservedUtilization, 0);
+		law2 = new ResponseTimeEquation(generator.getStateModel(), cursor, service2, useObservedUtilization, 0);
 		state = generator.getDemands();
 		
 		generator.nextObservation();
@@ -100,17 +101,10 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 	}
 
 	@Test
-	public void testGetObservedOutput() {
-		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service1).average().using(cursor);
-		assertThat(law1.getObservedOutput()).isEqualTo(resp.execute().getValue(), offset(1e-9));
-		assertThat(law2.getObservedOutput()).isZero();
-	}
-
-	@Test
 	public void testGetCalculatedOutput() {
 		Query<Scalar, Time> resp = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forService(service1).average().using(cursor);
-		assertThat(law1.getCalculatedOutput(state).getValue()).isEqualTo(resp.execute().getValue(), offset(1e-9));
-		assertThat(law2.getCalculatedOutput(state).getValue()).isZero();
+		assertThat(law1.getValue(state).getValue()).isEqualTo(resp.execute().getValue(), offset(1e-9));
+		assertThat(law2.getValue(state).getValue()).isZero();
 	}
 
 	@Test
@@ -118,7 +112,7 @@ public class ResponseTimeEquationNaNTest extends LibredeTest {
 		Vector diff1 = Differentiation.diff1(law1, state);
 		Matrix diff2 = Differentiation.diff2(law1, state);
 		
-		DerivativeStructure s = law1.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
+		DerivativeStructure s = law1.getValue(new State(state.getStateModel(), state.getVector(), 2));
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
