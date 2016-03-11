@@ -42,7 +42,6 @@ import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 

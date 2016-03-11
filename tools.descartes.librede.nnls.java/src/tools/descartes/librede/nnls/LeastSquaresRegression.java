@@ -46,7 +46,6 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.OutputFunction;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -59,8 +58,6 @@ import tools.descartes.librede.repository.IRepositoryCursor;
  */
 @Component(displayName="Non-negative Least-Squares Regression")
 public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
-
-	private ILinearOutputFunction outputFunction;
 
 	// contains current measurements
 	private Matrix independentVariables;
