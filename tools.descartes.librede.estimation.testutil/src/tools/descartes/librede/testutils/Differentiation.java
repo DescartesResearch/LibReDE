@@ -36,14 +36,14 @@ import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.models.observation.queueingmodel.ModelEquation;
 import tools.descartes.librede.models.state.IStateModel;
 
 public class Differentiation {
 	
-	public static Vector diff1(IOutputFunction equation, State state) {		
+	public static Vector diff1(ModelEquation equation, State state) {		
 		final double sqrte = Math.sqrt(epsilon());
-		final IOutputFunction f = equation;
+		final ModelEquation f = equation;
 		final IStateModel<?> stateModel = state.getStateModel();
 		final Vector x = state.getVector();
 		final double[] h = new double[x.rows()];
@@ -55,8 +55,8 @@ public class Differentiation {
 				h[row] = sqrte * (Math.abs(x.get(row)) + 1.0);
 				Vector hVec = vector(h);
 				
-				double x1 = f.getCalculatedOutput(new State(stateModel, x.plus(hVec))).getValue();
-				double x2 = f.getCalculatedOutput(new State(stateModel, x.minus(hVec))).getValue();
+				double x1 = f.getValue(new State(stateModel, x.plus(hVec))).getValue();
+				double x2 = f.getValue(new State(stateModel, x.minus(hVec))).getValue();
 				
 				return (x1 - x2) / (2 * h[row]);
 			}
@@ -64,9 +64,9 @@ public class Differentiation {
 		return dev;	
 	}
 	
-	public static Matrix diff2(IOutputFunction equation, State state) {		
+	public static Matrix diff2(ModelEquation equation, State state) {		
 		final double sqrtsqrte = Math.sqrt(Math.sqrt(epsilon()));
-		final IOutputFunction f = equation;
+		final ModelEquation f = equation;
 		final IStateModel<?> stateModel = state.getStateModel();
 		final Vector x = state.getVector();
 		final double[] h = new double[x.rows()];
@@ -83,9 +83,9 @@ public class Differentiation {
 					h[row] = sqrtsqrte * (Math.abs(x.get(row)) + 1.0);
 					Vector hVec = vector(h);
 					
-					double x1 = f.getCalculatedOutput(new State(stateModel, x.plus(hVec))).getValue();
-					double x2 = f.getCalculatedOutput(new State(stateModel, x)).getValue();
-					double x3 = f.getCalculatedOutput(new State(stateModel, x.minus(hVec))).getValue();
+					double x1 = f.getValue(new State(stateModel, x.plus(hVec))).getValue();
+					double x2 = f.getValue(new State(stateModel, x)).getValue();
+					double x3 = f.getValue(new State(stateModel, x.minus(hVec))).getValue();
 					
 					return (x1 - 2 * x2 + x3) / (h[row]*h[row]);
 				} else {
@@ -96,10 +96,10 @@ public class Differentiation {
 					h[column] = sqrtsqrte * (Math.abs(x.get(column)) + 1.0);
 					Vector h2 = vector(h);
 					
-					double x1 = f.getCalculatedOutput(new State(stateModel, x.plus(h1.plus(h2)))).getValue();
-					double x2 = f.getCalculatedOutput(new State(stateModel, x.plus(h1.minus(h2)))).getValue();
-					double x3 = f.getCalculatedOutput(new State(stateModel, x.plus(h2.minus(h1)))).getValue();
-					double x4 = f.getCalculatedOutput(new State(stateModel, x.minus(h1.plus(h2)))).getValue();
+					double x1 = f.getValue(new State(stateModel, x.plus(h1.plus(h2)))).getValue();
+					double x2 = f.getValue(new State(stateModel, x.plus(h1.minus(h2)))).getValue();
+					double x3 = f.getValue(new State(stateModel, x.plus(h2.minus(h1)))).getValue();
+					double x4 = f.getValue(new State(stateModel, x.minus(h1.plus(h2)))).getValue();
 					
 					return (x1 - x2 - x3 + x4) / (4 * h1.get(row) * h2.get(column));
 				}
