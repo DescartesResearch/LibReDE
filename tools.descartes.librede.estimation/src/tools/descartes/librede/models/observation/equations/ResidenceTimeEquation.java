@@ -124,7 +124,7 @@ public class ResidenceTimeEquation extends ModelEquation {
 		int idx = getStateModel().getStateVariableIndex(res_i, cls_r);
 		factors = factors.set(idx, factors.get(idx) + 1);
 		double C_i = contentionQuery.get(historicInterval).getValue();
-		return factors.times(C_i);
+		return factors.times(1 + C_i);
 	}
 
 	@Override
