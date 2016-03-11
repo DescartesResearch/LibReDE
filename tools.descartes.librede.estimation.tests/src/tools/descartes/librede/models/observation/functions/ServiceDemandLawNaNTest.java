@@ -43,6 +43,7 @@ import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
+import tools.descartes.librede.models.observation.queueingmodel.ServiceDemandLawEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
@@ -55,7 +56,7 @@ public class ServiceDemandLawNaNTest extends LibredeTest {
 	private final static int STATE_IDX = 1;
 	
 	private ObservationDataGenerator generator;
-	private ServiceDemandLaw law;
+	private ServiceDemandLawEquation law;
 	private IRepositoryCursor cursor;
 	private State state;
 	
@@ -73,7 +74,7 @@ public class ServiceDemandLawNaNTest extends LibredeTest {
 		resource = demand.getResource();
 		service = demand.getService();
 		
-		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
+		law = new ServiceDemandLawEquation(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
 		
 		generator.nextObservation();
@@ -81,18 +82,13 @@ public class ServiceDemandLawNaNTest extends LibredeTest {
 	}
 
 	@Test
-	public void testGetObservedOutput() {
-		assertThat(law.getObservedOutput()).isZero();
-	}
-
-	@Test
 	public void testGetCalculatedOutput() {
-		assertThat(law.getCalculatedOutput(state).getValue()).isZero();
+		assertThat(law.getValue(state).getValue()).isZero();
 	}
 	
 	@Test
 	public void testGetFactor() {
-		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
+		assertThat(law.getConstantValue()).isEqualTo(0.0, offset(1e-9));
 	}
 
 	@Test
@@ -100,7 +96,7 @@ public class ServiceDemandLawNaNTest extends LibredeTest {
 		Vector diff1 = Differentiation.diff1(law, state);
 		Matrix diff2 = Differentiation.diff2(law, state);
 		
-		DerivativeStructure s = law.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
+		DerivativeStructure s = law.getValue(new State(state.getStateModel(), state.getVector(), 2));
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}

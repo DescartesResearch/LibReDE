@@ -40,35 +40,34 @@ import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.diff.DifferentiationUtils;
+import tools.descartes.librede.models.observation.queueingmodel.ServiceDemandLawEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.QueryBuilder;
 import tools.descartes.librede.testutils.Differentiation;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
-import tools.descartes.librede.units.Ratio;
-import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.UnitsFactory;
 
 public class ServiceDemandLawTest extends LibredeTest {
 	
-	private final static int STATE_IDX = 7;
+	private final static int STATE_IDX = 3;
 	
 	private ObservationDataGenerator generator;
-	private ServiceDemandLaw law;
+	private ServiceDemandLawEquation law;
 	private IRepositoryCursor cursor;
 	private State state;
 	
 	private Resource resource;
 	private Service service;
-
+	
 	@Before
 	public void setUp() throws Exception {
-		generator = new ObservationDataGenerator(42, 5, 4);
+		/*
+		 * IMPORTANT: SDL is only accurate for the single resource case!
+		 */
+		generator = new ObservationDataGenerator(42, 5, 1);
 		generator.setRandomDemands();
 		
 		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
@@ -77,7 +76,7 @@ public class ServiceDemandLawTest extends LibredeTest {
 		resource = demand.getResource();
 		service = demand.getService();
 		
-		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
+		law = new ServiceDemandLawEquation(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
 		
 		generator.nextObservation();
@@ -85,26 +84,17 @@ public class ServiceDemandLawTest extends LibredeTest {
 	}
 
 	@Test
-	public void testGetObservedOutput() {
-		Query<Vector, RequestRate> x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor);
-		Query<Vector, Time> r = QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(generator.getStateModel().getUserServices()).average().using(cursor);
-		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
-		
-		Vector xVec = x.execute();
-		Vector rVec = r.execute();
-		assertThat(law.getObservedOutput()).isEqualTo(xVec.get(x.indexOf(service)) * rVec.get(r.indexOf(service)) * util / (xVec.dot(rVec) * xVec.get(x.indexOf(service))), offset(1e-9));
-	}
-
-	@Test
 	public void testGetCalculatedOutput() {
 		double expected = state.getVariable(resource, service).getValue();
 		
-		assertThat(law.getCalculatedOutput(state).getValue()).isEqualTo(expected, offset(1e-9));
+		assertThat(law.getValue(state).getValue()).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
 	public void testGetFactor() {
-		assertThat(law.getFactor()).isEqualTo(1.0, offset(1e-9));
+		double expected = state.getVariable(resource, service).getValue();
+		
+		assertThat(law.getConstantValue()).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
@@ -112,7 +102,7 @@ public class ServiceDemandLawTest extends LibredeTest {
 		Vector diff1 = Differentiation.diff1(law, state);
 		Matrix diff2 = Differentiation.diff2(law, state);
 		
-		DerivativeStructure s = law.getCalculatedOutput(new State(state.getStateModel(), state.getVector(), 2)).getDerivativeStructure();
+		DerivativeStructure s = law.getValue(new State(state.getStateModel(), state.getVector(), 2));
 		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
 		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}

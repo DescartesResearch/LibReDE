@@ -29,8 +29,9 @@ package tools.descartes.librede.models.state.constraints;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.models.AbstractDependencyTarget;
 import tools.descartes.librede.models.State;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.queueingmodel.UtilizationLawEquation;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.variables.ConstraintVariable;
 import tools.descartes.librede.models.variables.Variable;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
@@ -42,7 +43,7 @@ public class UtilizationConstraint extends AbstractDependencyTarget implements I
 	
 	private final int historicInterval;
 	
-	private UtilizationLaw utilLaw;
+	private UtilizationLawEquation utilLaw;
 	
 	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor) {
 		this(resource, cursor, 0);
@@ -69,12 +70,12 @@ public class UtilizationConstraint extends AbstractDependencyTarget implements I
 		if (utilLaw == null) {
 			throw new IllegalStateException();
 		}
-		return utilLaw.getCalculatedOutput(state);
+		return new ConstraintVariable(state, utilLaw.getValue(state));
 	}
 
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
-		this.utilLaw = new UtilizationLaw(model, cursor, res_i, historicInterval);
+		this.utilLaw = new UtilizationLawEquation(model, cursor, res_i, historicInterval);
 		addDataDependencies(this.utilLaw);
 	}
 
