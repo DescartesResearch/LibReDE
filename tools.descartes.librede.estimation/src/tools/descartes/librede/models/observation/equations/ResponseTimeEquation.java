@@ -163,12 +163,14 @@ public class ResponseTimeEquation extends ModelEquation {
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
-				ResidenceTimeEquation R_ir = accessingServices.get(curService);
-				DerivativeStructure curRt = R_ir.getValue(state).multiply(visits);
-				if (rt == null) {
-					rt = curRt;
-				} else {
-					rt = rt.add(curRt);
+				if (visits > 0.0) {
+					ResidenceTimeEquation R_ir = accessingServices.get(curService);
+					DerivativeStructure curRt = R_ir.getValue(state).multiply(visits);
+					if (rt == null) {
+						rt = curRt;
+					} else {
+						rt = rt.add(curRt);
+					}
 				}
 			}
 		}
@@ -197,8 +199,10 @@ public class ResponseTimeEquation extends ModelEquation {
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
 				}
-				ResidenceTimeEquation R_ir = accessingServices.get(curService);
-				rt = rt.plus(R_ir.getFactors().times(visits));
+				if (visits > 0.0) {
+					ResidenceTimeEquation R_ir = accessingServices.get(curService);
+					rt = rt.plus(R_ir.getFactors().times(visits));
+				}
 			}
 		}
 		return rt;
