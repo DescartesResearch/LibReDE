@@ -47,7 +47,10 @@ public class ResponseTimeValue extends FixedValue {
 	
 	@Override
 	public double getConstantValue() {
-		return respTimeQuery.get(historicInterval).getValue();
+		double rt = respTimeQuery.get(historicInterval).getValue();
+		// We did not observe a request in this interval
+		// therefore, we approximate the demand with zero
+		return (rt != rt) ? 0.0 : rt;
 	}
 
 	@Override
