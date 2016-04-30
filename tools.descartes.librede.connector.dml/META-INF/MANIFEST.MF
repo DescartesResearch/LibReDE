@@ -18,3 +18,4 @@ Import-Package: edu.kit.ipd.descartes.core,
  org.eclipse.emf.common.util,
  tools.descartes.librede.configuration
 Require-Bundle: com.google.guava;bundle-version="12.0.0"
+Export-Package: tools.descartes.librede.connector.dml
