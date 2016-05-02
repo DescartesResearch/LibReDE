@@ -71,47 +71,9 @@ public class DmlMapping {
 		public Service service;
 	}
 	
-	private static class ExternalCallKey {
-		public final Service service;
-		public final Service calledService;
-		public ExternalCallKey(Service service, Service calledService) {
-			super();
-			this.service = service;
-			this.calledService = calledService;
-		}
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((calledService == null) ? 0 : calledService.hashCode());
-			result = prime * result + ((service == null) ? 0 : service.hashCode());
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ExternalCallKey other = (ExternalCallKey) obj;
-			if (calledService == null) {
-				if (other.calledService != null)
-					return false;
-			} else if (!calledService.equals(other.calledService))
-				return false;
-			if (service == null) {
-				if (other.service != null)
-					return false;
-			} else if (!service.equals(other.service))
-				return false;
-			return true;
-		}
-	}
-	
 	private BiMap<edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand, ResourceDemand> demands = HashBiMap.create();
-	private BiMap<ExternalCallKey, ExternalCall> calls = HashBiMap.create();
+	private BiMap<edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall, ExternalCall> calls = HashBiMap
+			.create();
 	private Map<String, ServiceMapping> services = new HashMap<>();
 	private Map<String, ResourceMapping> resources = new HashMap<>();
 
@@ -138,8 +100,8 @@ public class DmlMapping {
 		return newEntities;
 	}
 	
-	public ExternalCall getLibredeCall(edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
-		return calls.get(dmlCall);
+	public edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall getDmlCall(ExternalCall libredeCall) {
+		return calls.inverse().get(libredeCall);
 	}
 	
 	public edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand getDmlDemand(ResourceDemand libredeDemand) {
@@ -290,8 +252,7 @@ public class DmlMapping {
 	}
 
 	public ExternalCall mapExternalCall(Service service, Service calledService, edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
-		ExternalCallKey key = new ExternalCallKey(service, calledService);
-		ExternalCall call = calls.get(key);
+		ExternalCall call = calls.get(dmlCall);
 		if (call != null) {
 			return call;
 		} else {
@@ -299,7 +260,7 @@ public class DmlMapping {
 			call.setCalledService(calledService);
 			call.setName(calledService.getName());
 			service.getTasks().add(call);
-			calls.put(key, call);
+			calls.put(dmlCall, call);
 			newEntities.add(call);
 			return call;
 		}
