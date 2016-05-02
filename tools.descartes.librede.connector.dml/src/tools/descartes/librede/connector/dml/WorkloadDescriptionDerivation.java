@@ -26,17 +26,20 @@
  */
 package tools.descartes.librede.connector.dml;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.log4j.Logger;
 
+import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
 import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ModelVariableCharacterizationType;
+import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ParameterdependenciesFactory;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyConnector;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyContext;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.BasicComponent;
@@ -91,16 +94,13 @@ public class WorkloadDescriptionDerivation {
 			addDeployment(depCtx.getAssemblyContext(), depCtx.getResourceContainer());
 		}
 
-		Stack<ComposedStructure> callStack = new Stack<ComposedStructure>();
+		Deque<AssemblyContext> callStack = new ArrayDeque<>();
 		System system = deployment.getSystem();
-		callStack.push(system);
 		for (AssemblyContext ctx : system.getAssemblyContexts()) {
+			callStack.push(ctx);
 			Container deploymentTarget = deploymentMapping.get(ctx);
-			if (deploymentTarget != null) {
-				visitAssemblyContext(callStack, deploymentTarget, ctx);
-			} else {
-				log.warn("Assembly context " + ctx.getName() + " is not deployed on any container.");
-			}			
+			visitAssemblyContext(callStack, deploymentTarget);
+			callStack.pop();
 		}
 		
 		// Remove all empty services
@@ -156,36 +156,52 @@ public class WorkloadDescriptionDerivation {
 		}
 	}
 	
-	private void visitAssemblyContext(Stack<ComposedStructure> callStack, Container deploymentTarget, AssemblyContext assembly) {
-		RepositoryComponent component = assembly.getEncapsulatedComponent();
+	private void visitAssemblyContext(Deque<AssemblyContext> callStack, Container deploymentTarget) {
+		AssemblyContext curAssembly = callStack.peek();
+		RepositoryComponent component = curAssembly.getEncapsulatedComponent();
 		if (component instanceof BasicComponent) {
-			for (InterfaceProvidingRole role : assembly.getEncapsulatedComponent().getInterfaceProvidingRoles()) {
-				for (Signature sig : role.getInterface().getSignatures()) {
-					determineTasks(callStack, deploymentTarget, assembly, component, role, sig);
+			if (deploymentTarget != null) {
+				for (InterfaceProvidingRole role : curAssembly.getEncapsulatedComponent()
+						.getInterfaceProvidingRoles()) {
+					for (Signature sig : role.getInterface().getSignatures()) {
+						determineTasks(callStack, deploymentTarget, component, role, sig);
+					}
 				}
+			} else {
+				log.warn("Assembly context " + curAssembly.getName() + " is not deployed on any container.");
 			}
 		} else {
-			CompositeComponent composite = (CompositeComponent)assembly.getEncapsulatedComponent();
-			callStack.push(composite);
+			CompositeComponent composite = (CompositeComponent) curAssembly.getEncapsulatedComponent();
 			for (AssemblyContext child : composite.getAssemblyContexts()) {
-				visitAssemblyContext(callStack, deploymentTarget, child);
+				callStack.push(child);
+				if (deploymentTarget == null) {
+					Container curTarget = deploymentMapping.get(curAssembly);
+					visitAssemblyContext(callStack, curTarget);
+				} else {
+					visitAssemblyContext(callStack, deploymentTarget);
+				}
+				callStack.pop();
 			}
-			callStack.pop();
 		}
 	}
 
-	private void determineTasks(Stack<ComposedStructure> callStack, Container deploymentTarget, AssemblyContext assembly, RepositoryComponent component, InterfaceProvidingRole role, Signature sig) {
-			BasicComponent implementation = (BasicComponent)component;
-			FineGrainedBehavior behavior = getImplementationBehavior(implementation, role, sig);
-			if (behavior != null) {
-				Service service = mapping.mapService(assembly, sig, deploymentTarget);
-				if (!completeServices.contains(service)) {
-					visitComponentInternalBehavior(service, callStack, deploymentTarget, assembly, sig, behavior.getBehavior(), "");
-					completeServices.add(service);					
-				}
-			} else {
-				log.warn("No fine-grained behavior found for component " + component.getName());
+	private void determineTasks(Deque<AssemblyContext> callStack, Container deploymentTarget,
+			RepositoryComponent component, InterfaceProvidingRole role, Signature sig) {
+		BasicComponent implementation = (BasicComponent) component;
+		FineGrainedBehavior behavior = getImplementationBehavior(implementation, role, sig);
+		if (behavior != null) {
+			ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE
+					.createComponentInstanceReference();
+			instance.getAssemblies().addAll(callStack);
+			Service service = mapping.mapService(instance, role, sig);
+			if (!completeServices.contains(service)) {
+				visitComponentInternalBehavior(service, callStack, role, sig, deploymentTarget, behavior.getBehavior(),
+						"");
+				completeServices.add(service);
 			}
+		} else {
+			log.warn("No fine-grained behavior found for component " + component.getName());
+		}
 	}
 	
 	private FineGrainedBehavior getImplementationBehavior(BasicComponent component, InterfaceProvidingRole role, Signature sig)	{
@@ -198,16 +214,9 @@ public class WorkloadDescriptionDerivation {
 		return null;
 	}
 	
-	private ProvidingDelegationConnector getDelegationConnector(CompositeComponent composite, InterfaceProvidingRole role) {		
-		for (ProvidingDelegationConnector connector : composite.getProvidingDelegationConnectors()) {
-			if (connector.getOuterInterfaceProvidingRole().equals(role)) {
-				return connector;
-			}
-		}
-		return null;
-	}
-
-	private void visitComponentInternalBehavior(Service service, Stack<ComposedStructure> callStack, Container deploymentTarget, AssemblyContext assembly, Signature signature, ComponentInternalBehavior behavior, String path) {
+	private void visitComponentInternalBehavior(Service service, Deque<AssemblyContext> callStack,
+			InterfaceProvidingRole role, Signature signature, Container deploymentTarget,
+			ComponentInternalBehavior behavior, String path) {
 		int i = 0;
 		path = path + "/actions.";
 		for (AbstractAction action : behavior.getActions()) {
@@ -215,14 +224,19 @@ public class WorkloadDescriptionDerivation {
 				// Only consider threads for which we will wait for completion
 				// Other types of threads do not influence the response time behavior of the current service.
 				if (((ForkAction)action).isWithSynchronizationBarrier()) {
-					forEachComponentInternalBehavior(service, callStack, deploymentTarget, assembly, signature, ((ForkAction) action).getForkedBehaviors(), path + i +"/forkedBehaviors");
+					forEachComponentInternalBehavior(service, callStack, role, signature, deploymentTarget,
+							((ForkAction) action).getForkedBehaviors(), path + i + "/forkedBehaviors");
 				}
 			} else if (action instanceof BranchAction) {
-				forEachComponentInternalBehavior(service, callStack, deploymentTarget, assembly, signature, ((BranchAction) action).getBranches(), path + i + "/branches");
+				forEachComponentInternalBehavior(service, callStack, role, signature, deploymentTarget,
+						((BranchAction) action).getBranches(), path + i + "/branches");
 			} else if (action instanceof LoopAction) {
-				forEachComponentInternalBehavior(service, callStack, deploymentTarget, assembly, signature, Collections.singletonList(((LoopAction) action).getLoopBodyBehavior()), path + i + "/loopBodyBehavior");
+				forEachComponentInternalBehavior(service, callStack, role, signature, deploymentTarget,
+						Collections.singletonList(((LoopAction) action).getLoopBodyBehavior()),
+						path + i + "/loopBodyBehavior");
 			} else if (action instanceof InternalAction) {
-				visitInternalAction(service, deploymentTarget, assembly, signature, (InternalAction)action, path + i);
+				visitInternalAction(service, callStack, role, signature, deploymentTarget, (InternalAction) action,
+						path + i);
 			} else if (action instanceof ExternalCallAction) {
 				visitExternalCallAction(service, callStack, (ExternalCallAction) action);
 			}
@@ -230,21 +244,27 @@ public class WorkloadDescriptionDerivation {
 		}
 	}
 	
-	private void forEachComponentInternalBehavior(Service service, Stack<ComposedStructure> callStack, Container deploymentTarget, AssemblyContext assembly, Signature signature, List<ComponentInternalBehavior> behaviors, String path) {
+	private void forEachComponentInternalBehavior(Service service, Deque<AssemblyContext> callStack,
+			InterfaceProvidingRole role, Signature signature, Container deploymentTarget,
+			List<ComponentInternalBehavior> behaviors, String path) {
 		int j = 0;
 		for (ComponentInternalBehavior b : behaviors) {
-			visitComponentInternalBehavior(service, callStack, deploymentTarget, assembly, signature, b, path + path + "." + j);
+			visitComponentInternalBehavior(service, callStack, role, signature, deploymentTarget, b,
+					path + path + "." + j);
 			j++;
 		}
 	}
 	
-	private void visitExternalCallAction(Service service, Stack<ComposedStructure> callStack, ExternalCallAction action) {
+	private void visitExternalCallAction(Service service, Deque<AssemblyContext> callStack, ExternalCallAction action) {
 		InterfaceRequiringRole requiringRole = action.getExternalCall().getInterfaceRequiringRole();
-		AssemblyContext providingCtx = getCalledAssemblyContext(callStack, requiringRole);
-		Container targetContainer = deploymentMapping.get(providingCtx);
+		Deque<AssemblyContext> calledStack = new ArrayDeque<>(callStack);
+		InterfaceProvidingRole calledProvidingRole = getCalledInterfaceProvidingRole(calledStack, requiringRole);
 		
-		if (providingCtx != null) {	
-			Service calledService = mapping.mapService(providingCtx, action.getExternalCall().getSignature(), targetContainer);
+		if (calledProvidingRole != null) {
+			ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE.createComponentInstanceReference();
+			instance.getAssemblies().addAll(calledStack);
+			Service calledService = mapping.mapService(instance, calledProvidingRole,
+					action.getExternalCall().getSignature());
 			// Recursive calls are currently not supported.			
 			if (!calledService.equals(service)) {
 				mapping.mapExternalCall(service, calledService, action.getExternalCall());
@@ -254,52 +274,61 @@ public class WorkloadDescriptionDerivation {
 		}
 	}
 	
-	private AssemblyContext getCalledAssemblyContext(Stack<ComposedStructure> callStack, InterfaceRequiringRole requiringRole) {
-		ComposedStructure parent = callStack.peek();
+	private InterfaceProvidingRole getCalledInterfaceProvidingRole(Deque<AssemblyContext> callStack,
+			InterfaceRequiringRole requiringRole) {
+		AssemblyContext curAssembly = callStack.pop();
+		ComposedStructure parent = (ComposedStructure) curAssembly.eContainer();
 		for (AssemblyConnector connector : parent.getAssemblyConnectors()) {
 			if (connector.getInterfaceRequiringRole().equals(requiringRole)) {
-				return getInnerAssemblyContext(connector.getProvidingAssemblyContext(), connector.getInterfaceProvidingRole());
+				callStack.push(connector.getProvidingAssemblyContext());
+				return getInnerInterfaceProvidingRole(callStack, connector.getInterfaceProvidingRole());
 			}
 		}
 		for (RequiringDelegationConnector connector : parent.getRequiringDelegationConnectors()) {
 			if (connector.getInnerInterfaceRequiringRole().equals(requiringRole)) {
-				// We have to go up one level in the callstack to determine the called component
+				// We have to go up one level in the callStack to determine the
+				// called component
 				callStack.pop();
-				AssemblyContext providingCtx = getCalledAssemblyContext(callStack, connector.getOuterInterfaceRequiringRole());
-				// Restore call stack
-				callStack.push(parent);
-				return providingCtx;
+				return getCalledInterfaceProvidingRole(callStack, connector.getOuterInterfaceRequiringRole());
 			}
 		}
-		
 		return null;
 	}
 	
-	private AssemblyContext getInnerAssemblyContext(AssemblyContext ctx, InterfaceProvidingRole role) {
+	private InterfaceProvidingRole getInnerInterfaceProvidingRole(Deque<AssemblyContext> callStack,
+			InterfaceProvidingRole role) {
+		AssemblyContext ctx = callStack.peek();
 		if (ctx.getEncapsulatedComponent() instanceof BasicComponent) {
-			return ctx;
+			return role;
 		} else {
-			CompositeComponent composite = (CompositeComponent)ctx.getEncapsulatedComponent();
+			ComposedStructure composite = (ComposedStructure) ctx.getEncapsulatedComponent();
 			for (ProvidingDelegationConnector del : composite.getProvidingDelegationConnectors()) {
 				if (del.getOuterInterfaceProvidingRole().equals(role)) {
-					return getInnerAssemblyContext(del.getAssemblyContext(), del.getInnerInterfaceProvidingRole());
+					callStack.push(del.getAssemblyContext());
+					return getInnerInterfaceProvidingRole(callStack, del.getInnerInterfaceProvidingRole());
 				}
 			}
 		}
-		return ctx;
+		throw new IllegalStateException();
 	}
 	
-	private void visitInternalAction(Service parent, Container deploymentTarget, AssemblyContext assembly, Signature signature, InternalAction action, String path) {
+	private void visitInternalAction(Service parent, Deque<AssemblyContext> callStack, InterfaceProvidingRole role,
+			Signature signature, Container deploymentTarget, InternalAction action, String path) {
 		for (ResourceDemand demand : action.getResourceDemand()) {
 			if (demand.getCharacterization() == ModelVariableCharacterizationType.EMPIRICAL) {
 				if (demand.getResourceType() instanceof ProcessingResourceType) {
-					Resource curResource = mapping.mapResource(deploymentTarget, demand.getResourceType());
-					if (curResource == null) {
+					List<Resource> curResources = mapping.mapResource(deploymentTarget, demand.getResourceType());
+					if (curResources.isEmpty()) {
 						log.warn("No processing resource of type " + demand.getResourceType() + " found in container " + deploymentTarget.getName() + ".");
 						continue;
 					}
-					Service curService = mapping.mapService(assembly, signature, deploymentTarget);
-					mapping.mapResourceDemand(curResource, curService, demand);
+					ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE
+							.createComponentInstanceReference();
+					instance.getAssemblies().addAll(callStack);
+					Service curService = mapping.mapService(instance, role, signature);
+					for (Resource res : curResources) {
+						mapping.mapResourceDemand(res, curService, demand);
+					}
 				}
 			}
 		}

@@ -26,15 +26,20 @@
  */
 package tools.descartes.librede.connector.dml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import edu.kit.ipd.descartes.core.NamedElement;
+import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyContext;
+import edu.kit.ipd.descartes.mm.applicationlevel.repository.InterfaceProvidingRole;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.Signature;
 import edu.kit.ipd.descartes.mm.resourceconfiguration.ConfigurationSpecification;
 import edu.kit.ipd.descartes.mm.resourceconfiguration.ProcessingResourceSpecification;
@@ -55,13 +60,14 @@ public class DmlMapping {
 	
 	private static class ResourceMapping {
 		public Container container;
+		public ProcessingResourceSpecification configuration;
 		public Resource resource;
 	}
 	
 	private static class ServiceMapping {
-		public AssemblyContext context;
+		public ComponentInstanceReference componentInstance;
+		public InterfaceProvidingRole role;
 		public Signature signature;
-		public Container container;
 		public Service service;
 	}
 	
@@ -108,7 +114,7 @@ public class DmlMapping {
 	private BiMap<ExternalCallKey, ExternalCall> calls = HashBiMap.create();
 	private Map<String, ServiceMapping> services = new HashMap<>();
 	private Map<String, ResourceMapping> resources = new HashMap<>();
-	
+
 	private Set<ModelEntity> newEntities = new HashSet<>();
 	private Set<String> unmappedServices = new HashSet<>();
 	private Set<String> unmappedResources = new HashSet<>();
@@ -184,29 +190,44 @@ public class DmlMapping {
 		calls.inverse().remove(call);
 	}
 	
-	public Service mapService(AssemblyContext context, Signature signature, Container container) {
-		return mapService(context.getName() + "#" + signature.getName(), context, signature, container); // TODO: cases with several providing roles with the same interfaces are there
-	}
-	
-	public Service mapService(String serviceName, AssemblyContext context, Signature signature, Container container) {
+	public Service mapService(ComponentInstanceReference componentInstance, InterfaceProvidingRole role,
+			Signature signature) {
+		String serviceName = getServiceName(componentInstance, role, signature);
 		unmappedServices.remove(serviceName);
 		ServiceMapping mapping = services.get(serviceName);
 		if (mapping == null) {
-			Service service = ConfigurationFactory.eINSTANCE.createService();
-			service.setName(serviceName);
-			
-			mapping = new ServiceMapping();
-			mapping.context = context;
-			mapping.signature = signature;
-			mapping.container = container;
-			mapping.service = service;
-			services.put(serviceName, mapping);
-			workload.getServices().add(service);
-			newEntities.add(service);
+			mapping = createService(serviceName, componentInstance, role, signature);
 		}
 		return mapping.service;		
 	}
 	
+	private ServiceMapping createService(String serviceName, ComponentInstanceReference componentInstance,
+			InterfaceProvidingRole role, Signature signature) {
+		Service service = ConfigurationFactory.eINSTANCE.createService();
+		service.setName(serviceName);
+
+		ServiceMapping mapping = new ServiceMapping();
+		mapping.componentInstance = componentInstance;
+		mapping.role = role;
+		mapping.signature = signature;
+		mapping.service = service;
+		services.put(serviceName, mapping);
+		workload.getServices().add(service);
+		newEntities.add(service);
+		return mapping;
+	}
+
+	private String getServiceName(ComponentInstanceReference componentInstance, InterfaceProvidingRole role,
+			Signature signature) {
+		StringBuilder name = new StringBuilder();
+		for (AssemblyContext ctx : componentInstance.getAssemblies()) {
+			name.append(ctx.getName()).append("/");
+		}
+		name.append(role.getName()).append("/");
+		name.append(signature.getName());
+		return name.toString();
+	}
+
 	public ResourceDemand mapResourceDemand(Resource resource, Service service, edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand) {
 		ResourceDemand demand = demands.get(dmlDemand);
 		if (demand != null) {
@@ -226,29 +247,48 @@ public class DmlMapping {
 		return demands.containsValue(dmlDemand);
 	}
 
-	public Resource mapResource(Container container, ResourceType resType) {
-		String resourceName = container.getName() + "_" + resType.getName();
-		ResourceMapping rm = resources.get(resourceName);
-		ProcessingResourceSpecification procRes = getProcessingResource(container, resType);
-		if (procRes != null) {
-			if (rm == null) {
-				rm = new ResourceMapping();
-				rm.resource = ConfigurationFactory.eINSTANCE.createResource();
-				rm.container = container;
-				resources.put(resourceName, rm);
-				workload.getResources().add(rm.resource);
-				newEntities.add(rm.resource);
+	public List<Resource> mapResource(Container container, ResourceType resType) {
+		List<Resource> childResources = new ArrayList<>();
+		for (ConfigurationSpecification spec : container.getConfigSpec()) {
+			if (spec instanceof ProcessingResourceSpecification) {
+				ProcessingResourceSpecification procRes = (ProcessingResourceSpecification) spec;
+				if (procRes.getProcessingResourceType().equals(resType)) {
+					String resourceName = getResourceName(procRes);
+					ResourceMapping rm = resources.get(resourceName);
+					if (rm == null) {
+						rm = createResource(resourceName, container, procRes);
+					}
+					// Update attribute settings
+					rm.resource.setNumberOfServers(procRes.getNrOfParProcUnits().getNumber());
+					rm.resource.setSchedulingStrategy(convertSchedulingStrategy(procRes.getSchedulingPolicy()));
+					childResources.add(rm.resource);
+					unmappedResources.remove(resourceName);
+				}
 			}
-			rm.resource.setName(resourceName);
-			rm.resource.setNumberOfServers(procRes.getNrOfParProcUnits().getNumber());
-			rm.resource.setSchedulingStrategy(convertSchedulingStrategy(procRes.getSchedulingPolicy()));							
-		} else {
-			return null;
 		}
-		unmappedResources.remove(resourceName);
-		return rm.resource;
+		return childResources;
 	}
 	
+	private ResourceMapping createResource(String resourceName, Container container,
+			ProcessingResourceSpecification specification) {
+		ResourceMapping rm = new ResourceMapping();
+		rm.resource = ConfigurationFactory.eINSTANCE.createResource();
+		rm.resource.setName(resourceName);
+		rm.container = container;
+		resources.put(resourceName, rm);
+		workload.getResources().add(rm.resource);
+		newEntities.add(rm.resource);
+		return rm;
+	}
+
+	private String getResourceName(ProcessingResourceSpecification spec) {
+		StringBuilder name = new StringBuilder();
+		name.append(((NamedElement) spec.eContainer()).getName()).append("_");
+		name.append(spec.getProcessingResourceType().getName()).append("_");
+		name.append(spec.getId());
+		return name.toString();
+	}
+
 	public ExternalCall mapExternalCall(Service service, Service calledService, edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
 		ExternalCallKey key = new ExternalCallKey(service, calledService);
 		ExternalCall call = calls.get(key);
@@ -265,6 +305,22 @@ public class DmlMapping {
 		}
 	}
 
+	public Service getService(ComponentInstanceReference instance, InterfaceProvidingRole role, Signature signature) {
+		ServiceMapping mapping = services.get(getServiceName(instance, role, signature));
+		if (mapping == null) {
+			return null;
+		}
+		return mapping.service;
+	}
+
+	public InterfaceProvidingRole getInterfaceProvidingRole(Service service) {
+		ServiceMapping mapping = services.get(service.getName());
+		if (mapping == null) {
+			return null;
+		}
+		return mapping.role;
+	}
+
 	public Signature getSignature(Service service) {
 		ServiceMapping mapping = services.get(service.getName());
 		if (mapping == null) {
@@ -273,22 +329,38 @@ public class DmlMapping {
 		return mapping.signature;
 	}
 	
-	public AssemblyContext getAssemblyContext(Service service) {
+	public ComponentInstanceReference getComponentInstance(Service service) {
 		ServiceMapping mapping = services.get(service.getName());
 		if (mapping == null) {
 			return null;
 		}
-		return mapping.context;
-	}
-
-	public Container getContainer(Service service) {
-		return services.get(service.getName()).container;
+		return mapping.componentInstance;
 	}
 	
 	public Container getContainer(Resource resource) {
-		return resources.get(resource.getName()).container;
+		ResourceMapping mapping = resources.get(resource.getName());
+		if (mapping == null) {
+			return null;
+		}
+		return mapping.container;
 	}
 	
+	public ProcessingResourceSpecification getResourceSpecification(Resource resource) {
+		ResourceMapping mapping = resources.get(resource.getName());
+		if (mapping == null) {
+			return null;
+		}
+		return mapping.configuration;
+	}
+
+	public Resource getResource(ProcessingResourceSpecification spec) {
+		ResourceMapping mapping = resources.get(getResourceName(spec));
+		if (mapping == null) {
+			return null;
+		}
+		return mapping.resource;
+	}
+
 	private SchedulingStrategy convertSchedulingStrategy(SchedulingPolicy policy) {
 		switch(policy) {
 		case DELAY:
@@ -303,17 +375,4 @@ public class DmlMapping {
 			return SchedulingStrategy.UNKOWN;
 		}
 	}
-	
-	private ProcessingResourceSpecification getProcessingResource(Container container, ResourceType resType) {
-		for (ConfigurationSpecification spec :  container.getConfigSpec()) {
-			if (spec instanceof ProcessingResourceSpecification) {
-				ProcessingResourceSpecification proc = (ProcessingResourceSpecification)spec;
-				if (proc.getProcessingResourceType().equals(resType)) {
-					return proc;
-				}
-			}
-		}
-		return null;
-	}
-
 }
