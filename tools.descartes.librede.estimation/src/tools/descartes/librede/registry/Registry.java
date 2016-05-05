@@ -96,11 +96,15 @@ public class Registry {
 		return new ResourceSetImpl();
 	}
 	
-	public <D extends Dimension> void registerMetric(Metric<D> metric, IMetricAdapter<D> handler) {
+	public <D extends Dimension> void registerMetric(Metric<D> metric) {
 		if (metric == null) {
 			throw new NullPointerException();
 		}
 		metrics.getMetrics().add(metric);
+	}
+
+	public <D extends Dimension> void registerMetric(Metric<D> metric, IMetricAdapter<D> handler) {
+		registerMetric(metric);
 		metricHandlers.put(metric, handler);
 	}
 	
