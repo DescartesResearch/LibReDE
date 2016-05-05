@@ -77,22 +77,23 @@ public class Registry {
 		unitsResource.getContents().add(units);
 		metricsResource = new ResourceImpl(URI.createGenericURI(LIBREDE_URI_SCHEME, LIBREDE_METRICS_NAMESPACE, null));
 		metricsResource.getContents().add(metrics);
+		
+		// Register a custom resource factory to return the pre-loaded, in-memory instances of metrics and units.
+		Resource.Factory.Registry.INSTANCE.getProtocolToFactoryMap().put(LIBREDE_URI_SCHEME, new Resource.Factory() {
+			@Override
+			public Resource createResource(URI uri) {
+				if (uri.opaquePart().equals(LIBREDE_METRICS_NAMESPACE)) {
+					return metricsResource;
+				} else if (uri.opaquePart().equals(LIBREDE_UNITS_NAMESPACE)) {
+					return unitsResource;
+				}
+				return null;
+			}			
+		});
 	}
 	
 	public ResourceSet createResourceSet() {
-		return new ResourceSetImpl() {
-			@Override
-			protected Resource delegatedGetResource(URI uri, boolean loadOnDemand) {
-				if (uri.scheme().equalsIgnoreCase(LIBREDE_URI_SCHEME)) {
-					if (uri.opaquePart().equals(LIBREDE_METRICS_NAMESPACE)) {
-						return metricsResource;
-					} else if (uri.opaquePart().equals(LIBREDE_UNITS_NAMESPACE)) {
-						return unitsResource;
-					}
-				}
-				return super.delegatedGetResource(uri, loadOnDemand);
-			}
-		};
+		return new ResourceSetImpl();
 	}
 	
 	public <D extends Dimension> void registerMetric(Metric<D> metric, IMetricAdapter<D> handler) {

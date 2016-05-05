@@ -1079,6 +1079,11 @@ public class ConfigurationEditor
 					//
 					boolean first = true;
 					for (Resource resource : editingDomain.getResourceSet().getResources()) {
+						// IMPORTANT: Do not save the librede units and metrics as they are in-memory only.
+						if (resource.getURI().scheme().equals(Registry.LIBREDE_URI_SCHEME)) {
+							continue;
+						}
+						
 						if ((first || !resource.getContents().isEmpty() || isPersisted(resource)) && !editingDomain.isReadOnly(resource)) {
 							try {
 								long timeStamp = resource.getTimeStamp();
