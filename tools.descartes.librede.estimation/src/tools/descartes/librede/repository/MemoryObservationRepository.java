@@ -598,4 +598,15 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		log.info(dump);
 	}
+
+	@Override
+	public void accept(IMonitoringRepositoryVisitor visitor) {
+		for (DataKey<?> key : data.keySet()) {
+			DataEntry<?> entry = data.get(key);
+			if (entry.data != null) {
+				visitor.visitTimeSeries(key.entity, key.metric, key.aggregation, entry.aggregationInterval, entry.data);
+			}
+		}
+
+	}
 }

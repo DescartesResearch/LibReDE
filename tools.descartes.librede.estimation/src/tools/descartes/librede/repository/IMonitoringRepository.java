@@ -80,4 +80,6 @@ public interface IMonitoringRepository {
 	public Quantity<Time> getCurrentTime();
 	public void setCurrentTime(Quantity<Time> currentTime);
 	public WorkloadDescription getWorkload();
+
+	public void accept(IMonitoringRepositoryVisitor visitor);
 }
