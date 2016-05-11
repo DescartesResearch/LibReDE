@@ -196,8 +196,9 @@ public class DmlMapping {
 			return demand;
 		} else {
 			demand = ConfigurationFactory.eINSTANCE.createResourceDemand();
-			demand.setResource(resource);
-			demand.setName(resource.getName());
+			demand.setResource(resource);			
+			// Set the name to the ID to allow for backward traceability (see DmlExport)
+			demand.setName(dmlDemand.getId());
 			service.getTasks().add(demand);
 			demands.put(dmlDemand, demand);
 			newEntities.add(demand);
