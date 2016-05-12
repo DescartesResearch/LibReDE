@@ -26,11 +26,22 @@
  */
 package tools.descartes.librede;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.registry.Instantiator;
+import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
@@ -42,13 +53,19 @@ public class LibredeVariables {
 	private MemoryObservationRepository repo;
 	private EstimationAlgorithmFactory algoFactory;
 	private LibredeResults results;
-	private HashMap<String, IRepositoryCursor> cursors;
+	private List<ApproachResult> resultsSelectedApproaches = new LinkedList<ApproachResult>();
+	private List<Double> meanErrorSelectedApproaches = new LinkedList<Double>();
+	private Map<String, IRepositoryCursor> cursors;
+	private int runNr;
+	private List<EstimationApproachConfiguration> selectedApproaches;
 
 	public LibredeVariables(LibredeConfiguration conf) {
 		this.conf = conf;
 		this.repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		this.algoFactory = new EstimationAlgorithmFactory();
 		this.cursors = new HashMap<String, IRepositoryCursor>();
+		this.runNr = 1;
+		this.selectedApproaches = conf.getEstimation().getApproaches();
 		// case cross validation
 		if (conf.getValidation().isValidateEstimates() && conf.getValidation().getValidationFolds() > 1) {
 			this.results = new LibredeResults(conf.getEstimation().getApproaches().size(),
@@ -73,6 +90,62 @@ public class LibredeVariables {
 				this.cursors.put(currentConf.getType(), cursor);
 			}
 		}
+
+	}
+
+	public void exportResultTimelineCSV(File outputFile) {
+		try {
+			List<String> saveResult = new LinkedList<String>();
+			int idx = 0;
+			for (ApproachResult approachResult : resultsSelectedApproaches) {
+				ResultTable[] result = approachResult.getResult();
+
+				// get Timestamp and Approach Name
+				// timestamp is startTime
+				double startTimestamp = result[0].getEstimates().getStartTime();
+				double endTimestamp = result[0].getEstimates().getEndTime();
+				String approachName = approachResult.getApproach().getName();
+
+				double utilizationError = approachResult.getUtilizationError();
+				double responseTimeError = approachResult.getResponseTimeError();
+
+				String[] line = new String[4];
+				line[0] = Double.toString(startTimestamp);
+				line[1] = Double.toString(endTimestamp);				
+				line[2] = approachName;
+				line[3] = Double.toString(meanErrorSelectedApproaches.get(idx));
+				saveResult.add(implode(";", line));
+				idx++;
+			}
+
+			// open buffered writer
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile, false));
+			//write header
+			String[] head = new String[4];
+			head[0] = "Start Timestamp";
+			head[1] = "End Timestamp";
+			head[2] = "Approach Name";
+			head[3] = "Mean Error Validation";
+			saveResult.add(0, implode(";", head));
+			// write each line (timestamp + approach name + mean error validation)
+			for (String line : saveResult) {
+				bw.write(line);
+				bw.write("\n");
+			}
+			// close buffer
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private String implode(String separator, String... line) {
+		StringBuilder sb = new StringBuilder();
+		for (String cell : line) {
+			sb.append(cell);
+			sb.append(separator);
+		}
+		return sb.toString();
 	}
 
 	public LibredeConfiguration getConf() {
@@ -91,7 +164,7 @@ public class LibredeVariables {
 		return results;
 	}
 
-	public HashMap<String, IRepositoryCursor> getCursors() {
+	public Map<String, IRepositoryCursor> getCursors() {
 		return cursors;
 	}
 
@@ -99,7 +172,57 @@ public class LibredeVariables {
 		return this.cursors.get(cursorOfApproach);
 	}
 
+	public int getRunNr() {
+		return runNr;
+	}
+
+	public void incrementRunNr() {
+		this.runNr++;
+	}
+
+	public void resetRunNr() {
+		this.runNr = 1;
+	}
+
 	public void updateResults(LibredeResults newResults) {
 		this.results = newResults;
 	}
+
+	public void addSelectedApproachResult(ApproachResult result) {
+		this.resultsSelectedApproaches.add(result);
+	}
+
+	public List<ApproachResult> getSelectedApproachResults() {
+		return resultsSelectedApproaches;
+	}
+
+	public List<EstimationApproachConfiguration> getSelectedApproaches() {
+		return selectedApproaches;
+	}
+
+	//this method is used for the second and following approach selections to save meanError in a List
+	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches, double meanError) {
+		this.selectedApproaches = selectedApproaches;
+		Class<?> cl = Registry.INSTANCE.getInstanceClass(selectedApproaches.get(0).getType());
+		IEstimationApproach selectedApproach = null;
+		try {
+			selectedApproach = (IEstimationApproach) Instantiator.newInstance(cl,
+					selectedApproaches.get(0).getParameters());
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		ApproachResult ares = new ApproachResult(selectedApproach.getClass(),
+				this.conf.getValidation().getValidationFolds());
+		for (int i = 0; i < this.conf.getValidation().getValidationFolds(); i++) {
+			ares.addEstimate(i, this.results.getEstimates(selectedApproach.getClass(), i));
+		}
+		this.resultsSelectedApproaches.add(ares);
+		this.meanErrorSelectedApproaches.add(meanError);
+	}
+
+	//this method ist only used once at the first selection to set all appproaches to the selected approach list for selection
+	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches) {
+		this.selectedApproaches = selectedApproaches;
+	}
+
 }

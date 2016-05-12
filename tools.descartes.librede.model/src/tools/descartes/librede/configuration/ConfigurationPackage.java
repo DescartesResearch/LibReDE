@@ -884,13 +884,22 @@ public interface ConfigurationPackage extends EPackage {
 	int ESTIMATION_SPECIFICATION__END_TIMESTAMP = 6;
 
 	/**
+	 * The feature id for the '<em><b>Automatic Approach Selection</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION = 7;
+
+	/**
 	 * The number of structural features of the '<em>Estimation Specification</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ESTIMATION_SPECIFICATION_FEATURE_COUNT = 7;
+	int ESTIMATION_SPECIFICATION_FEATURE_COUNT = 8;
 
 	/**
 	 * The number of operations of the '<em>Estimation Specification</em>' class.
@@ -2082,6 +2091,17 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getEstimationSpecification_EndTimestamp();
 
 	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.EstimationSpecification#isAutomaticApproachSelection <em>Automatic Approach Selection</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Automatic Approach Selection</em>'.
+	 * @see tools.descartes.librede.configuration.EstimationSpecification#isAutomaticApproachSelection()
+	 * @see #getEstimationSpecification()
+	 * @generated
+	 */
+	EAttribute getEstimationSpecification_AutomaticApproachSelection();
+
+	/**
 	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.EstimationSpecification#getAlgorithms <em>Algorithms</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2904,6 +2924,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ESTIMATION_SPECIFICATION__END_TIMESTAMP = eINSTANCE.getEstimationSpecification_EndTimestamp();
+
+		/**
+		 * The meta object literal for the '<em><b>Automatic Approach Selection</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION = eINSTANCE.getEstimationSpecification_AutomaticApproachSelection();
 
 		/**
 		 * The meta object literal for the '<em><b>Algorithms</b></em>' containment reference list feature.

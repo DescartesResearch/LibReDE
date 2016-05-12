@@ -5,9 +5,11 @@ Bundle-SymbolicName: tools.descartes.librede.estimation.tests
 Bundle-Version: 1.1.0.qualifier
 Fragment-Host: tools.descartes.librede.estimation;bundle-version="1.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.fest.assertions.api,
+Import-Package: org.eclipse.emf.ecore.xmi.impl,
+ org.fest.assertions.api,
  org.mockito;version="1.8.4",
  org.mockito.stubbing;version="1.8.4",
+ tools.descartes.librede,
  tools.descartes.librede.bayesplusplus,
  tools.descartes.librede.configuration,
  tools.descartes.librede.ipopt.java,

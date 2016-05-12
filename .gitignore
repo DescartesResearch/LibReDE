@@ -12,3 +12,5 @@ Redeem/Redeem Editor/edu.kit.ipd.descartes.redeem.model.editor/bin/
 Redeem/Estimation Library/edu.kit.ipd.descartes.redeem.ipopt.java.tests/bin/
 Redeem/Estimation Library/edu.kit.ipd.descartes.redeem.nativehelper/bin/
 .metadata/
+.recommenders/
+tools.descartes.librede.estimation.testutil/bin/

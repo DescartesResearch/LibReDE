@@ -65,6 +65,10 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	public IObservationModel<?> getObservationModel() {
 		return observationModel;
 	}
+	
+	public IRepositoryCursor getCursor() {
+		return cursor;
+	}
 
 	@Override
 	public void destroy() {

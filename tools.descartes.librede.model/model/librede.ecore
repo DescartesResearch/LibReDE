@@ -134,6 +134,9 @@
         <eTypeArguments eClassifier="ecore:EClass units.ecore#//Time"/>
       </eGenericType>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="automaticApproachSelection"
+        lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ValidationSpecification">
     <eStructuralFeatures xsi:type="ecore:EReference" name="validators" upperBound="-1"

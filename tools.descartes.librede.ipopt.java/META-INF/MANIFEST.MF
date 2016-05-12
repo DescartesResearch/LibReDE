@@ -23,6 +23,7 @@ Import-Package: com.sun.jna,
  tools.descartes.librede.models.variables,
  tools.descartes.librede.nativehelper,
  tools.descartes.librede.registry,
- tools.descartes.librede.repository
+ tools.descartes.librede.repository,
+ tools.descartes.librede.units
 Require-Bundle: org.eclipse.core.runtime
 Export-Package: tools.descartes.librede.ipopt.java

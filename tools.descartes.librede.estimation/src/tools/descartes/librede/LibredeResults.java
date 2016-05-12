@@ -27,54 +27,200 @@
 package tools.descartes.librede;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixBuilder;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
+import tools.descartes.librede.validation.IValidator;
 
 public class LibredeResults {
-	
-	private final Map<Class<? extends IEstimationApproach>, Integer> approaches = new HashMap<>(); 
-	private final ResultTable[][] results;
+
+	private final Map<Class<? extends IEstimationApproach>, ApproachResult> approachResults = new HashMap<>();
+	// private final ResultTable[][] results;
 	private final int numFolds;
-	private int currentNumApproaches = 0;
-	
+	// private int currentNumApproaches = 0;
+
 	public LibredeResults(int numApproaches, int numFolds) {
 		this.numFolds = numFolds;
-		results = new ResultTable[numApproaches][];
-		for (int i = 0; i < numApproaches; i++) {
-			results[i] = new ResultTable[numFolds];
-		}
+
 	}
-	
+
 	public void addEstimates(Class<? extends IEstimationApproach> approach, int fold, ResultTable estimates) {
-		Integer idx = approaches.get(approach);
-		if (idx == null) {
-			if (currentNumApproaches < results.length) {
-				idx = currentNumApproaches;
-				approaches.put(approach, currentNumApproaches);
-				currentNumApproaches++;
-			} else {
-				throw new IllegalStateException();
-			}
+		ApproachResult appRes = approachResults.get(approach);
+		if (appRes == null) {
+			appRes = new ApproachResult(approach, numFolds);
 		}
-		results[idx][fold] = estimates;
+		appRes.addEstimate(fold, estimates);
+		approachResults.put(approach, appRes);
 	}
-	
+
 	public ResultTable getEstimates(Class<? extends IEstimationApproach> approach, int fold) {
-		Integer idx = approaches.get(approach);
-		if (idx == null) {
-			throw new IllegalArgumentException();
-		}
-		return results[idx][fold];
-	}	
-	
+		ApproachResult appRes = approachResults.get(approach);
+		ResultTable result = appRes.getResultOfFold(fold);
+		return result;
+	}
+
 	public int getNumberOfFolds() {
 		return numFolds;
 	}
-	
+
 	public Set<Class<? extends IEstimationApproach>> getApproaches() {
-		return approaches.keySet();
+		return approachResults.keySet();
+	}
+
+	public Map<Class<? extends IEstimationApproach>, Matrix> getAllEstimates() {
+		Map<Class<? extends IEstimationApproach>, Matrix> allApproachResults = new HashMap<>();
+		for (Class<? extends IEstimationApproach> approach : getApproaches()) {
+			allApproachResults.put(approach, approachResults.get(approach).getMeanEstimates());
+		}
+		return allApproachResults;
+	}
+
+	// fetches all validated entities of all ApproachResults
+	// adds validator -> entity if
+	// validator is not part of the validatedEntities Map
+	// entity is not part of the validatedEntities Map
+	// validator -> entity is not part of the validatedEntities Map
+	public Map<Class<? extends IValidator>, List<ModelEntity>> getValidatedEntities() {
+		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
+		for (ApproachResult appRes : approachResults.values()) {
+			// Class<? extends IValidator>, List<ModelEntity>
+			Map<Class<? extends IValidator>, List<ModelEntity>> validEntities = appRes.getValidatedEntities();
+			for (Class<? extends IValidator> vali : validEntities.keySet()) {
+				if (!validatedEntities.containsKey(vali) || validatedEntities.containsValue(validEntities.get(vali))
+						|| !validEntities.get(vali).equals(validatedEntities.get(vali))) {
+					validatedEntities.put(vali, validEntities.get(vali));
+				}
+			}
+		}
+		return validatedEntities;
+
+	}
+
+	// returns a Map approach -> Matrix
+	// the Matrix contains of 2 rows one row for each validator
+	// the values are meanErrors of every fold per entity
+	public Map<Class<? extends IEstimationApproach>, Matrix> getValidationErrors() {
+		Map<Class<? extends IEstimationApproach>, Matrix> validationErrors = new HashMap<>();
+		//iterate over all ApproachResults (entities)
+		for (ApproachResult appRes : approachResults.values()) {
+			MatrixBuilder valiErrorsBuilder = MatrixBuilder.create(appRes.getResult().length);
+			double[] valiErrorsResp = new double[appRes.getResult().length];
+			double[] valiErrorsUtil = new double[appRes.getResult().length];
+			//iterate over all folds
+			for (int j = 0; j < appRes.getResult().length; j++) {
+				ResultTable appResFold = appRes.getResultOfFold(j);
+				Set<Class<? extends IValidator>> appResFoldValis = appResFold.getValidators();
+				//iterate over all validators
+				for (Class<? extends IValidator> vali : appResFoldValis) {
+					Vector errors = appResFold.getValidationErrors(vali);
+					double meanErrorsFold = 0.0;
+					for (int i = 0; i < errors.rows(); i++) {
+						meanErrorsFold += errors.get(i);
+					}
+					meanErrorsFold = meanErrorsFold / appRes.getResult().length;
+					if (vali.getName().equals("tools.descartes.librede.validation.ResponseTimeValidator")) {
+						valiErrorsResp[j] = meanErrorsFold;
+					} else {
+						valiErrorsUtil[j] = meanErrorsFold;
+					}
+				}
+			}
+
+			//add values of array to a vector to add it to the matrix
+			VectorBuilder valiErrorsRespVect = VectorBuilder.create(appRes.getResult().length);
+			VectorBuilder valiErrorsUtilVect = VectorBuilder.create(appRes.getResult().length);
+			for (int i = 0; i < valiErrorsUtil.length; i++) {
+				valiErrorsRespVect.add(valiErrorsResp[i]);
+				valiErrorsUtilVect.add(valiErrorsUtil[i]);
+			}
+			valiErrorsBuilder.addRow(valiErrorsRespVect.toVector());
+
+			valiErrorsBuilder.addRow(valiErrorsUtilVect.toVector());
+
+			validationErrors.put(appRes.getApproach(), valiErrorsBuilder.toMatrix());
+		}
+		return validationErrors;
+
+	}
+
+	public double getApproachValidationErrors(Class<? extends IEstimationApproach> approach) {
+		double meanError = 0.0;
+		Matrix approachResults = getValidationErrors().get(approach);
+		for (int i = 0; i < approachResults.rows(); i++) {
+			double errSum = 0.0;
+			for (int j = 0; j < approachResults.columns(); j++) {
+				// sum each row up
+				errSum += approachResults.get(i, j);
+			}
+			// calculate mean of every row
+			errSum = errSum / approachResults.columns();
+			// add calculated mean of every row (every validator) to the mean
+			// error of all validators
+			meanError += errSum;
+		}
+		return meanError;
+	}
+
+	public double getApproachUtilizationError(Class<? extends IEstimationApproach> approach) {
+		ApproachResult appRes = approachResults.get(approach);
+		return appRes.getUtilizationError();
+	}
+
+	public double getApproachResponseTimeError(Class<? extends IEstimationApproach> approach) {
+		ApproachResult appRes = approachResults.get(approach);
+		return appRes.getResponseTimeError();
+	}
+
+	// returns a Map approach -> Matrix
+	// the Matrix contains of 2 rows, one row for each validator
+	// the values are meanPredictions of every fold per entity
+	public Map<Class<? extends IEstimationApproach>, Matrix> getValidationPredictions() {
+		Map<Class<? extends IEstimationApproach>, Matrix> validationPredictions = new HashMap<>();
+		//iterate over alll ApproachResults (every entity)
+		for (ApproachResult appRes : approachResults.values()) {
+			MatrixBuilder valiPredBuilder = MatrixBuilder.create(appRes.getResult().length);
+			double[] valiPredResp = new double[appRes.getResult().length];
+			double[] valiPredUtil = new double[appRes.getResult().length];
+			//iterate over folds
+			for (int i = 0; i < appRes.getResult().length; i++) {
+				ResultTable appResFold = appRes.getResultOfFold(i);
+				Set<Class<? extends IValidator>> appResFoldValis = appResFold.getValidators();
+				//iterate over validators
+				for(Class<? extends IValidator> vali: appResFoldValis){
+					Vector preds = appResFold.getValidationPredictions(vali);
+					double meanPredsFold = 0.0;
+					for (int j = 0; j < preds.rows(); j++) {
+						meanPredsFold += preds.get(j);
+					}
+					meanPredsFold = meanPredsFold / appRes.getResult().length;
+					if (vali.getName().equals("tools.descartes.librede.validation.ResponseTimeValidator")) {
+						valiPredResp[i] = meanPredsFold;
+					} else {
+						valiPredUtil[i] = meanPredsFold;
+					}
+				}
+			}
+			
+			//add values of array to a vector to add it to the matrix
+			VectorBuilder valiPredRespVect = VectorBuilder.create(appRes.getResult().length);
+			VectorBuilder valiPredUtilVect = VectorBuilder.create(appRes.getResult().length);
+			for (int i = 0; i < valiPredUtil.length; i++) {
+				valiPredRespVect.add(valiPredResp[i]);
+				valiPredUtilVect.add(valiPredUtil[i]);
+			}
+			valiPredBuilder.addRow(valiPredRespVect.toVector());
+			valiPredBuilder.addRow(valiPredUtilVect.toVector());
+
+			validationPredictions.put(appRes.getApproach(), valiPredBuilder.toMatrix());
+		}
+		return validationPredictions;
 	}
 
 }

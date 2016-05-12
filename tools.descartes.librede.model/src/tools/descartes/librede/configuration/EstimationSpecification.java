@@ -50,6 +50,7 @@ import tools.descartes.librede.units.Time;
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getStepSize <em>Step Size</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getStartTimestamp <em>Start Timestamp</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#getEndTimestamp <em>End Timestamp</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.EstimationSpecification#isAutomaticApproachSelection <em>Automatic Approach Selection</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationSpecification()
@@ -203,6 +204,33 @@ public interface EstimationSpecification extends EObject {
 	 * @generated
 	 */
 	void setEndTimestamp(Quantity<Time> value);
+
+	/**
+	 * Returns the value of the '<em><b>Automatic Approach Selection</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Automatic Approach Selection</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Automatic Approach Selection</em>' attribute.
+	 * @see #setAutomaticApproachSelection(boolean)
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getEstimationSpecification_AutomaticApproachSelection()
+	 * @model default="false" required="true"
+	 * @generated
+	 */
+	boolean isAutomaticApproachSelection();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.EstimationSpecification#isAutomaticApproachSelection <em>Automatic Approach Selection</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Automatic Approach Selection</em>' attribute.
+	 * @see #isAutomaticApproachSelection()
+	 * @generated
+	 */
+	void setAutomaticApproachSelection(boolean value);
 
 	/**
 	 * Returns the value of the '<em><b>Algorithms</b></em>' containment reference list.

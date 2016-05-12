@@ -63,10 +63,10 @@ import tools.descartes.librede.testutils.LibredeTest;
 
 public class AddContinuousDataToCSVTest extends LibredeTest {
 
-	private static int WRITE_RATE = 1;
+	private static int WRITE_RATE = 100;
 	private static int LINES_TO_COPY = 5;
-	private static String SOURCE_PATH = "C:/Users/Veronika/Desktop/example1/sourcefiles/";
-	private static String DESTINATION_PATH = "C:/Users/Veronika/Desktop/example1/";
+	private static String SOURCE_PATH = null;
+	private static String DESTINATION_PATH = null;
 	private static LibredeConfiguration conf;
 
 	@BeforeClass
@@ -93,8 +93,7 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 
 	@Test
 	public void test() {
-		LibredeVariables var = new LibredeVariables(conf);
-		Librede.initRepo(var);
+		
 
 		LinkedList<DataReadWrite> drws = new LinkedList<DataReadWrite>();
 		File sourceDirectory = new File(SOURCE_PATH);
@@ -113,11 +112,14 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 		for (DataReadWrite drw : drws) {
 			tp.scheduleAtFixedRate(drw, 0, WRITE_RATE, TimeUnit.MILLISECONDS);
 		}
-
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+		}
+		LibredeVariables var = new LibredeVariables(conf);
+		Librede.initRepo(var);
+		
 		while (!(tp.isShutdown())) {
-			System.out.println("Test running");
-			var.updateResults(Librede.executeContinuous(var, Collections.<String, IDataSource> emptyMap()));
-			checkLibredeResults(var.getResults());
 			boolean runningTasks = false;
 			for (DataReadWrite drw : drws) {
 				if (!drw.getDataReader().isFileEnd()) {
@@ -127,13 +129,20 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 			if (!runningTasks) {
 				tp.shutdown();
 			}
+
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(8000);
 			} catch (InterruptedException e) {
 			}
+			System.err.println("Test running");
+			Librede.executeContinuous(var, Collections.<String, IDataSource> emptyMap());
 		}
-
 		
+//		System.out.println("Saving Data to CSV");
+//		File outputFile = new File("");
+//		var.exportResultTimelineCSV(outputFile);
+
+		checkLibredeResults(var.getResults());
 
 	}
 

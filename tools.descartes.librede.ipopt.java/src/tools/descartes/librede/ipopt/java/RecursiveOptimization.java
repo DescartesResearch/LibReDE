@@ -68,6 +68,8 @@ import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 
 @Component(displayName="Non-linear Constrained Optimization")
 public class RecursiveOptimization extends AbstractEstimationAlgorithm {
@@ -344,7 +346,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 				double o_real = func.getObservedOutput();
 				OutputVariable o_calc = func.getCalculatedOutput(state);
 				if (Double.isNaN(o_calc.getValue()) || Double.isNaN(o_real)){
-					System.out.println("Blub");
+					Quantity<Time> pos = getCursor().getIntervalEnd(getCursor().getLastInterval());
+					System.out.println("Blub: " + pos);
 				}
 				if (o_real > 0) {
  					DerivativeStructure summand = o_calc.getDerivativeStructure().subtract(o_real).divide(o_real).pow(2);

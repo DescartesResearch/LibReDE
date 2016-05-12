@@ -39,7 +39,7 @@ import java.util.List;
 public class DataReadWrite implements Runnable {
 	private DataReader dr;
 	private DataWriter dw;
-	private int linesToCopy = 1;
+	private int linesToCopy = 5;
 
 	public DataReadWrite(File sourceFile, File destinationFile) {
 		try {
@@ -68,7 +68,12 @@ public class DataReadWrite implements Runnable {
 	public void run() {
 		if (!dr.isFileEnd()) {
 			try {
+//				System.err.println("Schreiber " + dr.getSourceFile());
+//				System.err.println("Schreibe Zeilen:");
 				List<String> readLines = dr.readLines(linesToCopy);
+//				for (int i = 0; i < readLines.size(); i++) {
+//					System.err.println(readLines.get(i));
+//				}
 				dw.writeLines(readLines);
 			} catch (IOException e) {
 				System.err.println("IO Error");
@@ -125,6 +130,9 @@ class DataReader {
 		this.sourceFile = new File(inputFile);
 	}
 
+	public File getSourceFile() {
+		return sourceFile;
+	}
 	public boolean isFileEnd() {
 		return fileEnd;
 	}

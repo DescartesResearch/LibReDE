@@ -99,18 +99,18 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 			for (TraceKey curKey : latestObservations.keySet()) {
 				// check whether this trace is timed out
 				Quantity<Time> time = latestObservations.get(curKey);
-				if (!isTimeout(maxLatestObservationTime, time, e.getKey().getInterval())) {
+//				if (!isTimeout(maxLatestObservationTime, time, e.getKey().getInterval())) {
 					if (minLatestObservationTime.getValue(Time.SECONDS) > time.getValue(Time.SECONDS)) {
 						minLatestObservationTime = time;
 					}
-				} else {
-					if (!isTimeout(oldMaxLatestObservationTime, time, e.getKey().getInterval())) {
-						// the trace just timed out so inform the user once.
-						log.warn("The trace " + e.getKey().getMetric() + ":" + e.getKey().getUnit() + ":"
-								+ e.getKey().getInterval() + ":" + e.getKey().getEntity().getName()
-								+ " timed out. Stop waiting for new measurement data.");
-					}
-				}
+//				} else {
+//					if (!isTimeout(oldMaxLatestObservationTime, time, e.getKey().getInterval())) {
+//						// the trace just timed out so inform the user once.
+//						log.warn("The trace " + e.getKey().getMetric() + ":" + e.getKey().getUnit() + ":"
+//								+ e.getKey().getInterval() + ":" + e.getKey().getEntity().getName()
+//								+ " timed out. Stop waiting for new measurement data.");
+//					}
+//				}
 			}
 		}
 		events.offer(e);

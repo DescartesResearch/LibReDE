@@ -782,6 +782,15 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getEstimationSpecification_AutomaticApproachSelection() {
+		return (EAttribute)estimationSpecificationEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EReference getEstimationSpecification_Algorithms() {
 		return (EReference)estimationSpecificationEClass.getEStructuralFeatures().get(3);
 	}
@@ -1182,6 +1191,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEReference(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__STEP_SIZE);
 		createEReference(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__START_TIMESTAMP);
 		createEReference(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__END_TIMESTAMP);
+		createEAttribute(estimationSpecificationEClass, ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION);
 
 		validationSpecificationEClass = createEClass(VALIDATION_SPECIFICATION);
 		createEReference(validationSpecificationEClass, VALIDATION_SPECIFICATION__VALIDATORS);
@@ -1366,6 +1376,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		g2 = createEGenericType(theUnitsPackage.getTime());
 		g1.getETypeArguments().add(g2);
 		initEReference(getEstimationSpecification_EndTimestamp(), g1, null, "endTimestamp", null, 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEstimationSpecification_AutomaticApproachSelection(), ecorePackage.getEBoolean(), "automaticApproachSelection", "false", 1, 1, EstimationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(validationSpecificationEClass, ValidationSpecification.class, "ValidationSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getValidationSpecification_Validators(), this.getValidatorConfiguration(), null, "validators", null, 0, -1, ValidationSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

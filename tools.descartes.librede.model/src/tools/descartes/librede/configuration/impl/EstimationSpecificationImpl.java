@@ -62,6 +62,7 @@ import tools.descartes.librede.units.Time;
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getStepSize <em>Step Size</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getStartTimestamp <em>Start Timestamp</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#getEndTimestamp <em>End Timestamp</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.EstimationSpecificationImpl#isAutomaticApproachSelection <em>Automatic Approach Selection</em>}</li>
  * </ul>
  *
  * @generated
@@ -152,6 +153,26 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * @ordered
 	 */
 	protected Quantity<Time> endTimestamp;
+
+	/**
+	 * The default value of the '{@link #isAutomaticApproachSelection() <em>Automatic Approach Selection</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isAutomaticApproachSelection()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean AUTOMATIC_APPROACH_SELECTION_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isAutomaticApproachSelection() <em>Automatic Approach Selection</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isAutomaticApproachSelection()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean automaticApproachSelection = AUTOMATIC_APPROACH_SELECTION_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -360,6 +381,27 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public boolean isAutomaticApproachSelection() {
+		return automaticApproachSelection;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setAutomaticApproachSelection(boolean newAutomaticApproachSelection) {
+		boolean oldAutomaticApproachSelection = automaticApproachSelection;
+		automaticApproachSelection = newAutomaticApproachSelection;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION, oldAutomaticApproachSelection, automaticApproachSelection));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EList<EstimationAlgorithmConfiguration> getAlgorithms() {
 		if (algorithms == null) {
 			algorithms = new EObjectContainmentEList<EstimationAlgorithmConfiguration>(EstimationAlgorithmConfiguration.class, this, ConfigurationPackage.ESTIMATION_SPECIFICATION__ALGORITHMS);
@@ -411,6 +453,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				return getStartTimestamp();
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				return getEndTimestamp();
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION:
+				return isAutomaticApproachSelection();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -447,6 +491,9 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				setEndTimestamp((Quantity<Time>)newValue);
 				return;
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION:
+				setAutomaticApproachSelection((Boolean)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -480,6 +527,9 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				setEndTimestamp((Quantity<Time>)null);
 				return;
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION:
+				setAutomaticApproachSelection(AUTOMATIC_APPROACH_SELECTION_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -506,6 +556,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 				return startTimestamp != null;
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION__END_TIMESTAMP:
 				return endTimestamp != null;
+			case ConfigurationPackage.ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION:
+				return automaticApproachSelection != AUTOMATIC_APPROACH_SELECTION_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -524,6 +576,8 @@ public class EstimationSpecificationImpl extends MinimalEObjectImpl.Container im
 		result.append(recursive);
 		result.append(", window: ");
 		result.append(window);
+		result.append(", automaticApproachSelection: ");
+		result.append(automaticApproachSelection);
 		result.append(')');
 		return result.toString();
 	}

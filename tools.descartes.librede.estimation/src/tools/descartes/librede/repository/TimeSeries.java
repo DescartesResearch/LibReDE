@@ -502,7 +502,7 @@ public class TimeSeries implements Cloneable {
 	}
 
 	public boolean isEmpty() {
-		return timestamps.isEmpty();
+		return length==0;
 	}
 	
 	@Override

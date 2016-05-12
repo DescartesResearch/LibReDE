@@ -105,6 +105,7 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 	private ComboViewer comboStartUnitViewer;
 	private ComboViewer comboEndUnitViewer;
 	private Button btnRecursive;
+	private Button btnAutomaticApproachSelection;
 	private Spinner spnWindow;
 
 	private EMFDataBindingContext bindingContext = new EMFDataBindingContext();
@@ -212,6 +213,11 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 		GridData gd_btnRecursive = new GridData();
 		gd_btnRecursive.horizontalSpan = 4;
 		btnRecursive.setLayoutData(gd_btnRecursive);
+		
+		btnAutomaticApproachSelection = toolkit.createButton(client, "Automatic Approach Selection", SWT.CHECK);
+		GridData gd_btnAutomaticApproachSelection = new GridData();
+		gd_btnAutomaticApproachSelection.horizontalSpan = 4;
+		btnAutomaticApproachSelection.setLayoutData(gd_btnAutomaticApproachSelection);
 
 		toolkit.createLabel(client, "Window Size:");
 		spnWindow = new Spinner(client, SWT.BORDER);
@@ -291,6 +297,14 @@ public class EstimationFormPage extends MasterDetailsFormPage {
 								getEditingDomain(),
 								FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
 										ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__RECURSIVE)).observe(
+								getModel()));
+		bindingContext
+				.bindValue(
+						WidgetProperties.selection().observe(btnAutomaticApproachSelection),
+						EMFEditProperties.value(
+								getEditingDomain(),
+								FeaturePath.fromList(ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__ESTIMATION,
+										ConfigurationPackage.Literals.ESTIMATION_SPECIFICATION__AUTOMATIC_APPROACH_SELECTION)).observe(
 								getModel()));
 		bindingContext.bindValue(
 				WidgetProperties.selection().observe(spnWindow),

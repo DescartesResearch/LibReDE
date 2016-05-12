@@ -18,7 +18,7 @@
       <metric href="librede:metrics#RESPONSE_TIME"/>
       <mappings entity="//@workloadDescription/@services.0"/>
       <unit href="librede:units#SECONDS"/>
-      <interval value="0.0">
+      <interval>
         <unit href="librede:units#SECONDS"/>
       </interval>
     </observations>
@@ -26,7 +26,7 @@
       <metric href="librede:metrics#RESPONSE_TIME"/>
       <mappings entity="//@workloadDescription/@services.1"/>
       <unit href="librede:units#SECONDS"/>
-      <interval value="0.0">
+      <interval>
         <unit href="librede:units#SECONDS"/>
       </interval>
     </observations>
@@ -34,7 +34,7 @@
       <metric href="librede:metrics#RESPONSE_TIME"/>
       <mappings entity="//@workloadDescription/@services.2"/>
       <unit href="librede:units#SECONDS"/>
-      <interval value="0.0">
+      <interval>
         <unit href="librede:units#SECONDS"/>
       </interval>
     </observations>
@@ -47,21 +47,21 @@
       </interval>
     </observations>
   </input>
-  <estimation window="60">
+  <estimation window="60" automaticApproachSelection="true">
     <approaches type="tools.descartes.librede.approach.ServiceDemandLawApproach"/>
     <approaches type="tools.descartes.librede.approach.ResponseTimeApproximationApproach"/>
     <approaches type="tools.descartes.librede.approach.WangKalmanFilterApproach"/>
     <approaches type="tools.descartes.librede.approach.RoliaRegressionApproach"/>
     <approaches type="tools.descartes.librede.approach.ZhangKalmanFilterApproach"/>
     <approaches type="tools.descartes.librede.approach.MenasceOptimizationApproach"/>
-    <algorithms type="tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter"/>
+   <algorithms type="tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter"/>
     <algorithms type="tools.descartes.librede.nnls.LeastSquaresRegression"/>
     <algorithms type="tools.descartes.librede.ipopt.java.RecursiveOptimization"/>
     <algorithms type="tools.descartes.librede.algorithm.SimpleApproximation"/>
     <stepSize value="60.0">
       <unit href="librede:units#SECONDS"/>
     </stepSize>
-    <startTimestamp value="1.370087520718E9">
+    <startTimestamp value="1.370087520861E9">
       <unit href="librede:units#SECONDS"/>
     </startTimestamp>
     <endTimestamp value="1.370090939129E9">
@@ -74,7 +74,7 @@
       <parameters name="FileName" value="estimates"/>
     </exporters>
   </output>
-  <validation validationFolds="5" validateEstimates="true">
+  <validation validationFolds="1" validateEstimates="true">
     <validators type="tools.descartes.librede.validation.ResponseTimeValidator"/>
     <validators type="tools.descartes.librede.validation.UtilizationValidator"/>
   </validation>
