@@ -123,7 +123,7 @@ public class ApproachSelector {
 			// LibredeVariables
 			LinkedList<EstimationApproachConfiguration> selectedApproaches = new LinkedList<EstimationApproachConfiguration>();
 			for (EstimationApproachConfiguration currentConf : var.getConf().getEstimation().getApproaches()) {
-				if (currentConf.getType().equals(selectedApproach.getTypeName())) {
+				if (currentConf.getType().equals(selectedApproach.getName())) {
 					selectedApproaches.add(currentConf);
 				}
 			}
