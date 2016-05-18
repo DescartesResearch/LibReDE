@@ -589,7 +589,12 @@ public class Librede {
 				ResultTable curFold = results.getEstimates(approach, i);
 				lastEstimates.addRow(curFold.getLastEstimates());
 			}
-			meanEstimates.addRow(LinAlg.mean(lastEstimates.toMatrix()));
+			Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
+			if (lastEstimatesMatrix.isEmpty()) {
+				log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
+			} else {
+				meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
+			}
 
 			for (Class<? extends IValidator> validator : validators) {
 				MatrixBuilder errorsBuilder = null;

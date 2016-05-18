@@ -27,7 +27,6 @@
 package tools.descartes.librede;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,8 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.linalg.LinAlg;
+import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
@@ -94,7 +95,12 @@ public class ResultTable {
 			for (Map.Entry<ResourceDemand, Integer> e : entryToColumn.entrySet()) {
 				columnToEntry[e.getValue()] = e.getKey();
 			}
-			TimeSeries estimates = new TimeSeries(timestampBuilder.toVector(), estimateBuilder.toMatrix());
+			
+			Matrix estimatesMatrix = estimateBuilder.toMatrix();
+			TimeSeries estimates = TimeSeries.EMPTY;
+			if (!estimatesMatrix.isEmpty()) {
+				estimates = new TimeSeries(timestampBuilder.toVector(), estimateBuilder.toMatrix());
+			}
 			
 			return new ResultTable(approach, columnToEntry, estimates);
 		}
@@ -139,6 +145,9 @@ public class ResultTable {
 	}
 	
 	public Vector getLastEstimates() {
+		if (estimates.isEmpty()) {
+			return LinAlg.empty();
+		}
 		return estimates.getData().row(estimates.samples() - 1);
 	}
 	
