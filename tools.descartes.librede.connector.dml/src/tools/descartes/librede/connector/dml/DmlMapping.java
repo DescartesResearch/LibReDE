@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.emf.ecore.EObject;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -212,21 +214,35 @@ public class DmlMapping {
 
 	public List<Resource> mapResource(Container container, ResourceType resType) {
 		List<Resource> childResources = new ArrayList<>();
-		for (ConfigurationSpecification spec : container.getConfigSpec()) {
-			if (spec instanceof ProcessingResourceSpecification) {
-				ProcessingResourceSpecification procRes = (ProcessingResourceSpecification) spec;
-				if (procRes.getProcessingResourceType().equals(resType)) {
-					String resourceName = getResourceName(procRes);
-					ResourceMapping rm = resources.get(resourceName);
-					if (rm == null) {
-						rm = createResource(resourceName, container, procRes);
+
+		// Search in the container hierarchy until we find a resource with the
+		// specified type.
+		Container curContainer = container;
+		while (childResources.isEmpty()) {
+			for (ConfigurationSpecification spec : curContainer.getConfigSpec()) {
+				if (spec instanceof ProcessingResourceSpecification) {
+					ProcessingResourceSpecification procRes = (ProcessingResourceSpecification) spec;
+					if (procRes.getProcessingResourceType().equals(resType)) {
+						String resourceName = getResourceName(procRes);
+						ResourceMapping rm = resources.get(resourceName);
+						if (rm == null) {
+							rm = createResource(resourceName, container, procRes);
+						}
+						// Update attribute settings
+						rm.resource.setNumberOfServers(procRes.getNrOfParProcUnits().getNumber());
+						rm.resource.setSchedulingStrategy(convertSchedulingStrategy(procRes.getSchedulingPolicy()));
+						childResources.add(rm.resource);
+						unmappedResources.remove(resourceName);
 					}
-					// Update attribute settings
-					rm.resource.setNumberOfServers(procRes.getNrOfParProcUnits().getNumber());
-					rm.resource.setSchedulingStrategy(convertSchedulingStrategy(procRes.getSchedulingPolicy()));
-					childResources.add(rm.resource);
-					unmappedResources.remove(resourceName);
 				}
+			}
+
+			// Go one level up.
+			EObject parent = curContainer.eContainer();
+			if (parent instanceof Container) {
+				curContainer = (Container) parent;
+			} else {
+				break;
 			}
 		}
 		return childResources;

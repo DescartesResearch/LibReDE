@@ -27,6 +27,7 @@
 package tools.descartes.librede.connector.dml;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -171,7 +172,7 @@ public class WorkloadDescriptionDerivation {
 				log.warn("Assembly context " + curAssembly.getName() + " is not deployed on any container.");
 			}
 		} else {
-			CompositeComponent composite = (CompositeComponent) curAssembly.getEncapsulatedComponent();
+			ComposedStructure composite = (ComposedStructure) curAssembly.getEncapsulatedComponent();
 			for (AssemblyContext child : composite.getAssemblyContexts()) {
 				callStack.push(child);
 				if (deploymentTarget == null) {
@@ -190,9 +191,7 @@ public class WorkloadDescriptionDerivation {
 		BasicComponent implementation = (BasicComponent) component;
 		FineGrainedBehavior behavior = getImplementationBehavior(implementation, role, sig);
 		if (behavior != null) {
-			ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE
-					.createComponentInstanceReference();
-			instance.getAssemblies().addAll(callStack);
+			ComponentInstanceReference instance = getInstance(callStack);
 			Service service = mapping.mapService(instance, role, sig);
 			if (!completeServices.contains(service)) {
 				visitComponentInternalBehavior(service, callStack, role, sig, deploymentTarget, behavior.getBehavior(),
@@ -204,6 +203,18 @@ public class WorkloadDescriptionDerivation {
 		}
 	}
 	
+	private ComponentInstanceReference getInstance(Deque<AssemblyContext> callStack) {
+		ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE.createComponentInstanceReference();
+		// IMPORTANT: Skip the last assembly context which is the assembly
+		// context of application. Sensors in the repository are always relative
+		// to the application.
+		List<AssemblyContext> contexts = new ArrayList<>(callStack);
+		for (int i = callStack.size() - 2; i >= 0; i--) {
+			instance.getAssemblies().add(contexts.get(i));
+		}
+		return instance;
+	}
+
 	private FineGrainedBehavior getImplementationBehavior(BasicComponent component, InterfaceProvidingRole role, Signature sig)	{
 		for (FineGrainedBehavior currentBehavior : component.getFineGrainedBehavior()) {
 			if (currentBehavior.getInterfaceProvidingRole().equals(role)
@@ -288,7 +299,7 @@ public class WorkloadDescriptionDerivation {
 			if (connector.getInnerInterfaceRequiringRole().equals(requiringRole)) {
 				// We have to go up one level in the callStack to determine the
 				// called component
-				callStack.pop();
+				// callStack.pop();
 				return getCalledInterfaceProvidingRole(callStack, connector.getOuterInterfaceRequiringRole());
 			}
 		}
