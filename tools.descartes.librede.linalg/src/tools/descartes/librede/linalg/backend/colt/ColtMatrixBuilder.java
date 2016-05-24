@@ -81,7 +81,7 @@ public class ColtMatrixBuilder extends MatrixBuilder {
 
 	@Override
 	public Matrix toMatrix() {
-		if (last == 0) {
+		if (last == 0 || matrix.columns() == 0) {
 			return empty();
 		}		
 		if (matrix.columns() > 1) {
