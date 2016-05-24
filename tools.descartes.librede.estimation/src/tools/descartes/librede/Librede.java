@@ -88,7 +88,6 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
-import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.TimeSeries;
@@ -287,13 +286,8 @@ public class Librede {
 				@SuppressWarnings("unchecked")
 				Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
 
-				TimeSeries ts;
-				if (!repo.exists(metric, key.getEntity(), key.getAggregation())) {
-					ts = curEvent.getData();
-				} else {
-					ts = repo.select(metric, unit, key.getEntity(), key.getAggregation());
-					ts = ts.append(curEvent.getData());
-				}
+				TimeSeries ts = curEvent.getData();
+
 				//end timestamp is set in ts.append()
 				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
 //				ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));

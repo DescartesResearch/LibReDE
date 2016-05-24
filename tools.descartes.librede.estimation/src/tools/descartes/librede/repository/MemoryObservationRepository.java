@@ -341,14 +341,19 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		DataKey<D> key = new DataKey<D>(m, entity, aggregation);
 		DataEntry<D> entry = getEntry(key);
 		boolean existing = (entry != null);
+		observations.setInterpolationMethod(Registry.INSTANCE.getMetricHandler(m).getInterpolation());
 		if (!existing) {
 			entry = new DataEntry<>(key);
-		}
-		observations.setInterpolationMethod(Registry.INSTANCE.getMetricHandler(m).getInterpolation());
-		entry.setTimeSeries(observations, aggregationInterval);
-		if (!existing) {
+			entry.setTimeSeries(observations, aggregationInterval);
 			addEntry(key, entry);
-		}
+		} else {
+			TimeSeries existingData = entry.getRawData();
+			if (existingData != null) {
+				entry.setTimeSeries(existingData.append(observations), aggregationInterval);
+			} else {
+				entry.setTimeSeries(observations, aggregationInterval);
+			}
+		}		
 
 		if (log.isDebugEnabled()) {
 			log.debug((existing ? "New" : "Replaced") + " time series entry " + entity + "/" + m + "/" + aggregation);
