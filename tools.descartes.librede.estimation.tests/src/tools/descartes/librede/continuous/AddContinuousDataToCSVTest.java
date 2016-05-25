@@ -43,6 +43,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import tools.descartes.librede.Librede;
@@ -91,6 +92,7 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 
 	}
 
+	@Ignore
 	@Test
 	public void test() {
 		
