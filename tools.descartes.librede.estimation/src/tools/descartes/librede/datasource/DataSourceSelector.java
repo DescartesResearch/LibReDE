@@ -219,10 +219,12 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 
 	@Override
 	public synchronized void keyAdded(IDataSource source, TraceKey key) {
-		firstObservations.put(key, null);
-		latestObservations.put(key, null);
-		maxFirstObservationTime = null;
-		minLatestObservationTime = null;
+		if (!firstObservations.containsKey(key)) {
+			firstObservations.put(key, null);
+			latestObservations.put(key, null);
+			maxFirstObservationTime = null;
+			minLatestObservationTime = null;
+		}
 	}
 
 
