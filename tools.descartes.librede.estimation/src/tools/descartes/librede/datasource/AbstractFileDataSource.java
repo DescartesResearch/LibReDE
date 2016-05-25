@@ -673,6 +673,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		for (TraceToEntityMapping mapping : configuration.getMappings()) {
 			TraceKey k = new TraceKey(configuration.getMetric(), configuration.getUnit(), configuration.getInterval(),
 					mapping.getEntity(), configuration.getAggregation(), mapping.getFilters());
+			notifyListenersNewKey(k);
 			channel.addTrace(k, mapping.getTraceColumn() - 1);
 			keys.add(k);
 		}

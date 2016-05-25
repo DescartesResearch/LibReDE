@@ -67,6 +67,18 @@ public abstract class AbstractDataSource implements IDataSource {
 		}
 	}
 	
+	protected void notifyListenersNewKey(TraceKey newKey) {
+		for (IDataSourceListener listener : listeners) {
+			listener.keyAdded(this, newKey);
+		}
+	}
+	
+	protected void notifyListenersRemovedKey(TraceKey removedKey) {
+		for (IDataSourceListener listener : listeners) {
+			listener.keyAdded(this, removedKey);
+		}
+	}
+	
 	@Override
 	public String getName() {
 		return name;

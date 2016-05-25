@@ -110,6 +110,10 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 			// Determine minimum latest observation time.
 			for (TraceKey curKey : latestObservations.keySet()) {
 				Quantity<Time> curLatestTime = latestObservations.get(curKey);
+				if (curLatestTime == null) {
+					// No observations for this trace available.
+					return null;
+				}
 				if ((minLatestObservationTime == null) || 
 						(minLatestObservationTime.getValue(Time.SECONDS) > curLatestTime.getValue(Time.SECONDS))) {
 					minLatestObservationTime = curLatestTime;
@@ -131,6 +135,10 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 			// Determine maximum first observation time.
 			for (TraceKey curKey : firstObservations.keySet()) {
 				Quantity<Time> curFirstTime = firstObservations.get(curKey);
+				if (curFirstTime == null) {
+					// No observations for this trace available.
+					return null;
+				}
 				if ((maxFirstObservationTime == null) || 
 						(maxFirstObservationTime.getValue(Time.SECONDS) < curFirstTime.getValue(Time.SECONDS))) {
 					maxFirstObservationTime = curFirstTime;
@@ -206,5 +214,23 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 		if (dataSources == null) {
 			throw new IllegalStateException();
 		}
+	}
+
+
+	@Override
+	public synchronized void keyAdded(IDataSource source, TraceKey key) {
+		firstObservations.put(key, null);
+		latestObservations.put(key, null);
+		maxFirstObservationTime = null;
+		minLatestObservationTime = null;
+	}
+
+
+	@Override
+	public synchronized void keyRemoved(IDataSource source, TraceKey key) {
+		firstObservations.remove(key);
+		latestObservations.remove(key);
+		maxFirstObservationTime = null;
+		minLatestObservationTime = null;
 	}
 }
