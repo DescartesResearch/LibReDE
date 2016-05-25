@@ -288,13 +288,9 @@ public class ObservationDataGenerator {
 		
 
 		for (int i = 0; i < services.length; i++) {
-			TimeSeries ts;
+			TimeSeries ts = new TimeSeries(scalar(time), scalar(throughput.get(i)));
 			if (time == 1.0) {
-				ts = new TimeSeries(scalar(time), scalar(throughput.get(i)));
 				ts.setStartTime(0);
-			} else {
-				ts = repository.select(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[i], Aggregation.AVERAGE);
-				ts = ts.addSample(time, throughput.get(i));
 			}
 			ts.setEndTime(time);
 			repository.insert(StandardMetrics.THROUGHPUT, RequestRate.REQ_PER_SECOND, services[i], ts, Aggregation.AVERAGE, ONE_SECOND);	
@@ -303,13 +299,9 @@ public class ObservationDataGenerator {
 		
 
 		for (int i = 0; i < resources.length; i++) {
-			TimeSeries ts;
-			if (time == 1.0) {
-				ts = new TimeSeries(scalar(time), scalar(utilization.get(i)));
+			TimeSeries ts = new TimeSeries(scalar(time), scalar(utilization.get(i)));
+			if (time == 1.0) {				
 				ts.setStartTime(0);
-			} else {
-				ts = repository.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[i], Aggregation.AVERAGE);
-				ts = ts.addSample(time, utilization.get(i));
 			}
 			ts.setEndTime(time);
 			repository.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[i], ts, Aggregation.AVERAGE, ONE_SECOND);	
@@ -323,13 +315,9 @@ public class ObservationDataGenerator {
 				sumRT += (demands.get(stateIdx) * (erlangC.calculateValue(util) + 1 - util)) / (1 - util);
 			}
 			
-			TimeSeries ts;
+			TimeSeries ts = new TimeSeries(scalar(time), scalar(sumRT));
 			if (time == 1.0) {
-				ts = new TimeSeries(scalar(time), scalar(sumRT));
 				ts.setStartTime(0);
-			} else {
-				ts = repository.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], Aggregation.AVERAGE);
-				ts = ts.addSample(time, sumRT);
 			}
 			ts.setEndTime(time);
 			repository.insert(StandardMetrics.RESPONSE_TIME, Time.SECONDS, services[i], ts, Aggregation.AVERAGE, ONE_SECOND);	

@@ -45,4 +45,24 @@ public interface IDataSourceListener {
 	 */
 	public void dataAvailable(IDataSource source, TraceEvent e);
 
+	/**
+	 * Called when a new trace is added to a data source.
+	 * 
+	 * @param source
+	 *            the originating data source
+	 * @param key
+	 *            a TraceKey object containing information on the new trace
+	 */
+	public void keyAdded(IDataSource source, TraceKey key);
+
+	/**
+	 * Called when a trace is removed from a data source.
+	 * 
+	 * @param source
+	 *            the originating data source
+	 * @param key
+	 *            a TraceKey object containing information on the removed trace
+	 */
+	public void keyRemoved(IDataSource source, TraceKey key);
+
 }

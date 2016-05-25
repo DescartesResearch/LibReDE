@@ -37,7 +37,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
@@ -222,7 +221,7 @@ public class CsvDataSourceTest extends LibredeTest {
 				}
 			}
 			assertThat(found).isTrue();
-			assertThat(selector.getLatestObservationTime().getValue(Time.SECONDS)).isEqualTo(512 * (i + 1) - 1);
+			assertThat(selector.getLatestObservationTime().getValue(Time.SECONDS)).isEqualTo(512 - 1);
 			compare(data1, refData1);
 			
 			refData1 = writeData(file1, 512, 10, 512 * (i + 1));

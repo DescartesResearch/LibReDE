@@ -60,10 +60,10 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 	private static final Logger log = Loggers.DATASOURCE_LOG;
 
 	// The minimum latest observation time of all data sources
-	private Quantity<Time> minLatestObservationTime = ZERO;
+	private Quantity<Time> minLatestObservationTime = null;
 
-	// The maximum latest observation time of all data sources
-	private Quantity<Time> maxLatestObservationTime = ZERO;
+	// The maximum first observation time of all data sources
+	private Quantity<Time> maxFirstObservationTime = null;
 
 	private Set<IDataSource> dataSources = new HashSet<IDataSource>();
 
@@ -73,91 +73,79 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 	// a list of all traces with their corresponding last observation time.
 	private Map<TraceKey, Quantity<Time>> latestObservations = new HashMap<TraceKey, Quantity<Time>>();
 
-	// number of intervals after which a trace is considered to be unavailable.
-	private int timeoutIntervals = 3;
-
-	// the absolute timeout time
-	// depending on aggregation interval max(timeout, timeoutIntervals *
-	// interval) is the actual timeout
-	private Quantity<Time> timeout = UnitsFactory.eINSTANCE.createQuantity(5, Time.MINUTES);
+	// a list of all traces with their corresponding first observation time.
+	private Map<TraceKey, Quantity<Time>> firstObservations = new HashMap<TraceKey, Quantity<Time>>();
 
 	@Override
 	public synchronized void dataAvailable(IDataSource datasource, TraceEvent e) {
 		checkIsOpen();
 		Quantity<Time> oldLastestObservationTime = latestObservations.get(e.getKey());
+		Quantity<Time> oldFirstObservationTime = firstObservations.get(e.getKey());
 		Quantity<Time> newLatestObservationTime = e.getLastObservationTime();
-		// Update the internal timestamps
+		// Update the internal start timestamps
+		if (oldFirstObservationTime == null || (oldFirstObservationTime.getValue(Time.SECONDS) > newLatestObservationTime.getValue(Time.SECONDS))) {
+			firstObservations.put(e.getKey(), newLatestObservationTime);
+			maxFirstObservationTime = null;
+		}		
+		
+		// Update the internal end timestamps
 		if (oldLastestObservationTime == null
 				|| (oldLastestObservationTime.getValue(Time.SECONDS) < newLatestObservationTime.getValue(Time.SECONDS))) {
 			latestObservations.put(e.getKey(), newLatestObservationTime);
-			Quantity<Time> oldMaxLatestObservationTime = maxLatestObservationTime;
-
-			if ((newLatestObservationTime.getValue(Time.SECONDS) > maxLatestObservationTime.getValue(Time.SECONDS))) {
-				maxLatestObservationTime = newLatestObservationTime;
-			}
-			minLatestObservationTime = maxLatestObservationTime;
-			for (TraceKey curKey : latestObservations.keySet()) {
-				// check whether this trace is timed out
-				Quantity<Time> time = latestObservations.get(curKey);
-//				if (!isTimeout(maxLatestObservationTime, time, e.getKey().getInterval())) {
-					if (minLatestObservationTime.getValue(Time.SECONDS) > time.getValue(Time.SECONDS)) {
-						minLatestObservationTime = time;
-					}
-//				} else {
-//					if (!isTimeout(oldMaxLatestObservationTime, time, e.getKey().getInterval())) {
-//						// the trace just timed out so inform the user once.
-//						log.warn("The trace " + e.getKey().getMetric() + ":" + e.getKey().getUnit() + ":"
-//								+ e.getKey().getInterval() + ":" + e.getKey().getEntity().getName()
-//								+ " timed out. Stop waiting for new measurement data.");
-//					}
-//				}
-			}
+			minLatestObservationTime = null;
 		}
 		events.offer(e);
 	}
 
-	/**
-	 * The absolute timeout is a time value after which a trace is considered to
-	 * time out. The maximum between the absolute and the relative timeout is
-	 * the effective timeout for a trace.
-	 * 
-	 * @param timeout
-	 */
-	public void setAbsoluteTimeout(Quantity<Time> timeout) {
-		this.timeout = timeout;
-	}
-
-	public Quantity<Time> getAbsoluteTimeout() {
-		return timeout;
-	}
-
-	/**
-	 * The relative timeout specifies after how many intervals (as specified for
-	 * the trace) without measurement data a trace is considered to time out.
-	 * The maximum between the absolute and the relative timeout is the
-	 * effective timeout for a trace.
-	 * 
-	 * @param timeoutIntervals
-	 */
-	public void setRelativeTimeout(int timeoutIntervals) {
-		this.timeoutIntervals = timeoutIntervals;
-	}
-
-	public int getRelativeTimeout() {
-		return timeoutIntervals;
-	}
 
 	/**
 	 * The latest observation time is the latest time for which all traces have
 	 * monitoring (i.e., some traces might already have newer data available).
-	 * Traces considere to be timed out, i.e. in the configured timespan there
-	 * was no new data available, are excluded from the last observation time.
 	 * 
-	 * @return
+	 * @return a time quantity or null if no time could be determined.
 	 */
 	public synchronized Quantity<Time> getLatestObservationTime() {
 		checkIsOpen();
+		if (minLatestObservationTime == null) {
+			// Determine minimum latest observation time.
+			for (TraceKey curKey : latestObservations.keySet()) {
+				Quantity<Time> curLatestTime = latestObservations.get(curKey);
+				if (curLatestTime == null) {
+					// No observations for this trace available.
+					return null;
+				}
+				if ((minLatestObservationTime == null) || 
+						(minLatestObservationTime.getValue(Time.SECONDS) > curLatestTime.getValue(Time.SECONDS))) {
+					minLatestObservationTime = curLatestTime;
+				}
+			}
+		}
 		return minLatestObservationTime;
+	}
+	
+	/**
+	 * The first observation time is the first time for which all traces have
+	 * monitoring (i.e., some traces might have older data available).
+	 * 
+	 * @return a time quantity or null if no time could be determined.
+	 */
+	public synchronized Quantity<Time> getFirstObservationTime() {
+		checkIsOpen();
+		if (maxFirstObservationTime == null) {
+			// Determine maximum first observation time.
+			for (TraceKey curKey : firstObservations.keySet()) {
+				Quantity<Time> curFirstTime = firstObservations.get(curKey);
+				if (curFirstTime == null) {
+					// No observations for this trace available.
+					return null;
+				}
+				if ((maxFirstObservationTime == null) || 
+						(maxFirstObservationTime.getValue(Time.SECONDS) < curFirstTime.getValue(Time.SECONDS))) {
+					maxFirstObservationTime = curFirstTime;
+				}
+			}
+		}
+		return maxFirstObservationTime;
 	}
 
 	/**
@@ -228,9 +216,23 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 		}
 	}
 
-	private boolean isTimeout(Quantity<Time> latestObservationTime, Quantity<Time> time, Quantity<Time> aggrInterval) {
-		double curTimeout = Math.max(timeout.getValue(Time.SECONDS), aggrInterval.getValue(Time.SECONDS)
-				* timeoutIntervals);
-		return latestObservationTime.minus(time).getValue(Time.SECONDS) >= curTimeout;
+
+	@Override
+	public synchronized void keyAdded(IDataSource source, TraceKey key) {
+		if (!firstObservations.containsKey(key)) {
+			firstObservations.put(key, null);
+			latestObservations.put(key, null);
+			maxFirstObservationTime = null;
+			minLatestObservationTime = null;
+		}
+	}
+
+
+	@Override
+	public synchronized void keyRemoved(IDataSource source, TraceKey key) {
+		firstObservations.remove(key);
+		latestObservations.remove(key);
+		maxFirstObservationTime = null;
+		minLatestObservationTime = null;
 	}
 }

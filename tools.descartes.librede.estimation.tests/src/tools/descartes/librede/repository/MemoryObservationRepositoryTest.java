@@ -99,8 +99,8 @@ public class MemoryObservationRepositoryTest extends LibredeTest {
 	public void testSetAndGetData() {
 		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
 		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(5);
-		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(6);
+		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts2);
+		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(10);
 	}
 	
 	@Test(expected = NoMonitoringDataException.class)
