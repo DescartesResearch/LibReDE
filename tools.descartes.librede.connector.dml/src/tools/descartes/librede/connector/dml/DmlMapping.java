@@ -102,6 +102,10 @@ public class DmlMapping {
 		return newEntities;
 	}
 	
+	public ExternalCall getLibredeCall(edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
+		return calls.get(dmlCall);
+	}
+
 	public edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall getDmlCall(ExternalCall libredeCall) {
 		return calls.inverse().get(libredeCall);
 	}

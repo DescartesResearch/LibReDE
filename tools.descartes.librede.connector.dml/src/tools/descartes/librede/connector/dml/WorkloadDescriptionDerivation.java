@@ -272,8 +272,7 @@ public class WorkloadDescriptionDerivation {
 		InterfaceProvidingRole calledProvidingRole = getCalledInterfaceProvidingRole(calledStack, requiringRole);
 		
 		if (calledProvidingRole != null) {
-			ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE.createComponentInstanceReference();
-			instance.getAssemblies().addAll(calledStack);
+			ComponentInstanceReference instance = getComponentInstance(callStack);
 			Service calledService = mapping.mapService(instance, calledProvidingRole,
 					action.getExternalCall().getSignature());
 			// Recursive calls are currently not supported.			
@@ -333,9 +332,7 @@ public class WorkloadDescriptionDerivation {
 						log.warn("No processing resource of type " + demand.getResourceType() + " found in container " + deploymentTarget.getName() + ".");
 						continue;
 					}
-					ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE
-							.createComponentInstanceReference();
-					instance.getAssemblies().addAll(callStack);
+					ComponentInstanceReference instance = getComponentInstance(callStack);
 					Service curService = mapping.mapService(instance, role, signature);
 					for (Resource res : curResources) {
 						mapping.mapResourceDemand(res, curService, demand);
@@ -343,7 +340,14 @@ public class WorkloadDescriptionDerivation {
 				}
 			}
 		}
-	}	
+	}
+
+	private ComponentInstanceReference getComponentInstance(Deque<AssemblyContext> callStack) {
+		ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE.createComponentInstanceReference();
+		ArrayList<AssemblyContext> path = new ArrayList<>(callStack);
+		path.remove(path.size() - 1);
+		return instance;
+	}
 		
 }
  
