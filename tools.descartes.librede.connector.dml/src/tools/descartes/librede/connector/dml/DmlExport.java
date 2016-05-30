@@ -29,6 +29,7 @@ package tools.descartes.librede.connector.dml;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,7 @@ import edu.kit.ipd.descartes.mm.applicationlevel.repository.Repository;
 import edu.kit.ipd.descartes.mm.applicationlevel.system.System;
 import edu.kit.ipd.descartes.mm.deployment.Deployment;
 import edu.kit.ipd.descartes.mm.resourcelandscape.DistributedDataCenter;
+import edu.kit.ipd.descartes.mm.resourcetype.ResourceTypeRepository;
 import edu.kit.ipd.descartes.mm.resourcetype.ResourcetypePackage;
 import edu.kit.ipd.descartes.mm.usageprofile.UsageProfile;
 import tools.descartes.librede.configuration.ResourceDemand;
@@ -74,7 +76,7 @@ public class DmlExport implements IExporter {
 	private static final Logger log = Logger.getLogger(DmlExport.class);
 
 	@ParameterDefinition(name = "ModelPath", label = "Path to DML model", required = true)
-	private Path dmlModelPath;
+	private String dmlModelPath;
 	
 	@ParameterDefinition(name = "ModelName", label = "Name of DML model (excluding file extension)", required = true)
 	private String dmlModelName;
@@ -84,6 +86,7 @@ public class DmlExport implements IExporter {
 	private DistributedDataCenter ddc;
 	private Deployment deployment;
 	private UsageProfile usage;
+	private ResourceTypeRepository resourceTypes;
 
 	@Override
 	public void writeResults(String approach, int fold, ResourceDemand[] variables, TimeSeries estimates)
@@ -134,24 +137,36 @@ public class DmlExport implements IExporter {
 	private void storeModel(String approach, int fold) {
 		ResourceSet rset = createResourceSet();
 		try {
-			serialize(rset, repository, dmlModelPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".repository"));
-			serialize(rset, ddc, dmlModelPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".resourcelandscape"));
-			serialize(rset, system, dmlModelPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".system"));
-			serialize(rset, deployment, dmlModelPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".deployment"));
-			serialize(rset, usage, dmlModelPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".usageprofile"));
+			Path outputPath = Paths.get(dmlModelPath);
+			addToResourceSet(rset, resourceTypes,
+					outputPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".resourcetype"));
+			addToResourceSet(rset, repository,
+					outputPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".repository"));
+			addToResourceSet(rset, ddc,
+					outputPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".resourcelandscape"));
+			addToResourceSet(rset, system,
+					outputPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".system"));
+			addToResourceSet(rset, deployment,
+					outputPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".deployment"));
+			addToResourceSet(rset, usage,
+					outputPath.resolve(dmlModelName + "-" + approach + "-" + fold + ".usageprofile"));
+			serialize(rset);
 		} catch (IOException e) {
 			log.error("Error saving DML model " + dmlModelName + "-" + approach + "-" + fold + ".", e);
 		}
 	}
 	
 	private void loadModel() {
+		Path modelPath = Paths.get(dmlModelPath);
 		ResourceSet rset = createResourceSet();
 		EcoreUtil.Copier copier = new EcoreUtil.Copier();
-		repository = (Repository) copier.copy(deserialize(rset, dmlModelPath.resolve(dmlModelName + ".repository")));
-		ddc = (DistributedDataCenter) copier.copy(deserialize(rset, dmlModelPath.resolve(dmlModelName + ".resourcelandscape")));
-		system = (System) copier.copy(deserialize(rset, dmlModelPath.resolve(dmlModelName + ".system")));
-		deployment = (Deployment) copier.copy(deserialize(rset, dmlModelPath.resolve(dmlModelName + ".deployment")));
-		usage = (UsageProfile) copier.copy(deserialize(rset, dmlModelPath.resolve(dmlModelName + ".usageprofile")));
+		resourceTypes = (ResourceTypeRepository) copier
+				.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".resourcetype")));
+		repository = (Repository) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".repository")));
+		ddc = (DistributedDataCenter) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".resourcelandscape")));
+		system = (System) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".system")));
+		deployment = (Deployment) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".deployment")));
+		usage = (UsageProfile) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".usageprofile")));
 		copier.copyReferences();
 	}
 	
@@ -163,12 +178,17 @@ public class DmlExport implements IExporter {
 		return null;
 	}
 	
-	private void serialize(ResourceSet resSet, EObject root, Path path) throws IOException {
+	private void addToResourceSet(ResourceSet resSet, EObject root, Path path) {
 		Resource res = resSet.createResource(URI.createFileURI(path.toString()));
 		res.getContents().add(root);
-		res.save(Collections.EMPTY_MAP);
 	}
 	
+	private void serialize(ResourceSet resSet) throws IOException {
+		for (Resource curRes : resSet.getResources()) {
+			curRes.save(Collections.EMPTY_MAP);
+		}
+	}
+
 	private ResourceSet createResourceSet() {
 		ResourcetypePackage.eINSTANCE.eClass();
 

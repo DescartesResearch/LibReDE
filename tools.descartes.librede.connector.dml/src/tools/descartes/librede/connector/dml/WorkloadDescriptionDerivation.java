@@ -272,7 +272,7 @@ public class WorkloadDescriptionDerivation {
 		InterfaceProvidingRole calledProvidingRole = getCalledInterfaceProvidingRole(calledStack, requiringRole);
 		
 		if (calledProvidingRole != null) {
-			ComponentInstanceReference instance = getComponentInstance(callStack);
+			ComponentInstanceReference instance = getComponentInstance(calledStack);
 			Service calledService = mapping.mapService(instance, calledProvidingRole,
 					action.getExternalCall().getSignature());
 			// Recursive calls are currently not supported.			
@@ -345,7 +345,9 @@ public class WorkloadDescriptionDerivation {
 	private ComponentInstanceReference getComponentInstance(Deque<AssemblyContext> callStack) {
 		ComponentInstanceReference instance = ParameterdependenciesFactory.eINSTANCE.createComponentInstanceReference();
 		ArrayList<AssemblyContext> path = new ArrayList<>(callStack);
-		path.remove(path.size() - 1);
+		for (int i = path.size() - 2; i >= 0; i--) {
+			instance.getAssemblies().add(path.get(i));
+		}
 		return instance;
 	}
 		
