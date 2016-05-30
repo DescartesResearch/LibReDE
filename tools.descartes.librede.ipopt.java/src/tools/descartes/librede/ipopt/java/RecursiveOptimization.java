@@ -84,6 +84,9 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
 	private double lowerBoundsInfValue = -1e19;
+	
+	@ParameterDefinition(name = "PrintLevel", label = "The verbosity of log outputs", defaultValue = "5")
+	private int printLevel = 5;
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
@@ -259,7 +262,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	}
 
 	private void setOptimizationOptions(Pointer nlp) {
-		IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.PRINT_LEVEL.toNativeString(),5);
+		IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.PRINT_LEVEL.toNativeString(),printLevel);
 		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.MU_STRATEGY.toNativeString(), 
 				IpoptOptionValue.ADAPTIVE.toNativeString());
 //		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.CHECK_DERIVATIVES_FOR_NANINF.toNativeString(), 
