@@ -358,6 +358,9 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		}
 
 		private TimeSeries getNewData(TraceKey key, int column, int length) {
+			if (column < 0) {
+				throw new IllegalArgumentException();
+			}
 			VectorBuilder timestamps = VectorBuilder.create(length);
 			VectorBuilder values = VectorBuilder.create(length);
 			List<TraceFilter> filters = key.getFilters();
@@ -671,6 +674,9 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		}
 		List<TraceKey> keys = new LinkedList<TraceKey>();
 		for (TraceToEntityMapping mapping : configuration.getMappings()) {
+			if (mapping.getTraceColumn() <= 0) {
+				 throw new IllegalArgumentException("The column in an entity mapping must be larger than 0.");
+			}
 			TraceKey k = new TraceKey(configuration.getMetric(), configuration.getUnit(), configuration.getInterval(),
 					mapping.getEntity(), configuration.getAggregation(), mapping.getFilters());
 			notifyListenersNewKey(k);
