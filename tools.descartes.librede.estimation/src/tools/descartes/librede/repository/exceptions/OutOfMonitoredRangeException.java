@@ -26,15 +26,24 @@
  */
 package tools.descartes.librede.repository.exceptions;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 
+/**
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public class OutOfMonitoredRangeException extends MonitoringRepositoryException {
 
 	private static final long serialVersionUID = 8959366514292578488L;
+	
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 	
 	private final Quantity<Time> requestedStartTime;
 	private final Quantity<Time> requestedEndTime;
@@ -78,10 +87,22 @@ public class OutOfMonitoredRangeException extends MonitoringRepositoryException 
 		msg.append("entity=").append(getEntity()).append(", ");
 		msg.append("metric=").append(getMetric()).append(", ");
 		msg.append("aggregation=").append(getAggregation()).append(", ");
-		msg.append("requested=[").append(requestedStartTime).append(", ").append(requestedEndTime).append("], ");
-		msg.append("actual=[").append(actualStartTime).append(", ").append(actualEndTime).append("]");
+		msg.append("requested=[");
+		appendTimestamp(msg, requestedStartTime);
+		msg.append(", ");
+		appendTimestamp(msg, requestedEndTime);
+		msg.append("], ");
+		msg.append("actual=[");
+		appendTimestamp(msg, actualStartTime);
+		msg.append(", ");
+		appendTimestamp(msg, actualEndTime);
+		msg.append("]");
 		msg.append("}");
 		return msg.toString();
+	}
+	
+	private void appendTimestamp(StringBuilder builder, Quantity<Time> timestamp) {
+		builder.append(dateFormat.format(new Date((long)timestamp.getValue(Time.MILLISECONDS))));
 	}
 
 }
