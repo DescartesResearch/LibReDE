@@ -125,21 +125,6 @@ public class WorkloadDescriptionDerivation {
 			callStack.pop();
 		}
 		
-		// Remove all empty services
-//		List<Service> nonemptyServices = new LinkedList<>();
-//		for (Service curService : completeServices) {
-//			if (curService.getTasks().isEmpty()) {
-//				List<ExternalCall> calls = new ArrayList<>(curService.getIncomingCalls());
-//				for (ExternalCall curCall : calls) {
-//					curCall.getService().getTasks().remove(curCall);
-//					mapping.unmapExternalCall(curCall);
-//				}
-//				mapping.unmapService(curService);
-//			} else {
-//				nonemptyServices.add(curService);
-//			}
-//		}
-		
 		addDelayResource();
 		
 		mapping.removeUnmappedEntites();
