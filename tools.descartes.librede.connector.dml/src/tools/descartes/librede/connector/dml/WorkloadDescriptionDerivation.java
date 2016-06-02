@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
 
 import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
 import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ModelVariableCharacterizationType;
@@ -64,6 +66,8 @@ import edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand;
 import edu.kit.ipd.descartes.mm.applicationlevel.system.System;
 import edu.kit.ipd.descartes.mm.deployment.Deployment;
 import edu.kit.ipd.descartes.mm.deployment.DeploymentContext;
+import edu.kit.ipd.descartes.mm.resourceconfiguration.ConfigurationSpecification;
+import edu.kit.ipd.descartes.mm.resourceconfiguration.ProcessingResourceSpecification;
 import edu.kit.ipd.descartes.mm.resourcelandscape.Container;
 import edu.kit.ipd.descartes.mm.resourcetype.ProcessingResourceType;
 import tools.descartes.librede.configuration.ConfigurationFactory;
@@ -91,6 +95,23 @@ public class WorkloadDescriptionDerivation {
 		completeServices.clear();
 		deploymentMapping.clear();
 		
+		// Search for all resources in the data center and create a mapping	
+		TreeIterator<EObject> dcIterator = deployment.getTargetResourceLandscape().eAllContents();
+		while (dcIterator.hasNext()) {
+			EObject curObject = dcIterator.next();
+			if (curObject instanceof Container) {
+				Container curContainer = (Container) curObject;
+				for (ConfigurationSpecification curSpec : curContainer.getConfigSpec()) {
+					if (curSpec instanceof ProcessingResourceSpecification) {
+						mapping.mapResource(curContainer, ((ProcessingResourceSpecification) curSpec).getProcessingResourceType());
+					}
+				}
+			}
+		}
+		
+		// We determine the transitive deployment context for each assembly context in a system.
+		// For instance an assembly context within a composite component is directly deployed, only
+		// the assembly context of the outermost composite component is referenced by a deployment context.
 		for (DeploymentContext depCtx : deployment.getDeploymentContexts()) {
 			addDeployment(depCtx.getAssemblyContext(), depCtx.getResourceContainer());
 		}
@@ -319,7 +340,7 @@ public class WorkloadDescriptionDerivation {
 				}
 			}
 		}
-		throw new IllegalStateException();
+		throw new IllegalStateException("Could not determine inner interface providing role for " + role.getName());
 	}
 	
 	private void visitInternalAction(Service parent, Deque<AssemblyContext> callStack, InterfaceProvidingRole role,
