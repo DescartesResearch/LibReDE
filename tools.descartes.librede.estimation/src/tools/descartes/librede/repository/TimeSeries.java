@@ -228,6 +228,7 @@ public class TimeSeries implements Cloneable {
 		TimeSeries ts = new TimeSeries(vertcat(timestamps, series.timestamps), vertcat(values, series.values));
 		ts.setStartTime(Math.min(getStartTime(), series.getStartTime()));
 		ts.setEndTime(Math.max(getEndTime(), series.getEndTime()));
+		ts.setInterpolationMethod(this.getInterpolationMethod());
 		return ts;
 	}
 	
