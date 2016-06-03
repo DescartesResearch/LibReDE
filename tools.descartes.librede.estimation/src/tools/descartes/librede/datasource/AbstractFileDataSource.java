@@ -230,6 +230,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 		private Map<TraceKey, Integer> traces = new HashMap<TraceKey, Integer>();
 		private String linePart = ""; // contains any incomplete line at the end
 										// of a buffer
+		private int readLines = 0;
 
 		public Channel(Stream input) throws IOException {
 			this.input = input;
@@ -286,12 +287,15 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 									line = linePart + line;
 									linePart = "";
 								}
+								
+								// New line parsed
+								readLines++;
 
 								// Call subclasses to parse the line
-								if (!skipLine(input, line)) {
+								if (!skipLine(input, line, readLines)) {
 									try {
 										synchronized(traces) {
-											timestampBuffer[lineCnt] = parse(input, line, valuesBuffer[lineCnt]);
+											timestampBuffer[lineCnt] = parse(input, line, valuesBuffer[lineCnt], readLines);
 											lineCnt++;
 											if (lineCnt >= MAX_BUFFERED_LINES) {
 												// If MAX_BUFFERED_LINES is
@@ -367,7 +371,9 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 			for (int i = 0; i < length; i++) {
 				if (applyFilters(filters, valuesBuffer[i])) {
 					try {
-						double value = parseNumber(input, valuesBuffer[i][column]);
+						// The read lines counter is already increased further so we need
+						// do recalculate the actual position in the file.
+						double value = parseNumber(input, valuesBuffer[i][column], readLines - (length - i - 1));
 						timestamps.add(timestampBuffer[i]);
 						values.add(value);
 					} catch (ParseException e) {
@@ -700,10 +706,12 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 *            source stream
 	 * @param line
 	 *            the content of the line
+	 * @param readLines
+	 *            the current line number
 	 * @return <code>true</code> if this line should be skipped,
 	 *         <code>false</code> otherwise.
 	 */
-	protected abstract boolean skipLine(Stream stream, String line);
+	protected abstract boolean skipLine(Stream stream, String line, int readLines);
 
 	/**
 	 * Parses the given line
@@ -712,25 +720,31 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 	 *            source stream
 	 * @param line
 	 *            the content of the line
+	 * @param readLines
+	 *            the current line number
 	 * @param values
 	 *            the column values parsed from this line. This array may be
 	 *            larger or smaller than the actual number of columns in this
 	 *            line. If large the additional columns can be ignored. If
 	 *            smaller, the array needs to be filled up with NaN values.
-	 * @return the timestamp of the obsevation in this line
+	 * @return the timestamp of the observation in this line
 	 * @throws ParseException
 	 *             if the line cannot be parsed correctly
 	 */
-	protected abstract double parse(Stream stream, String line, String[] values) throws ParseException;
+	protected abstract double parse(Stream stream, String line, String[] values, int readLines) throws ParseException;
 
 	/**
 	 * Parses a floating-point number from a string.
-	 * 
+	 *
+	 * @param stream
+	 *            source stream
 	 * @param value
 	 *            the floating point number in String representation.
+	 * @param readLines
+	 *            the current line number
 	 * @return a double value
 	 * @throws ParseException
 	 *             if the number cannot be parsed correctly
 	 */
-	protected abstract double parseNumber(Stream stream, String value) throws ParseException;
+	protected abstract double parseNumber(Stream stream, String value, int readLines) throws ParseException;
 }

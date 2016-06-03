@@ -226,7 +226,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 							IEstimationAlgorithm a = algorithmInstances.get(currentProblem);
 							if (a == null) {
 								// should only happen if initilization logic is incorrect.
-								log.error("Could not initialize apporach");
+								log.error("Could not initialize approach");
 								throw new EstimationException("Could not initialize approach" + Registry.INSTANCE.getDisplayName(getClass()));
 							}
 

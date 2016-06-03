@@ -62,7 +62,6 @@ public class CsvDataSource extends AbstractFileDataSource {
 	@ParameterDefinition(name = "NumberLocale", label = "Number Locale", required = false, defaultValue = "en_US")
 	private String numberLocale;
 	
-	private int readLines = 0;
 	private SimpleDateFormat timestampFormat;
 	private NumberFormat numberFormat;
 	private Unit<Time> dateUnit = Time.SECONDS;
@@ -105,8 +104,7 @@ public class CsvDataSource extends AbstractFileDataSource {
 	}
 
 	@Override
-	protected boolean skipLine(Stream stream, String line) {
-		readLines++;
+	protected boolean skipLine(Stream stream, String line, int readLines) {
 		if (skipFirstLine && readLines == 1) {
 			return true;			
 		}
@@ -120,7 +118,7 @@ public class CsvDataSource extends AbstractFileDataSource {
 	}
 
 	@Override
-	protected double parse(Stream stream, String line, String[] values) throws ParseException {
+	protected double parse(Stream stream, String line, String[] values, int readLines) throws ParseException {
 		if (!initialized) {
 			if (timestampFormatPattern != null && !timestampFormatPattern.isEmpty()) {
 				if (timestampFormatPattern.startsWith("[") && timestampFormatPattern.endsWith("]")) {
@@ -141,7 +139,7 @@ public class CsvDataSource extends AbstractFileDataSource {
 		}
 		String[] fields = line.split(separators);
 		if (fields.length >= 1) {
-			double timestamp = getTimestamp(stream, fields[0]);
+			double timestamp = getTimestamp(stream, fields[0], readLines);
 			if (Double.isNaN(timestamp)) {
 				throw new ParseException("Timestamp is invalid", readLines);
 			}
@@ -161,37 +159,37 @@ public class CsvDataSource extends AbstractFileDataSource {
 	}
 	
 	@Override
-	protected double parseNumber(Stream stream, String value) throws ParseException {
-		return getNumber(stream, value);
+	protected double parseNumber(Stream stream, String value, int readLines) throws ParseException {
+		return getNumber(stream, value, readLines);
 	}
 
-	private double getTimestamp(Stream stream, String timestamp) {
+	private double getTimestamp(Stream stream, String timestamp, int readLines) {
 		double time;
 		if (timestampFormat == null) {
-			time = getNumber(stream, timestamp);
+			time = getNumber(stream, timestamp, readLines);
 		} else {
 			try {
 				time = timestampFormat.parse(timestamp.trim()).getTime();
 			} catch(ParseException ex) {
-				logDiagnosis(stream, "Skipping line due to invalid timestamp: " + timestamp);
+				logDiagnosis(stream, "Skipping line due to invalid timestamp: " + timestamp, readLines);
 			}
 			return Double.NaN;
 		}
 		return dateUnit.convertTo(time, Time.SECONDS);
 	}
 
-	private double getNumber(Stream stream, String number) {
+	private double getNumber(Stream stream, String number, int readLines) {
 		if (!number.isEmpty()) {
 			try {
 				return numberFormat.parse(number.trim()).doubleValue();
 			} catch(ParseException ex) {
-				logDiagnosis(stream, "Error parsing number: " + number);
+				logDiagnosis(stream, "Error parsing number: " + number, readLines);
 			}
 		}
 		return Double.NaN;
 	}
 	
-	private void logDiagnosis(Stream stream, String message) {
+	private void logDiagnosis(Stream stream, String message, int readLines) {
 		StringBuilder diagnosis = new StringBuilder(message);
 		diagnosis.append(" (");
 		diagnosis.append(stream);
