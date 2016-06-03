@@ -46,9 +46,6 @@ import tools.descartes.librede.units.UnitsFactory;
  * The selector is used to collect TraceEvents from a set of data sources. It
  * provides an asynchronous interface to poll or wait for events.
  * 
- * The data source selector also keeps track of the current time of the
- * different data sources. If one data source falls behind by a certain time, it
- * will be ignored until new data is available.
  * 
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
