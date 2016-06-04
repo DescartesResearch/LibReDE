@@ -26,9 +26,12 @@
  */
 package tools.descartes.librede.models.observation.equations;
 
+import static tools.descartes.librede.linalg.LinAlg.zeros;
+
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
@@ -58,15 +61,27 @@ import tools.descartes.librede.units.Ratio;
  * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
  *
  */
-public class ResidenceTimeEquation extends ModelEquation {
+public abstract class ResidenceTimeEquation extends ModelEquation {
 
-	private final Service cls_r;
-	private final Resource res_i;
-	private final WaitingTimeEquation waitingTime;
-	private final Query<Scalar, Ratio> contentionQuery;
+	protected final Service cls_r;
+	protected final Resource res_i;
 
 	/**
-	 * Constructor.
+	 * Use the create method instead.
+	 * 
+	 * @param stateModel
+	 * @param service
+	 * @param resource
+	 * @param historicInterval
+	 */
+	private ResidenceTimeEquation(IStateModel<? extends IStateConstraint> stateModel, Service service, Resource resource, int historicInterval) {
+		super(stateModel, historicInterval);
+		this.cls_r = service;
+		this.res_i = resource;
+	}
+
+	/**
+	 * Factory method.
 	 * 
 	 * @param stateModel
 	 * @param cursor
@@ -82,60 +97,133 @@ public class ResidenceTimeEquation extends ModelEquation {
 	 *            a reference to a {@code WaitingTimeEquation} to calculate
 	 *            W_{i,r}
 	 */
-	public ResidenceTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
+	public static ResidenceTimeEquation create(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
 			Service service, Resource resource, int historicInterval, WaitingTimeEquation waitingTime) {
-		super(stateModel, historicInterval);
-		this.cls_r = service;
-		this.res_i = resource;
-		this.waitingTime = waitingTime;
-		addDataDependencies(waitingTime);
-
-		// The contention is the ratio of time a virtual CPU is waiting for a
-		// physical CPU.
-		contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average()
-				.using(cursor);
-		addDataDependency(contentionQuery);
+		if (resource.getSchedulingStrategy() == SchedulingStrategy.IS) {
+			return new ResidenceTimeEquationIS(stateModel, service, resource, historicInterval);
+		} else {
+			return new ResidenceTimeEquationQueueing(stateModel, cursor, service, resource, historicInterval, waitingTime);
+		}
 	}
-
-	/*
-	 * (non-Javadoc)
+	
+	/**
+	 * Used for Infinite Server strategy.
 	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.equations.ModelEquation#
-	 * getValue(tools.descartes.librede.models.State)
+	 * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+	 *
 	 */
-	public DerivativeStructure getValue(State state) {
-		DerivativeStructure D_ir = state.getVariable(res_i, cls_r).getDerivativeStructure();
-		DerivativeStructure T_q = waitingTime.getValue(state);
-		double C_i = contentionQuery.get(historicInterval).getValue();
-		return D_ir.add(T_q).multiply(1 + C_i);
-	}
+	private static class ResidenceTimeEquationIS extends ResidenceTimeEquation {
+		
+		private final Vector zeroBuffer;
+		
+		/**
+		 * @param stateModel
+		 * @param service
+		 * @param resource
+		 * @param historicInterval
+		 */
+		private ResidenceTimeEquationIS(IStateModel<? extends IStateConstraint> stateModel, Service service, Resource resource, int historicInterval) {
+			super(stateModel, service, resource, historicInterval);
+			int idx = stateModel.getStateVariableIndex(resource, service);
+			zeroBuffer = zeros(stateModel.getStateSize()).set(idx, 1.0);
+		}
+		
+		/* (non-Javadoc)
+		 * @see tools.descartes.librede.models.observation.equations.ModelEquation#getFactors()
+		 */
+		@Override
+		public Vector getFactors() {
+			return zeroBuffer;
+		}
 
-	/*
-	 * (non-Javadoc)
+		/* (non-Javadoc)
+		 * @see tools.descartes.librede.models.observation.equations.ModelEquation#isLinear()
+		 */
+		@Override
+		public boolean isLinear() {
+			return true;
+		}
+
+		/* (non-Javadoc)
+		 * @see tools.descartes.librede.models.observation.equations.ModelEquation#hasData()
+		 */
+		@Override
+		public boolean hasData() {
+			return true;
+		}
+	}
+	
+	/**
+	 * Used for all scheduling strategies with queueing.
 	 * 
-	 * @see
-	 * tools.descartes.librede.models.observation.equations.ModelEquation#
-	 * getFactors()
+	 * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+	 *
 	 */
-	@Override
-	public Vector getFactors() {
-		Vector factors = waitingTime.getFactors();
-		int idx = getStateModel().getStateVariableIndex(res_i, cls_r);
-		factors = factors.set(idx, factors.get(idx) + 1);
-		double C_i = contentionQuery.get(historicInterval).getValue();
-		return factors.times(1 + C_i);
-	}
+	private static class ResidenceTimeEquationQueueing extends ResidenceTimeEquation {
+		private final WaitingTimeEquation waitingTime;
+		private final Query<Scalar, Ratio> contentionQuery;
+		
+		/**
+		 * @param stateModel
+		 * @param cursor
+		 * @param service
+		 * @param resource
+		 * @param historicInterval
+		 * @param waitingTime
+		 */
+		public ResidenceTimeEquationQueueing(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
+				Service service, Resource resource, int historicInterval, WaitingTimeEquation waitingTime) {
+			super(stateModel, service, resource, historicInterval);
+			this.waitingTime = waitingTime;
+			addDataDependencies(waitingTime);
 
-	@Override
-	public boolean hasData() {
-		return waitingTime.hasData();
-	}
+			// The contention is the ratio of time a virtual CPU is waiting for a
+			// physical CPU.
+			contentionQuery = QueryBuilder.select(StandardMetrics.CONTENTION).in(Ratio.NONE).forResource(res_i).average()
+					.using(cursor);
+			addDataDependency(contentionQuery);
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * tools.descartes.librede.models.observation.equations.ModelEquation#
+		 * getValue(tools.descartes.librede.models.State)
+		 */
+		public DerivativeStructure getValue(State state) {
+			DerivativeStructure D_ir = state.getVariable(res_i, cls_r).getDerivativeStructure();
+			DerivativeStructure T_q = waitingTime.getValue(state);
+			double C_i = contentionQuery.get(historicInterval).getValue();
+			return D_ir.add(T_q).multiply(1 + C_i);
+		}
 
-	@Override
-	public boolean isLinear() {
-		return waitingTime.isLinear();
-	}	
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * tools.descartes.librede.models.observation.equations.ModelEquation#
+		 * getFactors()
+		 */
+		@Override
+		public Vector getFactors() {
+			Vector factors = waitingTime.getFactors();
+			int idx = getStateModel().getStateVariableIndex(res_i, cls_r);
+			factors = factors.set(idx, factors.get(idx) + 1);
+			double C_i = contentionQuery.get(historicInterval).getValue();
+			return factors.times(1 + C_i);
+		}
+
+		@Override
+		public boolean hasData() {
+			return waitingTime.hasData();
+		}
+
+		@Override
+		public boolean isLinear() {
+			return waitingTime.isLinear();
+		}	
+	}
 	
 	@Override
 	public boolean isConstant() {
