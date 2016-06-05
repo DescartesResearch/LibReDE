@@ -40,6 +40,7 @@ import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.bayesplusplus.backend.BayesPlusPlusLibrary;
 import tools.descartes.librede.bayesplusplus.backend.FCallback;
 import tools.descartes.librede.bayesplusplus.backend.HCallback;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Matrix;
@@ -48,6 +49,8 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.variables.OutputVariable;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
@@ -115,6 +118,12 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	
 	@ParameterDefinition(name = "ObserveNoiseCovariance", label = "Observe Noise Covariance", defaultValue = "0.0001")
 	private double observeNoiseCovarianceConstant = 0.0001;
+	
+	@ParameterDefinition(name = "BoundsFactor", label = "Bounds factor", defaultValue = "0.9")
+	private double boundsFactor = 0.9;
+	
+	@ParameterDefinition(name = "InitialBoundsDistance", label = "Initial bounds distance", defaultValue = "1e-4")
+	private double initialBoundsDistance = 1e-4;
 
 	private int stateSize;
 	private int outputSize;
@@ -123,8 +132,12 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	private Matrix stateNoiseCoupling;
 
 	private Vector observeNoise;
-	
+
+	private Vector lastEstimate;
 	private Matrix estimates;
+	
+	private Vector lowerStateBounds;
+	private Vector upperStateBounds;
 	
 	private boolean initialized = false;
 
@@ -240,8 +253,32 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		BayesPlusPlusLibrary.get_X(nativeScheme, stateCovarianceBuffer);
 		Matrix P = nativeMatrix(stateSize, stateSize, stateCovarianceBuffer);
 		Matrix symP = (P.plus(transpose(P))).times(0.5);
-//		toNative(stateCovarianceBuffer, symP);
-//		BayesPlusPlusLibrary.set_X(nativeScheme, stateCovarianceBuffer, stateSize);
+		toNative(stateCovarianceBuffer, symP);
+		BayesPlusPlusLibrary.set_X(nativeScheme, stateCovarianceBuffer, stateSize);
+		
+		/*
+		 * Truncate estimate as described in: Tao Zheng; Woodside, M.; Litoiu, M.,
+		 * "Performance Model Estimation and Tracking Using Optimal Filters,"
+		 * Software Engineering, IEEE Transactions on , vol.34,
+		 * no.3, pp.391,406, May-June 2008
+		 */
+		BayesPlusPlusLibrary.get_x(nativeScheme, stateBuffer);
+		final Vector x = nativeVector(stateSize, stateBuffer);		
+		toNative(stateBuffer, truncateState(x));
+		BayesPlusPlusLibrary.set_x(nativeScheme, stateBuffer, stateSize);
+	}
+	
+	private Vector truncateState(final Vector x) {
+		final Vector x_lower = lowerStateBounds.times(boundsFactor).plus(lastEstimate.times(1 - boundsFactor));
+		final Vector x_upper = upperStateBounds.times(boundsFactor).plus(lastEstimate.times(1 - boundsFactor));
+		
+		Vector x_truncated = vector(stateSize, new VectorFunction() {			
+			@Override
+			public double cell(int row) {
+				return Math.min(x_upper.get(row), Math.max(x_lower.get(row), x.get(row)));
+			}
+		});
+		return x_truncated;
 	}
 
 	private Vector getCurrentEstimate() {		
@@ -295,6 +332,18 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		this.stateCovarianceBuffer = NativeHelper.allocateDoubleArray(stateSize * stateSize);
 		
 		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
+		
+		// Initialized the state bounds
+		upperStateBounds = vector(stateSize, Double.POSITIVE_INFINITY);
+		lowerStateBounds = vector(stateSize, 0);
+		for (IStateConstraint curConstraint : problem.getStateModel().getConstraints()) {
+			if (curConstraint instanceof IStateBoundsConstraint) {
+				ResourceDemand demand = ((IStateBoundsConstraint) curConstraint).getStateVariable();
+				int idx = getStateModel().getStateVariableIndex(demand.getResource(), demand.getService());
+				upperStateBounds = upperStateBounds.set(idx, curConstraint.getUpperBound());
+				lowerStateBounds = lowerStateBounds.set(idx, curConstraint.getLowerBound());
+			}
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -305,12 +354,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		if (!initialized) {
 			// First we need to obtain some observations to be able to
 			// determine a good initial state.
-			Vector initialState = getStateModel().getInitialState();
+			Vector initialState = truncateIntialState(getStateModel().getInitialState());
 			if (!initialState.isEmpty()) {
 				// initial state could be determined
 				initNativeStateModel();
 				initNativeObservationModel();
 				initNativeKalmanFilter(initialState);
+				lastEstimate = initialState;
 				initialized = true;
 			}
 		} else {	
@@ -323,6 +373,27 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 			Vector cur = getCurrentEstimate();
 			estimates = estimates.circshift(1).setRow(0, cur);
 		}
+	}
+	
+	/*
+	 * Truncates the initial state so that it is within the bounds, 
+	 * including a certain buffer distance (configurable).
+	 */
+	private Vector truncateIntialState(final Vector initialState) {
+		Vector truncatedInitialState = vector(initialState.rows(), new VectorFunction() {			
+			@Override
+			public double cell(int row) {
+				double value = initialState.get(row);
+				
+				if ((upperStateBounds.get(row) - initialBoundsDistance) < value) {
+					return upperStateBounds.get(row) - initialBoundsDistance;
+				} else if ((lowerStateBounds.get(row) + initialBoundsDistance) > value) {
+					return (lowerStateBounds.get(row) + initialBoundsDistance);
+				}
+				return value;
+			}
+		});
+		return truncatedInitialState;
 	}
 
 	/*
