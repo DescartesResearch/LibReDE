@@ -28,18 +28,25 @@ package tools.descartes.librede.approach;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.linalg.LinAlg;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
+import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.IOutputWeightingFunction;
 import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
 import tools.descartes.librede.models.observation.equations.ResponseTimeEquation;
@@ -55,7 +62,18 @@ import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstrai
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.Query;
+import tools.descartes.librede.repository.QueryBuilder;
+import tools.descartes.librede.units.RequestRate;
 
+/**
+ * See:
+ * Parameter inference of queueing models for it systems using end-to-end measurements.
+ * Z Liu, L Wynter, CH Xia, F Zhang - Performance Evaluation, 2006
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 @Component(displayName = "Recursive Optimization using Response Times and Utilization")
 public class LiuOptimizationApproach extends AbstractEstimationApproach {
 	
@@ -84,7 +102,12 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 
 	@Override
 	protected IObservationModel<?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel observationModel = new VectorObservationModel();
+		// Weight the individual equations by the throughput of the corresponding entities.
+		// See "Parameter inference of queueing models for it systems using end-to-end measurements.
+	    // Z Liu, L Wynter, CH Xia, F Zhang - Performance Evaluation, 2006" for details
+		ThroughputWeights weightsFunction = new ThroughputWeights();
+		VectorObservationModel observationModel = new VectorObservationModel(weightsFunction);
+		List<ModelEntity> entities = new LinkedList<>();
 		for (int i = 0; i < getEstimationWindow(); i++) {
 			for (Service service : stateModel.getUserServices()) {
 				// Current assumption is that services which are not called by others
@@ -94,21 +117,61 @@ public class LiuOptimizationApproach extends AbstractEstimationApproach {
 				if (service.getIncomingCalls().isEmpty()) {
 					ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, true, i);
 					observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, service, i), func));
+					entities.add(service);
 				}
 			}
 			for (Resource resource : stateModel.getResources()) {
 				if (resource.getSchedulingStrategy() != SchedulingStrategy.IS) {
 					UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, resource, i);
 					observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, resource, i), func));
+					entities.add(resource);
 				}
 			}
 		}
+		weightsFunction.setEntities(cursor, entities);
 		return observationModel;
 	}
 
 	@Override
 	protected IEstimationAlgorithm getEstimationAlgorithm(EstimationAlgorithmFactory factory) {
 		return factory.createInstance(IConstrainedNonLinearOptimizationAlgorithm.class);
+	}
+	
+	private class ThroughputWeights implements IOutputWeightingFunction {
+
+		private Query<Vector, RequestRate> tputQuery;
+		private List<ModelEntity> entities;
+		
+		public void setEntities(IRepositoryCursor cursor, List<ModelEntity> entities) {
+			this.entities = entities;
+			Set<Service> services = new HashSet<>();
+			for (ModelEntity curEntity : entities) {
+				if (curEntity instanceof Service) {
+					services.add((Service)curEntity);
+				}
+			}
+			tputQuery = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(services).average().using(cursor);
+		}
+
+		@Override
+		public Vector getOutputWheights() {
+			Vector tput = tputQuery.execute();
+			double sumTput = LinAlg.sum(tput).get(0);
+			VectorBuilder weights = VectorBuilder.create(entities.size());
+			for (ModelEntity curEntity : entities) {
+				if (curEntity instanceof Service) {
+					if (sumTput > 0.0) {
+						weights.add(tput.get(tputQuery.indexOf(curEntity)) / sumTput);
+					} else {
+						weights.add(0);
+					}
+				} else if (curEntity instanceof tools.descartes.librede.configuration.Resource) {
+					weights.add(1);
+				}
+			}
+			return weights.toVector();
+		}
+		
 	}
 
 }
