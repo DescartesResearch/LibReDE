@@ -64,7 +64,7 @@ public class DerivationRule<D extends Dimension> extends Rule implements Compara
 	}
 	
 	public DerivationRule<D> requiring(Metric<?> metric, Aggregation aggregation, DependencyScope scope) {
-		addDependency(metric, aggregation);
+		addDependency(metric, aggregation, scope);
 		return this;
 	}
 	
