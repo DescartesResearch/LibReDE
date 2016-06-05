@@ -70,10 +70,7 @@ import edu.kit.ipd.descartes.mm.resourceconfiguration.ConfigurationSpecification
 import edu.kit.ipd.descartes.mm.resourceconfiguration.ProcessingResourceSpecification;
 import edu.kit.ipd.descartes.mm.resourcelandscape.Container;
 import edu.kit.ipd.descartes.mm.resourcetype.ProcessingResourceType;
-import tools.descartes.librede.configuration.ConfigurationFactory;
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 
 public class WorkloadDescriptionDerivation {
@@ -125,10 +122,7 @@ public class WorkloadDescriptionDerivation {
 			callStack.pop();
 		}
 		
-		addDelayResource();
-		
 		mapping.removeUnmappedEntites();
-		
 	}
 	
 	private void addDeployment(AssemblyContext ctx, Container container) {
@@ -137,28 +131,6 @@ public class WorkloadDescriptionDerivation {
 			CompositeComponent composite = (CompositeComponent)ctx.getEncapsulatedComponent();
 			for (AssemblyContext child : composite.getAssemblyContexts()) {
 				addDeployment(child, container);
-			}
-		}
-	}
-	
-	private void addDelayResource() {
-		if (delayResource == null) {
-			delayResource = ConfigurationFactory.eINSTANCE.createResource();
-			delayResource.setName("Delay");
-			delayResource.setSchedulingStrategy(SchedulingStrategy.IS);
-			delayResource.setNumberOfServers(1);
-			mapping.getWorkload().getResources().add(delayResource);
-		}
-		
-		for (ModelEntity curEntity : mapping.getNewEntities()) {
-			if (curEntity instanceof Service) {
-				Service curService = (Service)curEntity;
-				if (curService.getIncomingCalls().isEmpty()) {
-					tools.descartes.librede.configuration.ResourceDemand delayDemand = ConfigurationFactory.eINSTANCE.createResourceDemand();
-					delayDemand.setName("Delay");
-					delayDemand.setResource(delayResource);
-					curService.getTasks().add(delayDemand);
-				}
 			}
 		}
 	}
