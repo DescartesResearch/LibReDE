@@ -29,6 +29,8 @@ package tools.descartes.librede.repository.adapters;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EReference;
+
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Service;
@@ -40,9 +42,9 @@ import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.IncomingCallsSummationHandler;
 import tools.descartes.librede.repository.handlers.RequestRateAggregationHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestRate;
 
 public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
@@ -65,7 +67,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 					.build(new RequestRateAggregationHandler(StandardMetrics.DEPARTURES)),
 				DerivationRule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE,
-							DependencyScope.dynamicScope().skipRoot().include(ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS))
+							DependencyScope.dynamicScope().skipRoot().include(new EReference[] { ConfigurationPackage.Literals.SERVICE__INCOMING_CALLS }, new EReference[] { ConfigurationPackage.Literals.EXTERNAL_CALL__CALLED_SERVICE } ))
 					.priority(0)
 					.build(new IncomingCallsSummationHandler()),
 				DerivationRule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE)

@@ -131,7 +131,7 @@ public class ResponseTimeEquation extends ModelEquation {
 				WaitingTimeEquation waitingTime = WaitingTimeEquation.create(getStateModel(), cursor, serv, res,
 						historicInterval, utilFunction);
 				currentMap.put(serv,
-						new ResidenceTimeEquation(stateModel, cursor, serv, res, historicInterval, waitingTime));
+						ResidenceTimeEquation.create(stateModel, cursor, serv, res, historicInterval, waitingTime));
 			}
 		}
 
