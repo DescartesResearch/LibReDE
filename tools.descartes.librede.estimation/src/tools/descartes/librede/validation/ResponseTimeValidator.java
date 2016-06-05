@@ -82,17 +82,19 @@ public class ResponseTimeValidator implements IValidator {
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
-			ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, srv, 0);
-			ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false, 0);
-			dependencies.addAll(rt.getDataDependencies());
-			dependencies.addAll(rtValue.getDataDependencies());
-			respEq.add(rt);
-			respObservation.add(rtValue);
-			this.services.add(srv);
+			if (srv.getIncomingCalls().isEmpty()) {
+				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, srv, 0);
+				ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false, 0);
+				dependencies.addAll(rt.getDataDependencies());
+				dependencies.addAll(rtValue.getDataDependencies());
+				respEq.add(rt);
+				respObservation.add(rtValue);
+				this.services.add(srv);
+			}
 		}
-		allErrors = MatrixBuilder.create(stateModel.getUserServices().size());	
-		predictedRespTimes = MatrixBuilder.create(stateModel.getUserServices().size());	
-		observedRespTimes = MatrixBuilder.create(stateModel.getUserServices().size());	
+		allErrors = MatrixBuilder.create(this.services.size());	
+		predictedRespTimes = MatrixBuilder.create(this.services.size());	
+		observedRespTimes = MatrixBuilder.create(this.services.size());	
 	}
 	
 	@Override
@@ -102,6 +104,7 @@ public class ResponseTimeValidator implements IValidator {
 	
 	public void predict(Vector state) {
 		State x = new State(stateModel, state);
+		stateModel.step(x);
 		double[] relErr = new double[respEq.size()];
 		double[] real = new double[respEq.size()];
 		double[] actual = new double[respEq.size()];
