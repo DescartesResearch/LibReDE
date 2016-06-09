@@ -753,30 +753,6 @@ public class LinAlg {
 	/**
 	 * Creates a new n x 1 vector filled with the specified values.
 	 * 
-	 * @param rows
-	 *            number of rows (rows >= 0).
-	 * @param value
-	 *            the value
-	 * @return a <code>Vector</code>, or <code>Scalar</code> instance.
-	 * @throws IllegalArgumentException
-	 *             if rows < 0.
-	 * @since 1.0
-	 */
-	public static Vector vector(int rows, double value) {
-		if (rows < 0) {
-			throw new IllegalArgumentException();
-		} else if (rows == 0) {
-			return Empty.EMPTY;
-		} else if (rows == 1) {
-			return scalar(value);
-		} else {
-			return FACTORY.createVector(rows, value);
-		}
-	}
-
-	/**
-	 * Creates a new n x 1 vector filled with the specified values.
-	 * 
 	 * @param values
 	 *            a double array containing the values of the vector.
 	 * @return a <code>Vector</code>, or <code>Scalar</code> instance.
