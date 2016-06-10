@@ -28,6 +28,7 @@ package tools.descartes.librede.datasource;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -180,6 +181,16 @@ public class DataSourceSelector implements Closeable, IDataSourceListener {
 	public TraceEvent take() throws InterruptedException {
 		checkIsOpen();
 		return events.take();
+	}
+	
+	/**
+	 * Reads all trace events and puts them in the collection.
+	 * 
+	 * @param events the output collection
+	 */
+	public void drainTo(Collection<? super TraceEvent> events) {
+		checkIsOpen();
+		this.events.drainTo(events);
 	}
 
 	public void add(IDataSource datasource) {
