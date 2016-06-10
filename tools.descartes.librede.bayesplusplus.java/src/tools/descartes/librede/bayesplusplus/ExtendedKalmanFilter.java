@@ -334,8 +334,8 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
 		
 		// Initialized the state bounds
-		upperStateBounds = vector(stateSize, Double.POSITIVE_INFINITY);
-		lowerStateBounds = vector(stateSize, 0);
+		upperStateBounds = (Vector) matrix(stateSize, 1, Double.POSITIVE_INFINITY);
+		lowerStateBounds = (Vector) matrix(stateSize, 1, 0);
 		for (IStateConstraint curConstraint : problem.getStateModel().getConstraints()) {
 			if (curConstraint instanceof IStateBoundsConstraint) {
 				ResourceDemand demand = ((IStateBoundsConstraint) curConstraint).getStateVariable();

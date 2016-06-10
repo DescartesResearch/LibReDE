@@ -43,16 +43,12 @@ import org.eclipse.emf.ecore.EObject;
 import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
 import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ModelVariableCharacterizationType;
 import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ParameterdependenciesFactory;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyConnector;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyContext;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.BasicComponent;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.ComposedStructure;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.CompositeComponent;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.InterfaceProvidingRole;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.InterfaceRequiringRole;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.ProvidingDelegationConnector;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.RepositoryComponent;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.RequiringDelegationConnector;
 import edu.kit.ipd.descartes.mm.applicationlevel.repository.Signature;
 import edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.AbstractAction;
 import edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.BranchAction;
@@ -65,7 +61,6 @@ import edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.LoopAction;
 import edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand;
 import edu.kit.ipd.descartes.mm.applicationlevel.system.System;
 import edu.kit.ipd.descartes.mm.deployment.Deployment;
-import edu.kit.ipd.descartes.mm.deployment.DeploymentContext;
 import edu.kit.ipd.descartes.mm.resourceconfiguration.ConfigurationSpecification;
 import edu.kit.ipd.descartes.mm.resourceconfiguration.ProcessingResourceSpecification;
 import edu.kit.ipd.descartes.mm.resourcelandscape.Container;
@@ -106,12 +101,7 @@ public class WorkloadDescriptionDerivation {
 			}
 		}
 		
-		// We determine the transitive deployment context for each assembly context in a system.
-		// For instance an assembly context within a composite component is directly deployed, only
-		// the assembly context of the outermost composite component is referenced by a deployment context.
-		for (DeploymentContext depCtx : deployment.getDeploymentContexts()) {
-			addDeployment(depCtx.getAssemblyContext(), depCtx.getResourceContainer());
-		}
+		deploymentMapping.putAll(DmlHelper.determineDeploymentMapping(deployment));
 
 		Deque<AssemblyContext> callStack = new ArrayDeque<>();
 		System system = deployment.getSystem();
@@ -125,15 +115,7 @@ public class WorkloadDescriptionDerivation {
 		mapping.removeUnmappedEntites();
 	}
 	
-	private void addDeployment(AssemblyContext ctx, Container container) {
-		deploymentMapping.put(ctx, container);
-		if (ctx.getEncapsulatedComponent() instanceof CompositeComponent) {
-			CompositeComponent composite = (CompositeComponent)ctx.getEncapsulatedComponent();
-			for (AssemblyContext child : composite.getAssemblyContexts()) {
-				addDeployment(child, container);
-			}
-		}
-	}
+
 	
 	private void visitAssemblyContext(Deque<AssemblyContext> callStack, Container deploymentTarget) {
 		AssemblyContext curAssembly = callStack.peek();
@@ -247,7 +229,8 @@ public class WorkloadDescriptionDerivation {
 	private void visitExternalCallAction(Service service, Deque<AssemblyContext> callStack, ExternalCallAction action) {
 		InterfaceRequiringRole requiringRole = action.getExternalCall().getInterfaceRequiringRole();
 		Deque<AssemblyContext> calledStack = new ArrayDeque<>(callStack);
-		InterfaceProvidingRole calledProvidingRole = getCalledInterfaceProvidingRole(calledStack, requiringRole);
+		InterfaceProvidingRole calledProvidingRole = DmlHelper.getCalledInterfaceProvidingRole(calledStack,
+				requiringRole);
 		
 		if (calledProvidingRole != null) {
 			ComponentInstanceReference instance = getComponentInstance(calledStack);
@@ -261,45 +244,6 @@ public class WorkloadDescriptionDerivation {
 			log.warn("No providing assembly context found for requiring role " + requiringRole.getName());
 		}
 	}
-	
-	private InterfaceProvidingRole getCalledInterfaceProvidingRole(Deque<AssemblyContext> callStack,
-			InterfaceRequiringRole requiringRole) {
-		AssemblyContext curAssembly = callStack.pop();
-		ComposedStructure parent = (ComposedStructure) curAssembly.eContainer();
-		for (AssemblyConnector connector : parent.getAssemblyConnectors()) {
-			if (connector.getInterfaceRequiringRole().equals(requiringRole)) {
-				callStack.push(connector.getProvidingAssemblyContext());
-				return getInnerInterfaceProvidingRole(callStack, connector.getInterfaceProvidingRole());
-			}
-		}
-		for (RequiringDelegationConnector connector : parent.getRequiringDelegationConnectors()) {
-			if (connector.getInnerInterfaceRequiringRole().equals(requiringRole)) {
-				// We have to go up one level in the callStack to determine the
-				// called component
-				// callStack.pop();
-				return getCalledInterfaceProvidingRole(callStack, connector.getOuterInterfaceRequiringRole());
-			}
-		}
-		return null;
-	}
-	
-	private InterfaceProvidingRole getInnerInterfaceProvidingRole(Deque<AssemblyContext> callStack,
-			InterfaceProvidingRole role) {
-		AssemblyContext ctx = callStack.peek();
-		if (ctx.getEncapsulatedComponent() instanceof BasicComponent) {
-			return role;
-		} else {
-			ComposedStructure composite = (ComposedStructure) ctx.getEncapsulatedComponent();
-			for (ProvidingDelegationConnector del : composite.getProvidingDelegationConnectors()) {
-				if (del.getOuterInterfaceProvidingRole().equals(role)) {
-					callStack.push(del.getAssemblyContext());
-					return getInnerInterfaceProvidingRole(callStack, del.getInnerInterfaceProvidingRole());
-				}
-			}
-		}
-		throw new IllegalStateException("Could not determine inner interface providing role for " + role.getName());
-	}
-	
 	private void visitInternalAction(Service parent, Deque<AssemblyContext> callStack, InterfaceProvidingRole role,
 			Signature signature, Container deploymentTarget, InternalAction action, String path) {
 		for (ResourceDemand demand : action.getResourceDemand()) {
