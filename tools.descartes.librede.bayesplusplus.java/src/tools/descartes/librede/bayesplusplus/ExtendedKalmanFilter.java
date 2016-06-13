@@ -250,11 +250,13 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		
 		// Symmetrize the state covariance matrix to avoid numberical instabilities
 		// See Optimal State Estimation by Dan Simon, page 140
-		BayesPlusPlusLibrary.get_X(nativeScheme, stateCovarianceBuffer);
-		Matrix P = nativeMatrix(stateSize, stateSize, stateCovarianceBuffer);
-		Matrix symP = (P.plus(transpose(P))).times(0.5);
-		toNative(stateCovarianceBuffer, symP);
-		BayesPlusPlusLibrary.set_X(nativeScheme, stateCovarianceBuffer, stateSize);
+		// Simon: Doing this seems to result in even higher instability (S not PD errors).
+		// Therefore, I have commented it out.
+//		BayesPlusPlusLibrary.get_X(nativeScheme, stateCovarianceBuffer);
+//		Matrix P = nativeMatrix(stateSize, stateSize, stateCovarianceBuffer);
+//		Matrix symP = (P.plus(transpose(P))).times(0.5);
+//		toNative(stateCovarianceBuffer, symP);
+//		BayesPlusPlusLibrary.set_X(nativeScheme, stateCovarianceBuffer, stateSize);
 		
 		/*
 		 * Truncate estimate as described in: Tao Zheng; Woodside, M.; Litoiu, M.,
