@@ -28,9 +28,7 @@ package tools.descartes.librede.bayesplusplus;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.nanmean;
-import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.nativehelper.NativeHelper.nativeMatrix;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 
@@ -354,6 +352,9 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	@Override
 	public void update() throws EstimationException {
 		if (!initialized) {
+			// IMPORTANT: Call step so that invocation graph is correctly initialized.
+			getStateModel().step(null);
+			
 			// First we need to obtain some observations to be able to
 			// determine a good initial state.
 			Vector initialState = truncateIntialState(getStateModel().getInitialState());
