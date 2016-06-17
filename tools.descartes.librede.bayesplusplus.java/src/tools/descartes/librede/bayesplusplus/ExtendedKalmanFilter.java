@@ -366,16 +366,16 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 				lastEstimate = initialState;
 				initialized = true;
 			}
-		} else {	
-			predict();
-	
-			observe(getObservationModel().getObservedOutput());
-	
-			updateState();
-			
-			Vector cur = getCurrentEstimate();
-			estimates = estimates.circshift(1).setRow(0, cur);
 		}
+
+		predict();
+
+		observe(getObservationModel().getObservedOutput());
+
+		updateState();
+		
+		Vector cur = getCurrentEstimate();
+		estimates = estimates.circshift(1).setRow(0, cur);
 	}
 	
 	/*
