@@ -28,6 +28,9 @@
  */
 package tools.descartes.librede.configuration;
 
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -39,6 +42,7 @@ package tools.descartes.librede.configuration;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.ExternalCall#getCalledService <em>Called Service</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.ExternalCall#getDelay <em>Delay</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getExternalCall()
@@ -73,5 +77,31 @@ public interface ExternalCall extends Task {
 	 * @generated
 	 */
 	void setCalledService(Service value);
+
+	/**
+	 * Returns the value of the '<em><b>Delay</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Delay</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Delay</em>' containment reference.
+	 * @see #setDelay(Quantity)
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getExternalCall_Delay()
+	 * @model containment="true"
+	 * @generated
+	 */
+	Quantity<Time> getDelay();
+
+	/**
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.ExternalCall#getDelay <em>Delay</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Delay</em>' containment reference.
+	 * @see #getDelay()
+	 * @generated
+	 */
+	void setDelay(Quantity<Time> value);
 
 } // ExternalCall

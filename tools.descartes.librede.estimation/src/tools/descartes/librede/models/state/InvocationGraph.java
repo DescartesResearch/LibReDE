@@ -46,11 +46,13 @@ import tools.descartes.librede.repository.rules.DataDependency;
 import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.repository.rules.IDependencyTarget;
 import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.Time;
 
 public class InvocationGraph implements IDependencyTarget {
 	private final int historySize;
 	private final Query<Vector, RequestCount> visitCountQuery;
 	private final double[][][] invocations;
+	private final double[][] delays;
 	private final boolean[][] reachability;
 	private final List<Service> services;
 	private final Map<Service, Integer> servicesToIdx = new HashMap<>();
@@ -70,6 +72,7 @@ public class InvocationGraph implements IDependencyTarget {
 			servicesToIdx.put(services.get(i), i);
 		}
 		invocations = new double[historySize][serviceCount][serviceCount];
+		delays = new double[serviceCount][serviceCount];
 		List<ExternalCall> calls = getExternalCalls(services);
 		this.externalCalls = !calls.isEmpty();
 		if (!externalCalls) {
@@ -80,6 +83,26 @@ public class InvocationGraph implements IDependencyTarget {
 			visitCountQuery = QueryBuilder.select(StandardMetrics.VISITS).in(RequestCount.REQUESTS)
 					.forExternalCalls(calls).average().using(cursor);
 		}
+		
+		initDelays();
+	}
+	
+	private void initDelays() {
+		for (Service curService : services) {
+			for (ExternalCall curCall : curService.getOutgoingCalls()) {
+				if (curCall.getDelay() != null) {
+					int idxA = servicesToIdx.get(curService);
+					int idxB = servicesToIdx.get(curCall.getCalledService());
+					delays[idxA][idxB] = curCall.getDelay().getValue(Time.SECONDS);
+				}
+			}
+		}
+	}
+	
+	public double getInvocationDelay(Service a, Service b) {
+		int idxA = servicesToIdx.get(a);
+		int idxB = servicesToIdx.get(b);
+		return delays[idxA][idxB];
 	}
 	
 	public double getInvocationCount(Service a, Service b) {

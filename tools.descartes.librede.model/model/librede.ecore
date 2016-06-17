@@ -192,6 +192,11 @@
   <eClassifiers xsi:type="ecore:EClass" name="ExternalCall" eSuperTypes="#//Task">
     <eStructuralFeatures xsi:type="ecore:EReference" name="calledService" lowerBound="1"
         eType="#//Service" eOpposite="#//Service/incomingCalls"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="delay" containment="true">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Quantity">
+        <eTypeArguments eClassifier="ecore:EClass units.ecore#//Time"/>
+      </eGenericType>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CompositeService" eSuperTypes="#//Service">
     <eStructuralFeatures xsi:type="ecore:EReference" name="subServices" upperBound="-1"

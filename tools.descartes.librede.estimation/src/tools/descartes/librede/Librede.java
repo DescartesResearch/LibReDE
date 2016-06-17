@@ -575,77 +575,81 @@ public class Librede {
 		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, MatrixBuilder> meanPredictions = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
-
-		MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
-		for (Class<? extends IEstimationApproach> approach : approaches) {
-			MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
-			for (int i = 0; i < results.getNumberOfFolds(); i++) {
-				ResultTable curFold = results.getEstimates(approach, i);
-				lastEstimates.addRow(curFold.getLastEstimates());
-			}
-			Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
-			if (lastEstimatesMatrix.isEmpty()) {
-				log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
-			} else {
-				meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
-			}
-
-			for (Class<? extends IValidator> validator : validators) {
-				MatrixBuilder errorsBuilder = null;
-				MatrixBuilder predictionsBuilder = null;
+		
+		if (variables != null) {
+			MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
+			for (Class<? extends IEstimationApproach> approach : approaches) {
+				MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
 				for (int i = 0; i < results.getNumberOfFolds(); i++) {
 					ResultTable curFold = results.getEstimates(approach, i);
-					Vector curErr = curFold.getValidationErrors(validator);
-					if (errorsBuilder == null) {
-						errorsBuilder = MatrixBuilder.create(curErr.rows());
-						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
-					}
-					errorsBuilder.addRow(curErr);
-					Vector curPred = curFold.getValidationPredictions(validator);
-					if (predictionsBuilder == null) {
-						predictionsBuilder = MatrixBuilder.create(curPred.rows());
-					}
-					predictionsBuilder.addRow(curPred);
+					lastEstimates.addRow(curFold.getLastEstimates());
 				}
-
-				Matrix errors = errorsBuilder.toMatrix();
-				Matrix predictions = predictionsBuilder.toMatrix();
-				if (!errors.isEmpty() && !predictions.isEmpty()) {
-					Vector curMeanErr = LinAlg.mean(errors);
-					Vector curMeanPred = LinAlg.mean(predictions);
-					if (!meanErrors.containsKey(validator)) {
-						meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
-						meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
-					}
-					meanErrors.get(validator).addRow(curMeanErr);
-					meanPredictions.get(validator).addRow(curMeanPred);
+				Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
+				if (lastEstimatesMatrix.isEmpty()) {
+					log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
+				} else {
+					meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
 				}
+	
+				for (Class<? extends IValidator> validator : validators) {
+					MatrixBuilder errorsBuilder = null;
+					MatrixBuilder predictionsBuilder = null;
+					for (int i = 0; i < results.getNumberOfFolds(); i++) {
+						ResultTable curFold = results.getEstimates(approach, i);
+						Vector curErr = curFold.getValidationErrors(validator);
+						if (errorsBuilder == null) {
+							errorsBuilder = MatrixBuilder.create(curErr.rows());
+							validatedEntities.put(validator, curFold.getValidatedEntities(validator));
+						}
+						errorsBuilder.addRow(curErr);
+						Vector curPred = curFold.getValidationPredictions(validator);
+						if (predictionsBuilder == null) {
+							predictionsBuilder = MatrixBuilder.create(curPred.rows());
+						}
+						predictionsBuilder.addRow(curPred);
+					}
+	
+					Matrix errors = errorsBuilder.toMatrix();
+					Matrix predictions = predictionsBuilder.toMatrix();
+					if (!errors.isEmpty() && !predictions.isEmpty()) {
+						Vector curMeanErr = LinAlg.mean(errors);
+						Vector curMeanPred = LinAlg.mean(predictions);
+						if (!meanErrors.containsKey(validator)) {
+							meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
+							meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
+						}
+						meanErrors.get(validator).addRow(curMeanErr);
+						meanPredictions.get(validator).addRow(curMeanPred);
+					}
+				}
+	
 			}
 
-		}
 
-		// Estimates
-		System.out.println("Estimates");
-		System.out.println("=========");
-		printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
-		System.out.println();
+			// Estimates
+			System.out.println("Estimates");
+			System.out.println("=========");
+			printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
+			System.out.println();
 
-		if (validators.size() > 0) {
-			// Cross-Validation Results
-			System.out.println("Cross-Validation Results:");
-			System.out.println("=========================");
 
-			for (Class<? extends IValidator> validator : validators) {
-				String name = Registry.INSTANCE.getDisplayName(validator);
-				System.out.println(name + ":");
-				if (meanErrors.containsKey(validator)) {
-
-					Matrix errors = meanErrors.get(validator).toMatrix();
-					Matrix predictions = meanPredictions.get(validator).toMatrix();
-					printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors);
-					System.out.println();
-				} else {
-					System.out.println("No results.");
+			if (validators.size() > 0) {
+				// Cross-Validation Results
+				System.out.println("Cross-Validation Results:");
+				System.out.println("=========================");
+	
+				for (Class<? extends IValidator> validator : validators) {
+					String name = Registry.INSTANCE.getDisplayName(validator);
+					System.out.println(name + ":");
+					if (meanErrors.containsKey(validator)) {
+	
+						Matrix errors = meanErrors.get(validator).toMatrix();
+						Matrix predictions = meanPredictions.get(validator).toMatrix();
+						printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors);
+						System.out.println();
+					} else {
+						System.out.println("No results.");
+					}
 				}
 			}
 		}
