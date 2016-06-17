@@ -185,7 +185,12 @@ public class Librede {
 		
 		
 		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(), existingDatasources);
-		var.getRepo().setCurrentTime(endTime);
+		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
+			// do not progress further than the configured end timestamp.
+			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
+		} else {		
+			var.getRepo().setCurrentTime(endTime);
+		}
 
 		if (!var.getConf().getValidation().isValidateEstimates()) {
 			try {
