@@ -114,6 +114,7 @@ import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.CrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
@@ -399,16 +400,16 @@ public class Librede {
 			log.info("Run estimation approach " + approachName);
 
 			List<IValidator> validators = initValidators(var.getConf(),
-					(CrossValidationCursor) var.getCursor(currentConf.getType()));
+					(ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()));
 
 
 			for (int i = 0; i < var.getConf().getValidation().getValidationFolds(); i++) {
 				log.info("Start repetition " + (i + 1));
-				((CrossValidationCursor) var.getCursor(currentConf.getType())).startTrainingPhase(i);
+				((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType())).startTrainingPhase(i);
 
 				ResultTable estimates = initAndExecuteEstimation(currentApproach, var.getRepo().getWorkload(),
 						var.getConf().getEstimation().getWindow(), var.getConf().getEstimation().isRecursive(),
-						new CachingRepositoryCursor((CrossValidationCursor) var.getCursor(currentConf.getType()),
+						new CachingRepositoryCursor((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
 								var.getConf().getEstimation().getWindow()),
 						var.getAlgoFactory());
 				if (estimates.getEstimates().isEmpty()) {
@@ -416,9 +417,9 @@ public class Librede {
 				}
 				Vector state = estimates.getLastEstimates();
 
-				((CrossValidationCursor) var.getCursor(currentConf.getType())).startValidationPhase(i);
+				((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType())).startValidationPhase(i);
 
-				runValidation(var.getConf(), validators, (CrossValidationCursor) var.getCursor(currentConf.getType()),
+				runValidation(var.getConf(), validators, (ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
 						state, estimates);
 
 				var.getResults().addEstimates(currentApproach.getClass(), i, estimates);
