@@ -32,6 +32,8 @@ import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 
+import org.apache.log4j.Logger;
+
 import com.sun.jna.Pointer;
 
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
@@ -47,6 +49,7 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.variables.OutputVariable;
@@ -57,7 +60,9 @@ import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName="Extended Kalman Filter")
 public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
-
+	
+	private static final Logger log = Logger.getLogger(ExtendedKalmanFilter.class);
+	
 	// Callback function from native library for the observation model
 	private class HFunction implements HCallback {
 
@@ -66,23 +71,33 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 
 		@Override
 		public Pointer execute(Pointer x) {
+
 			State currentState = new State(getStateModel(), nativeVector(stateSize, x), 1);
 
 			double[] value = new double[outputSize];
 			double[][] jacobi = new double[outputSize][stateSize];
-			int[] idx = new int[stateSize];
-			for (int i = 0; i < outputSize; i++) {
-				OutputVariable v = getObservationModel().getOutputFunction(i).getCalculatedOutput(currentState);
-				value[i] = v.getDerivativeStructure().getValue();
-				for (int j = 0; j < stateSize; j++) {
-					idx[j] = 1;
-					jacobi[i][j] = v.getDerivativeStructure().getPartialDerivative(idx);
-					idx[j] = 0;
+			try {
+				int[] idx = new int[stateSize];
+				for (int i = 0; i < outputSize; i++) {
+					OutputFunction func = getObservationModel().getOutputFunction(i);
+					if (func.hasData()) {
+						OutputVariable v = func.getCalculatedOutput(currentState);
+						value[i] = v.getDerivativeStructure().getValue();
+						for (int j = 0; j < stateSize; j++) {
+							idx[j] = 1;
+							jacobi[i][j] = v.getDerivativeStructure().getPartialDerivative(idx);
+							idx[j] = 0;
+						}
+					}
 				}
+				toNative(jacobiBuffer, matrix(jacobi));
+				BayesPlusPlusLibrary.set_Hx(nativeObservationModel, jacobiBuffer, stateSize, outputSize);
+	
+				
+			} catch(Throwable t) {
+				log.error("Error evaluating H(x).", t);
 			}
-			toNative(jacobiBuffer, matrix(jacobi));
-			BayesPlusPlusLibrary.set_Hx(nativeObservationModel, jacobiBuffer, stateSize, outputSize);
-
+			
 			toNative(outputBuffer, vector(value));
 			return outputBuffer;
 		}
@@ -333,17 +348,6 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 		
 		this.estimates = matrix(estimationWindow, stateSize, Double.NaN);
 		
-		// Initialized the state bounds
-		upperStateBounds = (Vector) matrix(stateSize, 1, Double.POSITIVE_INFINITY);
-		lowerStateBounds = (Vector) matrix(stateSize, 1, 0);
-		for (IStateConstraint curConstraint : problem.getStateModel().getConstraints()) {
-			if (curConstraint instanceof IStateBoundsConstraint) {
-				ResourceDemand demand = ((IStateBoundsConstraint) curConstraint).getStateVariable();
-				int idx = getStateModel().getStateVariableIndex(demand.getResource(), demand.getService());
-				upperStateBounds = upperStateBounds.set(idx, curConstraint.getUpperBound());
-				lowerStateBounds = lowerStateBounds.set(idx, curConstraint.getLowerBound());
-			}
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -351,6 +355,9 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 	 */
 	@Override
 	public void update() throws EstimationException {
+		
+		updateStateBounds();
+		
 		if (!initialized) {
 			// IMPORTANT: Call step so that invocation graph is correctly initialized.
 			getStateModel().step(null);
@@ -397,6 +404,20 @@ public class ExtendedKalmanFilter extends AbstractEstimationAlgorithm {
 			}
 		});
 		return truncatedInitialState;
+	}
+	
+	private void updateStateBounds() {
+		// Initialized the state bounds
+		upperStateBounds = (Vector) matrix(stateSize, 1, Double.POSITIVE_INFINITY);
+		lowerStateBounds = (Vector) matrix(stateSize, 1, 0);
+		for (IStateConstraint curConstraint : getStateModel().getConstraints()) {
+			if (curConstraint instanceof IStateBoundsConstraint) {
+				ResourceDemand demand = ((IStateBoundsConstraint) curConstraint).getStateVariable();
+				int idx = getStateModel().getStateVariableIndex(demand.getResource(), demand.getService());
+				upperStateBounds = upperStateBounds.set(idx, Math.min(upperStateBounds.get(idx), curConstraint.getUpperBound()));
+				lowerStateBounds = lowerStateBounds.set(idx, Math.max(lowerStateBounds.get(idx), curConstraint.getLowerBound()));
+			}
+		}
 	}
 
 	/*
