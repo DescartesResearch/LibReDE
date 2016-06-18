@@ -46,6 +46,7 @@ import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.CrossValidationCursor;
 
 public class LibredeVariables {
@@ -71,13 +72,10 @@ public class LibredeVariables {
 			this.results = new LibredeResults(conf.getEstimation().getApproaches().size(),
 					conf.getValidation().getValidationFolds());
 			for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
-				CrossValidationCursor cursor = new CrossValidationCursor(
+				ContinuousCrossValidationCursor cursor = new ContinuousCrossValidationCursor(
 						repo.getCursor(conf.getEstimation().getStartTimestamp(), conf.getEstimation().getStepSize()),
-						conf.getValidation().getValidationFolds(),
-						(int) (conf.getEstimation().getEndTimestamp().minus(conf.getEstimation().getStartTimestamp())
-								.getValue(Time.SECONDS) / conf.getEstimation().getStepSize().getValue(Time.SECONDS)));
-				cursor.initPartitions();
-				this.cursors.put(currentConf.getType(), (IRepositoryCursor) cursor);
+						conf.getValidation().getValidationFolds(), conf.getEstimation().getWindow());
+				this.cursors.put(currentConf.getType(), cursor);
 			}
 			// case no or one validation
 		} else {
@@ -111,7 +109,7 @@ public class LibredeVariables {
 
 				String[] line = new String[4];
 				line[0] = Double.toString(startTimestamp);
-				line[1] = Double.toString(endTimestamp);				
+				line[1] = Double.toString(endTimestamp);
 				line[2] = approachName;
 				line[3] = Double.toString(meanErrorSelectedApproaches.get(idx));
 				saveResult.add(implode(";", line));
@@ -120,14 +118,15 @@ public class LibredeVariables {
 
 			// open buffered writer
 			BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile, false));
-			//write header
+			// write header
 			String[] head = new String[4];
 			head[0] = "Start Timestamp";
 			head[1] = "End Timestamp";
 			head[2] = "Approach Name";
 			head[3] = "Mean Error Validation";
 			saveResult.add(0, implode(";", head));
-			// write each line (timestamp + approach name + mean error validation)
+			// write each line (timestamp + approach name + mean error
+			// validation)
 			for (String line : saveResult) {
 				bw.write(line);
 				bw.write("\n");
@@ -200,7 +199,8 @@ public class LibredeVariables {
 		return selectedApproaches;
 	}
 
-	//this method is used for the second and following approach selections to save meanError in a List
+	// this method is used for the second and following approach selections to
+	// save meanError in a List
 	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches, double meanError) {
 		this.selectedApproaches = selectedApproaches;
 		Class<?> cl = Registry.INSTANCE.getInstanceClass(selectedApproaches.get(0).getType());
@@ -220,7 +220,8 @@ public class LibredeVariables {
 		this.meanErrorSelectedApproaches.add(meanError);
 	}
 
-	//this method ist only used once at the first selection to set all appproaches to the selected approach list for selection
+	// this method ist only used once at the first selection to set all
+	// appproaches to the selected approach list for selection
 	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches) {
 		this.selectedApproaches = selectedApproaches;
 	}
