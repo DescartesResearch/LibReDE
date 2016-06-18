@@ -97,11 +97,11 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 	public static void initLibraries() {
 		File file = new File(""); // Dummy file
 		SOURCE_PATH = file.getAbsolutePath() + "\\resources\\source";
-		DESTINATION_PATH = file.getAbsolutePath() + "\\resources\\target";
+		DESTINATION_PATH = file.getAbsolutePath() + "\\resources\\destination";
 		IpoptLibrary.init();
 		NNLSLibrary.init();
 		BayesLibrary.init();
-		LogManager.getRootLogger().setLevel(Level.WARN);
+//		LogManager.getRootLogger().setLevel(Level.WARN);
 
 		// load LibredeConf to test the execute method
 
