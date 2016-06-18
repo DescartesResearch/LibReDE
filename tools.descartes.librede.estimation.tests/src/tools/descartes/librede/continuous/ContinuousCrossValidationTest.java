@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,14 +45,13 @@ import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import tools.descartes.librede.Librede;
@@ -141,8 +139,9 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		}
 
 	}
-
+	
 	@Test
+	@Ignore
 	public void test() {
 
 		LinkedList<DataReadWrite> drws = new LinkedList<DataReadWrite>();
