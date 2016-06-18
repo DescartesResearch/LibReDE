@@ -51,8 +51,9 @@ import tools.descartes.librede.units.Time;
 public class InvocationGraph implements IDependencyTarget {
 	private final int historySize;
 	private final Query<Vector, RequestCount> visitCountQuery;
+	private final Query<Vector, Time> delayQuery;
 	private final double[][][] invocations;
-	private final double[][] delays;
+	private final double[][][] delays;
 	private final boolean[][] reachability;
 	private final List<Service> services;
 	private final Map<Service, Integer> servicesToIdx = new HashMap<>();
@@ -72,37 +73,31 @@ public class InvocationGraph implements IDependencyTarget {
 			servicesToIdx.put(services.get(i), i);
 		}
 		invocations = new double[historySize][serviceCount][serviceCount];
-		delays = new double[serviceCount][serviceCount];
+		delays = new double[historySize][serviceCount][serviceCount];
 		List<ExternalCall> calls = getExternalCalls(services);
 		this.externalCalls = !calls.isEmpty();
 		if (!externalCalls) {
 			reachability = new boolean[serviceCount][serviceCount];
 			visitCountQuery = null;
+			delayQuery = null;
 		} else {
 			reachability = calculateReachabilities(serviceCount, calls);			
 			visitCountQuery = QueryBuilder.select(StandardMetrics.VISITS).in(RequestCount.REQUESTS)
 					.forExternalCalls(calls).average().using(cursor);
-		}
-		
-		initDelays();
-	}
-	
-	private void initDelays() {
-		for (Service curService : services) {
-			for (ExternalCall curCall : curService.getOutgoingCalls()) {
-				if (curCall.getDelay() != null) {
-					int idxA = servicesToIdx.get(curService);
-					int idxB = servicesToIdx.get(curCall.getCalledService());
-					delays[idxA][idxB] = curCall.getDelay().getValue(Time.SECONDS);
-				}
-			}
+			delayQuery = QueryBuilder.select(StandardMetrics.DELAY).in(Time.SECONDS)
+					.forExternalCalls(calls).average().using(cursor);
 		}
 	}
 	
 	public double getInvocationDelay(Service a, Service b) {
+		return getInvocationDelay(a, b, 0);
+	}
+	
+	public double getInvocationDelay(Service a, Service b, int historicInterval) {
 		int idxA = servicesToIdx.get(a);
 		int idxB = servicesToIdx.get(b);
-		return delays[idxA][idxB];
+		int interval = last - historicInterval;
+		return delays[(interval < 0) ? (historySize + interval) : interval][idxA][idxB];
 	}
 	
 	public double getInvocationCount(Service a, Service b) {
@@ -138,11 +133,13 @@ public class InvocationGraph implements IDependencyTarget {
 		}	
 		
 		Vector visits = visitCountQuery.get(0);
+		Vector delayVector = delayQuery.get(0);
 		for (int i = 0; i < visits.rows(); i++) {
 			ExternalCall call = (ExternalCall)visitCountQuery.getEntity(i);
 			int idx1 = services.indexOf(call.getService());
 			int idx2 = services.indexOf(call.getCalledService());
-			invocations[last][idx1][idx2] += visits.get(i);				
+			invocations[last][idx1][idx2] += visits.get(i);
+			delays[last][idx1][idx2] += delayVector.get(i);
 		}
 	}
 	

@@ -39,8 +39,6 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.Time;
 
 /**
  * <!-- begin-user-doc -->
@@ -51,7 +49,6 @@ import tools.descartes.librede.units.Time;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ExternalCallImpl#getCalledService <em>Called Service</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ExternalCallImpl#getDelay <em>Delay</em>}</li>
  * </ul>
  *
  * @generated
@@ -66,16 +63,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 	 * @ordered
 	 */
 	protected Service calledService;
-
-	/**
-	 * The cached value of the '{@link #getDelay() <em>Delay</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDelay()
-	 * @generated
-	 * @ordered
-	 */
-	protected Quantity<Time> delay;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -161,49 +148,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Quantity<Time> getDelay() {
-		return delay;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetDelay(Quantity<Time> newDelay, NotificationChain msgs) {
-		Quantity<Time> oldDelay = delay;
-		delay = newDelay;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.EXTERNAL_CALL__DELAY, oldDelay, newDelay);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setDelay(Quantity<Time> newDelay) {
-		if (newDelay != delay) {
-			NotificationChain msgs = null;
-			if (delay != null)
-				msgs = ((InternalEObject)delay).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.EXTERNAL_CALL__DELAY, null, msgs);
-			if (newDelay != null)
-				msgs = ((InternalEObject)newDelay).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.EXTERNAL_CALL__DELAY, null, msgs);
-			msgs = basicSetDelay(newDelay, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.EXTERNAL_CALL__DELAY, newDelay, newDelay));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -225,8 +169,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 		switch (featureID) {
 			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
 				return basicSetCalledService(null, msgs);
-			case ConfigurationPackage.EXTERNAL_CALL__DELAY:
-				return basicSetDelay(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -242,8 +184,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
 				if (resolve) return getCalledService();
 				return basicGetCalledService();
-			case ConfigurationPackage.EXTERNAL_CALL__DELAY:
-				return getDelay();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -260,9 +200,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
 				setCalledService((Service)newValue);
 				return;
-			case ConfigurationPackage.EXTERNAL_CALL__DELAY:
-				setDelay((Quantity<Time>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -278,9 +215,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
 				setCalledService((Service)null);
 				return;
-			case ConfigurationPackage.EXTERNAL_CALL__DELAY:
-				setDelay((Quantity<Time>)null);
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -295,8 +229,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 		switch (featureID) {
 			case ConfigurationPackage.EXTERNAL_CALL__CALLED_SERVICE:
 				return calledService != null;
-			case ConfigurationPackage.EXTERNAL_CALL__DELAY:
-				return delay != null;
 		}
 		return super.eIsSet(featureID);
 	}

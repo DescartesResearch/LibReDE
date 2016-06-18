@@ -1412,22 +1412,13 @@ public interface ConfigurationPackage extends EPackage {
 	int EXTERNAL_CALL__CALLED_SERVICE = TASK_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Delay</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int EXTERNAL_CALL__DELAY = TASK_FEATURE_COUNT + 1;
-
-	/**
 	 * The number of structural features of the '<em>External Call</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int EXTERNAL_CALL_FEATURE_COUNT = TASK_FEATURE_COUNT + 2;
+	int EXTERNAL_CALL_FEATURE_COUNT = TASK_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>External Call</em>' class.
@@ -2430,17 +2421,6 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getExternalCall_CalledService();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.ExternalCall#getDelay <em>Delay</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Delay</em>'.
-	 * @see tools.descartes.librede.configuration.ExternalCall#getDelay()
-	 * @see #getExternalCall()
-	 * @generated
-	 */
-	EReference getExternalCall_Delay();
-
-	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.CompositeService <em>Composite Service</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3214,14 +3194,6 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference EXTERNAL_CALL__CALLED_SERVICE = eINSTANCE.getExternalCall_CalledService();
-
-		/**
-		 * The meta object literal for the '<em><b>Delay</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference EXTERNAL_CALL__DELAY = eINSTANCE.getExternalCall_Delay();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.CompositeServiceImpl <em>Composite Service</em>}' class.

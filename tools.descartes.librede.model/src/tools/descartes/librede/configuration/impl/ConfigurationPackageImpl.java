@@ -1061,15 +1061,6 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getExternalCall_Delay() {
-		return (EReference)externalCallEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getCompositeService() {
 		return compositeServiceEClass;
 	}
@@ -1241,7 +1232,6 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		externalCallEClass = createEClass(EXTERNAL_CALL);
 		createEReference(externalCallEClass, EXTERNAL_CALL__CALLED_SERVICE);
-		createEReference(externalCallEClass, EXTERNAL_CALL__DELAY);
 
 		compositeServiceEClass = createEClass(COMPOSITE_SERVICE);
 		createEReference(compositeServiceEClass, COMPOSITE_SERVICE__SUB_SERVICES);
@@ -1427,10 +1417,6 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 
 		initEClass(externalCallEClass, ExternalCall.class, "ExternalCall", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getExternalCall_CalledService(), this.getService(), this.getService_IncomingCalls(), "calledService", null, 1, 1, ExternalCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		g1 = createEGenericType(theUnitsPackage.getQuantity());
-		g2 = createEGenericType(theUnitsPackage.getTime());
-		g1.getETypeArguments().add(g2);
-		initEReference(getExternalCall_Delay(), g1, null, "delay", null, 0, 1, ExternalCall.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(compositeServiceEClass, CompositeService.class, "CompositeService", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getCompositeService_SubServices(), this.getService(), null, "subServices", null, 0, -1, CompositeService.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
