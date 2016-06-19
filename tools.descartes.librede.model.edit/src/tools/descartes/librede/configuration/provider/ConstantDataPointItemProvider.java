@@ -14,6 +14,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ConstantDataPoint;
 
@@ -66,6 +67,7 @@ public class ConstantDataPointItemProvider extends ObservationItemProvider {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__VALUE);
+			childrenFeatures.add(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__MAPPINGS);
 		}
 		return childrenFeatures;
 	}
@@ -123,6 +125,7 @@ public class ConstantDataPointItemProvider extends ObservationItemProvider {
 
 		switch (notification.getFeatureID(ConstantDataPoint.class)) {
 			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
+			case ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -144,6 +147,16 @@ public class ConstantDataPointItemProvider extends ObservationItemProvider {
 			(createChildParameter
 				(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__VALUE,
 				 UnitsFactory.eINSTANCE.createQuantity()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__MAPPINGS,
+				 ConfigurationFactory.eINSTANCE.createObservationToEntityMapping()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__MAPPINGS,
+				 ConfigurationFactory.eINSTANCE.createTraceToEntityMapping()));
 	}
 
 }

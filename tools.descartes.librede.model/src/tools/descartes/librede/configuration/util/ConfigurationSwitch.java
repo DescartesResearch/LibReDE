@@ -259,7 +259,7 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 				return result;
 			}
 			case ConfigurationPackage.OBSERVATION: {
-				Observation<?> observation = (Observation<?>)theEObject;
+				Observation observation = (Observation)theEObject;
 				T1 result = caseObservation(observation);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -652,7 +652,7 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public <M extends ObservationToEntityMapping> T1 caseObservation(Observation<M> object) {
+	public T1 caseObservation(Observation object) {
 		return null;
 	}
 

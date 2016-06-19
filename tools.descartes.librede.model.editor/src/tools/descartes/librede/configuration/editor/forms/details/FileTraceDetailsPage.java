@@ -419,7 +419,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 				}
 			}
 		}
-		Command cmd = AddCommand.create(domain, input, ConfigurationPackage.Literals.OBSERVATION__MAPPINGS, mapping);
+		Command cmd = AddCommand.create(domain, input, ConfigurationPackage.Literals.TRACE_CONFIGURATION__MAPPINGS, mapping);
 		domain.getCommandStack().execute(cmd);
 	}
 	

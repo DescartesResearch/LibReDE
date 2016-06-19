@@ -188,7 +188,7 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createTaskAdapter();
 			}
 			@Override
-			public <M extends ObservationToEntityMapping> Adapter caseObservation(Observation<M> object) {
+			public Adapter caseObservation(Observation object) {
 				return createObservationAdapter();
 			}
 			@Override

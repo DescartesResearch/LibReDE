@@ -28,6 +28,7 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -35,6 +36,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
@@ -56,11 +58,12 @@ import tools.descartes.librede.units.Unit;
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getLocation <em>Location</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping> implements TraceConfiguration {
+public class TraceConfigurationImpl extends ObservationImpl implements TraceConfiguration {
 	/**
 	 * The cached value of the '{@link #getDataSource() <em>Data Source</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -110,6 +113,16 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 	 * @ordered
 	 */
 	protected String location = LOCATION_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getMappings() <em>Mappings</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMappings()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<TraceToEntityMapping> mappings;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -274,7 +287,6 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * This is specialized for the more specific element type known in this context.
 	 * @generated
 	 */
 	@Override
@@ -295,6 +307,8 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 		switch (featureID) {
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return basicSetInterval(null, msgs);
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
+				return ((InternalEList<?>)getMappings()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -317,6 +331,8 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 				return getInterval();
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				return getLocation();
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
+				return getMappings();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -342,6 +358,10 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				setLocation((String)newValue);
 				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
+				getMappings().clear();
+				getMappings().addAll((Collection<? extends TraceToEntityMapping>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -366,6 +386,9 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				setLocation(LOCATION_EDEFAULT);
 				return;
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
+				getMappings().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -386,6 +409,8 @@ public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping
 				return interval != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
+				return mappings != null && !mappings.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

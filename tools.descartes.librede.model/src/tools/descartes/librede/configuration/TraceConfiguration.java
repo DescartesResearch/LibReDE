@@ -28,6 +28,7 @@
  */
 package tools.descartes.librede.configuration;
 
+import org.eclipse.emf.common.util.EList;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -46,13 +47,14 @@ import tools.descartes.librede.units.Unit;
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getLocation <em>Location</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration()
  * @model
  * @generated
  */
-public interface TraceConfiguration extends Observation<TraceToEntityMapping> {
+public interface TraceConfiguration extends Observation {
 	/**
 	 * Returns the value of the '<em><b>Unit</b></em>' reference.
 	 * <!-- begin-user-doc -->
@@ -130,6 +132,22 @@ public interface TraceConfiguration extends Observation<TraceToEntityMapping> {
 	 * @generated
 	 */
 	void setLocation(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Mappings</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.TraceToEntityMapping}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Mappings</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Mappings</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Mappings()
+	 * @model containment="true" required="true"
+	 * @generated
+	 */
+	EList<TraceToEntityMapping> getMappings();
 
 	/**
 	 * Returns the value of the '<em><b>Data Source</b></em>' reference.

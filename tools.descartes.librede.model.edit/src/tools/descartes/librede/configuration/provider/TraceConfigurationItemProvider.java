@@ -38,10 +38,10 @@ import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
+import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.units.UnitsFactory;
 
 /**
  * This is the item provider adapter for a {@link tools.descartes.librede.configuration.TraceConfiguration} object.
@@ -74,6 +74,7 @@ public class TraceConfigurationItemProvider
 
 			addDataSourcePropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
+			addIntervalPropertyDescriptor(object);
 			addLocationPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
@@ -95,7 +96,29 @@ public class TraceConfigurationItemProvider
 				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__UNIT,
 				 true,
 				 false,
+				 false,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Interval feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addIntervalPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TraceConfiguration_interval_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_interval_feature", "_UI_TraceConfiguration_type"),
+				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
 				 true,
+				 false,
+				 false,
 				 null,
 				 null,
 				 null));
@@ -157,7 +180,7 @@ public class TraceConfigurationItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL);
+			childrenFeatures.add(ConfigurationPackage.Literals.TRACE_CONFIGURATION__MAPPINGS);
 		}
 		return childrenFeatures;
 	}
@@ -214,10 +237,12 @@ public class TraceConfigurationItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(TraceConfiguration.class)) {
+			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
+			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
+			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -237,8 +262,8 @@ public class TraceConfigurationItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
-				 UnitsFactory.eINSTANCE.createQuantity()));
+				(ConfigurationPackage.Literals.TRACE_CONFIGURATION__MAPPINGS,
+				 ConfigurationFactory.eINSTANCE.createTraceToEntityMapping()));
 	}
 
 	@Override

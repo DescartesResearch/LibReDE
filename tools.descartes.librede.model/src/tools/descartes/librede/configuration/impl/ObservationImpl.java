@@ -2,26 +2,14 @@
  */
 package tools.descartes.librede.configuration.impl;
 
-import java.util.Collection;
-
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.NotificationChain;
-
-import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
-
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
-
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Observation;
-import tools.descartes.librede.configuration.ObservationToEntityMapping;
-
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 
@@ -37,12 +25,11 @@ import tools.descartes.librede.units.Dimension;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ObservationImpl#getAggregation <em>Aggregation</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.ObservationImpl#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.ObservationImpl#getMappings <em>Mappings</em>}</li>
  * </ul>
  *
  * @generated
  */
-public abstract class ObservationImpl<M extends ObservationToEntityMapping> extends MinimalEObjectImpl.Container implements Observation<M> {
+public abstract class ObservationImpl extends MinimalEObjectImpl.Container implements Observation {
 	/**
 	 * The default value of the '{@link #getAggregation() <em>Aggregation</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -72,16 +59,6 @@ public abstract class ObservationImpl<M extends ObservationToEntityMapping> exte
 	 * @ordered
 	 */
 	protected Metric<? extends Dimension> metric;
-
-	/**
-	 * The cached value of the '{@link #getMappings() <em>Mappings</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMappings()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<M> mappings;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -167,32 +144,6 @@ public abstract class ObservationImpl<M extends ObservationToEntityMapping> exte
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<M> getMappings() {
-		if (mappings == null) {
-			mappings = new EObjectContainmentEList<M>(ObservationToEntityMapping.class, this, ConfigurationPackage.OBSERVATION__MAPPINGS);
-		}
-		return mappings;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case ConfigurationPackage.OBSERVATION__MAPPINGS:
-				return ((InternalEList<?>)getMappings()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -201,8 +152,6 @@ public abstract class ObservationImpl<M extends ObservationToEntityMapping> exte
 			case ConfigurationPackage.OBSERVATION__METRIC:
 				if (resolve) return getMetric();
 				return basicGetMetric();
-			case ConfigurationPackage.OBSERVATION__MAPPINGS:
-				return getMappings();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -222,10 +171,6 @@ public abstract class ObservationImpl<M extends ObservationToEntityMapping> exte
 			case ConfigurationPackage.OBSERVATION__METRIC:
 				setMetric((Metric<? extends Dimension>)newValue);
 				return;
-			case ConfigurationPackage.OBSERVATION__MAPPINGS:
-				getMappings().clear();
-				getMappings().addAll((Collection<? extends M>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -244,9 +189,6 @@ public abstract class ObservationImpl<M extends ObservationToEntityMapping> exte
 			case ConfigurationPackage.OBSERVATION__METRIC:
 				setMetric((Metric<? extends Dimension>)null);
 				return;
-			case ConfigurationPackage.OBSERVATION__MAPPINGS:
-				getMappings().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -263,8 +205,6 @@ public abstract class ObservationImpl<M extends ObservationToEntityMapping> exte
 				return aggregation != AGGREGATION_EDEFAULT;
 			case ConfigurationPackage.OBSERVATION__METRIC:
 				return metric != null;
-			case ConfigurationPackage.OBSERVATION__MAPPINGS:
-				return mappings != null && !mappings.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

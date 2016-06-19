@@ -2,8 +2,6 @@
  */
 package tools.descartes.librede.configuration;
 
-import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
 
 import tools.descartes.librede.metrics.Aggregation;
@@ -22,14 +20,13 @@ import tools.descartes.librede.units.Dimension;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.Observation#getAggregation <em>Aggregation</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.Observation#getMetric <em>Metric</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.Observation#getMappings <em>Mappings</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getObservation()
  * @model abstract="true"
  * @generated
  */
-public interface Observation<M extends ObservationToEntityMapping> extends EObject {
+public interface Observation extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Aggregation</b></em>' attribute.
 	 * The literals are from the enumeration {@link tools.descartes.librede.metrics.Aggregation}.
@@ -84,20 +81,5 @@ public interface Observation<M extends ObservationToEntityMapping> extends EObje
 	 * @generated
 	 */
 	void setMetric(Metric<? extends Dimension> value);
-
-	/**
-	 * Returns the value of the '<em><b>Mappings</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Mappings</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Mappings</em>' containment reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getObservation_Mappings()
-	 * @model containment="true" required="true"
-	 * @generated
-	 */
-	EList<M> getMappings();
 
 } // Observation

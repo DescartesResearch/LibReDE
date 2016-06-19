@@ -2,14 +2,18 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ConstantDataPoint;
 import tools.descartes.librede.configuration.ObservationToEntityMapping;
@@ -25,11 +29,12 @@ import tools.descartes.librede.units.Quantity;
  * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.ConstantDataPointImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ConstantDataPointImpl#getMappings <em>Mappings</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMapping> implements ConstantDataPoint {
+public class ConstantDataPointImpl extends ObservationImpl implements ConstantDataPoint {
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -39,6 +44,16 @@ public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMa
 	 * @ordered
 	 */
 	protected Quantity<?> value;
+
+	/**
+	 * The cached value of the '{@link #getMappings() <em>Mappings</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMappings()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<ObservationToEntityMapping> mappings;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -107,11 +122,25 @@ public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMa
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<ObservationToEntityMapping> getMappings() {
+		if (mappings == null) {
+			mappings = new EObjectContainmentEList<ObservationToEntityMapping>(ObservationToEntityMapping.class, this, ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS);
+		}
+		return mappings;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				return basicSetValue(null, msgs);
+			case ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS:
+				return ((InternalEList<?>)getMappings()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -126,6 +155,8 @@ public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMa
 		switch (featureID) {
 			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				return getValue();
+			case ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS:
+				return getMappings();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -135,11 +166,16 @@ public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMa
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				setValue((Quantity<?>)newValue);
+				return;
+			case ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS:
+				getMappings().clear();
+				getMappings().addAll((Collection<? extends ObservationToEntityMapping>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -156,6 +192,9 @@ public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMa
 			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				setValue((Quantity<?>)null);
 				return;
+			case ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS:
+				getMappings().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -170,6 +209,8 @@ public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMa
 		switch (featureID) {
 			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				return value != null;
+			case ConfigurationPackage.CONSTANT_DATA_POINT__MAPPINGS:
+				return mappings != null && !mappings.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
