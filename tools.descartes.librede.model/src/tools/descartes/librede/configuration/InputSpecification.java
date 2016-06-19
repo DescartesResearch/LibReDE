@@ -43,7 +43,7 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getDataSources <em>Data Sources</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getObservations <em>Observations</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getConstantValues <em>Constant Values</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getConstantDataPoints <em>Constant Data Points</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getInputSpecification()
@@ -84,19 +84,19 @@ public interface InputSpecification extends EObject {
 	EList<TraceConfiguration> getObservations();
 
 	/**
-	 * Returns the value of the '<em><b>Constant Values</b></em>' containment reference list.
-	 * The list contents are of type {@link tools.descartes.librede.configuration.ConstantValue}.
+	 * Returns the value of the '<em><b>Constant Data Points</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.ConstantDataPoint}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Constant Values</em>' containment reference list isn't clear,
+	 * If the meaning of the '<em>Constant Data Points</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Constant Values</em>' containment reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getInputSpecification_ConstantValues()
+	 * @return the value of the '<em>Constant Data Points</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getInputSpecification_ConstantDataPoints()
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<ConstantValue> getConstantValues();
+	EList<ConstantDataPoint> getConstantDataPoints();
 
 } // InputSpecification

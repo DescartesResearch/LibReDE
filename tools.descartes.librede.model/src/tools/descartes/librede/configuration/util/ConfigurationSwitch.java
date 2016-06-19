@@ -270,10 +270,10 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ConfigurationPackage.CONSTANT_VALUE: {
-				ConstantValue constantValue = (ConstantValue)theEObject;
-				T1 result = caseConstantValue(constantValue);
-				if (result == null) result = caseObservation(constantValue);
+			case ConfigurationPackage.CONSTANT_DATA_POINT: {
+				ConstantDataPoint constantDataPoint = (ConstantDataPoint)theEObject;
+				T1 result = caseConstantDataPoint(constantDataPoint);
+				if (result == null) result = caseObservation(constantDataPoint);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -672,17 +672,17 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Constant Value</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Constant Data Point</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Constant Value</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Constant Data Point</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T1 caseConstantValue(ConstantValue object) {
+	public T1 caseConstantDataPoint(ConstantDataPoint object) {
 		return null;
 	}
 

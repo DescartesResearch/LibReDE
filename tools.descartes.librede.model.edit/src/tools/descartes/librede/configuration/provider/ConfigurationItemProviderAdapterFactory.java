@@ -628,26 +628,26 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ConstantValue} instances.
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ConstantDataPoint} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ConstantValueItemProvider constantValueItemProvider;
+	protected ConstantDataPointItemProvider constantDataPointItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ConstantValue}.
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ConstantDataPoint}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public Adapter createConstantValueAdapter() {
-		if (constantValueItemProvider == null) {
-			constantValueItemProvider = new ConstantValueItemProvider(this);
+	public Adapter createConstantDataPointAdapter() {
+		if (constantDataPointItemProvider == null) {
+			constantDataPointItemProvider = new ConstantDataPointItemProvider(this);
 		}
 
-		return constantValueItemProvider;
+		return constantDataPointItemProvider;
 	}
 
 	/**
@@ -772,7 +772,7 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (externalCallItemProvider != null) externalCallItemProvider.dispose();
 		if (compositeServiceItemProvider != null) compositeServiceItemProvider.dispose();
 		if (observationToEntityMappingItemProvider != null) observationToEntityMappingItemProvider.dispose();
-		if (constantValueItemProvider != null) constantValueItemProvider.dispose();
+		if (constantDataPointItemProvider != null) constantDataPointItemProvider.dispose();
 	}
 
 }

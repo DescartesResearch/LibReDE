@@ -11,25 +11,25 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.ConstantValue;
+import tools.descartes.librede.configuration.ConstantDataPoint;
 import tools.descartes.librede.configuration.ObservationToEntityMapping;
 
 import tools.descartes.librede.units.Quantity;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Constant Value</b></em>'.
+ * An implementation of the model object '<em><b>Constant Data Point</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link tools.descartes.librede.configuration.impl.ConstantValueImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.ConstantDataPointImpl#getValue <em>Value</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMapping> implements ConstantValue {
+public class ConstantDataPointImpl extends ObservationImpl<ObservationToEntityMapping> implements ConstantDataPoint {
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -45,7 +45,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected ConstantValueImpl() {
+	protected ConstantDataPointImpl() {
 		super();
 	}
 
@@ -56,7 +56,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ConfigurationPackage.Literals.CONSTANT_VALUE;
+		return ConfigurationPackage.Literals.CONSTANT_DATA_POINT;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 		Quantity<?> oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.CONSTANT_VALUE__VALUE, oldValue, newValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ConfigurationPackage.CONSTANT_DATA_POINT__VALUE, oldValue, newValue);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -92,14 +92,14 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 		if (newValue != value) {
 			NotificationChain msgs = null;
 			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.CONSTANT_VALUE__VALUE, null, msgs);
+				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.CONSTANT_DATA_POINT__VALUE, null, msgs);
 			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.CONSTANT_VALUE__VALUE, null, msgs);
+				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ConfigurationPackage.CONSTANT_DATA_POINT__VALUE, null, msgs);
 			msgs = basicSetValue(newValue, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.CONSTANT_VALUE__VALUE, newValue, newValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.CONSTANT_DATA_POINT__VALUE, newValue, newValue));
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ConfigurationPackage.CONSTANT_VALUE__VALUE:
+			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				return basicSetValue(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -124,7 +124,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.CONSTANT_VALUE__VALUE:
+			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -138,7 +138,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.CONSTANT_VALUE__VALUE:
+			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				setValue((Quantity<?>)newValue);
 				return;
 		}
@@ -153,7 +153,7 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.CONSTANT_VALUE__VALUE:
+			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				setValue((Quantity<?>)null);
 				return;
 		}
@@ -168,10 +168,10 @@ public class ConstantValueImpl extends ObservationImpl<ObservationToEntityMappin
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.CONSTANT_VALUE__VALUE:
+			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				return value != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
-} //ConstantValueImpl
+} //ConstantDataPointImpl

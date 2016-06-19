@@ -255,13 +255,13 @@ public interface ConfigurationFactory extends EFactory {
 	ObservationToEntityMapping createObservationToEntityMapping();
 
 	/**
-	 * Returns a new object of class '<em>Constant Value</em>'.
+	 * Returns a new object of class '<em>Constant Data Point</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Constant Value</em>'.
+	 * @return a new object of class '<em>Constant Data Point</em>'.
 	 * @generated
 	 */
-	ConstantValue createConstantValue();
+	ConstantDataPoint createConstantDataPoint();
 
 	/**
 	 * Returns the package supported by this factory.

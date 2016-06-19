@@ -6,21 +6,21 @@ import tools.descartes.librede.units.Quantity;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Constant Value</b></em>'.
+ * A representation of the model object '<em><b>Constant Data Point</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link tools.descartes.librede.configuration.ConstantValue#getValue <em>Value</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.ConstantDataPoint#getValue <em>Value</em>}</li>
  * </ul>
  *
- * @see tools.descartes.librede.configuration.ConfigurationPackage#getConstantValue()
+ * @see tools.descartes.librede.configuration.ConfigurationPackage#getConstantDataPoint()
  * @model
  * @generated
  */
-public interface ConstantValue extends Observation<ObservationToEntityMapping> {
+public interface ConstantDataPoint extends Observation<ObservationToEntityMapping> {
 	/**
 	 * Returns the value of the '<em><b>Value</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
@@ -31,14 +31,14 @@ public interface ConstantValue extends Observation<ObservationToEntityMapping> {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Value</em>' containment reference.
 	 * @see #setValue(Quantity)
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getConstantValue_Value()
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getConstantDataPoint_Value()
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
 	Quantity<?> getValue();
 
 	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.ConstantValue#getValue <em>Value</em>}' containment reference.
+	 * Sets the value of the '{@link tools.descartes.librede.configuration.ConstantDataPoint#getValue <em>Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Value</em>' containment reference.
@@ -47,4 +47,4 @@ public interface ConstantValue extends Observation<ObservationToEntityMapping> {
 	 */
 	void setValue(Quantity<?> value);
 
-} // ConstantValue
+} // ConstantDataPoint

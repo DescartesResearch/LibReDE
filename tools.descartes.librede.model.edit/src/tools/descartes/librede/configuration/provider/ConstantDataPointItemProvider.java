@@ -15,26 +15,26 @@ import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.ConstantValue;
+import tools.descartes.librede.configuration.ConstantDataPoint;
 
 import tools.descartes.librede.metrics.Aggregation;
 
 import tools.descartes.librede.units.UnitsFactory;
 
 /**
- * This is the item provider adapter for a {@link tools.descartes.librede.configuration.ConstantValue} object.
+ * This is the item provider adapter for a {@link tools.descartes.librede.configuration.ConstantDataPoint} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class ConstantValueItemProvider extends ObservationItemProvider {
+public class ConstantDataPointItemProvider extends ObservationItemProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ConstantValueItemProvider(AdapterFactory adapterFactory) {
+	public ConstantDataPointItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -65,7 +65,7 @@ public class ConstantValueItemProvider extends ObservationItemProvider {
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.CONSTANT_VALUE__VALUE);
+			childrenFeatures.add(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__VALUE);
 		}
 		return childrenFeatures;
 	}
@@ -84,14 +84,14 @@ public class ConstantValueItemProvider extends ObservationItemProvider {
 	}
 
 	/**
-	 * This returns ConstantValue.gif.
+	 * This returns ConstantDataPoint.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/ConstantValue"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/ConstantDataPoint"));
 	}
 
 	/**
@@ -102,11 +102,11 @@ public class ConstantValueItemProvider extends ObservationItemProvider {
 	 */
 	@Override
 	public String getText(Object object) {
-		Aggregation labelValue = ((ConstantValue)object).getAggregation();
+		Aggregation labelValue = ((ConstantDataPoint)object).getAggregation();
 		String label = labelValue == null ? null : labelValue.toString();
 		return label == null || label.length() == 0 ?
-			getString("_UI_ConstantValue_type") :
-			getString("_UI_ConstantValue_type") + " " + label;
+			getString("_UI_ConstantDataPoint_type") :
+			getString("_UI_ConstantDataPoint_type") + " " + label;
 	}
 	
 
@@ -121,8 +121,8 @@ public class ConstantValueItemProvider extends ObservationItemProvider {
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(ConstantValue.class)) {
-			case ConfigurationPackage.CONSTANT_VALUE__VALUE:
+		switch (notification.getFeatureID(ConstantDataPoint.class)) {
+			case ConfigurationPackage.CONSTANT_DATA_POINT__VALUE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -142,7 +142,7 @@ public class ConstantValueItemProvider extends ObservationItemProvider {
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.CONSTANT_VALUE__VALUE,
+				(ConfigurationPackage.Literals.CONSTANT_DATA_POINT__VALUE,
 				 UnitsFactory.eINSTANCE.createQuantity()));
 	}
 

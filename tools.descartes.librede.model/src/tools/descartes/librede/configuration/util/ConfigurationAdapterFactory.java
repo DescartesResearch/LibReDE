@@ -196,8 +196,8 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createObservationToEntityMappingAdapter();
 			}
 			@Override
-			public Adapter caseConstantValue(ConstantValue object) {
-				return createConstantValueAdapter();
+			public Adapter caseConstantDataPoint(ConstantDataPoint object) {
+				return createConstantDataPointAdapter();
 			}
 			@Override
 			public <T> Adapter caseComparable(Comparable<T> object) {
@@ -588,16 +588,16 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ConstantValue <em>Constant Value</em>}'.
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ConstantDataPoint <em>Constant Data Point</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see tools.descartes.librede.configuration.ConstantValue
+	 * @see tools.descartes.librede.configuration.ConstantDataPoint
 	 * @generated
 	 */
-	public Adapter createConstantValueAdapter() {
+	public Adapter createConstantDataPointAdapter() {
 		return null;
 	}
 

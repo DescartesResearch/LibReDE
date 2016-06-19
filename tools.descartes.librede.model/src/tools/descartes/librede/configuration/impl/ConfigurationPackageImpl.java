@@ -39,7 +39,7 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 import tools.descartes.librede.configuration.CompositeService;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.ConstantValue;
+import tools.descartes.librede.configuration.ConstantDataPoint;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
@@ -265,7 +265,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass constantValueEClass = null;
+	private EClass constantDataPointEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -483,7 +483,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInputSpecification_ConstantValues() {
+	public EReference getInputSpecification_ConstantDataPoints() {
 		return (EReference)inputSpecificationEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -1149,8 +1149,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getConstantValue() {
-		return constantValueEClass;
+	public EClass getConstantDataPoint() {
+		return constantDataPointEClass;
 	}
 
 	/**
@@ -1158,8 +1158,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getConstantValue_Value() {
-		return (EReference)constantValueEClass.getEStructuralFeatures().get(0);
+	public EReference getConstantDataPoint_Value() {
+		return (EReference)constantDataPointEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1217,7 +1217,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		inputSpecificationEClass = createEClass(INPUT_SPECIFICATION);
 		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__DATA_SOURCES);
 		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__OBSERVATIONS);
-		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__CONSTANT_VALUES);
+		createEReference(inputSpecificationEClass, INPUT_SPECIFICATION__CONSTANT_DATA_POINTS);
 
 		estimationApproachConfigurationEClass = createEClass(ESTIMATION_APPROACH_CONFIGURATION);
 		createEAttribute(estimationApproachConfigurationEClass, ESTIMATION_APPROACH_CONFIGURATION__TYPE);
@@ -1314,8 +1314,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		observationToEntityMappingEClass = createEClass(OBSERVATION_TO_ENTITY_MAPPING);
 		createEReference(observationToEntityMappingEClass, OBSERVATION_TO_ENTITY_MAPPING__ENTITY);
 
-		constantValueEClass = createEClass(CONSTANT_VALUE);
-		createEReference(constantValueEClass, CONSTANT_VALUE__VALUE);
+		constantDataPointEClass = createEClass(CONSTANT_DATA_POINT);
+		createEReference(constantDataPointEClass, CONSTANT_DATA_POINT__VALUE);
 
 		// Create enums
 		schedulingStrategyEEnum = createEEnum(SCHEDULING_STRATEGY);
@@ -1379,7 +1379,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		g1 = createEGenericType(this.getObservation());
 		g2 = createEGenericType(this.getObservationToEntityMapping());
 		g1.getETypeArguments().add(g2);
-		constantValueEClass.getEGenericSuperTypes().add(g1);
+		constantDataPointEClass.getEGenericSuperTypes().add(g1);
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(libredeConfigurationEClass, LibredeConfiguration.class, "LibredeConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1400,7 +1400,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(inputSpecificationEClass, InputSpecification.class, "InputSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInputSpecification_DataSources(), this.getDataSourceConfiguration(), null, "dataSources", null, 1, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInputSpecification_Observations(), this.getTraceConfiguration(), null, "observations", null, 0, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getInputSpecification_ConstantValues(), this.getConstantValue(), null, "constantValues", null, 0, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInputSpecification_ConstantDataPoints(), this.getConstantDataPoint(), null, "constantDataPoints", null, 0, -1, InputSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(estimationApproachConfigurationEClass, EstimationApproachConfiguration.class, "EstimationApproachConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEstimationApproachConfiguration_Type(), ecorePackage.getEString(), "type", null, 1, 1, EstimationApproachConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1520,11 +1520,11 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEClass(observationToEntityMappingEClass, ObservationToEntityMapping.class, "ObservationToEntityMapping", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getObservationToEntityMapping_Entity(), this.getModelEntity(), null, "entity", null, 1, 1, ObservationToEntityMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(constantValueEClass, ConstantValue.class, "ConstantValue", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(constantDataPointEClass, ConstantDataPoint.class, "ConstantDataPoint", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		g1 = createEGenericType(theUnitsPackage.getQuantity());
 		g2 = createEGenericType();
 		g1.getETypeArguments().add(g2);
-		initEReference(getConstantValue_Value(), g1, null, "value", null, 1, 1, ConstantValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getConstantDataPoint_Value(), g1, null, "value", null, 1, 1, ConstantDataPoint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(schedulingStrategyEEnum, SchedulingStrategy.class, "SchedulingStrategy");

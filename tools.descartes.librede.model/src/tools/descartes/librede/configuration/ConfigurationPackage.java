@@ -433,13 +433,13 @@ public interface ConfigurationPackage extends EPackage {
 	int INPUT_SPECIFICATION__OBSERVATIONS = 1;
 
 	/**
-	 * The feature id for the '<em><b>Constant Values</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Constant Data Points</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INPUT_SPECIFICATION__CONSTANT_VALUES = 2;
+	int INPUT_SPECIFICATION__CONSTANT_DATA_POINTS = 2;
 
 	/**
 	 * The number of structural features of the '<em>Input Specification</em>' class.
@@ -1631,14 +1631,14 @@ public interface ConfigurationPackage extends EPackage {
 	int COMPOSITE_SERVICE_OPERATION_COUNT = SERVICE_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ConstantValueImpl <em>Constant Value</em>}' class.
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ConstantDataPointImpl <em>Constant Data Point</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see tools.descartes.librede.configuration.impl.ConstantValueImpl
-	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getConstantValue()
+	 * @see tools.descartes.librede.configuration.impl.ConstantDataPointImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getConstantDataPoint()
 	 * @generated
 	 */
-	int CONSTANT_VALUE = 26;
+	int CONSTANT_DATA_POINT = 26;
 
 	/**
 	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
@@ -1647,7 +1647,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONSTANT_VALUE__AGGREGATION = OBSERVATION__AGGREGATION;
+	int CONSTANT_DATA_POINT__AGGREGATION = OBSERVATION__AGGREGATION;
 
 	/**
 	 * The feature id for the '<em><b>Metric</b></em>' reference.
@@ -1656,7 +1656,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONSTANT_VALUE__METRIC = OBSERVATION__METRIC;
+	int CONSTANT_DATA_POINT__METRIC = OBSERVATION__METRIC;
 
 	/**
 	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
@@ -1665,7 +1665,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONSTANT_VALUE__MAPPINGS = OBSERVATION__MAPPINGS;
+	int CONSTANT_DATA_POINT__MAPPINGS = OBSERVATION__MAPPINGS;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
@@ -1674,25 +1674,25 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CONSTANT_VALUE__VALUE = OBSERVATION_FEATURE_COUNT + 0;
+	int CONSTANT_DATA_POINT__VALUE = OBSERVATION_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Constant Value</em>' class.
+	 * The number of structural features of the '<em>Constant Data Point</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONSTANT_VALUE_FEATURE_COUNT = OBSERVATION_FEATURE_COUNT + 1;
+	int CONSTANT_DATA_POINT_FEATURE_COUNT = OBSERVATION_FEATURE_COUNT + 1;
 
 	/**
-	 * The number of operations of the '<em>Constant Value</em>' class.
+	 * The number of operations of the '<em>Constant Data Point</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONSTANT_VALUE_OPERATION_COUNT = OBSERVATION_OPERATION_COUNT + 0;
+	int CONSTANT_DATA_POINT_OPERATION_COUNT = OBSERVATION_OPERATION_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.
@@ -1867,15 +1867,15 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getInputSpecification_Observations();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.InputSpecification#getConstantValues <em>Constant Values</em>}'.
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.InputSpecification#getConstantDataPoints <em>Constant Data Points</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Constant Values</em>'.
-	 * @see tools.descartes.librede.configuration.InputSpecification#getConstantValues()
+	 * @return the meta object for the containment reference list '<em>Constant Data Points</em>'.
+	 * @see tools.descartes.librede.configuration.InputSpecification#getConstantDataPoints()
 	 * @see #getInputSpecification()
 	 * @generated
 	 */
-	EReference getInputSpecification_ConstantValues();
+	EReference getInputSpecification_ConstantDataPoints();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.EstimationApproachConfiguration <em>Estimation Approach Configuration</em>}'.
@@ -2659,25 +2659,25 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getObservationToEntityMapping_Entity();
 
 	/**
-	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ConstantValue <em>Constant Value</em>}'.
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ConstantDataPoint <em>Constant Data Point</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Constant Value</em>'.
-	 * @see tools.descartes.librede.configuration.ConstantValue
+	 * @return the meta object for class '<em>Constant Data Point</em>'.
+	 * @see tools.descartes.librede.configuration.ConstantDataPoint
 	 * @generated
 	 */
-	EClass getConstantValue();
+	EClass getConstantDataPoint();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.ConstantValue#getValue <em>Value</em>}'.
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.ConstantDataPoint#getValue <em>Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Value</em>'.
-	 * @see tools.descartes.librede.configuration.ConstantValue#getValue()
-	 * @see #getConstantValue()
+	 * @see tools.descartes.librede.configuration.ConstantDataPoint#getValue()
+	 * @see #getConstantDataPoint()
 	 * @generated
 	 */
-	EReference getConstantValue_Value();
+	EReference getConstantDataPoint_Value();
 
 	/**
 	 * Returns the meta object for enum '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
@@ -2841,12 +2841,12 @@ public interface ConfigurationPackage extends EPackage {
 		EReference INPUT_SPECIFICATION__OBSERVATIONS = eINSTANCE.getInputSpecification_Observations();
 
 		/**
-		 * The meta object literal for the '<em><b>Constant Values</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Constant Data Points</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INPUT_SPECIFICATION__CONSTANT_VALUES = eINSTANCE.getInputSpecification_ConstantValues();
+		EReference INPUT_SPECIFICATION__CONSTANT_DATA_POINTS = eINSTANCE.getInputSpecification_ConstantDataPoints();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.EstimationApproachConfigurationImpl <em>Estimation Approach Configuration</em>}' class.
@@ -3477,14 +3477,14 @@ public interface ConfigurationPackage extends EPackage {
 		EReference OBSERVATION_TO_ENTITY_MAPPING__ENTITY = eINSTANCE.getObservationToEntityMapping_Entity();
 
 		/**
-		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ConstantValueImpl <em>Constant Value</em>}' class.
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ConstantDataPointImpl <em>Constant Data Point</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see tools.descartes.librede.configuration.impl.ConstantValueImpl
-		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getConstantValue()
+		 * @see tools.descartes.librede.configuration.impl.ConstantDataPointImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getConstantDataPoint()
 		 * @generated
 		 */
-		EClass CONSTANT_VALUE = eINSTANCE.getConstantValue();
+		EClass CONSTANT_DATA_POINT = eINSTANCE.getConstantDataPoint();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
@@ -3492,7 +3492,7 @@ public interface ConfigurationPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CONSTANT_VALUE__VALUE = eINSTANCE.getConstantValue_Value();
+		EReference CONSTANT_DATA_POINT__VALUE = eINSTANCE.getConstantDataPoint_Value();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

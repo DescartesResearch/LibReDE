@@ -104,7 +104,7 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 			case ConfigurationPackage.EXTERNAL_CALL: return createExternalCall();
 			case ConfigurationPackage.COMPOSITE_SERVICE: return createCompositeService();
 			case ConfigurationPackage.OBSERVATION_TO_ENTITY_MAPPING: return createObservationToEntityMapping();
-			case ConfigurationPackage.CONSTANT_VALUE: return createConstantValue();
+			case ConfigurationPackage.CONSTANT_DATA_POINT: return createConstantDataPoint();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -375,9 +375,9 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ConstantValue createConstantValue() {
-		ConstantValueImpl constantValue = new ConstantValueImpl();
-		return constantValue;
+	public ConstantDataPoint createConstantDataPoint() {
+		ConstantDataPointImpl constantDataPoint = new ConstantDataPointImpl();
+		return constantDataPoint;
 	}
 
 	/**
