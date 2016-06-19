@@ -37,21 +37,26 @@ import java.util.Map;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.configuration.ConstantDataPoint;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
-import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.configuration.ObservationToEntityMapping;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.units.Time;
+import tools.descartes.librede.repository.handlers.ConstantHandler;
+import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
-import tools.descartes.librede.validation.CrossValidationCursor;
 
 public class LibredeVariables {
 	private LibredeConfiguration conf;
-	private MemoryObservationRepository repo;
+	private final IMonitoringRepository repo;
 	private EstimationAlgorithmFactory algoFactory;
 	private LibredeResults results;
 	private List<ApproachResult> resultsSelectedApproaches = new LinkedList<ApproachResult>();
@@ -62,7 +67,7 @@ public class LibredeVariables {
 
 	public LibredeVariables(LibredeConfiguration conf) {
 		this.conf = conf;
-		this.repo = new MemoryObservationRepository(conf.getWorkloadDescription());
+		this.repo = createRepository(conf);
 		this.algoFactory = new EstimationAlgorithmFactory();
 		this.cursors = new HashMap<String, IRepositoryCursor>();
 		this.runNr = 1;
@@ -151,7 +156,7 @@ public class LibredeVariables {
 		return conf;
 	}
 
-	public MemoryObservationRepository getRepo() {
+	public IMonitoringRepository getRepo() {
 		return repo;
 	}
 
@@ -224,6 +229,19 @@ public class LibredeVariables {
 	// appproaches to the selected approach list for selection
 	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches) {
 		this.selectedApproaches = selectedApproaches;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static IMonitoringRepository createRepository(LibredeConfiguration conf) {
+		IMonitoringRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
+		// Load constant data points into repository
+		for (ConstantDataPoint curValue : conf.getInput().getConstantDataPoints()) {
+			DerivationRule<?> rule = DerivationRule.rule((Metric<Dimension>)curValue.getMetric(), curValue.getAggregation()).build(new ConstantHandler<Dimension>((Quantity<Dimension>)curValue.getValue()));
+			for (ObservationToEntityMapping curMapping : curValue.getMappings()) {
+				repo.insertDerivation(rule, curMapping.getEntity());
+			}
+		}
+		return repo;
 	}
 
 }

@@ -88,6 +88,7 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.TimeSeries;
@@ -95,6 +96,7 @@ import tools.descartes.librede.repository.adapters.ArrivalRateAdapter;
 import tools.descartes.librede.repository.adapters.ArrivalsAdapter;
 import tools.descartes.librede.repository.adapters.BusyTimeAdapter;
 import tools.descartes.librede.repository.adapters.ContentionAdapter;
+import tools.descartes.librede.repository.adapters.DelayAdapter;
 import tools.descartes.librede.repository.adapters.DeparturesAdapter;
 import tools.descartes.librede.repository.adapters.IdleTimeAdapter;
 import tools.descartes.librede.repository.adapters.QueueLengthSeenOnArrivalAdapter;
@@ -115,7 +117,6 @@ import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
 import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
-import tools.descartes.librede.validation.CrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
@@ -139,6 +140,7 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS, new ArrivalsAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, new BusyTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.CONTENTION, new ContentionAdapter());
+		Registry.INSTANCE.registerMetric(StandardMetrics.DELAY, new DelayAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, new DeparturesAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, new IdleTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.RESIDENCE_TIME, new ResidenceTimeAdapter());
@@ -239,7 +241,7 @@ public class Librede {
 		return loadRepository(conf, repo, Collections.<String, IDataSource> emptyMap());
 	}
 
-	public static Quantity<Time> loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo,
+	public static Quantity<Time> loadRepository(LibredeConfiguration conf, IMonitoringRepository repo,
 			Map<String, IDataSource> existingDataSources) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		Quantity<Time> endTime = repo.getCurrentTime();
