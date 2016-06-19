@@ -213,7 +213,10 @@ public class InvocationGraph implements IDependencyTarget {
 		if (!externalCalls) {
 			return Collections.emptyList();
 		} else {
-			return Collections.<DataDependency<?>>singletonList(new DataDependency<>(visitCountQuery.getMetric(), visitCountQuery.getAggregation(), DependencyScope.fixedScope(visitCountQuery.getEntities())));
+			return Arrays.<DataDependency<?>>asList(
+					new DataDependency<>(visitCountQuery.getMetric(), visitCountQuery.getAggregation(), DependencyScope.fixedScope(visitCountQuery.getEntities())),
+					new DataDependency<>(delayQuery.getMetric(), delayQuery.getAggregation(), DependencyScope.fixedScope(delayQuery.getEntities()))
+					);
 		}
 	}
 
