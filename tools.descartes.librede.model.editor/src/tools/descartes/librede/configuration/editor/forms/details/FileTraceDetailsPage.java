@@ -29,47 +29,35 @@ package tools.descartes.librede.configuration.editor.forms.details;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.core.databinding.observable.list.IObservableList;
-import org.eclipse.core.databinding.observable.list.ObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
-import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -88,7 +76,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
@@ -100,15 +87,7 @@ import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsPackage;
-import tools.descartes.librede.metrics.StandardMetrics;
-import tools.descartes.librede.model.util.PrettyPrinter;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetricAdapter;
-import tools.descartes.librede.units.Quantity;
-import tools.descartes.librede.units.RequestRate;
-import tools.descartes.librede.units.Time;
-import tools.descartes.librede.units.Unit;
-import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsPackage;
 
 public class FileTraceDetailsPage extends AbstractDetailsPage {
@@ -267,7 +246,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		TableColumn entityColumn = entityViewerColumn.getColumn();
 		mappingTableLayout.setColumnData(entityColumn, new ColumnWeightData(10, 50, true));
 		entityColumn.setText("Entity");
-		entityViewerColumn.setEditingSupport(AbstractEstimationConfigurationFormPage.EObjectEditingSupport.create(mappingTableViewer, domain, ConfigurationPackage.Literals.TRACE_TO_ENTITY_MAPPING__ENTITY));
+		entityViewerColumn.setEditingSupport(AbstractEstimationConfigurationFormPage.EObjectEditingSupport.create(mappingTableViewer, domain, ConfigurationPackage.Literals.OBSERVATION_TO_ENTITY_MAPPING__ENTITY));
 
 		
 		TableViewerColumn indexViewerColumn = new TableViewerColumn(mappingTableViewer, SWT.NONE);
@@ -341,7 +320,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 						ViewerProperties.singleSelection().observe(comboMetricViewer),
 						EMFEditProperties
 								.value(domain,
-										ConfigurationPackage.Literals.TRACE_CONFIGURATION__METRIC)
+										ConfigurationPackage.Literals.OBSERVATION__METRIC)
 								.observe(input));
 		detailBindingContext
 				.bindValue(
@@ -355,7 +334,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 					ViewerProperties.singleSelection().observe(comboAggregationViewer),
 					EMFEditProperties
 							.value(domain,
-									ConfigurationPackage.Literals.TRACE_CONFIGURATION__AGGREGATION)
+									ConfigurationPackage.Literals.OBSERVATION__AGGREGATION)
 							.observe(input));
 		detailBindingContext
 				.bindValue(
@@ -398,7 +377,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 			input = (FileTraceConfiguration) structuredSelection.getFirstElement();
 			mappingTableViewer.setInput(input);
 			IObservableList units = EMFEditProperties.list(domain, FeaturePath.fromList(
-					ConfigurationPackage.Literals.TRACE_CONFIGURATION__METRIC,
+					ConfigurationPackage.Literals.OBSERVATION__METRIC,
 					MetricsPackage.Literals.METRIC__DIMENSION,
 					UnitsPackage.Literals.DIMENSION__UNITS
 					)).observe(input);

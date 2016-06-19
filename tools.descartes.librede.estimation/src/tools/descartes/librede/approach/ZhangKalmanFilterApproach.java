@@ -51,7 +51,8 @@ import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.InvocationGraph;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.state.constraints.ResponseTimeConstraint;
 import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -69,7 +70,7 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 	@Override
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Set<Service> services = new HashSet<>();
-		Builder<Unconstrained> b = ConstantStateModel.unconstrainedModelBuilder();
+		Builder<IStateConstraint> b = ConstantStateModel.constrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
 			for (ResourceDemand demand : res.getDemands()) {
 				b.addVariable(demand);
@@ -77,7 +78,20 @@ public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
 			}
 		}
 		b.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
-		b.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
+		InvocationGraph graph = new InvocationGraph(new ArrayList<>(services), cursor, 1);
+		b.setInvocationGraph(graph);
+		for (Service curService : services) {
+			if (curService.getIncomingCalls().isEmpty()) {
+				for (ResourceDemand curDemand : curService.getResourceDemands()) {
+					b.addConstraint(new ResponseTimeConstraint(curService, curDemand, cursor, 0));
+				}
+				for (Service calledService : graph.getCalledServices(curService)) {
+					for (ResourceDemand curDemand : calledService.getResourceDemands()) {
+						b.addConstraint(new ResponseTimeConstraint(calledService, curDemand, cursor, 0));
+					}
+				}
+			}
+		}
 		return Arrays.<IStateModel<?>> asList(b.build());
 	}
 

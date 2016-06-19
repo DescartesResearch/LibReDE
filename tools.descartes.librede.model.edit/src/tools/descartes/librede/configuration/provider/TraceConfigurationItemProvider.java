@@ -33,22 +33,15 @@ import java.util.Collection;
 import java.util.List;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.ResourceLocator;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
-import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
-import org.eclipse.emf.edit.provider.IItemPropertySource;
-import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
-import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
-import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
-import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.metrics.Aggregation;
 
 /**
  * This is the item provider adapter for a {@link tools.descartes.librede.configuration.TraceConfiguration} object.
@@ -57,9 +50,7 @@ import tools.descartes.librede.configuration.TraceConfiguration;
  * @generated
  */
 public class TraceConfigurationItemProvider 
-	extends ItemProviderAdapter
-	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
+	extends ObservationItemProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
@@ -81,36 +72,12 @@ public class TraceConfigurationItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addMetricPropertyDescriptor(object);
 			addDataSourcePropertyDescriptor(object);
 			addUnitPropertyDescriptor(object);
 			addIntervalPropertyDescriptor(object);
 			addLocationPropertyDescriptor(object);
-			addAggregationPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
-	}
-
-	/**
-	 * This adds a property descriptor for the Metric feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addMetricPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_TraceConfiguration_metric_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_metric_feature", "_UI_TraceConfiguration_type"),
-				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__METRIC,
-				 true,
-				 false,
-				 false,
-				 null,
-				 null,
-				 null));
 	}
 
 	/**
@@ -171,28 +138,6 @@ public class TraceConfigurationItemProvider
 				 getString("_UI_TraceConfiguration_location_feature"),
 				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_location_feature", "_UI_TraceConfiguration_type"),
 				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__LOCATION,
-				 true,
-				 false,
-				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
-				 null));
-	}
-
-	/**
-	 * This adds a property descriptor for the Aggregation feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addAggregationPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_TraceConfiguration_aggregation_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_TraceConfiguration_aggregation_feature", "_UI_TraceConfiguration_type"),
-				 ConfigurationPackage.Literals.TRACE_CONFIGURATION__AGGREGATION,
 				 true,
 				 false,
 				 false,
@@ -272,7 +217,8 @@ public class TraceConfigurationItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		String label = ((TraceConfiguration)object).getLocation();
+		Aggregation labelValue = ((TraceConfiguration)object).getAggregation();
+		String label = labelValue == null ? null : labelValue.toString();
 		return label == null || label.length() == 0 ?
 			getString("_UI_TraceConfiguration_type") :
 			getString("_UI_TraceConfiguration_type") + " " + label;
@@ -291,11 +237,9 @@ public class TraceConfigurationItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(TraceConfiguration.class)) {
-			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
-			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
@@ -322,17 +266,6 @@ public class TraceConfigurationItemProvider
 				 ConfigurationFactory.eINSTANCE.createTraceToEntityMapping()));
 	}
 
-	/**
-	 * Return the resource locator for this item provider's resources.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public ResourceLocator getResourceLocator() {
-		return LibredeEditPlugin.INSTANCE;
-	}
-	
 	@Override
 	public Object getColumnImage(Object object, int columnIndex) {
 		return getImage(object);

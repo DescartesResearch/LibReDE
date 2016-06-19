@@ -8,6 +8,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: tools.descartes.librede.bayesplusplus.BayesPlusPlusBundleActivator
 Import-Package: com.sun.jna,
  org.apache.commons.math3.analysis.differentiation;version="3.2.0",
+ org.apache.log4j,
  tools.descartes.librede.algorithm,
  tools.descartes.librede.configuration,
  tools.descartes.librede.exceptions,

@@ -63,4 +63,6 @@ public interface StandardMetrics {
 	public static final Metric<Time> STEAL_TIME = MetricsFactory.eINSTANCE.createMetric("STEAL_TIME", "steal time", Time.INSTANCE, Aggregation.SUM);
 	
 	public static final Metric<Ratio> CONTENTION = MetricsFactory.eINSTANCE.createMetric("CONTENTION", "contention", Ratio.INSTANCE, Aggregation.AVERAGE);
+	
+	public static final Metric<Time> DELAY = MetricsFactory.eINSTANCE.createMetric("DELAY", "delay", Time.INSTANCE, Aggregation.NONE, Aggregation.AVERAGE, Aggregation.CUMULATIVE_SUM, Aggregation.SUM, Aggregation.MAXIMUM, Aggregation.MINIMUM);
 }

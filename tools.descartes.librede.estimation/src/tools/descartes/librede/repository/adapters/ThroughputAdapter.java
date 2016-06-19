@@ -46,6 +46,7 @@ import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 	
@@ -78,7 +79,7 @@ public class ThroughputAdapter implements IMetricAdapter<RequestRate> {
 							return (entity instanceof Service) && ((Service)entity).isBackgroundService();
 						}
 					})
-					.build(new ConstantHandler<RequestRate>(1.0))
+					.build(new ConstantHandler<RequestRate>(UnitsFactory.eINSTANCE.createQuantity(1.0, RequestRate.REQ_PER_SECOND)))
 				);
 	}
 

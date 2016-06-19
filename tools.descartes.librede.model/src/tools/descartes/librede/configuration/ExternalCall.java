@@ -28,7 +28,6 @@
  */
 package tools.descartes.librede.configuration;
 
-
 /**
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>External Call</b></em>'.

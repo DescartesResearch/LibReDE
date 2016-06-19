@@ -41,9 +41,9 @@ public class ConstantHandler<D extends Dimension> extends BaseDerivationHandler<
 	
 	private static final Logger log = Loggers.DERIVATION_HANDLER_LOG;
 	
-	private final double constantValue;
+	private final Quantity<D> constantValue;
 	
-	public ConstantHandler(double value) {
+	public ConstantHandler(Quantity<D> value) {
 		this.constantValue = value;
 	}
 	
@@ -53,6 +53,6 @@ public class ConstantHandler<D extends Dimension> extends BaseDerivationHandler<
 		if (log.isTraceEnabled()) {
 			log.trace("Derive constant " + metric.getName());
 		}
-		return constantValue;
+		return constantValue.getValue(unit);
 	}
 }

@@ -88,6 +88,7 @@ import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.MemoryObservationRepository;
 import tools.descartes.librede.repository.TimeSeries;
@@ -95,6 +96,7 @@ import tools.descartes.librede.repository.adapters.ArrivalRateAdapter;
 import tools.descartes.librede.repository.adapters.ArrivalsAdapter;
 import tools.descartes.librede.repository.adapters.BusyTimeAdapter;
 import tools.descartes.librede.repository.adapters.ContentionAdapter;
+import tools.descartes.librede.repository.adapters.DelayAdapter;
 import tools.descartes.librede.repository.adapters.DeparturesAdapter;
 import tools.descartes.librede.repository.adapters.IdleTimeAdapter;
 import tools.descartes.librede.repository.adapters.QueueLengthSeenOnArrivalAdapter;
@@ -114,7 +116,7 @@ import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsPackage;
-import tools.descartes.librede.validation.CrossValidationCursor;
+import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
@@ -138,6 +140,7 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.ARRIVALS, new ArrivalsAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.BUSY_TIME, new BusyTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.CONTENTION, new ContentionAdapter());
+		Registry.INSTANCE.registerMetric(StandardMetrics.DELAY, new DelayAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.DEPARTURES, new DeparturesAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.IDLE_TIME, new IdleTimeAdapter());
 		Registry.INSTANCE.registerMetric(StandardMetrics.RESIDENCE_TIME, new ResidenceTimeAdapter());
@@ -185,7 +188,12 @@ public class Librede {
 		
 		
 		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(), existingDatasources);
-		var.getRepo().setCurrentTime(endTime);
+		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
+			// do not progress further than the configured end timestamp.
+			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
+		} else {		
+			var.getRepo().setCurrentTime(endTime);
+		}
 
 		if (!var.getConf().getValidation().isValidateEstimates()) {
 			try {
@@ -233,7 +241,7 @@ public class Librede {
 		return loadRepository(conf, repo, Collections.<String, IDataSource> emptyMap());
 	}
 
-	public static Quantity<Time> loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo,
+	public static Quantity<Time> loadRepository(LibredeConfiguration conf, IMonitoringRepository repo,
 			Map<String, IDataSource> existingDataSources) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
 		Quantity<Time> endTime = repo.getCurrentTime();
@@ -399,16 +407,16 @@ public class Librede {
 			log.info("Run estimation approach " + approachName);
 
 			List<IValidator> validators = initValidators(var.getConf(),
-					(CrossValidationCursor) var.getCursor(currentConf.getType()));
+					(ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()));
 
 
 			for (int i = 0; i < var.getConf().getValidation().getValidationFolds(); i++) {
 				log.info("Start repetition " + (i + 1));
-				((CrossValidationCursor) var.getCursor(currentConf.getType())).startTrainingPhase(i);
+				((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType())).startTrainingPhase(i);
 
 				ResultTable estimates = initAndExecuteEstimation(currentApproach, var.getRepo().getWorkload(),
 						var.getConf().getEstimation().getWindow(), var.getConf().getEstimation().isRecursive(),
-						new CachingRepositoryCursor((CrossValidationCursor) var.getCursor(currentConf.getType()),
+						new CachingRepositoryCursor((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
 								var.getConf().getEstimation().getWindow()),
 						var.getAlgoFactory());
 				if (estimates.getEstimates().isEmpty()) {
@@ -416,9 +424,9 @@ public class Librede {
 				}
 				Vector state = estimates.getLastEstimates();
 
-				((CrossValidationCursor) var.getCursor(currentConf.getType())).startValidationPhase(i);
+				((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType())).startValidationPhase(i);
 
-				runValidation(var.getConf(), validators, (CrossValidationCursor) var.getCursor(currentConf.getType()),
+				runValidation(var.getConf(), validators, (ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
 						state, estimates);
 
 				var.getResults().addEstimates(currentApproach.getClass(), i, estimates);
@@ -575,77 +583,81 @@ public class Librede {
 		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, MatrixBuilder> meanPredictions = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
 		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
-
-		MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
-		for (Class<? extends IEstimationApproach> approach : approaches) {
-			MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
-			for (int i = 0; i < results.getNumberOfFolds(); i++) {
-				ResultTable curFold = results.getEstimates(approach, i);
-				lastEstimates.addRow(curFold.getLastEstimates());
-			}
-			Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
-			if (lastEstimatesMatrix.isEmpty()) {
-				log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
-			} else {
-				meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
-			}
-
-			for (Class<? extends IValidator> validator : validators) {
-				MatrixBuilder errorsBuilder = null;
-				MatrixBuilder predictionsBuilder = null;
+		
+		if (variables != null) {
+			MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
+			for (Class<? extends IEstimationApproach> approach : approaches) {
+				MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
 				for (int i = 0; i < results.getNumberOfFolds(); i++) {
 					ResultTable curFold = results.getEstimates(approach, i);
-					Vector curErr = curFold.getValidationErrors(validator);
-					if (errorsBuilder == null) {
-						errorsBuilder = MatrixBuilder.create(curErr.rows());
-						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
-					}
-					errorsBuilder.addRow(curErr);
-					Vector curPred = curFold.getValidationPredictions(validator);
-					if (predictionsBuilder == null) {
-						predictionsBuilder = MatrixBuilder.create(curPred.rows());
-					}
-					predictionsBuilder.addRow(curPred);
+					lastEstimates.addRow(curFold.getLastEstimates());
 				}
-
-				Matrix errors = errorsBuilder.toMatrix();
-				Matrix predictions = predictionsBuilder.toMatrix();
-				if (!errors.isEmpty() && !predictions.isEmpty()) {
-					Vector curMeanErr = LinAlg.mean(errors);
-					Vector curMeanPred = LinAlg.mean(predictions);
-					if (!meanErrors.containsKey(validator)) {
-						meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
-						meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
-					}
-					meanErrors.get(validator).addRow(curMeanErr);
-					meanPredictions.get(validator).addRow(curMeanPred);
+				Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
+				if (lastEstimatesMatrix.isEmpty()) {
+					log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
+				} else {
+					meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
 				}
+	
+				for (Class<? extends IValidator> validator : validators) {
+					MatrixBuilder errorsBuilder = null;
+					MatrixBuilder predictionsBuilder = null;
+					for (int i = 0; i < results.getNumberOfFolds(); i++) {
+						ResultTable curFold = results.getEstimates(approach, i);
+						Vector curErr = curFold.getValidationErrors(validator);
+						if (errorsBuilder == null) {
+							errorsBuilder = MatrixBuilder.create(curErr.rows());
+							validatedEntities.put(validator, curFold.getValidatedEntities(validator));
+						}
+						errorsBuilder.addRow(curErr);
+						Vector curPred = curFold.getValidationPredictions(validator);
+						if (predictionsBuilder == null) {
+							predictionsBuilder = MatrixBuilder.create(curPred.rows());
+						}
+						predictionsBuilder.addRow(curPred);
+					}
+	
+					Matrix errors = errorsBuilder.toMatrix();
+					Matrix predictions = predictionsBuilder.toMatrix();
+					if (!errors.isEmpty() && !predictions.isEmpty()) {
+						Vector curMeanErr = LinAlg.mean(errors);
+						Vector curMeanPred = LinAlg.mean(predictions);
+						if (!meanErrors.containsKey(validator)) {
+							meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
+							meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
+						}
+						meanErrors.get(validator).addRow(curMeanErr);
+						meanPredictions.get(validator).addRow(curMeanPred);
+					}
+				}
+	
 			}
 
-		}
 
-		// Estimates
-		System.out.println("Estimates");
-		System.out.println("=========");
-		printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
-		System.out.println();
+			// Estimates
+			System.out.println("Estimates");
+			System.out.println("=========");
+			printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
+			System.out.println();
 
-		if (validators.size() > 0) {
-			// Cross-Validation Results
-			System.out.println("Cross-Validation Results:");
-			System.out.println("=========================");
 
-			for (Class<? extends IValidator> validator : validators) {
-				String name = Registry.INSTANCE.getDisplayName(validator);
-				System.out.println(name + ":");
-				if (meanErrors.containsKey(validator)) {
-
-					Matrix errors = meanErrors.get(validator).toMatrix();
-					Matrix predictions = meanPredictions.get(validator).toMatrix();
-					printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors);
-					System.out.println();
-				} else {
-					System.out.println("No results.");
+			if (validators.size() > 0) {
+				// Cross-Validation Results
+				System.out.println("Cross-Validation Results:");
+				System.out.println("=========================");
+	
+				for (Class<? extends IValidator> validator : validators) {
+					String name = Registry.INSTANCE.getDisplayName(validator);
+					System.out.println(name + ":");
+					if (meanErrors.containsKey(validator)) {
+	
+						Matrix errors = meanErrors.get(validator).toMatrix();
+						Matrix predictions = meanPredictions.get(validator).toMatrix();
+						printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors);
+						System.out.println();
+					} else {
+						System.out.println("No results.");
+					}
 				}
 			}
 		}

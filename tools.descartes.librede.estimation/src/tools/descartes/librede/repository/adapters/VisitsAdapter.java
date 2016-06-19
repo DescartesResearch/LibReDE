@@ -40,10 +40,11 @@ import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveVisitCountHandler;
 import tools.descartes.librede.repository.handlers.TimeWeightedAggregationHandler;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.RequestCount;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 
@@ -71,7 +72,7 @@ public class VisitsAdapter implements IMetricAdapter<RequestCount> {
 						}
 					})
 					.priority(-100) //IMPORTANT: Use this only if nothing else is available
-					.build(new ConstantHandler<RequestCount>(1.0)),
+					.build(new ConstantHandler<RequestCount>(UnitsFactory.eINSTANCE.createQuantity(1.0, RequestCount.REQUESTS))),
 				DerivationRule.rule(StandardMetrics.VISITS, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE, 
 							DependencyScope.dynamicScope()

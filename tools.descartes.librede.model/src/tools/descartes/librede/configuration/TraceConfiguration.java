@@ -29,10 +29,6 @@
 package tools.descartes.librede.configuration;
 
 import org.eclipse.emf.common.util.EList;
-
-import org.eclipse.emf.ecore.EObject;
-import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -47,46 +43,18 @@ import tools.descartes.librede.units.Unit;
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getLocation <em>Location</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getAggregation <em>Aggregation</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}</li>
  * </ul>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration()
  * @model
  * @generated
  */
-public interface TraceConfiguration extends EObject {
-	/**
-	 * Returns the value of the '<em><b>Metric</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Metric</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Metric</em>' reference.
-	 * @see #setMetric(Metric)
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Metric()
-	 * @model required="true"
-	 * @generated
-	 */
-	Metric<? extends Dimension> getMetric();
-
-	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Metric</em>' reference.
-	 * @see #getMetric()
-	 * @generated
-	 */
-	void setMetric(Metric<? extends Dimension> value);
-
+public interface TraceConfiguration extends Observation {
 	/**
 	 * Returns the value of the '<em><b>Unit</b></em>' reference.
 	 * <!-- begin-user-doc -->
@@ -166,33 +134,20 @@ public interface TraceConfiguration extends EObject {
 	void setLocation(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Aggregation</b></em>' attribute.
-	 * The literals are from the enumeration {@link tools.descartes.librede.metrics.Aggregation}.
+	 * Returns the value of the '<em><b>Mappings</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.TraceToEntityMapping}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Aggregation</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Mappings</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Aggregation</em>' attribute.
-	 * @see tools.descartes.librede.metrics.Aggregation
-	 * @see #setAggregation(Aggregation)
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Aggregation()
-	 * @model
+	 * @return the value of the '<em>Mappings</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Mappings()
+	 * @model containment="true" required="true"
 	 * @generated
 	 */
-	Aggregation getAggregation();
-
-	/**
-	 * Sets the value of the '{@link tools.descartes.librede.configuration.TraceConfiguration#getAggregation <em>Aggregation</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Aggregation</em>' attribute.
-	 * @see tools.descartes.librede.metrics.Aggregation
-	 * @see #getAggregation()
-	 * @generated
-	 */
-	void setAggregation(Aggregation value);
+	EList<TraceToEntityMapping> getMappings();
 
 	/**
 	 * Returns the value of the '<em><b>Data Source</b></em>' reference.
@@ -219,21 +174,5 @@ public interface TraceConfiguration extends EObject {
 	 * @generated
 	 */
 	void setDataSource(DataSourceConfiguration value);
-
-	/**
-	 * Returns the value of the '<em><b>Mappings</b></em>' containment reference list.
-	 * The list contents are of type {@link tools.descartes.librede.configuration.TraceToEntityMapping}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Mappings</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Mappings</em>' containment reference list.
-	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getTraceConfiguration_Mappings()
-	 * @model containment="true" required="true"
-	 * @generated
-	 */
-	EList<TraceToEntityMapping> getMappings();
 
 } // TraceConfiguration

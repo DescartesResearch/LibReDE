@@ -78,7 +78,7 @@ public class AggregationRepositoryCursor implements IRepositoryCursor {
 	@Override
 	public void reset() {
 		this.currentTime = startTime;
-		this.lastInterval = 0;
+		this.lastInterval = -1;
 	}
 	
 	/* (non-Javadoc)

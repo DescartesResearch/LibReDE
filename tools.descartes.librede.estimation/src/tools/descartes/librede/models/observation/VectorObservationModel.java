@@ -77,7 +77,10 @@ public class VectorObservationModel implements IObservationModel<Vector> {
 	public Vector getObservedOutput() {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = outputFunctions.get(i).getObservedOutput();
+			OutputFunction func = outputFunctions.get(i);
+			if (func.hasData()) {
+				temp[i] = outputFunctions.get(i).getObservedOutput();
+			}
 		}
 		return vector(temp);
 	}
@@ -86,7 +89,10 @@ public class VectorObservationModel implements IObservationModel<Vector> {
 	public Vector getCalculatedOutput(State state) {
 		double[] temp = new double[outputSize];
 		for (int i = 0; i < outputSize; i++) {
-			temp[i] = outputFunctions.get(i).getCalculatedOutput(state).getValue();
+			OutputFunction func = outputFunctions.get(i);
+			if (func.hasData()) {
+				temp[i] = func.getCalculatedOutput(state).getValue();
+			}
 		}
 		return vector(temp);
 	}

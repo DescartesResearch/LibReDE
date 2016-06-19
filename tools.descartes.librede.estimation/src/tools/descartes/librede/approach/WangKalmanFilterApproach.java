@@ -34,6 +34,7 @@ import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.OutputFunction;
@@ -76,8 +77,10 @@ public class WangKalmanFilterApproach extends AbstractEstimationApproach {
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel observationModel = new VectorObservationModel();
 		for (Resource res : stateModel.getResources()) {
-			UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, res, 0);
-			observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, res, 0), func));
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, res, 0);
+				observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, res, 0), func));
+			}
 		}
 		return observationModel;
 	}

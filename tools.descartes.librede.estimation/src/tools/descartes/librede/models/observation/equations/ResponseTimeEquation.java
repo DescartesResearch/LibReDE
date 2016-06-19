@@ -160,12 +160,14 @@ public class ResponseTimeEquation extends ModelEquation {
 			Map<Service, ResidenceTimeEquation> accessingServices = residenceTimeEquations.get(res_i);
 			for (Service curService : accessingServices.keySet()) {
 				double visits = 1;
+				double invocationDelay = 0.0;
 				if (!curService.equals(cls_r)) {
 					visits = invocations.getInvocationCount(cls_r, curService, historicInterval);
+					invocationDelay = invocations.getInvocationDelay(cls_r, curService);
 				}
 				if (visits > 0.0) {
 					ResidenceTimeEquation R_ir = accessingServices.get(curService);
-					DerivativeStructure curRt = R_ir.getValue(state).multiply(visits);
+					DerivativeStructure curRt = R_ir.getValue(state).add(invocationDelay).multiply(visits);
 					if (rt == null) {
 						rt = curRt;
 					} else {
