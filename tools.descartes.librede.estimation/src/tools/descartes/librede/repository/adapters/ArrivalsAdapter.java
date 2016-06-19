@@ -42,7 +42,7 @@ import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.RequestCount;
-import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 
@@ -87,7 +87,7 @@ public class ArrivalsAdapter implements IMetricAdapter<RequestCount> {
 						}
 					})
 					.priority(-100) //IMPORTANT: Use this only if nothing else is available
-					.build(new ConstantHandler<RequestCount>(1.0))
+					.build(new ConstantHandler<RequestCount>(UnitsFactory.eINSTANCE.createQuantity(1.0, RequestCount.REQUESTS)))
 				);
 	}
 

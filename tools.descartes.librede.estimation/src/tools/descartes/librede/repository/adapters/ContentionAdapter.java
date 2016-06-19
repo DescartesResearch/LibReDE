@@ -41,7 +41,7 @@ import tools.descartes.librede.repository.handlers.DeriveContentionHandler;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.Ratio;
-import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class ContentionAdapter implements IMetricAdapter<Ratio> {
 
@@ -66,7 +66,7 @@ public class ContentionAdapter implements IMetricAdapter<Ratio> {
 							return false;
 						}
 					})
-					.build(new ConstantHandler<Ratio>(0.0)),
+					.build(new ConstantHandler<Ratio>(UnitsFactory.eINSTANCE.createQuantity(0.0, Ratio.NONE))),
 				DerivationRule.rule(StandardMetrics.CONTENTION, Aggregation.AVERAGE)
 					.requiring(StandardMetrics.STEAL_TIME, Aggregation.SUM)
 					.build(new DeriveContentionHandler())

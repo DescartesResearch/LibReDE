@@ -38,6 +38,7 @@ import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
 public class DelayAdapter implements IMetricAdapter<Time> {
 
@@ -65,7 +66,7 @@ public class DelayAdapter implements IMetricAdapter<Time> {
 						.requiring(Aggregation.CUMULATIVE_SUM).build(new DeriveDiffHandler<Time>()),
 				DerivationRule.rule(StandardMetrics.DELAY, Aggregation.AVERAGE)
 						.priority(-100) //IMPORTANT: Use this only if nothing else is available
-						.build(new ConstantHandler<Time>(0.0))
+						.build(new ConstantHandler<Time>(UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS)))
 						);
 	}
 
