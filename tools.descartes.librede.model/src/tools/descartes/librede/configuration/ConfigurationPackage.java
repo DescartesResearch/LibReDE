@@ -433,13 +433,22 @@ public interface ConfigurationPackage extends EPackage {
 	int INPUT_SPECIFICATION__OBSERVATIONS = 1;
 
 	/**
+	 * The feature id for the '<em><b>Constant Values</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INPUT_SPECIFICATION__CONSTANT_VALUES = 2;
+
+	/**
 	 * The number of structural features of the '<em>Input Specification</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INPUT_SPECIFICATION_FEATURE_COUNT = 2;
+	int INPUT_SPECIFICATION_FEATURE_COUNT = 3;
 
 	/**
 	 * The number of operations of the '<em>Input Specification</em>' class.
@@ -704,58 +713,14 @@ public interface ConfigurationPackage extends EPackage {
 	int SERVICE_OPERATION_COUNT = MODEL_ENTITY_OPERATION_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Metric</b></em>' reference.
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ObservationImpl <em>Observation</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.ObservationImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getObservation()
 	 * @generated
-	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__METRIC = 0;
-
-	/**
-	 * The feature id for the '<em><b>Data Source</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__DATA_SOURCE = 1;
-
-	/**
-	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__MAPPINGS = 2;
-
-	/**
-	 * The feature id for the '<em><b>Unit</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__UNIT = 3;
-
-	/**
-	 * The feature id for the '<em><b>Interval</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__INTERVAL = 4;
-
-	/**
-	 * The feature id for the '<em><b>Location</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRACE_CONFIGURATION__LOCATION = 5;
+	int OBSERVATION = 24;
 
 	/**
 	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
@@ -764,7 +729,106 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION__AGGREGATION = 6;
+	int OBSERVATION__AGGREGATION = 0;
+
+	/**
+	 * The feature id for the '<em><b>Metric</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION__METRIC = 1;
+
+	/**
+	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION__MAPPINGS = 2;
+
+	/**
+	 * The number of structural features of the '<em>Observation</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION_FEATURE_COUNT = 3;
+
+	/**
+	 * The number of operations of the '<em>Observation</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION_OPERATION_COUNT = 0;
+
+	/**
+	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__AGGREGATION = OBSERVATION__AGGREGATION;
+
+	/**
+	 * The feature id for the '<em><b>Metric</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__METRIC = OBSERVATION__METRIC;
+
+	/**
+	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__MAPPINGS = OBSERVATION__MAPPINGS;
+
+	/**
+	 * The feature id for the '<em><b>Data Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__DATA_SOURCE = OBSERVATION_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Unit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__UNIT = OBSERVATION_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Interval</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__INTERVAL = OBSERVATION_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRACE_CONFIGURATION__LOCATION = OBSERVATION_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Trace Configuration</em>' class.
@@ -773,7 +837,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION_FEATURE_COUNT = 7;
+	int TRACE_CONFIGURATION_FEATURE_COUNT = OBSERVATION_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of operations of the '<em>Trace Configuration</em>' class.
@@ -782,7 +846,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_CONFIGURATION_OPERATION_COUNT = 0;
+	int TRACE_CONFIGURATION_OPERATION_COUNT = OBSERVATION_OPERATION_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1037,6 +1101,15 @@ public interface ConfigurationPackage extends EPackage {
 	int EXPORTER_CONFIGURATION_OPERATION_COUNT = NAMED_ELEMENT_OPERATION_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FILE_TRACE_CONFIGURATION__AGGREGATION = TRACE_CONFIGURATION__AGGREGATION;
+
+	/**
 	 * The feature id for the '<em><b>Metric</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1046,15 +1119,6 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION__METRIC = TRACE_CONFIGURATION__METRIC;
 
 	/**
-	 * The feature id for the '<em><b>Data Source</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FILE_TRACE_CONFIGURATION__DATA_SOURCE = TRACE_CONFIGURATION__DATA_SOURCE;
-
-	/**
 	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1062,6 +1126,15 @@ public interface ConfigurationPackage extends EPackage {
 	 * @ordered
 	 */
 	int FILE_TRACE_CONFIGURATION__MAPPINGS = TRACE_CONFIGURATION__MAPPINGS;
+
+	/**
+	 * The feature id for the '<em><b>Data Source</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FILE_TRACE_CONFIGURATION__DATA_SOURCE = TRACE_CONFIGURATION__DATA_SOURCE;
 
 	/**
 	 * The feature id for the '<em><b>Unit</b></em>' reference.
@@ -1091,15 +1164,6 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION__LOCATION = TRACE_CONFIGURATION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int FILE_TRACE_CONFIGURATION__AGGREGATION = TRACE_CONFIGURATION__AGGREGATION;
-
-	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1127,6 +1191,43 @@ public interface ConfigurationPackage extends EPackage {
 	int FILE_TRACE_CONFIGURATION_OPERATION_COUNT = TRACE_CONFIGURATION_OPERATION_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ObservationToEntityMappingImpl <em>Observation To Entity Mapping</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.ObservationToEntityMappingImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getObservationToEntityMapping()
+	 * @generated
+	 */
+	int OBSERVATION_TO_ENTITY_MAPPING = 25;
+
+	/**
+	 * The feature id for the '<em><b>Entity</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION_TO_ENTITY_MAPPING__ENTITY = 0;
+
+	/**
+	 * The number of structural features of the '<em>Observation To Entity Mapping</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION_TO_ENTITY_MAPPING_FEATURE_COUNT = 1;
+
+	/**
+	 * The number of operations of the '<em>Observation To Entity Mapping</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int OBSERVATION_TO_ENTITY_MAPPING_OPERATION_COUNT = 0;
+
+	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl <em>Trace To Entity Mapping</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1143,7 +1244,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_TO_ENTITY_MAPPING__ENTITY = 0;
+	int TRACE_TO_ENTITY_MAPPING__ENTITY = OBSERVATION_TO_ENTITY_MAPPING__ENTITY;
 
 	/**
 	 * The feature id for the '<em><b>Trace Column</b></em>' attribute.
@@ -1152,7 +1253,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN = 1;
+	int TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN = OBSERVATION_TO_ENTITY_MAPPING_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Filters</b></em>' containment reference list.
@@ -1161,7 +1262,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_TO_ENTITY_MAPPING__FILTERS = 2;
+	int TRACE_TO_ENTITY_MAPPING__FILTERS = OBSERVATION_TO_ENTITY_MAPPING_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Trace To Entity Mapping</em>' class.
@@ -1170,7 +1271,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_TO_ENTITY_MAPPING_FEATURE_COUNT = 3;
+	int TRACE_TO_ENTITY_MAPPING_FEATURE_COUNT = OBSERVATION_TO_ENTITY_MAPPING_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of operations of the '<em>Trace To Entity Mapping</em>' class.
@@ -1179,7 +1280,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRACE_TO_ENTITY_MAPPING_OPERATION_COUNT = 0;
+	int TRACE_TO_ENTITY_MAPPING_OPERATION_COUNT = OBSERVATION_TO_ENTITY_MAPPING_OPERATION_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.EstimationAlgorithmConfigurationImpl <em>Estimation Algorithm Configuration</em>}' class.
@@ -1530,6 +1631,70 @@ public interface ConfigurationPackage extends EPackage {
 	int COMPOSITE_SERVICE_OPERATION_COUNT = SERVICE_OPERATION_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link tools.descartes.librede.configuration.impl.ConstantValueImpl <em>Constant Value</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see tools.descartes.librede.configuration.impl.ConstantValueImpl
+	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getConstantValue()
+	 * @generated
+	 */
+	int CONSTANT_VALUE = 26;
+
+	/**
+	 * The feature id for the '<em><b>Aggregation</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONSTANT_VALUE__AGGREGATION = OBSERVATION__AGGREGATION;
+
+	/**
+	 * The feature id for the '<em><b>Metric</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONSTANT_VALUE__METRIC = OBSERVATION__METRIC;
+
+	/**
+	 * The feature id for the '<em><b>Mappings</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONSTANT_VALUE__MAPPINGS = OBSERVATION__MAPPINGS;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONSTANT_VALUE__VALUE = OBSERVATION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Constant Value</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONSTANT_VALUE_FEATURE_COUNT = OBSERVATION_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Constant Value</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONSTANT_VALUE_OPERATION_COUNT = OBSERVATION_OPERATION_COUNT + 0;
+
+	/**
 	 * The meta object id for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1537,7 +1702,7 @@ public interface ConfigurationPackage extends EPackage {
 	 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getSchedulingStrategy()
 	 * @generated
 	 */
-	int SCHEDULING_STRATEGY = 24;
+	int SCHEDULING_STRATEGY = 27;
 
 
 	/**
@@ -1700,6 +1865,17 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getInputSpecification_Observations();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.InputSpecification#getConstantValues <em>Constant Values</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Constant Values</em>'.
+	 * @see tools.descartes.librede.configuration.InputSpecification#getConstantValues()
+	 * @see #getInputSpecification()
+	 * @generated
+	 */
+	EReference getInputSpecification_ConstantValues();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.EstimationApproachConfiguration <em>Estimation Approach Configuration</em>}'.
@@ -1906,17 +2082,6 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getTraceConfiguration();
 
 	/**
-	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getMetric <em>Metric</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Metric</em>'.
-	 * @see tools.descartes.librede.configuration.TraceConfiguration#getMetric()
-	 * @see #getTraceConfiguration()
-	 * @generated
-	 */
-	EReference getTraceConfiguration_Metric();
-
-	/**
 	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getUnit <em>Unit</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1950,17 +2115,6 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getTraceConfiguration_Location();
 
 	/**
-	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceConfiguration#getAggregation <em>Aggregation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Aggregation</em>'.
-	 * @see tools.descartes.librede.configuration.TraceConfiguration#getAggregation()
-	 * @see #getTraceConfiguration()
-	 * @generated
-	 */
-	EAttribute getTraceConfiguration_Aggregation();
-
-	/**
 	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceConfiguration#getDataSource <em>Data Source</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1970,17 +2124,6 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getTraceConfiguration_DataSource();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.TraceConfiguration#getMappings <em>Mappings</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Mappings</em>'.
-	 * @see tools.descartes.librede.configuration.TraceConfiguration#getMappings()
-	 * @see #getTraceConfiguration()
-	 * @generated
-	 */
-	EReference getTraceConfiguration_Mappings();
 
 	/**
 	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.Parameter <em>Parameter</em>}'.
@@ -2272,17 +2415,6 @@ public interface ConfigurationPackage extends EPackage {
 	EClass getTraceToEntityMapping();
 
 	/**
-	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.TraceToEntityMapping#getEntity <em>Entity</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Entity</em>'.
-	 * @see tools.descartes.librede.configuration.TraceToEntityMapping#getEntity()
-	 * @see #getTraceToEntityMapping()
-	 * @generated
-	 */
-	EReference getTraceToEntityMapping_Entity();
-
-	/**
 	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.TraceToEntityMapping#getTraceColumn <em>Trace Column</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2463,6 +2595,91 @@ public interface ConfigurationPackage extends EPackage {
 	EReference getTask_Service();
 
 	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.Observation <em>Observation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Observation</em>'.
+	 * @see tools.descartes.librede.configuration.Observation
+	 * @generated
+	 */
+	EClass getObservation();
+
+	/**
+	 * Returns the meta object for the attribute '{@link tools.descartes.librede.configuration.Observation#getAggregation <em>Aggregation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Aggregation</em>'.
+	 * @see tools.descartes.librede.configuration.Observation#getAggregation()
+	 * @see #getObservation()
+	 * @generated
+	 */
+	EAttribute getObservation_Aggregation();
+
+	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.Observation#getMetric <em>Metric</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Metric</em>'.
+	 * @see tools.descartes.librede.configuration.Observation#getMetric()
+	 * @see #getObservation()
+	 * @generated
+	 */
+	EReference getObservation_Metric();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link tools.descartes.librede.configuration.Observation#getMappings <em>Mappings</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Mappings</em>'.
+	 * @see tools.descartes.librede.configuration.Observation#getMappings()
+	 * @see #getObservation()
+	 * @generated
+	 */
+	EReference getObservation_Mappings();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ObservationToEntityMapping <em>Observation To Entity Mapping</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Observation To Entity Mapping</em>'.
+	 * @see tools.descartes.librede.configuration.ObservationToEntityMapping
+	 * @generated
+	 */
+	EClass getObservationToEntityMapping();
+
+	/**
+	 * Returns the meta object for the reference '{@link tools.descartes.librede.configuration.ObservationToEntityMapping#getEntity <em>Entity</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Entity</em>'.
+	 * @see tools.descartes.librede.configuration.ObservationToEntityMapping#getEntity()
+	 * @see #getObservationToEntityMapping()
+	 * @generated
+	 */
+	EReference getObservationToEntityMapping_Entity();
+
+	/**
+	 * Returns the meta object for class '{@link tools.descartes.librede.configuration.ConstantValue <em>Constant Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Constant Value</em>'.
+	 * @see tools.descartes.librede.configuration.ConstantValue
+	 * @generated
+	 */
+	EClass getConstantValue();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link tools.descartes.librede.configuration.ConstantValue#getValue <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Value</em>'.
+	 * @see tools.descartes.librede.configuration.ConstantValue#getValue()
+	 * @see #getConstantValue()
+	 * @generated
+	 */
+	EReference getConstantValue_Value();
+
+	/**
 	 * Returns the meta object for enum '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2622,6 +2839,14 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INPUT_SPECIFICATION__OBSERVATIONS = eINSTANCE.getInputSpecification_Observations();
+
+		/**
+		 * The meta object literal for the '<em><b>Constant Values</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INPUT_SPECIFICATION__CONSTANT_VALUES = eINSTANCE.getInputSpecification_ConstantValues();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.EstimationApproachConfigurationImpl <em>Estimation Approach Configuration</em>}' class.
@@ -2786,14 +3011,6 @@ public interface ConfigurationPackage extends EPackage {
 		EClass TRACE_CONFIGURATION = eINSTANCE.getTraceConfiguration();
 
 		/**
-		 * The meta object literal for the '<em><b>Metric</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRACE_CONFIGURATION__METRIC = eINSTANCE.getTraceConfiguration_Metric();
-
-		/**
 		 * The meta object literal for the '<em><b>Unit</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2818,28 +3035,12 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute TRACE_CONFIGURATION__LOCATION = eINSTANCE.getTraceConfiguration_Location();
 
 		/**
-		 * The meta object literal for the '<em><b>Aggregation</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute TRACE_CONFIGURATION__AGGREGATION = eINSTANCE.getTraceConfiguration_Aggregation();
-
-		/**
 		 * The meta object literal for the '<em><b>Data Source</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference TRACE_CONFIGURATION__DATA_SOURCE = eINSTANCE.getTraceConfiguration_DataSource();
-
-		/**
-		 * The meta object literal for the '<em><b>Mappings</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRACE_CONFIGURATION__MAPPINGS = eINSTANCE.getTraceConfiguration_Mappings();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ParameterImpl <em>Parameter</em>}' class.
@@ -3074,14 +3275,6 @@ public interface ConfigurationPackage extends EPackage {
 		EClass TRACE_TO_ENTITY_MAPPING = eINSTANCE.getTraceToEntityMapping();
 
 		/**
-		 * The meta object literal for the '<em><b>Entity</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRACE_TO_ENTITY_MAPPING__ENTITY = eINSTANCE.getTraceToEntityMapping_Entity();
-
-		/**
 		 * The meta object literal for the '<em><b>Trace Column</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3230,6 +3423,76 @@ public interface ConfigurationPackage extends EPackage {
 		 * @generated
 		 */
 		EReference TASK__SERVICE = eINSTANCE.getTask_Service();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ObservationImpl <em>Observation</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.ObservationImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getObservation()
+		 * @generated
+		 */
+		EClass OBSERVATION = eINSTANCE.getObservation();
+
+		/**
+		 * The meta object literal for the '<em><b>Aggregation</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute OBSERVATION__AGGREGATION = eINSTANCE.getObservation_Aggregation();
+
+		/**
+		 * The meta object literal for the '<em><b>Metric</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference OBSERVATION__METRIC = eINSTANCE.getObservation_Metric();
+
+		/**
+		 * The meta object literal for the '<em><b>Mappings</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference OBSERVATION__MAPPINGS = eINSTANCE.getObservation_Mappings();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ObservationToEntityMappingImpl <em>Observation To Entity Mapping</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.ObservationToEntityMappingImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getObservationToEntityMapping()
+		 * @generated
+		 */
+		EClass OBSERVATION_TO_ENTITY_MAPPING = eINSTANCE.getObservationToEntityMapping();
+
+		/**
+		 * The meta object literal for the '<em><b>Entity</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference OBSERVATION_TO_ENTITY_MAPPING__ENTITY = eINSTANCE.getObservationToEntityMapping_Entity();
+
+		/**
+		 * The meta object literal for the '{@link tools.descartes.librede.configuration.impl.ConstantValueImpl <em>Constant Value</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see tools.descartes.librede.configuration.impl.ConstantValueImpl
+		 * @see tools.descartes.librede.configuration.impl.ConfigurationPackageImpl#getConstantValue()
+		 * @generated
+		 */
+		EClass CONSTANT_VALUE = eINSTANCE.getConstantValue();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CONSTANT_VALUE__VALUE = eINSTANCE.getConstantValue_Value();
 
 		/**
 		 * The meta object literal for the '{@link tools.descartes.librede.configuration.SchedulingStrategy <em>Scheduling Strategy</em>}' enum.

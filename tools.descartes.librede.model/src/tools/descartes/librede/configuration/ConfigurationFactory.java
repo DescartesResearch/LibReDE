@@ -246,6 +246,24 @@ public interface ConfigurationFactory extends EFactory {
 	CompositeService createCompositeService();
 
 	/**
+	 * Returns a new object of class '<em>Observation To Entity Mapping</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Observation To Entity Mapping</em>'.
+	 * @generated
+	 */
+	ObservationToEntityMapping createObservationToEntityMapping();
+
+	/**
+	 * Returns a new object of class '<em>Constant Value</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Constant Value</em>'.
+	 * @generated
+	 */
+	ConstantValue createConstantValue();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

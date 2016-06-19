@@ -39,6 +39,7 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.ConstantValue;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.InputSpecification;
 import tools.descartes.librede.configuration.TraceConfiguration;
@@ -53,6 +54,7 @@ import tools.descartes.librede.configuration.TraceConfiguration;
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.impl.InputSpecificationImpl#getDataSources <em>Data Sources</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.InputSpecificationImpl#getObservations <em>Observations</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.InputSpecificationImpl#getConstantValues <em>Constant Values</em>}</li>
  * </ul>
  *
  * @generated
@@ -77,6 +79,16 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected EList<TraceConfiguration> observations;
+
+	/**
+	 * The cached value of the '{@link #getConstantValues() <em>Constant Values</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getConstantValues()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<ConstantValue> constantValues;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -126,6 +138,18 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<ConstantValue> getConstantValues() {
+		if (constantValues == null) {
+			constantValues = new EObjectContainmentEList<ConstantValue>(ConstantValue.class, this, ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES);
+		}
+		return constantValues;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -133,6 +157,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 				return ((InternalEList<?>)getDataSources()).basicRemove(otherEnd, msgs);
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				return ((InternalEList<?>)getObservations()).basicRemove(otherEnd, msgs);
+			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES:
+				return ((InternalEList<?>)getConstantValues()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -149,6 +175,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 				return getDataSources();
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				return getObservations();
+			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES:
+				return getConstantValues();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -170,6 +198,10 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 				getObservations().clear();
 				getObservations().addAll((Collection<? extends TraceConfiguration>)newValue);
 				return;
+			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES:
+				getConstantValues().clear();
+				getConstantValues().addAll((Collection<? extends ConstantValue>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -188,6 +220,9 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				getObservations().clear();
 				return;
+			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES:
+				getConstantValues().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -204,6 +239,8 @@ public class InputSpecificationImpl extends MinimalEObjectImpl.Container impleme
 				return dataSources != null && !dataSources.isEmpty();
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
 				return observations != null && !observations.isEmpty();
+			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES:
+				return constantValues != null && !constantValues.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

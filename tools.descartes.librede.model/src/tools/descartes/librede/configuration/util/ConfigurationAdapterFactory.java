@@ -188,6 +188,18 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 				return createTaskAdapter();
 			}
 			@Override
+			public <M extends ObservationToEntityMapping> Adapter caseObservation(Observation<M> object) {
+				return createObservationAdapter();
+			}
+			@Override
+			public Adapter caseObservationToEntityMapping(ObservationToEntityMapping object) {
+				return createObservationToEntityMappingAdapter();
+			}
+			@Override
+			public Adapter caseConstantValue(ConstantValue object) {
+				return createConstantValueAdapter();
+			}
+			@Override
 			public <T> Adapter caseComparable(Comparable<T> object) {
 				return createComparableAdapter();
 			}
@@ -544,6 +556,48 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTaskAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.Observation <em>Observation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.Observation
+	 * @generated
+	 */
+	public Adapter createObservationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ObservationToEntityMapping <em>Observation To Entity Mapping</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ObservationToEntityMapping
+	 * @generated
+	 */
+	public Adapter createObservationToEntityMappingAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ConstantValue <em>Constant Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ConstantValue
+	 * @generated
+	 */
+	public Adapter createConstantValueAdapter() {
 		return null;
 	}
 

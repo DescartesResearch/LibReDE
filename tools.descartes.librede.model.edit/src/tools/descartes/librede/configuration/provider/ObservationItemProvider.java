@@ -1,30 +1,4 @@
 /**
- * ==============================================
- *  LibReDE : Library for Resource Demand Estimation
- * ==============================================
- *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
- *
- * Project Info:   http://www.descartes-research.net/
- *
- * All rights reserved. This software is made available under the terms of the
- * Eclipse Public License (EPL) v1.0 as published by the Eclipse Foundation
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * This software is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License (EPL)
- * for more details.
- *
- * You should have received a copy of the Eclipse Public License (EPL)
- * along with this software; if not visit http://www.eclipse.org or write to
- * Eclipse Foundation, Inc., 308 SW First Avenue, Suite 110, Portland, 97204 USA
- * Email: license (at) eclipse.org
- *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- */
-/**
  */
 package tools.descartes.librede.configuration.provider;
 
@@ -34,8 +8,12 @@ import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
+
 import org.eclipse.emf.common.util.ResourceLocator;
+
 import org.eclipse.emf.ecore.EStructuralFeature;
+
+import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
@@ -43,30 +21,38 @@ import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.InputSpecification;
+import tools.descartes.librede.configuration.Observation;
+
+import tools.descartes.librede.metrics.Aggregation;
 
 /**
- * This is the item provider adapter for a {@link tools.descartes.librede.configuration.InputSpecification} object.
+ * This is the item provider adapter for a {@link tools.descartes.librede.configuration.Observation} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class InputSpecificationItemProvider 
+public class ObservationItemProvider 
 	extends ItemProviderAdapter
 	implements
-		IEditingDomainItemProvider, IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource, ITableItemLabelProvider {
+		IEditingDomainItemProvider,
+		IStructuredItemContentProvider,
+		ITreeItemContentProvider,
+		IItemLabelProvider,
+		IItemPropertySource,
+		ITableItemLabelProvider {
 	/**
 	 * This constructs an instance from a factory and a notifier.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public InputSpecificationItemProvider(AdapterFactory adapterFactory) {
+	public ObservationItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -81,8 +67,54 @@ public class InputSpecificationItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
+			addAggregationPropertyDescriptor(object);
+			addMetricPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
+	}
+
+	/**
+	 * This adds a property descriptor for the Aggregation feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addAggregationPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Observation_aggregation_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Observation_aggregation_feature", "_UI_Observation_type"),
+				 ConfigurationPackage.Literals.OBSERVATION__AGGREGATION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Metric feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addMetricPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Observation_metric_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Observation_metric_feature", "_UI_Observation_type"),
+				 ConfigurationPackage.Literals.OBSERVATION__METRIC,
+				 true,
+				 false,
+				 true,
+				 null,
+				 null,
+				 null));
 	}
 
 	/**
@@ -97,9 +129,7 @@ public class InputSpecificationItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
-			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES);
-			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS);
-			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__CONSTANT_VALUES);
+			childrenFeatures.add(ConfigurationPackage.Literals.OBSERVATION__MAPPINGS);
 		}
 		return childrenFeatures;
 	}
@@ -118,17 +148,6 @@ public class InputSpecificationItemProvider
 	}
 
 	/**
-	 * This returns InputSpecification.gif.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/InputSpecification"));
-	}
-
-	/**
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -136,7 +155,11 @@ public class InputSpecificationItemProvider
 	 */
 	@Override
 	public String getText(Object object) {
-		return getString("_UI_InputSpecification_type");
+		Aggregation labelValue = ((Observation<?>)object).getAggregation();
+		String label = labelValue == null ? null : labelValue.toString();
+		return label == null || label.length() == 0 ?
+			getString("_UI_Observation_type") :
+			getString("_UI_Observation_type") + " " + label;
 	}
 	
 
@@ -151,10 +174,11 @@ public class InputSpecificationItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(InputSpecification.class)) {
-			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
-			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
-			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_VALUES:
+		switch (notification.getFeatureID(Observation.class)) {
+			case ConfigurationPackage.OBSERVATION__AGGREGATION:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
+			case ConfigurationPackage.OBSERVATION__MAPPINGS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -174,23 +198,13 @@ public class InputSpecificationItemProvider
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES,
-				 ConfigurationFactory.eINSTANCE.createDataSourceConfiguration()));
+				(ConfigurationPackage.Literals.OBSERVATION__MAPPINGS,
+				 ConfigurationFactory.eINSTANCE.createObservationToEntityMapping()));
 
 		newChildDescriptors.add
 			(createChildParameter
-				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS,
-				 ConfigurationFactory.eINSTANCE.createTraceConfiguration()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS,
-				 ConfigurationFactory.eINSTANCE.createFileTraceConfiguration()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__CONSTANT_VALUES,
-				 ConfigurationFactory.eINSTANCE.createConstantValue()));
+				(ConfigurationPackage.Literals.OBSERVATION__MAPPINGS,
+				 ConfigurationFactory.eINSTANCE.createTraceToEntityMapping()));
 	}
 
 	/**

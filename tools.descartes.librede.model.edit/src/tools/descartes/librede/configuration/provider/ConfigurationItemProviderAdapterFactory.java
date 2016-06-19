@@ -605,6 +605,52 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ObservationToEntityMapping} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ObservationToEntityMappingItemProvider observationToEntityMappingItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ObservationToEntityMapping}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createObservationToEntityMappingAdapter() {
+		if (observationToEntityMappingItemProvider == null) {
+			observationToEntityMappingItemProvider = new ObservationToEntityMappingItemProvider(this);
+		}
+
+		return observationToEntityMappingItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ConstantValue} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ConstantValueItemProvider constantValueItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ConstantValue}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createConstantValueAdapter() {
+		if (constantValueItemProvider == null) {
+			constantValueItemProvider = new ConstantValueItemProvider(this);
+		}
+
+		return constantValueItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -725,6 +771,8 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (resourceDemandItemProvider != null) resourceDemandItemProvider.dispose();
 		if (externalCallItemProvider != null) externalCallItemProvider.dispose();
 		if (compositeServiceItemProvider != null) compositeServiceItemProvider.dispose();
+		if (observationToEntityMappingItemProvider != null) observationToEntityMappingItemProvider.dispose();
+		if (constantValueItemProvider != null) constantValueItemProvider.dispose();
 	}
 
 }

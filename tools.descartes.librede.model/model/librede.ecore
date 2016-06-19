@@ -30,6 +30,8 @@
         upperBound="-1" eType="#//DataSourceConfiguration" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="observations" upperBound="-1"
         eType="#//TraceConfiguration" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constantValues" upperBound="-1"
+        eType="#//ConstantValue" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="EstimationApproachConfiguration">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -75,17 +77,8 @@
     <eLiterals name="UNKOWN" literal="Unkown"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TraceConfiguration">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="metric" lowerBound="1">
-      <eGenericType eClassifier="ecore:EClass metrics.ecore#//Metric">
-        <eTypeArguments>
-          <eUpperBound eClassifier="ecore:EClass units.ecore#//Dimension"/>
-        </eTypeArguments>
-      </eGenericType>
-    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EReference" name="dataSource" lowerBound="1"
         eType="#//DataSourceConfiguration"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="mappings" lowerBound="1"
-        upperBound="-1" eType="#//TraceToEntityMapping" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="unit" lowerBound="1">
       <eGenericType eClassifier="ecore:EClass units.ecore#//Unit">
         <eTypeArguments>
@@ -101,7 +94,9 @@
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" lowerBound="1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="aggregation" eType="ecore:EEnum metrics.ecore#//Aggregation"/>
+    <eGenericSuperTypes eClassifier="#//Observation">
+      <eTypeArguments eClassifier="#//TraceToEntityMapping"/>
+    </eGenericSuperTypes>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Parameter">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -162,9 +157,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="NamedElement" abstract="true" interface="true">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="TraceToEntityMapping">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="entity" lowerBound="1"
-        eType="#//ModelEntity"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TraceToEntityMapping" eSuperTypes="#//ObservationToEntityMapping">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="traceColumn" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
         defaultValueLiteral="1"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="filters" upperBound="-1"
@@ -200,5 +193,36 @@
   <eClassifiers xsi:type="ecore:EClass" name="Task" abstract="true" eSuperTypes="#//ModelEntity">
     <eStructuralFeatures xsi:type="ecore:EReference" name="service" eType="#//Service"
         eOpposite="#//Service/tasks"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Observation" abstract="true">
+    <eTypeParameters name="M">
+      <eBounds eClassifier="#//ObservationToEntityMapping"/>
+    </eTypeParameters>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="aggregation" eType="ecore:EEnum metrics.ecore#//Aggregation"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metric" lowerBound="1">
+      <eGenericType eClassifier="ecore:EClass metrics.ecore#//Metric">
+        <eTypeArguments>
+          <eUpperBound eClassifier="ecore:EClass units.ecore#//Dimension"/>
+        </eTypeArguments>
+      </eGenericType>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mappings" lowerBound="1"
+        upperBound="-1" containment="true">
+      <eGenericType eTypeParameter="#//Observation/M"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ObservationToEntityMapping">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entity" lowerBound="1"
+        eType="#//ModelEntity"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ConstantValue">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" lowerBound="1" containment="true">
+      <eGenericType eClassifier="ecore:EClass units.ecore#//Quantity">
+        <eTypeArguments/>
+      </eGenericType>
+    </eStructuralFeatures>
+    <eGenericSuperTypes eClassifier="#//Observation">
+      <eTypeArguments eClassifier="#//ObservationToEntityMapping"/>
+    </eGenericSuperTypes>
   </eClassifiers>
 </ecore:EPackage>

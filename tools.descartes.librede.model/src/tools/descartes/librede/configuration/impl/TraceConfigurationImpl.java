@@ -28,22 +28,17 @@
  */
 package tools.descartes.librede.configuration.impl;
 
-import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
-import tools.descartes.librede.metrics.Aggregation;
-import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -57,28 +52,15 @@ import tools.descartes.librede.units.Unit;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMetric <em>Metric</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getDataSource <em>Data Source</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getMappings <em>Mappings</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getUnit <em>Unit</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getInterval <em>Interval</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getLocation <em>Location</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceConfigurationImpl#getAggregation <em>Aggregation</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class TraceConfigurationImpl extends MinimalEObjectImpl.Container implements TraceConfiguration {
-	/**
-	 * The cached value of the '{@link #getMetric() <em>Metric</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMetric()
-	 * @generated
-	 * @ordered
-	 */
-	protected Metric<? extends Dimension> metric;
-
+public class TraceConfigurationImpl extends ObservationImpl<TraceToEntityMapping> implements TraceConfiguration {
 	/**
 	 * The cached value of the '{@link #getDataSource() <em>Data Source</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -88,16 +70,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * @ordered
 	 */
 	protected DataSourceConfiguration dataSource;
-
-	/**
-	 * The cached value of the '{@link #getMappings() <em>Mappings</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMappings()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<TraceToEntityMapping> mappings;
 
 	/**
 	 * The cached value of the '{@link #getUnit() <em>Unit</em>}' reference.
@@ -140,26 +112,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	protected String location = LOCATION_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getAggregation() <em>Aggregation</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getAggregation()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final Aggregation AGGREGATION_EDEFAULT = Aggregation.NONE;
-
-	/**
-	 * The cached value of the '{@link #getAggregation() <em>Aggregation</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getAggregation()
-	 * @generated
-	 * @ordered
-	 */
-	protected Aggregation aggregation = AGGREGATION_EDEFAULT;
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -176,45 +128,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	protected EClass eStaticClass() {
 		return ConfigurationPackage.Literals.TRACE_CONFIGURATION;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	public Metric<? extends Dimension> getMetric() {
-		if (metric != null && metric.eIsProxy()) {
-			InternalEObject oldMetric = (InternalEObject)metric;
-			metric = (Metric<? extends Dimension>)eResolveProxy(oldMetric);
-			if (metric != oldMetric) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
-			}
-		}
-		return metric;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Metric<? extends Dimension> basicGetMetric() {
-		return metric;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setMetric(Metric<? extends Dimension> newMetric) {
-		Metric<? extends Dimension> oldMetric = metric;
-		metric = newMetric;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__METRIC, oldMetric, metric));
 	}
 
 	/**
@@ -325,27 +238,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Aggregation getAggregation() {
-		return aggregation;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setAggregation(Aggregation newAggregation) {
-		Aggregation oldAggregation = aggregation;
-		aggregation = newAggregation == null ? AGGREGATION_EDEFAULT : newAggregation;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION, oldAggregation, aggregation));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public DataSourceConfiguration getDataSource() {
 		if (dataSource != null && dataSource.eIsProxy()) {
 			InternalEObject oldDataSource = (InternalEObject)dataSource;
@@ -382,8 +274,10 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * This is specialized for the more specific element type known in this context.
 	 * @generated
 	 */
+	@Override
 	public EList<TraceToEntityMapping> getMappings() {
 		if (mappings == null) {
 			mappings = new EObjectContainmentEList<TraceToEntityMapping>(TraceToEntityMapping.class, this, ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS);
@@ -399,8 +293,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
-				return ((InternalEList<?>)getMappings()).basicRemove(otherEnd, msgs);
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return basicSetInterval(null, msgs);
 		}
@@ -415,14 +307,9 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				if (resolve) return getMetric();
-				return basicGetMetric();
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				if (resolve) return getDataSource();
 				return basicGetDataSource();
-			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
-				return getMappings();
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				if (resolve) return getUnit();
 				return basicGetUnit();
@@ -430,8 +317,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return getInterval();
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				return getLocation();
-			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
-				return getAggregation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -445,15 +330,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				setMetric((Metric<? extends Dimension>)newValue);
-				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				setDataSource((DataSourceConfiguration)newValue);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
-				getMappings().clear();
-				getMappings().addAll((Collection<? extends TraceToEntityMapping>)newValue);
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				setUnit((Unit<? extends Dimension>)newValue);
@@ -463,9 +341,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				setLocation((String)newValue);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
-				setAggregation((Aggregation)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -479,14 +354,8 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				setMetric((Metric<? extends Dimension>)null);
-				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				setDataSource((DataSourceConfiguration)null);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
-				getMappings().clear();
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				setUnit((Unit<? extends Dimension>)null);
@@ -496,9 +365,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 				return;
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				setLocation(LOCATION_EDEFAULT);
-				return;
-			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
-				setAggregation(AGGREGATION_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -512,20 +378,14 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_CONFIGURATION__METRIC:
-				return metric != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__DATA_SOURCE:
 				return dataSource != null;
-			case ConfigurationPackage.TRACE_CONFIGURATION__MAPPINGS:
-				return mappings != null && !mappings.isEmpty();
 			case ConfigurationPackage.TRACE_CONFIGURATION__UNIT:
 				return unit != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__INTERVAL:
 				return interval != null;
 			case ConfigurationPackage.TRACE_CONFIGURATION__LOCATION:
 				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
-			case ConfigurationPackage.TRACE_CONFIGURATION__AGGREGATION:
-				return aggregation != AGGREGATION_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -542,8 +402,6 @@ public class TraceConfigurationImpl extends MinimalEObjectImpl.Container impleme
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (location: ");
 		result.append(location);
-		result.append(", aggregation: ");
-		result.append(aggregation);
 		result.append(')');
 		return result.toString();
 	}

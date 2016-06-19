@@ -147,6 +147,7 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 			case ConfigurationPackage.TRACE_CONFIGURATION: {
 				TraceConfiguration traceConfiguration = (TraceConfiguration)theEObject;
 				T1 result = caseTraceConfiguration(traceConfiguration);
+				if (result == null) result = caseObservation(traceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -185,6 +186,7 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 				FileTraceConfiguration fileTraceConfiguration = (FileTraceConfiguration)theEObject;
 				T1 result = caseFileTraceConfiguration(fileTraceConfiguration);
 				if (result == null) result = caseTraceConfiguration(fileTraceConfiguration);
+				if (result == null) result = caseObservation(fileTraceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -197,6 +199,7 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING: {
 				TraceToEntityMapping traceToEntityMapping = (TraceToEntityMapping)theEObject;
 				T1 result = caseTraceToEntityMapping(traceToEntityMapping);
+				if (result == null) result = caseObservationToEntityMapping(traceToEntityMapping);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -252,6 +255,25 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 				T1 result = caseTask(task);
 				if (result == null) result = caseModelEntity(task);
 				if (result == null) result = caseNamedElement(task);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.OBSERVATION: {
+				Observation<?> observation = (Observation<?>)theEObject;
+				T1 result = caseObservation(observation);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.OBSERVATION_TO_ENTITY_MAPPING: {
+				ObservationToEntityMapping observationToEntityMapping = (ObservationToEntityMapping)theEObject;
+				T1 result = caseObservationToEntityMapping(observationToEntityMapping);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.CONSTANT_VALUE: {
+				ConstantValue constantValue = (ConstantValue)theEObject;
+				T1 result = caseConstantValue(constantValue);
+				if (result == null) result = caseObservation(constantValue);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -616,6 +638,51 @@ public class ConfigurationSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseTask(Task object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Observation</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Observation</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public <M extends ObservationToEntityMapping> T1 caseObservation(Observation<M> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Observation To Entity Mapping</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Observation To Entity Mapping</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseObservationToEntityMapping(ObservationToEntityMapping object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Constant Value</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Constant Value</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseConstantValue(ConstantValue object) {
 		return null;
 	}
 
