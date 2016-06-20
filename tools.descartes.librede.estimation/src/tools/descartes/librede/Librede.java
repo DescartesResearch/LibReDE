@@ -739,18 +739,10 @@ public class Librede {
 			}
 			String exporterName = Registry.INSTANCE.getDisplayName(exporter.getClass());
 			log.info("Run exporter " + exporterName);
-			for (Class<? extends IEstimationApproach> approach : results.getApproaches()) {
-				int i = 0;
-				for (int f = 0; f < results.getNumberOfFolds(); f++) {
-					ResultTable curFold = results.getEstimates(approach, f);
-					try {
-						exporter.writeResults(curFold.getApproach().getSimpleName(), i, curFold.getStateVariables(),
-								curFold.getEstimates());
-					} catch (Exception e) {
-						log.error("Error running exporter " + exporterName, e);
-					}
-					i++;
-				}
+			try {
+				exporter.writeResults(results);
+			} catch (Exception e) {
+				log.error("Error running exporter " + exporterName, e);
 			}
 		}
 	}

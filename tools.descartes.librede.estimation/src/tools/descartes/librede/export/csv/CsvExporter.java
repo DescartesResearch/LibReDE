@@ -29,6 +29,9 @@ package tools.descartes.librede.export.csv;
 import java.io.File;
 import java.io.PrintWriter;
 
+import tools.descartes.librede.LibredeResults;
+import tools.descartes.librede.ResultTable;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.export.IExporter;
 import tools.descartes.librede.linalg.Matrix;
@@ -77,6 +80,19 @@ public class CsvExporter implements IExporter {
 		} finally {
 			out.close();
 		}
+	}
+
+	@Override
+	public void writeResults(LibredeResults results) throws Exception {
+		for (Class<? extends IEstimationApproach> approach : results.getApproaches()) {
+			int i = 0;
+			for (int f = 0; f < results.getNumberOfFolds(); f++) {
+				ResultTable curFold = results.getEstimates(approach, f);
+				writeResults(curFold.getApproach().getSimpleName(), i, curFold.getStateVariables(),
+							curFold.getEstimates());
+				i++;
+			}
+		}		
 	}
 
 }

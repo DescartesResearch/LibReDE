@@ -55,6 +55,9 @@ import edu.kit.ipd.descartes.mm.resourcelandscape.DistributedDataCenter;
 import edu.kit.ipd.descartes.mm.resourcetype.ResourceTypeRepository;
 import edu.kit.ipd.descartes.mm.resourcetype.ResourcetypePackage;
 import edu.kit.ipd.descartes.mm.usageprofile.UsageProfile;
+import tools.descartes.librede.LibredeResults;
+import tools.descartes.librede.ResultTable;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.export.IExporter;
 import tools.descartes.librede.registry.Component;
@@ -87,8 +90,20 @@ public class DmlExport implements IExporter {
 	private Deployment deployment;
 	private UsageProfile usage;
 	private ResourceTypeRepository resourceTypes;
-
+	
 	@Override
+	public void writeResults(LibredeResults results) throws Exception {
+		for (Class<? extends IEstimationApproach> approach : results.getApproaches()) {
+			int i = 0;
+			for (int f = 0; f < results.getNumberOfFolds(); f++) {
+				ResultTable curFold = results.getEstimates(approach, f);
+				writeResults(curFold.getApproach().getSimpleName(), i, curFold.getStateVariables(),
+							curFold.getEstimates());
+				i++;
+			}
+		}
+	}
+
 	public void writeResults(String approach, int fold, ResourceDemand[] variables, TimeSeries estimates)
 			throws Exception {
 		// Load and create a copey of the DML model

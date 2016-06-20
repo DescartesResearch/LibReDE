@@ -26,11 +26,10 @@
  */
 package tools.descartes.librede.export;
 
-import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.LibredeResults;
 
 public interface IExporter {
 	
-	public void writeResults(String approach, int fold, ResourceDemand[] variables, TimeSeries estimates) throws Exception;
+	public void writeResults(LibredeResults results) throws Exception;
 
 }
