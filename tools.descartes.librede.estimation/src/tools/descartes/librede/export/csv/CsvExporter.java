@@ -26,9 +26,15 @@
  */
 package tools.descartes.librede.export.csv;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 
+import tools.descartes.librede.ApproachResult;
 import tools.descartes.librede.LibredeResults;
 import tools.descartes.librede.ResultTable;
 import tools.descartes.librede.approach.IEstimationApproach;
@@ -92,7 +98,68 @@ public class CsvExporter implements IExporter {
 							curFold.getEstimates());
 				i++;
 			}
-		}		
+		}
+		
+		exportResultTimelineCSV(results);
+	}
+	
+	private void exportResultTimelineCSV(LibredeResults results) {
+		File outputFile = new File(outputPath, fileName + "_Selection.csv");
+		
+		try {
+			List<String> saveResult = new LinkedList<String>();
+			int idx = 0;
+			for (Class<? extends IEstimationApproach> curApproach : results.getSelectedApproaches()) {
+				ApproachResult approachResult = results.getApproachResults(curApproach);
+				ResultTable[] result = approachResult.getResult();
+
+				// get Timestamp and Approach Name
+				// timestamp is startTime
+				double startTimestamp = result[0].getEstimates().getStartTime();
+				double endTimestamp = result[0].getEstimates().getEndTime();
+				String approachName = approachResult.getApproach().getName();
+
+				double utilizationError = approachResult.getUtilizationError();
+				double responseTimeError = approachResult.getResponseTimeError();
+
+				String[] line = new String[4];
+				line[0] = Double.toString(startTimestamp);
+				line[1] = Double.toString(endTimestamp);
+				line[2] = approachName;
+				line[3] = Double.toString(approachResult.getMeanValidationError());
+				saveResult.add(implode(";", line));
+				idx++;
+			}
+
+			// open buffered writer
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile, false));
+			// write header
+			String[] head = new String[4];
+			head[0] = "Start Timestamp";
+			head[1] = "End Timestamp";
+			head[2] = "Approach Name";
+			head[3] = "Mean Error Validation";
+			saveResult.add(0, implode(";", head));
+			// write each line (timestamp + approach name + mean error
+			// validation)
+			for (String line : saveResult) {
+				bw.write(line);
+				bw.write("\n");
+			}
+			// close buffer
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String implode(String separator, String... line) {
+		StringBuilder sb = new StringBuilder();
+		for (String cell : line) {
+			sb.append(cell);
+			sb.append(separator);
+		}
+		return sb.toString();
 	}
 
 }
