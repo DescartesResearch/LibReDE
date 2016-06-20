@@ -28,11 +28,9 @@ package tools.descartes.librede.continuous;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
@@ -42,10 +40,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,25 +55,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import tools.descartes.librede.ApproachResult;
 import tools.descartes.librede.Librede;
 import tools.descartes.librede.LibredeVariables;
-import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.units.UnitsPackage;
 
 public class ApproachSelectionTest {
 	private static String basePath = null;
@@ -310,11 +300,11 @@ public class ApproachSelectionTest {
 		LibredeVariables var = new LibredeVariables(config);
 		Librede.initRepo(var);
 		Librede.executeContinuous(var, Collections.<String, IDataSource> emptyMap());
-		List<ApproachResult> appResults = var.getSelectedApproachResults();
-		for (int i = 0; i < appResults.size(); i++) {
-			System.out.println(appResults.get(i).getApproach().getName() + ", RespError: "
-					+ appResults.get(i).getResponseTimeError() + ", UtilError: "
-					+ appResults.get(i).getUtilizationError());
+		Set<Class<? extends IEstimationApproach>> approaches = var.getResults().getApproaches();
+		for (Class<? extends IEstimationApproach> curApproach : approaches) {
+			System.out.println(var.getResults().getApproachResults(curApproach).getApproach().getName() + ", RespError: "
+					+ var.getResults().getApproachResults(curApproach).getResponseTimeError() + ", UtilError: "
+					+ var.getResults().getApproachResults(curApproach).getUtilizationError());
 
 		}
 

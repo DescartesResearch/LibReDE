@@ -28,27 +28,13 @@ package tools.descartes.librede;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.approach.IEstimationApproach;
-import tools.descartes.librede.configuration.EstimationApproachConfiguration;
-import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.linalg.AggregationFunction;
-import tools.descartes.librede.linalg.LinAlg;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.MatrixBuilder;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.validation.IValidator;
 
 public class ApproachSelector {
 
@@ -57,7 +43,6 @@ public class ApproachSelector {
 	private List<Class<? extends IEstimationApproach>> approaches;
 	private double[] errorTable;
 	private Map<Integer, Class<? extends IEstimationApproach>> approachMap = new HashMap<>();
-	private Class<? extends IEstimationApproach> selectedApproach = null;
 
 	public ApproachSelector(LibredeVariables var) {
 		this.var = var;
@@ -75,9 +60,9 @@ public class ApproachSelector {
 		// previous selected approaches
 		// List<EstimationApproachConfiguration> selectedApproachesBackup =
 		// var.getSelectedApproaches();
-		if ((var.getSelectedApproaches()).isEmpty()) {
-			var.setSelectedApproaches(var.getConf().getEstimation().getApproaches());
-		}
+//		if ((var.getSelectedApproaches()).isEmpty()) {
+//			var.setSelectedApproaches(var.getConf().getEstimation().getApproaches());
+//		}
 		// run execute with all approaches to get validation results of all
 		// approaches
 		//
@@ -94,7 +79,7 @@ public class ApproachSelector {
 			// save the errors to the errorTable and the index to approachMap
 			int i = 0;
 			for (Class<? extends IEstimationApproach> approach : approaches) {
-				errorTable[i] = var.getResults().getApproachValidationErrors(approach);
+				errorTable[i] = var.getResults().getApproachResults(approach).getMeanValidationError();
 				approachMap.put(i, approach);
 				i++;
 			}
@@ -106,6 +91,7 @@ public class ApproachSelector {
 	public void selectApproach() {
 
 		double minError = Double.MAX_VALUE;
+		Class<? extends IEstimationApproach> selectedApproach = null;
 
 		for (int i = 0; i < errorTable.length; i++) {
 //			System.err.println("Approach Name: " + approachMap.get(i));
@@ -116,19 +102,9 @@ public class ApproachSelector {
 			}
 		}
 
-		if (selectedApproach == null) {
-			var.setSelectedApproaches(var.getConf().getEstimation().getApproaches());
-		} else {
-			// add selected Approach (possible to set multiple Approaches) to
-			// LibredeVariables
-			LinkedList<EstimationApproachConfiguration> selectedApproaches = new LinkedList<EstimationApproachConfiguration>();
-			for (EstimationApproachConfiguration currentConf : var.getConf().getEstimation().getApproaches()) {
-				if (currentConf.getType().equals(selectedApproach.getName())) {
-					selectedApproaches.add(currentConf);
-				}
-			}
+		if (selectedApproach != null) {
 			log.info("Selected approach: " + selectedApproach.getName() + " Mean Validation Error: " + minError);
-			var.setSelectedApproaches(selectedApproaches, minError);
+			var.getResults().setSelectedApproaches(Arrays.<Class<? extends IEstimationApproach>>asList(selectedApproach));
 		}
 	}
 

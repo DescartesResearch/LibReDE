@@ -26,6 +26,7 @@
  */
 package tools.descartes.librede;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +43,11 @@ import tools.descartes.librede.validation.IValidator;
 public class LibredeResults {
 
 	private final Map<Class<? extends IEstimationApproach>, ApproachResult> approachResults = new HashMap<>();
-	// private final ResultTable[][] results;
 	private final int numFolds;
-	// private int currentNumApproaches = 0;
+	private final List<Class<? extends IEstimationApproach>> selectedApproaches = new ArrayList<>();
 
 	public LibredeResults(int numApproaches, int numFolds) {
 		this.numFolds = numFolds;
-
 	}
 
 	public void addEstimates(Class<? extends IEstimationApproach> approach, int fold, ResultTable estimates) {
@@ -58,6 +57,15 @@ public class LibredeResults {
 		}
 		appRes.addEstimate(fold, estimates);
 		approachResults.put(approach, appRes);
+	}
+	
+	public void setSelectedApproaches(List<Class<? extends IEstimationApproach>> newSelection) {
+		selectedApproaches.clear();
+		selectedApproaches.addAll(newSelection);
+	}
+	
+	public List<Class<? extends IEstimationApproach>> getSelectedApproaches() {
+		return selectedApproaches;
 	}
 
 	public ResultTable getEstimates(Class<? extends IEstimationApproach> approach, int fold) {
@@ -72,6 +80,10 @@ public class LibredeResults {
 
 	public Set<Class<? extends IEstimationApproach>> getApproaches() {
 		return approachResults.keySet();
+	}
+	
+	public ApproachResult getApproachResults(Class<? extends IEstimationApproach> approach) {
+		return approachResults.get(approach);
 	}
 
 	public Map<Class<? extends IEstimationApproach>, Matrix> getAllEstimates() {
@@ -150,23 +162,7 @@ public class LibredeResults {
 
 	}
 
-	public double getApproachValidationErrors(Class<? extends IEstimationApproach> approach) {
-		double meanError = 0.0;
-		Matrix approachResults = getValidationErrors().get(approach);
-		for (int i = 0; i < approachResults.rows(); i++) {
-			double errSum = 0.0;
-			for (int j = 0; j < approachResults.columns(); j++) {
-				// sum each row up
-				errSum += approachResults.get(i, j);
-			}
-			// calculate mean of every row
-			errSum = errSum / approachResults.columns();
-			// add calculated mean of every row (every validator) to the mean
-			// error of all validators
-			meanError += errSum;
-		}
-		return meanError;
-	}
+
 
 	public double getApproachUtilizationError(Class<? extends IEstimationApproach> approach) {
 		ApproachResult appRes = approachResults.get(approach);

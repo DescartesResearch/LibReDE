@@ -188,5 +188,23 @@ public class ApproachResult {
 
 		return 0;
 	}
+	
+	public double getMeanValidationError() {
+		double meanError = 0.0;
+		Matrix approachResults = getValidationErrors().get(approach);
+		for (int i = 0; i < approachResults.rows(); i++) {
+			double errSum = 0.0;
+			for (int j = 0; j < approachResults.columns(); j++) {
+				// sum each row up
+				errSum += approachResults.get(i, j);
+			}
+			// calculate mean of every row
+			errSum = errSum / approachResults.columns();
+			// add calculated mean of every row (every validator) to the mean
+			// error of all validators
+			meanError += errSum;
+		}
+		return meanError;
+	}
 
 }

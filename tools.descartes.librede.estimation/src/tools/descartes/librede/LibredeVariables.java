@@ -42,8 +42,6 @@ import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ObservationToEntityMapping;
 import tools.descartes.librede.metrics.Metric;
-import tools.descartes.librede.registry.Instantiator;
-import tools.descartes.librede.registry.Registry;
 import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
@@ -59,11 +57,11 @@ public class LibredeVariables {
 	private final IMonitoringRepository repo;
 	private EstimationAlgorithmFactory algoFactory;
 	private LibredeResults results;
-	private List<ApproachResult> resultsSelectedApproaches = new LinkedList<ApproachResult>();
-	private List<Double> meanErrorSelectedApproaches = new LinkedList<Double>();
+	//private List<ApproachResult> resultsSelectedApproaches = new LinkedList<ApproachResult>();
+//	private List<Double> meanErrorSelectedApproaches = new LinkedList<Double>();
 	private Map<String, IRepositoryCursor> cursors;
 	private int runNr;
-	private List<EstimationApproachConfiguration> selectedApproaches;
+//	private List<EstimationApproachConfiguration> selectedApproaches;
 
 	public LibredeVariables(LibredeConfiguration conf) {
 		this.conf = conf;
@@ -71,7 +69,6 @@ public class LibredeVariables {
 		this.algoFactory = new EstimationAlgorithmFactory();
 		this.cursors = new HashMap<String, IRepositoryCursor>();
 		this.runNr = 1;
-		this.selectedApproaches = conf.getEstimation().getApproaches();
 		// case cross validation
 		if (conf.getValidation().isValidateEstimates() && conf.getValidation().getValidationFolds() > 1) {
 			this.results = new LibredeResults(conf.getEstimation().getApproaches().size(),
@@ -100,7 +97,8 @@ public class LibredeVariables {
 		try {
 			List<String> saveResult = new LinkedList<String>();
 			int idx = 0;
-			for (ApproachResult approachResult : resultsSelectedApproaches) {
+			for (Class<? extends IEstimationApproach> curApproach : getResults().getSelectedApproaches()) {
+				ApproachResult approachResult = getResults().getApproachResults(curApproach);
 				ResultTable[] result = approachResult.getResult();
 
 				// get Timestamp and Approach Name
@@ -116,7 +114,7 @@ public class LibredeVariables {
 				line[0] = Double.toString(startTimestamp);
 				line[1] = Double.toString(endTimestamp);
 				line[2] = approachName;
-				line[3] = Double.toString(meanErrorSelectedApproaches.get(idx));
+				line[3] = Double.toString(approachResult.getMeanValidationError());
 				saveResult.add(implode(";", line));
 				idx++;
 			}
@@ -190,45 +188,6 @@ public class LibredeVariables {
 
 	public void updateResults(LibredeResults newResults) {
 		this.results = newResults;
-	}
-
-	public void addSelectedApproachResult(ApproachResult result) {
-		this.resultsSelectedApproaches.add(result);
-	}
-
-	public List<ApproachResult> getSelectedApproachResults() {
-		return resultsSelectedApproaches;
-	}
-
-	public List<EstimationApproachConfiguration> getSelectedApproaches() {
-		return selectedApproaches;
-	}
-
-	// this method is used for the second and following approach selections to
-	// save meanError in a List
-	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches, double meanError) {
-		this.selectedApproaches = selectedApproaches;
-		Class<?> cl = Registry.INSTANCE.getInstanceClass(selectedApproaches.get(0).getType());
-		IEstimationApproach selectedApproach = null;
-		try {
-			selectedApproach = (IEstimationApproach) Instantiator.newInstance(cl,
-					selectedApproaches.get(0).getParameters());
-		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		ApproachResult ares = new ApproachResult(selectedApproach.getClass(),
-				this.conf.getValidation().getValidationFolds());
-		for (int i = 0; i < this.conf.getValidation().getValidationFolds(); i++) {
-			ares.addEstimate(i, this.results.getEstimates(selectedApproach.getClass(), i));
-		}
-		this.resultsSelectedApproaches.add(ares);
-		this.meanErrorSelectedApproaches.add(meanError);
-	}
-
-	// this method ist only used once at the first selection to set all
-	// appproaches to the selected approach list for selection
-	public void setSelectedApproaches(List<EstimationApproachConfiguration> selectedApproaches) {
-		this.selectedApproaches = selectedApproaches;
 	}
 
 	@SuppressWarnings("unchecked")
