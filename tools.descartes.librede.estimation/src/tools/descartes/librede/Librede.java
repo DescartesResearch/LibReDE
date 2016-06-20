@@ -199,8 +199,6 @@ public class Librede {
 			try {
 				var.updateResults(runEstimation(var));
 				printSummary(var.getResults());
-				exportResults(var.getConf(), var.getResults());
-//				return var.getResults();
 			} catch (Exception e) {
 				log.error("Error running estimation.", e);
 			}
@@ -212,20 +210,22 @@ public class Librede {
 					var.updateResults(runEstimationWithCrossValidation(var));
 				}
 				printSummary(var.getResults());
-				exportResults(var.getConf(), var.getResults());
-//				return var.getResults();
 			} catch (Exception e) {
 				log.error("Error running estimation.", e);
 			}
 		}
 		
 		if (var.getConf().getEstimation().isAutomaticApproachSelection() && var.getResults().getApproaches().size() > 0 ) {
-			ApproachSelection.selectApproach(var);
+			ApproachSelector.selectApproach(var);
 			if (var.getRunNr() >= selectionInterval) {
 				var.resetRunNr();
 			}
 			var.incrementRunNr();
 		}
+		
+		// Now export the results.
+		exportResults(var.getConf(), var.getResults());
+
 		return var.getResults();
 //		return null;
 	}

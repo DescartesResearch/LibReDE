@@ -107,5 +107,11 @@ public class ApproachSelector {
 			var.getResults().setSelectedApproaches(Arrays.<Class<? extends IEstimationApproach>>asList(selectedApproach));
 		}
 	}
+	
+	public static void selectApproach(LibredeVariables var) {
+		ApproachSelector s = new ApproachSelector(var);
+		//loads error table and calls intern method select approach
+		s.loadErrorTable();
+	}
 
 }
