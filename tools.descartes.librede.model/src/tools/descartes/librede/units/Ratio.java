@@ -54,6 +54,6 @@ public interface Ratio extends Dimension {
 	/**
 	 * @generated NOT
 	 */
-	public static final Unit<Ratio> PERCENTAGE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "PERCENTAGE", "percentage", "%", 100);
+	public static final Unit<Ratio> PERCENTAGE = UnitsFactory.eINSTANCE.createUnit(INSTANCE, "PERCENTAGE", "percentage", "%", 0.01);
 	
 } // Ratio
