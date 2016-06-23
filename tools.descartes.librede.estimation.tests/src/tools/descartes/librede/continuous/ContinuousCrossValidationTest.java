@@ -45,13 +45,14 @@ import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import tools.descartes.librede.Librede;
@@ -85,7 +86,7 @@ import tools.descartes.librede.validation.IValidator;
 
 public class ContinuousCrossValidationTest extends LibredeTest {
 
-	private static int WRITE_RATE = 100;
+	private static int WRITE_RATE = 25;
 	private static int LINES_TO_COPY = 5;
 	private static String SOURCE_PATH = null;
 	private static String DESTINATION_PATH = null;
@@ -101,7 +102,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		IpoptLibrary.init();
 		NNLSLibrary.init();
 		BayesLibrary.init();
-		// LogManager.getRootLogger().setLevel(Level.WARN);
+		 LogManager.getRootLogger().setLevel(Level.WARN);
 
 		// load LibredeConf to test the execute method
 
@@ -120,6 +121,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				FileTraceConfiguration filetrace = (FileTraceConfiguration) trace;
 				filetrace.setFile(SOURCE_PATH + File.separator
 						+ new File(filetrace.getFile()).getName());
+//				System.out.println(SOURCE_PATH + File.separator
+//						+ new File(filetrace.getFile()).getName());
 			}
 			// read data
 			handleReadFromTrace();
@@ -129,6 +132,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				FileTraceConfiguration filetrace = (FileTraceConfiguration) trace;
 				filetrace.setFile(DESTINATION_PATH + File.separator
 						+ new File(filetrace.getFile()).getName());
+//				System.out.println(DESTINATION_PATH + File.separator
+//						+ new File(filetrace.getFile()).getName());
 			}
 			// output also in destination path
 			for (ExporterConfiguration export : conf.getOutput().getExporters()) {
@@ -188,7 +193,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 			}
 
 			try {
-				Thread.sleep(40000);
+				Thread.sleep(30000);
 			} catch (InterruptedException e) {
 				System.err.print("Error sleeping thread.");
 			}
@@ -337,9 +342,12 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		}
 
 		int idx = 0;
+		boolean tested = false;
 		for (ResourceDemand var : variables) {
 			if (var.getService().getName().equals("WC0")) {
+				tested = false;
 				for (int i = 0; i < approaches.size(); i++) {
+					tested = true;
 					if (!Double.isNaN(meanEstimates.toMatrix().get(i, idx))) {
 						Assert.assertEquals(0.025, meanEstimates.toMatrix()
 								.get(i, idx), 0.08);
@@ -347,8 +355,11 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 						fail("Value is NaN.");
 					}
 				}
+				Assert.assertEquals(true, tested);
 			} else if (var.getService().getName().equals("WC1")) {
+				tested = false;
 				for (int i = 0; i < approaches.size(); i++) {
+					tested = true;
 					if (!Double.isNaN(meanEstimates.toMatrix().get(i, idx))) {
 						Assert.assertEquals(0.125, meanEstimates.toMatrix()
 								.get(i, idx), 0.9);
@@ -356,8 +367,11 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 						fail("Value is NaN.");
 					}
 				}
+				Assert.assertEquals(true, tested);
 			} else if (var.getService().getName().equals("WC2")) {
+				tested = false;
 				for (int i = 0; i < approaches.size(); i++) {
+					tested = true;
 					if (!Double.isNaN(meanEstimates.toMatrix().get(i, idx))) {
 						Assert.assertEquals(0.075, meanEstimates.toMatrix()
 								.get(i, idx), 0.1);
@@ -365,11 +379,13 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 						fail("Value is NaN.");
 					}
 				}
+				Assert.assertEquals(true, tested);
 			} else {
 				fail("Unknown Service.");
 			}
 			idx++;
 		}
+		Assert.assertNotEquals(0, idx);
 	}
 
 	private static void handleReadFromTrace() {

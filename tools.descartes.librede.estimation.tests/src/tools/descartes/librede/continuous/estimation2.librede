@@ -14,7 +14,7 @@
   </workloadDescription>
   <input>
     <dataSources name="Primary Data Source" type="tools.descartes.librede.datasource.csv.CsvDataSource"/>
-    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="C:\Users\Veronika\Desktop\example1\experiment1_WC0_RESPONSE_TIME.csv">
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="experiment1_WC0_RESPONSE_TIME.csv">
       <metric href="librede:metrics#RESPONSE_TIME"/>
       <mappings entity="//@workloadDescription/@services.0"/>
       <unit href="librede:units#SECONDS"/>
@@ -22,7 +22,7 @@
         <unit href="librede:units#SECONDS"/>
       </interval>
     </observations>
-    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="C:\Users\Veronika\Desktop\example1\experiment1_WC1_RESPONSE_TIME.csv">
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="experiment1_WC1_RESPONSE_TIME.csv">
       <metric href="librede:metrics#RESPONSE_TIME"/>
       <mappings entity="//@workloadDescription/@services.1"/>
       <unit href="librede:units#SECONDS"/>
@@ -30,7 +30,7 @@
         <unit href="librede:units#SECONDS"/>
       </interval>
     </observations>
-    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="C:\Users\Veronika\Desktop\example1\experiment1_WC2_RESPONSE_TIME.csv">
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" file="experiment1_WC2_RESPONSE_TIME.csv">
       <metric href="librede:metrics#RESPONSE_TIME"/>
       <mappings entity="//@workloadDescription/@services.2"/>
       <unit href="librede:units#SECONDS"/>
@@ -38,7 +38,7 @@
         <unit href="librede:units#SECONDS"/>
       </interval>
     </observations>
-    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" aggregation="AVERAGE" file="C:\Users\Veronika\Desktop\example1\host1_CPU_UTILIZATION.csv">
+    <observations xsi:type="librede:FileTraceConfiguration" dataSource="//@input/@dataSources.0" aggregation="AVERAGE" file="host1_CPU_UTILIZATION.csv">
       <metric href="librede:metrics#UTILIZATION"/>
       <mappings entity="//@workloadDescription/@resources.0"/>
       <unit href="librede:units#NONE"/>
