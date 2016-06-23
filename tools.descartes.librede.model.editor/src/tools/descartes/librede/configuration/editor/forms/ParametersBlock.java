@@ -34,12 +34,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -61,7 +59,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
-import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
@@ -289,17 +286,19 @@ public class ParametersBlock {
 	
 	public void setObjectType(String type) {
 		Class<?> cl = Registry.INSTANCE.getInstanceClass(type);
-		if (cl.isAnnotationPresent(Component.class)) {
-			for (Field curField : cl.getDeclaredFields()) {
-				ParameterDefinition param = curField.getAnnotation(ParameterDefinition.class);
-				if (param != null) {
-					ParameterEditor editor = createEditor(curField.getType(), param.subType());
-					editor.label = param.label();
-					editor.name = param.name();
-					editor.required = param.required();
-					editor.defaultValue = param.defaultValue();
-					editors.add(editor);
-					nameToEditor.put(param.name().toLowerCase(), editor);
+		if (cl != null) {
+			if (cl.isAnnotationPresent(Component.class)) {
+				for (Field curField : cl.getDeclaredFields()) {
+					ParameterDefinition param = curField.getAnnotation(ParameterDefinition.class);
+					if (param != null) {
+						ParameterEditor editor = createEditor(curField.getType(), param.subType());
+						editor.label = param.label();
+						editor.name = param.name();
+						editor.required = param.required();
+						editor.defaultValue = param.defaultValue();
+						editors.add(editor);
+						nameToEditor.put(param.name().toLowerCase(), editor);
+					}
 				}
 			}
 		}
