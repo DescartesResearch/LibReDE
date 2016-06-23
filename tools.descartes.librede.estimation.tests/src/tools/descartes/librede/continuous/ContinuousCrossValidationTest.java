@@ -102,7 +102,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		IpoptLibrary.init();
 		NNLSLibrary.init();
 		BayesLibrary.init();
-		 LogManager.getRootLogger().setLevel(Level.WARN);
+		// LogManager.getRootLogger().setLevel(Level.WARN);
 
 		// load LibredeConf to test the execute method
 
@@ -121,8 +121,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				FileTraceConfiguration filetrace = (FileTraceConfiguration) trace;
 				filetrace.setFile(SOURCE_PATH + File.separator
 						+ new File(filetrace.getFile()).getName());
-//				System.out.println(SOURCE_PATH + File.separator
-//						+ new File(filetrace.getFile()).getName());
+				// System.out.println(SOURCE_PATH + File.separator
+				// + new File(filetrace.getFile()).getName());
 			}
 			// read data
 			handleReadFromTrace();
@@ -132,8 +132,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				FileTraceConfiguration filetrace = (FileTraceConfiguration) trace;
 				filetrace.setFile(DESTINATION_PATH + File.separator
 						+ new File(filetrace.getFile()).getName());
-//				System.out.println(DESTINATION_PATH + File.separator
-//						+ new File(filetrace.getFile()).getName());
+				// System.out.println(DESTINATION_PATH + File.separator
+				// + new File(filetrace.getFile()).getName());
 			}
 			// output also in destination path
 			for (ExporterConfiguration export : conf.getOutput().getExporters()) {
