@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.linalg.LinAlg;
@@ -192,6 +194,10 @@ public class ApproachResult {
 	public double getMeanValidationError() {
 		double meanError = 0.0;
 		Matrix approachResults = getValidationErrors().get(approach);
+		if(approachResults==null){
+			Logger.getLogger(this.getClass()).warn("No results for approach "+approach);
+			return 0;
+		}
 		for (int i = 0; i < approachResults.rows(); i++) {
 			double errSum = 0.0;
 			for (int j = 0; j < approachResults.columns(); j++) {
