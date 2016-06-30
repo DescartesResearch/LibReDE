@@ -220,7 +220,25 @@ public class ApproachResult {
 	}
 
 	public double getMeanError() {
-		return (getResponseTimeError() + getUtilizationError()) / (2.0);
+		int values = 0;
+		double errorSum = 0.0;
+		Map<Class<? extends IValidator>, Vector> errorMap = getValidationErrors();
+		Set<Class<? extends IValidator>> valis = result[0].getValidators();
+		for (Class<? extends IValidator> vali : valis) {
+			Vector validationerrors = errorMap.get(vali);
+			if (validationerrors != null) {
+				for (int i = 0; i < validationerrors.rows(); i++) {
+					errorSum += validationerrors.get(i);
+					values++;
+				}
+			}
+		}
+		if (values < 1) {
+			Logger.getLogger(this.getClass()).warn(
+					"No validation results for approach " + approach);
+			return 0;
+		}
+		return errorSum / values;
 	}
 
 }
