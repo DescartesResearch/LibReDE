@@ -184,9 +184,7 @@ public class Librede {
 		return executeContinuous(var, existingDatasources);
 	}
 
-	public static LibredeResults executeContinuous(LibredeVariables var, Map<String, IDataSource> existingDatasources) {
-		
-		
+	public static LibredeResults executeContinuous(LibredeVariables var, Map<String, IDataSource> existingDatasources) {		
 		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(), existingDatasources);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
 			// do not progress further than the configured end timestamp.
@@ -195,32 +193,10 @@ public class Librede {
 			var.getRepo().setCurrentTime(endTime);
 		}
 
-		if (!var.getConf().getValidation().isValidateEstimates()) {
-			try {
-				var.updateResults(runEstimation(var));
-				printSummary(var.getResults());
-			} catch (Exception e) {
-				log.error("Error running estimation.", e);
-			}
-		} else {
-			try {
-				if (var.getConf().getValidation().getValidationFolds() <= 1) {
-					var.updateResults(runEstimationWithValidation(var));
-				} else {
-					var.updateResults(runEstimationWithCrossValidation(var));
-				}
-				printSummary(var.getResults());
-			} catch (Exception e) {
-				log.error("Error running estimation.", e);
-			}
-		}
-		
-		if (var.getConf().getEstimation().isAutomaticApproachSelection() && var.getResults().getApproaches().size() > 0 ) {
-			ApproachSelector.selectApproach(var);
-			if (var.getRunNr() >= selectionInterval) {
-				var.resetRunNr();
-			}
-			var.incrementRunNr();
+		try {
+			runEstimation(var);
+		} catch (Exception e) {
+			log.error("Error running estimation.", e);
 		}
 		
 		// Now export the results.
@@ -332,6 +308,32 @@ public class Librede {
 	}
 
 	public static LibredeResults runEstimation(LibredeVariables var) throws Exception {
+		
+		if (!var.getConf().getValidation().isValidateEstimates()) {
+			var.updateResults(runEstimation(var));
+			printSummary(var.getResults());
+		} else {
+			if (var.getConf().getValidation().getValidationFolds() <= 1) {
+				var.updateResults(runEstimationWithValidation(var));
+			} else {
+				var.updateResults(runEstimationWithCrossValidation(var));
+			}
+			printSummary(var.getResults());
+		}
+		
+		if (var.getConf().getEstimation().isAutomaticApproachSelection() && var.getResults().getApproaches().size() > 0 ) {
+			ApproachSelector.selectApproach(var);
+			if (var.getRunNr() >= selectionInterval) {
+				var.resetRunNr();
+			}
+			var.incrementRunNr();
+		}
+		
+		return var.getResults();
+		
+	}
+	
+	private static LibredeResults runEstimationInternal(LibredeVariables var) throws Exception {
 		for (EstimationApproachConfiguration currentConf : var.getConf().getEstimation().getApproaches()) {
 
 			IEstimationApproach currentApproach;
