@@ -85,8 +85,8 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
 	private double lowerBoundsInfValue = -1e19;
 	
-	@ParameterDefinition(name = "PrintLevel", label = "The verbosity of log outputs", defaultValue = "5")
-	private int printLevel = 5;
+	@ParameterDefinition(name = "PrintLevel", label = "The verbosity of log outputs", defaultValue = "0")
+	private int printLevel = 0;
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
@@ -350,7 +350,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 				OutputVariable o_calc = func.getCalculatedOutput(state);
 				if (Double.isNaN(o_calc.getValue()) || Double.isNaN(o_real)){
 					Quantity<Time> pos = getCursor().getIntervalEnd(getCursor().getLastInterval());
-					System.out.println("Blub: " + pos);
+					log.error("Blub: " + pos);
 				}
 				if (o_real > 0) {
  					DerivativeStructure summand = o_calc.getDerivativeStructure().subtract(o_real).divide(o_real).pow(2);
