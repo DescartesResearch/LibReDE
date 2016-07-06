@@ -310,7 +310,7 @@ public class Librede {
 	public static LibredeResults runEstimation(LibredeVariables var) throws Exception {
 		
 		if (!var.getConf().getValidation().isValidateEstimates()) {
-			var.updateResults(runEstimation(var));
+			var.updateResults(runEstimationInternal(var));
 			printSummary(var.getResults());
 		} else {
 			if (var.getConf().getValidation().getValidationFolds() <= 1) {
