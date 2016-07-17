@@ -109,7 +109,7 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 		super();
 		this.kfold = kfold;
 		this.cursor = cursor;
-		this.maxlength = Math.max(maxlength, kfold);
+		this.maxlength = kfold * maxlength;
 		this.validationk = 1;
 		this.validation = false;
 		kmapping = new MaxSizeHashMap<Integer, Integer>(this.maxlength);
