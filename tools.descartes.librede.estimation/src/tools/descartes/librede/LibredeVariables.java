@@ -66,7 +66,7 @@ public class LibredeVariables {
 			for (EstimationApproachConfiguration currentConf : conf.getEstimation().getApproaches()) {
 				ContinuousCrossValidationCursor cursor = new ContinuousCrossValidationCursor(
 						repo.getCursor(conf.getEstimation().getStartTimestamp(), conf.getEstimation().getStepSize()),
-						conf.getValidation().getValidationFolds(), conf.getEstimation().getWindow());
+						conf.getValidation().getValidationFolds(), conf.getEstimation().getWindow(), true);
 				this.cursors.put(currentConf.getType(), cursor);
 			}
 			// case no or one validation

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
 
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
@@ -37,8 +38,6 @@ import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
-import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
 import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
@@ -51,6 +50,11 @@ import tools.descartes.librede.units.Unit;
  *
  */
 public class ContinuousCrossValidationCursor implements IRepositoryCursor {
+
+	/**
+	 * The seed used for the RNG, if deterministic behavior is required
+	 */
+	private static final int DETERMINISTIC_SEED = 12345;
 
 	/**
 	 * The number of folds in the cross-validation
@@ -95,6 +99,17 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 	private int validationk;
 
 	/**
+	 * If the RNG should be deterministic or not, i.e. if the mapping should be
+	 * the same, when reused.
+	 */
+	private boolean deterministic;
+
+	/**
+	 * The RNG used throughout execution
+	 */
+	private Random rng;
+
+	/**
 	 * Creates a new instance
 	 * 
 	 * @param cursor
@@ -104,15 +119,20 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 	 * @param maxlength
 	 *            The maximum history that needs to be stored, i.e. the maximum
 	 *            length of the arrays, usually defined by the window size
+	 * @param deterministic
+	 *            If the mapping should be deterministic
 	 */
-	public ContinuousCrossValidationCursor(IRepositoryCursor cursor, int kfold, int maxlength) {
+	public ContinuousCrossValidationCursor(IRepositoryCursor cursor, int kfold,
+			int maxlength, boolean deterministic) {
 		super();
 		this.kfold = kfold;
 		this.cursor = cursor;
 		this.maxlength = kfold * maxlength;
 		this.validationk = 1;
 		this.validation = false;
+		this.deterministic = deterministic;
 		kmapping = new MaxSizeHashMap<Integer, Integer>(this.maxlength);
+		rng = new Random(DETERMINISTIC_SEED);
 		resetPointer();
 	}
 
@@ -182,17 +202,19 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public <D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit,
-			ModelEntity entity) {
-		return cursor.getValues(translateToDelegate(interval), metric, unit, entity);
+	public <D extends Dimension> TimeSeries getValues(int interval,
+			Metric<D> metric, Unit<D> unit, ModelEntity entity) {
+		return cursor.getValues(translateToDelegate(interval), metric, unit,
+				entity);
 	}
 
 	@Override
-	public <D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit,
-			ModelEntity entity, Aggregation func) {
+	public <D extends Dimension> double getAggregatedValue(int interval,
+			Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation func) {
 		// System.out.println("Interval " + interval + " translated to
 		// "+translateToDelegate(interval));
-		return cursor.getAggregatedValue(translateToDelegate(interval), metric, unit, entity, func);
+		return cursor.getAggregatedValue(translateToDelegate(interval), metric,
+				unit, entity, func);
 	}
 
 	@Override
@@ -201,9 +223,10 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, ModelEntity entity,
-			Aggregation aggregation) {
-		return cursor.hasData(translateToDelegate(interval), metric, entity, aggregation);
+	public <D extends Dimension> boolean hasData(int interval,
+			Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
+		return cursor.hasData(translateToDelegate(interval), metric, entity,
+				aggregation);
 	}
 
 	/**
@@ -213,6 +236,7 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 	@Override
 	public void reset() {
 		resetPointer();
+		rng = new Random(DETERMINISTIC_SEED);
 		translation.clear();
 	}
 
@@ -250,8 +274,10 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 			// to catch calls with 0 without initialization
 			if (interval == 0)
 				return 0;
-			throw new IndexOutOfBoundsException("Interval index " + interval
-					+ " is either not yet initialized or already deleted. Try calling next().");
+			throw new IndexOutOfBoundsException(
+					"Interval index "
+							+ interval
+							+ " is either not yet initialized or already deleted. Try calling next().");
 		}
 		return real.intValue();
 	}
@@ -274,7 +300,11 @@ public class ContinuousCrossValidationCursor implements IRepositoryCursor {
 			for (int i = 1; i <= kfold; i++) {
 				list.add(i);
 			}
-			Collections.shuffle(list);
+			if (deterministic)
+				Collections.shuffle(list, rng);
+			else {
+				Collections.shuffle(list);
+			}
 			while (list.peek() != null) {
 				kmapping.put(run++, list.remove());
 			}
