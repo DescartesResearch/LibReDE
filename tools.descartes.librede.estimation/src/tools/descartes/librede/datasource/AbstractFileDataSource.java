@@ -514,6 +514,12 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 				log.error("Error waiting for new data.", e);
 			}		
 		}
+		
+		@Override
+		public void close() throws IOException{
+			super.close();
+			selector.close();
+		}
 	}
 
 	/**
