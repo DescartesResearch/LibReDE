@@ -56,7 +56,7 @@ public class LibredeVariables {
 	public LibredeVariables(LibredeConfiguration conf) {
 		this.conf = conf;
 		this.repo = createRepository(conf);
-		this.algoFactory = new EstimationAlgorithmFactory();
+		this.algoFactory = new EstimationAlgorithmFactory(conf.getEstimation().getAlgorithms());
 		this.cursors = new HashMap<String, IRepositoryCursor>();
 		this.runNr = 1;
 		// case cross validation

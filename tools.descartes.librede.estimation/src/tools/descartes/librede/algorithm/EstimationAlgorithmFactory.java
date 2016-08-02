@@ -27,10 +27,14 @@
 package tools.descartes.librede.algorithm;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Instantiator;
 import tools.descartes.librede.registry.Registry;
@@ -47,6 +51,13 @@ import tools.descartes.librede.registry.Registry;
 public class EstimationAlgorithmFactory {
 	
 	private static final Logger log = Logger.getLogger(EstimationAlgorithmFactory.class);
+	private final Map<String, List<Parameter>> algorithms = new HashMap<>();
+	
+	public EstimationAlgorithmFactory(List<EstimationAlgorithmConfiguration> algorithmConfigurations) {		
+		for (EstimationAlgorithmConfiguration configuration : algorithmConfigurations) {
+			algorithms.put(configuration.getType(), configuration.getParameters());
+		}
+	}
 	
 	/**
 	 * Automatically creates an instance for a specified subclass of estimation algorithms.
@@ -58,8 +69,12 @@ public class EstimationAlgorithmFactory {
 		Set<String> candidates = Registry.INSTANCE.getInstances(componentClass);
 
 		for (String cand : candidates) {
+			List<Parameter> parameters = algorithms.get(cand);
+			if (parameters == null) {
+				parameters = Collections.<Parameter>emptyList();
+			}
 			try {
-				return (IEstimationAlgorithm) Instantiator.newInstance(Registry.INSTANCE.getInstanceClass(cand), Collections.<Parameter>emptyList());
+				return (IEstimationAlgorithm) Instantiator.newInstance(Registry.INSTANCE.getInstanceClass(cand), parameters);
 			} catch(Exception ex) {
 				log.error("Error instantiating estimation algorithm " + cand + ". Skip it...", ex);
 			}
