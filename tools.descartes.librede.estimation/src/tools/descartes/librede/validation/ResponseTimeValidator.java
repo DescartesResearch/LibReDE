@@ -54,7 +54,7 @@ import tools.descartes.librede.repository.rules.DataDependency;
 
 @Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
-	
+
 	private List<ModelEntity> services;
 	private List<ResponseTimeValue> respObservation;
 	private List<ResponseTimeEquation> respEq;
@@ -63,11 +63,12 @@ public class ResponseTimeValidator implements IValidator {
 	private MatrixBuilder observedRespTimes;
 	private ConstantStateModel<Unconstrained> stateModel;
 	private final List<DataDependency<?>> dependencies = new ArrayList<>();
-	
+
 	@Override
 	public void initialize(WorkloadDescription workload,
 			IRepositoryCursor cursor) {
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+		Builder<Unconstrained> builder = ConstantStateModel
+				.unconstrainedModelBuilder();
 		Set<Service> services = new HashSet<Service>();
 		for (Resource res : workload.getResources()) {
 			for (ResourceDemand demand : res.getDemands()) {
@@ -75,16 +76,19 @@ public class ResponseTimeValidator implements IValidator {
 				services.add(demand.getService());
 			}
 		}
-		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
-		this.stateModel = builder.build(); 
-		
+		builder.setInvocationGraph(new InvocationGraph(
+				new ArrayList<>(services), cursor, 1));
+		this.stateModel = builder.build();
+
 		this.respObservation = new ArrayList<>();
 		this.respEq = new ArrayList<ResponseTimeEquation>();
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
 			if (srv.getIncomingCalls().isEmpty()) {
-				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, srv, 0);
-				ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false, 0);
+				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel,
+						cursor, srv, 0);
+				ResponseTimeEquation rt = new ResponseTimeEquation(stateModel,
+						cursor, srv, false, 0);
 				dependencies.addAll(rt.getDataDependencies());
 				dependencies.addAll(rtValue.getDataDependencies());
 				respEq.add(rt);
@@ -92,16 +96,16 @@ public class ResponseTimeValidator implements IValidator {
 				this.services.add(srv);
 			}
 		}
-		allErrors = MatrixBuilder.create(this.services.size());	
-		predictedRespTimes = MatrixBuilder.create(this.services.size());	
-		observedRespTimes = MatrixBuilder.create(this.services.size());	
+		allErrors = MatrixBuilder.create(this.services.size());
+		predictedRespTimes = MatrixBuilder.create(this.services.size());
+		observedRespTimes = MatrixBuilder.create(this.services.size());
 	}
-	
+
 	@Override
 	public IStateModel<?> getStateModel() {
 		return stateModel;
 	}
-	
+
 	public void predict(Vector state) {
 		State x = new State(stateModel, state);
 		stateModel.step(x);
@@ -110,40 +114,57 @@ public class ResponseTimeValidator implements IValidator {
 		double[] actual = new double[respEq.size()];
 		for (int i = 0; i < respEq.size(); i++) {
 			real[i] = respObservation.get(i).getConstantValue();
+			if (Double.isNaN(real[i])) {
+				// replace NaN with MAX_VALUE
+				real[i] = Double.MAX_VALUE;
+			}
 			actual[i] = respEq.get(i).getValue(x).getValue();
-			relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
+			if (Double.isNaN(actual[i])) {
+				// replace NaN with MAX_VALUE
+				actual[i] = Double.MAX_VALUE;
+			}
+			if (real[i] != 0) {
+				// to avoid dividing by zero resulting in NaN
+				relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
+			} else {
+				relErr[i] = Math.abs(actual[i] - real[i]);
+			}
+			if (Double.isNaN(relErr[i]) || Double.isNaN(actual[i])
+					|| Double.isNaN(real[i])) {
+				System.out.println("NAN");
+			}
 		}
 		allErrors.addRow(relErr);
 		predictedRespTimes.addRow(actual);
 		observedRespTimes.addRow(real);
 	}
-	
+
 	public Vector getPredictionError() {
 		return checkedMean(allErrors.toMatrix());
 	}
-	
+
 	@Override
 	public List<ModelEntity> getModelEntities() {
 		return services;
 	}
-	
+
 	@Override
 	public Vector getObservedValues() {
 		return checkedMean(observedRespTimes.toMatrix());
 	}
-	
+
 	@Override
 	public Vector getPredictedValues() {
 		return checkedMean(predictedRespTimes.toMatrix());
 	}
-	
+
 	private Vector checkedMean(Matrix matrix) {
 		if (matrix.isEmpty()) {
 			return LinAlg.empty();
 		}
 		return LinAlg.mean(matrix);
 	}
-	
+
 	@Override
 	public List<DataDependency<?>> getDataDependencies() {
 		return dependencies;

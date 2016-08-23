@@ -103,8 +103,21 @@ public class UtilizationValidator implements IValidator {
 		double[] realUtil = new double[utilLaw.size()];
 		for (int i = 0; i < utilLaw.size(); i++) {
 			realUtil[i] = utilObservation.get(i).getConstantValue();
+			if (Double.isNaN(realUtil[i])) {
+				// replace NaN with MAX_VALUE
+				realUtil[i] = Double.MAX_VALUE;
+			}
 			actualUtil[i] = utilLaw.get(i).getValue(x).getValue();
-			relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
+			if (Double.isNaN(actualUtil[i])) {
+				// replace NaN with MAX_VALUE
+				actualUtil[i] = Double.MAX_VALUE;
+			}
+			if (realUtil[i] != 0) {
+				// to avoid dividing by zero resulting in NaN
+				relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
+			} else {
+				relErr[i] = Math.abs(actualUtil[i] - realUtil[i]);
+			}
 		}
 		allErrors.addRow(relErr);
 		predictedUtilization.addRow(actualUtil);
