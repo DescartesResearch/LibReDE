@@ -35,6 +35,7 @@ import org.osgi.framework.BundleContext;
 
 import tools.descartes.librede.Librede;
 import tools.descartes.librede.bayesplusplus.BayesLibrary;
+import tools.descartes.librede.connector.dml.DmlLibrary;
 import tools.descartes.librede.ipopt.java.IpoptLibrary;
 import tools.descartes.librede.nnls.NNLSLibrary;
 
@@ -128,6 +129,13 @@ public final class LibredeEditorPlugin extends EMFPlugin {
 			NNLSLibrary.init();
 			IpoptLibrary.init();
 			BayesLibrary.init();
+			
+			try {
+				// This is only optional.
+				DmlLibrary.init();
+			} catch(NoClassDefFoundError er) {
+				// Ignore it.
+			}
 		}
 	}
 
