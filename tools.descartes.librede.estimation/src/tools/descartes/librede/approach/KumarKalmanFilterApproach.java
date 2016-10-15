@@ -58,7 +58,7 @@ import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Kalman Filter using Response Times and Utilization")
-public class ZhangKalmanFilterApproach extends AbstractEstimationApproach {
+public class KumarKalmanFilterApproach extends AbstractEstimationApproach {
 
 	/**
 	 * The initial demand is scaled to this utilization level, to avoid bad

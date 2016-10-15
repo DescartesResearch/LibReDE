@@ -26,7 +26,7 @@
  */
 package tools.descartes.librede.approach;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
@@ -34,60 +34,53 @@ import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.ILeastSquaresRegressionAlgorithm;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.equations.ResponseTimeEquation;
-import tools.descartes.librede.models.observation.equations.ResponseTimeValue;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.equations.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.InvocationGraph;
-import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
-/**
- * This class implements the linear regression based approach described in the following paper:
- * 
- * Kraft, Stephan, et al. "Estimating service resource consumption from response time measurements." 
- * Proceedings of the Fourth International ICST Conference on Performance Evaluation Methodologies and Tools. 
- * ICST (Institute for Computer Sciences, Social-Informatics and Telecommunications Engineering), 2009.
- * 
- * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
- */
-@Component(displayName = "Least-squares Regression using Queue Lengths and Response Times")
-public class KraftRegressionApproach extends AbstractEstimationApproach {
-
+@Component(displayName = "Least-squares Regression using Utilization Law")
+public class UtilizationRegressionApproach extends AbstractEstimationApproach {
+	
 	@Override
-	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
-		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+	protected List<IStateModel<?>> deriveStateModels(
+			WorkloadDescription workload, IRepositoryCursor cursor) {
+		// For each resource we create a separate state model as
+		// linear regression only supports one output variable (Utilization)
+		// at a time.
+		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		for (Resource res : workload.getResources()) {
-			for (ResourceDemand demand : res.getDemands()) {				
+			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
+			for (ResourceDemand demand : res.getDemands()) {
 				builder.addVariable(demand);
 			}
+			stateModels.add(builder.build());
 		}
-		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, getEstimationWindow()));
-		return Collections.<IStateModel<?>>singletonList(builder.build());
+		return stateModels;
 	}
 
 	@Override
-	protected IObservationModel<?> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
+	protected IObservationModel<?> deriveObservationModel(
+			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		VectorObservationModel om = new VectorObservationModel();
-		for (Service curService : stateModel.getUserServices()) {
-			ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, curService, 0);
-			ResponseTimeEquation rtEquation = new ResponseTimeEquation(stateModel, cursor, curService, true, 0);
-			
-			om.addOutputFunction(new OutputFunction(rtValue, rtEquation));
-		}
-		return om;		
+		for (Resource resource : stateModel.getResources()) {
+			UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, resource, 0);
+			om.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, resource, 0), func));
+		}		
+		return om;
 	}
 
 	@Override
-	protected IEstimationAlgorithm getEstimationAlgorithm(EstimationAlgorithmFactory factory) {
+	protected IEstimationAlgorithm getEstimationAlgorithm(
+			EstimationAlgorithmFactory factory) {
 		return factory.createInstance(ILeastSquaresRegressionAlgorithm.class);
 	}
-
 }
