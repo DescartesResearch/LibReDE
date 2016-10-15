@@ -50,6 +50,7 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.approach.KraftRegressionApproach;
 import tools.descartes.librede.approach.LiuOptimizationApproach;
 import tools.descartes.librede.approach.MenasceOptimizationApproach;
 import tools.descartes.librede.approach.ResponseTimeApproximationApproach;
@@ -166,6 +167,7 @@ public class Librede {
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, ZhangKalmanFilterApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, WangKalmanFilterApproach.class);
 		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, LiuOptimizationApproach.class);
+		Registry.INSTANCE.registerImplementationType(IEstimationApproach.class, KraftRegressionApproach.class);
 
 		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);

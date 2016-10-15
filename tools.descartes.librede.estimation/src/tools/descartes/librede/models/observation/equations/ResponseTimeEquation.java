@@ -120,16 +120,9 @@ public class ResponseTimeEquation extends ModelEquation {
 				residenceTimeEquations.put(res, currentMap);
 			}
 
-			ModelEquation utilFunction;
-			if (useObservedUtilization) {
-				utilFunction = new UtilizationValue(getStateModel(), cursor, res, historicInterval);
-			} else {
-				utilFunction = new UtilizationLawEquation(getStateModel(), cursor, res, historicInterval);
-			}
-
 			for (Service serv : res.getAccessingServices()) {
 				WaitingTimeEquation waitingTime = WaitingTimeEquation.create(getStateModel(), cursor, serv, res,
-						historicInterval, utilFunction);
+						historicInterval, useObservedUtilization);
 				currentMap.put(serv,
 						ResidenceTimeEquation.create(stateModel, cursor, serv, res, historicInterval, waitingTime));
 			}
