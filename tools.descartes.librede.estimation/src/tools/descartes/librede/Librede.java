@@ -115,6 +115,7 @@ import tools.descartes.librede.units.RequestCount;
 import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
+import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsPackage;
 import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
@@ -125,6 +126,8 @@ public class Librede {
 
 	private static final Logger log = Logger.getLogger(Librede.class);
 	private final static int selectionInterval = 1;
+	private static final Quantity<Time> ONE_FOLD_STEPSIZE = UnitsFactory.eINSTANCE.createQuantity();
+
 
 	public static void initLogging() {
 		BasicConfigurator.configure();
@@ -171,6 +174,9 @@ public class Librede {
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
 
 		Registry.INSTANCE.registerImplementationType(IExporter.class, CsvExporter.class);
+		
+		ONE_FOLD_STEPSIZE.setValue(60);
+		ONE_FOLD_STEPSIZE.setUnit(Time.SECONDS);
 	}
 
 	public static LibredeResults execute(LibredeConfiguration conf) {
@@ -382,8 +388,12 @@ public class Librede {
 			}
 			Vector state = estimates.getLastEstimates();
 
+			// Attention: one-fold estimation always gets fixed step size
 			IRepositoryCursor validatingCursor = var.getRepo().getCursor(
-					var.getConf().getEstimation().getStartTimestamp(), var.getConf().getEstimation().getStepSize());
+					var.getConf().getEstimation().getStartTimestamp(), ONE_FOLD_STEPSIZE);
+			// uncomment this for normal behavior
+//			IRepositoryCursor validatingCursor = var.getRepo().getCursor(
+//					var.getConf().getEstimation().getStartTimestamp(), var.getConf().getEstimation().getStepSize());
 
 			List<IValidator> validators = initValidators(var.getConf(), validatingCursor);
 
