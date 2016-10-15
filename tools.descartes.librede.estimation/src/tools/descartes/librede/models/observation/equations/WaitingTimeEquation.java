@@ -61,9 +61,7 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 
 	protected final Service cls_r;
 	protected final Resource res_i;
-	protected final ErlangCEquation erlangC;
 	protected final int historicInterval;
-	protected final ModelEquation utilization;
 
 	/**
 	 * Use {@code WaitingTimeEquation#create(IRepositoryCursor, Resource, int)}
@@ -75,16 +73,11 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	 * @param utilization
 	 */
 	private WaitingTimeEquation(IStateModel<? extends IStateConstraint> stateModel, IRepositoryCursor cursor,
-			Service service, Resource resource, int historicInterval, ModelEquation utilization) {
+			Service service, Resource resource, int historicInterval) {
 		super(stateModel, historicInterval);
 		this.cls_r = service;
 		this.res_i = resource;
 		this.historicInterval = historicInterval;
-		this.erlangC = new ErlangCEquation(resource.getNumberOfServers());
-		this.utilization = utilization;
-
-		addDataDependencies(this.erlangC);
-		addDataDependencies(this.utilization);
 	}
 
 	/**
@@ -103,27 +96,17 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	 * @return a new {@code WaitingTimeEquation} instance
 	 */
 	public static WaitingTimeEquation create(IStateModel<? extends IStateConstraint> stateModel,
-			IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, ModelEquation utilization) {
+			IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, boolean useObservations) {
 		if (isProductForm(resource)) {
-			return new WaitingTimeEquationProductForm(stateModel, cursor, service, resource, historicInterval, utilization);
+			return new WaitingTimeEquationProductForm(stateModel, cursor, service, resource, historicInterval, useObservations);
 		} else {
 			if (resource.getSchedulingStrategy() == SchedulingStrategy.FCFS) {
 				return new WaitingTimeEquationMultiClassFCFS(stateModel, cursor, service, resource, historicInterval,
-						utilization);
+						useObservations);
 			}
 			throw new IllegalArgumentException();
 		}
 	}
-	
-	@Override
-	public boolean hasData() {
-		return utilization.hasData();
-	}
-	
-	@Override
-	public boolean isLinear() {
-		return utilization.isConstant();
-	}	
 	
 	@Override
 	public boolean isConstant() {
@@ -153,6 +136,8 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 	private static class WaitingTimeEquationProductForm extends WaitingTimeEquation {
 		
 		private final Vector zeroBuffer;
+		private final ErlangCEquation erlangC;
+		private final ModelEquation utilization;
 
 		/**
 		 * Constructor.
@@ -164,9 +149,27 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 		 */
 		public WaitingTimeEquationProductForm(IStateModel<? extends IStateConstraint> stateModel,
 				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval,
-				ModelEquation utilization) {
-			super(stateModel, cursor, service, resource, historicInterval, utilization);
+				boolean useObservations) {
+			super(stateModel, cursor, service, resource, historicInterval);
+			if (useObservations) {
+				this.utilization = new UtilizationValue(getStateModel(), cursor, resource, historicInterval);
+			} else {
+				this.utilization = new UtilizationLawEquation(getStateModel(), cursor, resource, historicInterval);
+			}
+			this.erlangC = new ErlangCEquation(resource.getNumberOfServers());
 			zeroBuffer = zeros(stateModel.getStateSize());
+			addDataDependencies(this.erlangC);
+			addDataDependencies(this.utilization);
+		}
+		
+		@Override
+		public boolean hasData() {
+			return utilization.hasData();
+		}
+		
+		@Override
+		public boolean isLinear() {
+			return utilization.isConstant();
 		}
 
 		/*
@@ -282,8 +285,8 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 		 * @param utilization
 		 */
 		public WaitingTimeEquationMultiClassFCFS(IStateModel<? extends IStateConstraint> stateModel,
-				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, ModelEquation utilization) {
-			super(stateModel, cursor, service, resource, historicInterval, utilization);
+				IRepositoryCursor cursor, Service service, Resource resource, int historicInterval, boolean useObservations) {
+			super(stateModel, cursor, service, resource, historicInterval);
 			queueLengthQuery = QueryBuilder.select(StandardMetrics.QUEUE_LENGTH_SEEN_ON_ARRIVAL)
 					.in(RequestCount.REQUESTS).forResourceDemands(resource.getDemands()).average().using(cursor);
 			addDataDependency(queueLengthQuery);
@@ -305,16 +308,9 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 			for (int i = 0; i < Q_ir.rows(); i++) {
 				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
 				DerivativeStructure D_ir = state.getVariable(res_i, curDemand.getService()).getDerivativeStructure();
-				T_q = T_q.add(D_ir.multiply(Q_ir.get(i)));
+				T_q = T_q.add(D_ir.multiply(Q_ir.get(i) / res_i.getNumberOfServers()));
 			}
-			DerivativeStructure U_i = utilization.getValue(state);
-			DerivativeStructure P_q = erlangC.value(U_i);
-			/*
-			 * We need to wait only in cases where all servers are busy.
-			 * Therefore we multiply the waiting time with the busy probability
-			 * of the resource.
-			 */
-			return T_q.multiply(P_q.divide(res_i.getNumberOfServers()));
+			return T_q;
 		}
 
 
@@ -332,12 +328,23 @@ public abstract class WaitingTimeEquation extends ModelEquation {
 			for (int i = 0; i < Q_ir.rows(); i++) {
 				ResourceDemand curDemand = (ResourceDemand) queueLengthQuery.getEntity(i);
 				int stateIdx = getStateModel().getStateVariableIndex(res_i, curDemand.getService());
-				factorsBuffer[stateIdx] = Q_ir.get(i);
+				// We divide the queue length by the number of parallel servers. This
+				// is an approximation proposed by Giuliano Casale et al (see ICPE tutorial 2016)
+				factorsBuffer[stateIdx] = Q_ir.get(i) / res_i.getNumberOfServers();
 			}
-			Vector factors = vector(factorsBuffer);
-			double U_i = utilization.getFactors().get(0);
-			double P_q = erlangC.calculateValue(U_i);
-			return factors.times(P_q / res_i.getNumberOfServers());
+			return vector(factorsBuffer);
+		}
+
+
+		@Override
+		public boolean isLinear() {
+			return true;
+		}
+
+
+		@Override
+		public boolean hasData() {
+			return queueLengthQuery.hasData();
 		}
 	}
 }
