@@ -44,17 +44,16 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
-import edu.kit.ipd.descartes.mm.applicationlevel.functions.ExponentialDistribution;
-import edu.kit.ipd.descartes.mm.applicationlevel.functions.FunctionsFactory;
-import edu.kit.ipd.descartes.mm.applicationlevel.functions.RandomVariable;
-import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ModelVariableCharacterizationType;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.Repository;
-import edu.kit.ipd.descartes.mm.applicationlevel.system.System;
-import edu.kit.ipd.descartes.mm.deployment.Deployment;
-import edu.kit.ipd.descartes.mm.resourcelandscape.DistributedDataCenter;
-import edu.kit.ipd.descartes.mm.resourcetype.ResourceTypeRepository;
-import edu.kit.ipd.descartes.mm.resourcetype.ResourcetypePackage;
-import edu.kit.ipd.descartes.mm.usageprofile.UsageProfile;
+import tools.descartes.dml.mm.applicationlevel.functions.ExponentialDistribution;
+import tools.descartes.dml.mm.applicationlevel.functions.FunctionsFactory;
+import tools.descartes.dml.mm.applicationlevel.functions.RandomVariable;
+import tools.descartes.dml.mm.applicationlevel.parameterdependencies.ModelVariableCharacterizationType;
+import tools.descartes.dml.mm.applicationlevel.repository.Repository;
+import tools.descartes.dml.mm.deployment.Deployment;
+import tools.descartes.dml.mm.resourcelandscape.DistributedDataCenter;
+import tools.descartes.dml.mm.resourcetype.ResourceTypeRepository;
+import tools.descartes.dml.mm.resourcetype.ResourcetypePackage;
+import tools.descartes.dml.mm.usageprofile.UsageProfile;
 import tools.descartes.librede.LibredeResults;
 import tools.descartes.librede.ResultTable;
 import tools.descartes.librede.approach.IEstimationApproach;
@@ -85,7 +84,7 @@ public class DmlExport implements IExporter {
 	private String dmlModelName;
 	
 	private Repository repository;
-	private System system;
+	private tools.descartes.dml.mm.applicationlevel.system.System system;
 	private DistributedDataCenter ddc;
 	private Deployment deployment;
 	private UsageProfile usage;
@@ -123,8 +122,8 @@ public class DmlExport implements IExporter {
 		TreeIterator<EObject> elementsIter = repository.eAllContents();
 		while (elementsIter.hasNext()) {
 			EObject curObj = elementsIter.next();
-			if (curObj instanceof edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand) {
-				edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand = (edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand) curObj;
+			if (curObj instanceof tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand) {
+				tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand = (tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand) curObj;
 				Integer idx = demandsToIdx.get(dmlDemand.getId());
 				if (idx != null) {
 					double lastEstimate = estimates.getData(idx).get(estimates.samples() - 1);
@@ -179,7 +178,7 @@ public class DmlExport implements IExporter {
 				.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".resourcetype")));
 		repository = (Repository) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".repository")));
 		ddc = (DistributedDataCenter) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".resourcelandscape")));
-		system = (System) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".system")));
+		system = (tools.descartes.dml.mm.applicationlevel.system.System) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".system")));
 		deployment = (Deployment) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".deployment")));
 		usage = (UsageProfile) copier.copy(deserialize(rset, modelPath.resolve(dmlModelName + ".usageprofile")));
 		copier.copyReferences();

@@ -30,19 +30,19 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyConnector;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyContext;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.BasicComponent;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.ComposedStructure;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.CompositeComponent;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.InterfaceProvidingRole;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.InterfaceRequiringRole;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.ProvidingDelegationConnector;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.RequiringDelegationConnector;
-import edu.kit.ipd.descartes.mm.deployment.Deployment;
-import edu.kit.ipd.descartes.mm.deployment.DeploymentContext;
-import edu.kit.ipd.descartes.mm.resourcelandscape.ComputeNode;
-import edu.kit.ipd.descartes.mm.resourcelandscape.Container;
+import tools.descartes.dml.mm.applicationlevel.repository.AssemblyConnector;
+import tools.descartes.dml.mm.applicationlevel.repository.AssemblyContext;
+import tools.descartes.dml.mm.applicationlevel.repository.BasicComponent;
+import tools.descartes.dml.mm.applicationlevel.repository.ComposedStructure;
+import tools.descartes.dml.mm.applicationlevel.repository.CompositeComponent;
+import tools.descartes.dml.mm.applicationlevel.repository.InterfaceProvidingRole;
+import tools.descartes.dml.mm.applicationlevel.repository.InterfaceRequiringRole;
+import tools.descartes.dml.mm.applicationlevel.repository.ProvidingDelegationConnector;
+import tools.descartes.dml.mm.applicationlevel.repository.RequiringDelegationConnector;
+import tools.descartes.dml.mm.deployment.Deployment;
+import tools.descartes.dml.mm.deployment.DeploymentContext;
+import tools.descartes.dml.mm.resourcelandscape.ComputeNode;
+import tools.descartes.dml.mm.resourcelandscape.Container;
 
 public class DmlHelper {
 

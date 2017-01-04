@@ -38,16 +38,16 @@ import org.eclipse.emf.ecore.EObject;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import edu.kit.ipd.descartes.core.NamedElement;
-import edu.kit.ipd.descartes.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.AssemblyContext;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.InterfaceProvidingRole;
-import edu.kit.ipd.descartes.mm.applicationlevel.repository.Signature;
-import edu.kit.ipd.descartes.mm.resourceconfiguration.ConfigurationSpecification;
-import edu.kit.ipd.descartes.mm.resourceconfiguration.ProcessingResourceSpecification;
-import edu.kit.ipd.descartes.mm.resourceconfiguration.SchedulingPolicy;
-import edu.kit.ipd.descartes.mm.resourcelandscape.Container;
-import edu.kit.ipd.descartes.mm.resourcetype.ResourceType;
+import tools.descartes.dml.core.NamedElement;
+import tools.descartes.dml.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
+import tools.descartes.dml.mm.applicationlevel.repository.AssemblyContext;
+import tools.descartes.dml.mm.applicationlevel.repository.InterfaceProvidingRole;
+import tools.descartes.dml.mm.applicationlevel.repository.Signature;
+import tools.descartes.dml.mm.resourceconfiguration.ConfigurationSpecification;
+import tools.descartes.dml.mm.resourceconfiguration.ProcessingResourceSpecification;
+import tools.descartes.dml.mm.resourceconfiguration.SchedulingPolicy;
+import tools.descartes.dml.mm.resourcelandscape.Container;
+import tools.descartes.dml.mm.resourcetype.ResourceType;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ExternalCall;
 import tools.descartes.librede.configuration.ModelEntity;
@@ -59,22 +59,23 @@ import tools.descartes.librede.configuration.Task;
 import tools.descartes.librede.configuration.WorkloadDescription;
 
 public class DmlMapping {
-	
+
 	private static class ResourceMapping {
 		public Container container;
 		public ProcessingResourceSpecification configuration;
 		public Resource resource;
 	}
-	
+
 	private static class ServiceMapping {
 		public ComponentInstanceReference componentInstance;
 		public InterfaceProvidingRole role;
 		public Signature signature;
 		public Service service;
 	}
-	
-	private BiMap<edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand, ResourceDemand> demands = HashBiMap.create();
-	private BiMap<edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall, ExternalCall> calls = HashBiMap
+
+	private BiMap<tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand, ResourceDemand> demands = HashBiMap
+			.create();
+	private BiMap<tools.descartes.dml.mm.applicationlevel.servicebehavior.ExternalCall, ExternalCall> calls = HashBiMap
 			.create();
 	private Map<String, ServiceMapping> services = new HashMap<>();
 	private Map<String, ResourceMapping> resources = new HashMap<>();
@@ -82,38 +83,39 @@ public class DmlMapping {
 	private Set<ModelEntity> newEntities = new HashSet<>();
 	private Set<String> unmappedServices = new HashSet<>();
 	private Set<String> unmappedResources = new HashSet<>();
-	
+
 	private WorkloadDescription workload = ConfigurationFactory.eINSTANCE.createWorkloadDescription();
-	
+
 	public WorkloadDescription getWorkload() {
 		return workload;
 	}
-	
+
 	public void reset() {
 		newEntities.clear();
 		unmappedResources.clear();
 		unmappedServices.clear();
-		
+
 		unmappedResources.addAll(resources.keySet());
 		unmappedServices.addAll(services.keySet());
 	}
-	
+
 	public Set<ModelEntity> getNewEntities() {
 		return newEntities;
 	}
-	
-	public ExternalCall getLibredeCall(edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
+
+	public ExternalCall getLibredeCall(tools.descartes.dml.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
 		return calls.get(dmlCall);
 	}
 
-	public edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall getDmlCall(ExternalCall libredeCall) {
+	public tools.descartes.dml.mm.applicationlevel.servicebehavior.ExternalCall getDmlCall(ExternalCall libredeCall) {
 		return calls.inverse().get(libredeCall);
 	}
-	
-	public edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand getDmlDemand(ResourceDemand libredeDemand) {
+
+	public tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand getDmlDemand(
+			ResourceDemand libredeDemand) {
 		return demands.inverse().get(libredeDemand);
 	}
-	
+
 	public void removeUnmappedEntites() {
 		Set<String> servicesToUnmap = new HashSet<>(unmappedServices);
 		for (String serviceName : servicesToUnmap) {
@@ -130,7 +132,7 @@ public class DmlMapping {
 			}
 		}
 	}
-	
+
 	public void unmapService(Service service) {
 		workload.getServices().remove(service);
 		services.remove(service.getName());
@@ -139,25 +141,25 @@ public class DmlMapping {
 		for (Task task : service.getTasks()) {
 			newEntities.remove(task);
 			if (task instanceof ResourceDemand) {
-				demands.inverse().remove(task);				
+				demands.inverse().remove(task);
 			} else if (task instanceof ExternalCall) {
 				calls.inverse().remove(task);
-			}			
-		}		
+			}
+		}
 	}
-	
+
 	public void unmapResource(Resource resource) {
 		workload.getResources().remove(resource);
 		resources.remove(resource);
 		newEntities.remove(resource);
 		unmappedResources.remove(resource);
 	}
-	
+
 	public void unmapExternalCall(ExternalCall call) {
 		newEntities.remove(call);
 		calls.inverse().remove(call);
 	}
-	
+
 	public Service mapService(ComponentInstanceReference componentInstance, InterfaceProvidingRole role,
 			Signature signature) {
 		String serviceName = getServiceName(componentInstance, role, signature);
@@ -166,9 +168,9 @@ public class DmlMapping {
 		if (mapping == null) {
 			mapping = createService(serviceName, componentInstance, role, signature);
 		}
-		return mapping.service;		
+		return mapping.service;
 	}
-	
+
 	private ServiceMapping createService(String serviceName, ComponentInstanceReference componentInstance,
 			InterfaceProvidingRole role, Signature signature) {
 		Service service = ConfigurationFactory.eINSTANCE.createService();
@@ -196,14 +198,16 @@ public class DmlMapping {
 		return name.toString();
 	}
 
-	public ResourceDemand mapResourceDemand(Resource resource, Service service, edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand) {
+	public ResourceDemand mapResourceDemand(Resource resource, Service service,
+			tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand) {
 		ResourceDemand demand = demands.get(dmlDemand);
 		if (demand != null) {
 			return demand;
 		} else {
 			demand = ConfigurationFactory.eINSTANCE.createResourceDemand();
-			demand.setResource(resource);			
-			// Set the name to the ID to allow for backward traceability (see DmlExport)
+			demand.setResource(resource);
+			// Set the name to the ID to allow for backward traceability (see
+			// DmlExport)
 			demand.setName(dmlDemand.getId());
 			service.getTasks().add(demand);
 			demands.put(dmlDemand, demand);
@@ -211,8 +215,8 @@ public class DmlMapping {
 			return demand;
 		}
 	}
-	
-	public boolean contains(edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand) {
+
+	public boolean contains(tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand dmlDemand) {
 		return demands.containsValue(dmlDemand);
 	}
 
@@ -251,7 +255,7 @@ public class DmlMapping {
 		}
 		return childResources;
 	}
-	
+
 	private ResourceMapping createResource(String resourceName, Container container,
 			ProcessingResourceSpecification specification) {
 		ResourceMapping rm = new ResourceMapping();
@@ -272,7 +276,8 @@ public class DmlMapping {
 		return name.toString();
 	}
 
-	public ExternalCall mapExternalCall(Service service, Service calledService, edu.kit.ipd.descartes.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
+	public ExternalCall mapExternalCall(Service service, Service calledService,
+			tools.descartes.dml.mm.applicationlevel.servicebehavior.ExternalCall dmlCall) {
 		ExternalCall call = calls.get(dmlCall);
 		if (call != null) {
 			return call;
@@ -310,7 +315,7 @@ public class DmlMapping {
 		}
 		return mapping.signature;
 	}
-	
+
 	public ComponentInstanceReference getComponentInstance(Service service) {
 		ServiceMapping mapping = services.get(service.getName());
 		if (mapping == null) {
@@ -318,7 +323,7 @@ public class DmlMapping {
 		}
 		return mapping.componentInstance;
 	}
-	
+
 	public Container getContainer(Resource resource) {
 		ResourceMapping mapping = resources.get(resource.getName());
 		if (mapping == null) {
@@ -326,7 +331,7 @@ public class DmlMapping {
 		}
 		return mapping.container;
 	}
-	
+
 	public ProcessingResourceSpecification getResourceSpecification(Resource resource) {
 		ResourceMapping mapping = resources.get(resource.getName());
 		if (mapping == null) {
@@ -344,7 +349,7 @@ public class DmlMapping {
 	}
 
 	private SchedulingStrategy convertSchedulingStrategy(SchedulingPolicy policy) {
-		switch(policy) {
+		switch (policy) {
 		case DELAY:
 			return SchedulingStrategy.IS;
 		case FCFS:
