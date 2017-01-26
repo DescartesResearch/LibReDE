@@ -118,6 +118,7 @@ import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsFactory;
 import tools.descartes.librede.units.UnitsPackage;
+import tools.descartes.librede.validation.AbsoluteUtilizationValidator;
 import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
@@ -174,6 +175,7 @@ public class Librede {
 
 		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
+		Registry.INSTANCE.registerImplementationType(IValidator.class, AbsoluteUtilizationValidator.class);
 
 		Registry.INSTANCE.registerImplementationType(IExporter.class, CsvExporter.class);
 		

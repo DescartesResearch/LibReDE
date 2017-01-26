@@ -49,7 +49,7 @@ import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.rules.DataDependency;
 
-@Component(displayName = "Utilization Law Validator")
+@Component(displayName = "Utilization Law Validator (Relative)")
 public class UtilizationValidator implements IValidator {
 	
 	private final List<DataDependency<?>> dependencies = new ArrayList<>();
@@ -112,17 +112,31 @@ public class UtilizationValidator implements IValidator {
 				// replace NaN with MAX_VALUE
 				actualUtil[i] = Double.MAX_VALUE;
 			}
-			if (realUtil[i] != 0) {
-				// to avoid dividing by zero resulting in NaN
-				relErr[i] = Math.abs(actualUtil[i] - realUtil[i]) / realUtil[i];
-			} else {
-				relErr[i] = Math.abs(actualUtil[i] - realUtil[i]);
-			}
+			relErr[i] = returnErrorValue(actualUtil[i], realUtil[i]);
 		}
 		allErrors.addRow(relErr);
 		predictedUtilization.addRow(actualUtil);
 		observedUtilization.addRow(realUtil);
 	}
+	
+	/**
+	 * Returns the required error value (relative or absolute)
+	 * 
+	 * @param actual
+	 *            The actual utilization
+	 * @param real
+	 *            The real utilization
+	 * @return The error
+	 */
+	protected double returnErrorValue(double actual, double real) {
+		if (real != 0) {
+			// to avoid dividing by zero resulting in NaN
+			return Math.abs(actual - real) / real;
+		} else {
+			return Math.abs(actual - real);
+		}
+	}
+
 	
 	@Override
 	public Vector getPredictionError() {
