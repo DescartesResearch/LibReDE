@@ -36,5 +36,5 @@ location "https://se4.informatik.uni-wuerzburg.de/thirdparty/repository/" {
 }
 
 location "https://se4.informatik.uni-wuerzburg.de/dml/downloads/snapshot/" {
-	edu.kit.ipd.descartes.mm.feature.feature.group lazy
+	tools.descartes.dml.mm.feature.feature.group lazy
 }

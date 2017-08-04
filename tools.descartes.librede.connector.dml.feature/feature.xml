@@ -23,10 +23,10 @@ For purposes of the EPL, &quot;Program&quot; will mean the Content.
 
    <requires>
       <import plugin="com.google.guava" version="12.0.0" match="greaterOrEqual"/>
-      <import plugin="edu.kit.ipd.descartes.core"/>
-      <import plugin="edu.kit.ipd.descartes.mm.applicationlevel"/>
-      <import plugin="edu.kit.ipd.descartes.mm.deployment"/>
-      <import plugin="edu.kit.ipd.descartes.mm.resourcelandscape"/>
+      <import plugin="tools.descartes.dml.core"/>
+      <import plugin="tools.descartes.dml.mm.applicationlevel"/>
+      <import plugin="tools.descartes.dml.mm.deployment"/>
+      <import plugin="tools.descartes.dml.mm.resourcelandscape"/>
       <import plugin="org.apache.log4j"/>
       <import plugin="org.eclipse.emf.common"/>
       <import plugin="tools.descartes.librede.model"/>
