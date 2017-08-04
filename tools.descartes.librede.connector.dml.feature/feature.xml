@@ -4,21 +4,16 @@
       label="DML Connector Feature"
       version="1.1.0.qualifier">
 
-   <description>
-      This feature serves as connector between DML and Librede.
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
    </description>
 
-   <copyright>
-      (c) Copyright LibReDE contributors and others 2014.  All rights
-reserved.
-This product includes software developed by other open source
-projects including the Apache Software Foundation, https://www.apache.org/.
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
    </copyright>
 
-   <license url="https://www.eclipse.org/legal/epl-v10.html">
-      Unless otherwise indicated, all Content  is provided to you under the terms and conditions of the Eclipse Public License Version 1.0 (&quot;EPL&quot;). A copy of the EPL is
-provided with this Content and is also available at http://www.eclipse.org/legal/epl-v10.html.
-For purposes of the EPL, &quot;Program&quot; will mean the Content.
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
    </license>
 
    <requires>
