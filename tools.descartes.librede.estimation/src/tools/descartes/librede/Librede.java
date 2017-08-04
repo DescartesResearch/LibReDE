@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.crypto.Data;
-
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.URI;
@@ -73,11 +71,9 @@ import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.datasource.DataSourceSelector;
 import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.datasource.IDataSourceListener;
 import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
-import tools.descartes.librede.datasource.kieker.KiekerDataSource;
 import tools.descartes.librede.datasource.memory.InMemoryDataSource;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
@@ -163,7 +159,6 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.STEAL_TIME, new StealTimeAdapter());
 
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
-		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, InMemoryDataSource.class);
 
 		Registry.INSTANCE.registerImplementationType(IEstimationAlgorithm.class, SimpleApproximation.class);
@@ -221,35 +216,6 @@ public class Librede {
 //		return null;
 	}
 
-	public static LibredeResults executeContinuousOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
-		Quantity<Time> endTime = updateRepositoryOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener);
-		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
-			// do not progress further than the configured end timestamp.
-			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
-		} else {		
-			var.getRepo().setCurrentTime(endTime);
-		}
-
-		try {
-			runEstimation(var);
-		} catch (Exception e) {
-			log.error("Error running estimation.", e);
-		}
-		
-		// Now export the results.
-		//exportResults(var.getConf(), var.getResults());
-
-		return var.getResults();
-//		return null;
-	}
-	
-	public static void initRepoOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener){
-		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
-
-		Quantity<Time> endTime = loadRepositoryOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener);
-		var.getRepo().setCurrentTime(endTime);
-	}
-	
 	public static void initRepo(LibredeVariables var) {
 		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
 
@@ -261,199 +227,6 @@ public class Librede {
 		return loadRepository(conf, repo, Collections.<String, IDataSource> emptyMap());
 	}
 
-	/**
-	 * This method was created by Torsten Krauß to enable the online scenario and the kieker datasource.
-	 * @param conf
-	 * @param repo
-	 * @param existingDataSources
-	 * @param dataSourceListener 
-	 * @return
-	 */
-	public static Quantity<Time> loadRepositoryOnline(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener){
-		//verify we have a valid listener.
-		if(!(iDataSourceListener instanceof DataSourceSelector)){
-			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
-		}
-		//cast it
-		DataSourceSelector selector = (DataSourceSelector) iDataSourceListener;
-		//the map for all the data sources in use
-		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
-		//the actual last timestamp of the librede repo
-		Quantity<Time> endTime = repo.getCurrentTime();
-
-		log.info("Start loading monitoring data");
-		//for each trace, which means for each of our metrics / folder combinations
-		for (TraceConfiguration trace : conf.getInput().getObservations()) {
-			//get the data source name
-			String dataSourceName = trace.getDataSource().getName();
-			//check if we already deal with this data source
-			if (!dataSources.containsKey(dataSourceName)) {
-				//no we do not
-				//get it from elsewhere
-				IDataSource newSource;
-				//have we previously dealt with this data source
-				if (existingDataSources.containsKey(dataSourceName)) {
-					//yes we have so get it
-					newSource = existingDataSources.get(dataSourceName);
-				} else {
-					//no we have not
-					//create a new instance
-					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
-					try {
-						//create it
-						newSource = (IDataSource) Instantiator.newInstance(cl,
-								trace.getDataSource().getParameters());
-						//set the name of the new data source
-						newSource.setName(dataSourceName);
-						//add it to the overall data sources we ever used
-						existingDataSources.put(dataSourceName, newSource);
-						//add a listener to the data source
-						selector.add(newSource);
-					} catch (Exception e) {
-						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
-						continue;
-					}
-				}
-				//add it to the data sources in use
-				dataSources.put(dataSourceName, newSource);
-			}//yes we have already dealt with this data source
-			//get the data source from those in use
-			IDataSource source = dataSources.get(dataSourceName);
-			//add the trace to the data source
-			try {
-				source.addTrace(trace);
-			} catch (IOException ex) {
-				log.error("Error loading data.", ex);
-			}
-		}
-		//start loading all the datasources.
-		//this initally loads all the available data
-		//and then listens for new data
-		for (IDataSource ds : dataSources.values()) {
-			try {
-				ds.load();
-			} catch (IOException e) {
-				log.error("Error loading data initially.", e);
-			}
-		}
-		//create some set to log the traces we poll
-		Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
-		//variable to hold the actual event we polled from the listener
-		TraceEvent curEvent = null;
-		//poll events from the listener as long as the queue is empty
-		while ((curEvent = selector.poll()) != null) {
-			//the last time in the listener
-			endTime = selector.getLatestObservationTime();
-			//the trace key of the actual traceEvent
-			TraceKey key = curEvent.getKey();
-			//add for logging
-			loadedTraces.add(key);
-
-			@SuppressWarnings("unchecked")
-			Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
-			@SuppressWarnings("unchecked")
-			Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
-			
-			//get the data out of the actual traceEvent
-			TimeSeries ts = curEvent.getData();
-
-			//end timestamp is set in ts.append()
-			ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-			//ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-
-			//insert the data into the librede repository
-			if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
-				repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
-			} else {
-				repo.insert(metric, unit, key.getEntity(), ts);
-			}
-			//try to get more data from the queue
-		}
-		//log the traces we added during the last poll period
-		for (TraceKey t : loadedTraces) {
-			TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(),
-					t.getEntity(), t.getAggregation());
-			log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation()
-					+ " <- [length=" + ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start="
-					+ ts.getStartTime() + "s, end=" + ts.getEndTime() + "s]");
-		}
-		log.info("Successfully loaded monitoring data.");
-		//here we dump information from the repository.
-		//I think i can see all the data for all the resources, services and tasks.
-		//((MemoryObservationRepository) repo).logContentDump();
-		//return the last time in the listener.
-		return endTime;
-	}
-	/**
-	 * This method was created by Torsten Krauß to enable the online scenario and the kieker datasource.
-	 * @param conf
-	 * @param repo
-	 * @param existingDataSources
-	 * @param dataSourceListener 
-	 * @return
-	 */
-	public static Quantity<Time> updateRepositoryOnline(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener){
-		//verify we have a valid listener.
-		if(!(iDataSourceListener instanceof DataSourceSelector)){
-			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
-		}
-		//cast it
-		DataSourceSelector selector = (DataSourceSelector) iDataSourceListener;
-		//the actual last timestamp of the librede repo
-		Quantity<Time> endTime = repo.getCurrentTime();
-
-		log.info("Start loading monitoring data for updating repo.");
-		//create some set to log the traces we poll
-		Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
-		//variable to hold the actual event we polled from the listener
-		TraceEvent curEvent = null;
-		//poll events from the listener as long as the queue is empty
-		while ((curEvent = selector.poll()) != null) {
-			//the last time in the listener
-			endTime = selector.getLatestObservationTime();
-			//the trace key of the actual traceEvent
-			TraceKey key = curEvent.getKey();
-			//add for logging
-			loadedTraces.add(key);
-
-			@SuppressWarnings("unchecked")
-			Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
-			@SuppressWarnings("unchecked")
-			Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
-			
-			//get the data out of the actual traceEvent
-			TimeSeries ts = curEvent.getData();
-
-			//end timestamp is set in ts.append()
-			ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-			//ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-
-			//insert the data into the librede repository
-			if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
-				repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
-			} else {
-				repo.insert(metric, unit, key.getEntity(), ts);
-			}
-			//try to get more data from the queue
-		}
-		//log the traces we added during the last poll period
-		for (TraceKey t : loadedTraces) {
-			TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(),
-					t.getEntity(), t.getAggregation());
-			log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation()
-					+ " <- [length=" + ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start="
-					+ ts.getStartTime() + "s, end=" + ts.getEndTime() + "s]");
-		}
-		log.info("Successfully loaded monitoring data for updating repo.");
-		//here we dump information from the repository.
-		//I think i can see all the data for all the resources, services and tasks.
-		//((MemoryObservationRepository) repo).logContentDump();
-		//return the last time in the listener.
-		return endTime;
-	}
-	
 	public static Quantity<Time> loadRepository(LibredeConfiguration conf, IMonitoringRepository repo,
 			Map<String, IDataSource> existingDataSources) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
