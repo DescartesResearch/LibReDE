@@ -85,3 +85,5 @@ Import-Package: cern.jet.random.sampling;version="1.2.0",
  tools.descartes.librede.linalg,
  tools.descartes.librede.metrics,
  tools.descartes.librede.units
+Bundle-ClassPath: lib/commons-io-2.5.jar,
+ .
