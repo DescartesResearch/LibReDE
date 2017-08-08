@@ -28,6 +28,8 @@ package tools.descartes.librede;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.crypto.Data;
 
 import javax.xml.crypto.Data;
 
@@ -78,6 +82,7 @@ import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.datasource.kieker.KiekerDataSource;
+import tools.descartes.librede.datasource.kiekeramqp.KiekerAmqpDataSource;
 import tools.descartes.librede.datasource.memory.InMemoryDataSource;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
@@ -164,6 +169,8 @@ public class Librede {
 
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerDataSource.class);
+		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerAmqpDataSource.class);
+
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, InMemoryDataSource.class);
 
 		Registry.INSTANCE.registerImplementationType(IEstimationAlgorithm.class, SimpleApproximation.class);
@@ -221,8 +228,8 @@ public class Librede {
 //		return null;
 	}
 
-	public static LibredeResults executeContinuousOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
-		Quantity<Time> endTime = updateRepositoryOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener);
+	public static LibredeResults executeContinuousOnline(int maxInsertionTimeMs, LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
+		Quantity<Time> endTime = updateRepositoryOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener, maxInsertionTimeMs);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
 			// do not progress further than the configured end timestamp.
 			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
@@ -243,11 +250,15 @@ public class Librede {
 //		return null;
 	}
 	
-	public static void initRepoOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener){
+	public static void initDataSources(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener){
+		//set the current time of the repo to the start time of the librede file
 		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
-
-		Quantity<Time> endTime = loadRepositoryOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener);
+		//load data to the repo
+		Quantity<Time> endTime = initDataSourcesOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener);
+		//set the current time of the repo to the last observation timestamp of all the actual traces
 		var.getRepo().setCurrentTime(endTime);
+		
+		//var.getConf().getEstimation().setStartTimestamp(((DataSourceSelector)dataSourceListener).getFirstObservationTime());
 	}
 	
 	public static void initRepo(LibredeVariables var) {
@@ -269,7 +280,7 @@ public class Librede {
 	 * @param dataSourceListener 
 	 * @return
 	 */
-	public static Quantity<Time> loadRepositoryOnline(LibredeConfiguration conf, IMonitoringRepository repo,
+	public static Quantity<Time> initDataSourcesOnline(LibredeConfiguration conf, IMonitoringRepository repo,
 			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener){
 		//verify we have a valid listener.
 		if(!(iDataSourceListener instanceof DataSourceSelector)){
@@ -282,7 +293,7 @@ public class Librede {
 		//the actual last timestamp of the librede repo
 		Quantity<Time> endTime = repo.getCurrentTime();
 
-		log.info("Start loading monitoring data");
+		log.info("Start loading traces");
 		//for each trace, which means for each of our metrics / folder combinations
 		for (TraceConfiguration trace : conf.getInput().getObservations()) {
 			//get the data source name
@@ -337,8 +348,11 @@ public class Librede {
 				log.error("Error loading data initially.", e);
 			}
 		}
+		//THIS IS NOT NECESSARY ANYMORE, BECAUSE WE 
+		//NOW WAIT BEFORE WE ESTIMATE THE FIRST TIME AND THE 
+		//LISTENER WILL THEN BE POLLED
 		//create some set to log the traces we poll
-		Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
+		/*Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
 		//variable to hold the actual event we polled from the listener
 		TraceEvent curEvent = null;
 		//poll events from the listener as long as the queue is empty
@@ -382,7 +396,7 @@ public class Librede {
 		//here we dump information from the repository.
 		//I think i can see all the data for all the resources, services and tasks.
 		//((MemoryObservationRepository) repo).logContentDump();
-		//return the last time in the listener.
+		//return the last time in the listener.*/
 		return endTime;
 	}
 	/**
@@ -390,11 +404,12 @@ public class Librede {
 	 * @param conf
 	 * @param repo
 	 * @param existingDataSources
+	 * @param maxInsertionTimeMs 
 	 * @param dataSourceListener 
 	 * @return
 	 */
 	public static Quantity<Time> updateRepositoryOnline(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener){
+			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener, int maxInsertionTimeMs){
 		//verify we have a valid listener.
 		if(!(iDataSourceListener instanceof DataSourceSelector)){
 			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
@@ -404,37 +419,51 @@ public class Librede {
 		//the actual last timestamp of the librede repo
 		Quantity<Time> endTime = repo.getCurrentTime();
 
+		//remember the actual timestamp to not load longer then maxInsertionTimeMs
+		long maxTimeStamp = System.currentTimeMillis()+maxInsertionTimeMs;
 		log.info("Start loading monitoring data for updating repo.");
 		//create some set to log the traces we poll
 		Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
 		//variable to hold the actual event we polled from the listener
 		TraceEvent curEvent = null;
-		//poll events from the listener as long as the queue is empty
-		while ((curEvent = selector.poll()) != null) {
-			//the last time in the listener
-			endTime = selector.getLatestObservationTime();
-			//the trace key of the actual traceEvent
-			TraceKey key = curEvent.getKey();
-			//add for logging
-			loadedTraces.add(key);
-
-			@SuppressWarnings("unchecked")
-			Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
-			@SuppressWarnings("unchecked")
-			Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
-			
-			//get the data out of the actual traceEvent
-			TimeSeries ts = curEvent.getData();
-
-			//end timestamp is set in ts.append()
-			ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-			//ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-
-			//insert the data into the librede repository
-			if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
-				repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
-			} else {
-				repo.insert(metric, unit, key.getEntity(), ts);
+		//flag to indicate if further polling is wanted
+		boolean pollNext = true;
+		//poll events from the listener until the queue is empty or the maxTimeStamp is reached
+		while (pollNext) {
+			//poll the next event from the queue/listener
+			curEvent = selector.poll();
+			//check if we have polled something
+			if(curEvent!=null){
+				//the last time in the listener
+				endTime = selector.getLatestObservationTime();
+				//the trace key of the actual traceEvent
+				TraceKey key = curEvent.getKey();
+				//add for logging
+				loadedTraces.add(key);
+	
+				@SuppressWarnings("unchecked")
+				Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
+				@SuppressWarnings("unchecked")
+				Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
+				
+				//get the data out of the actual traceEvent
+				TimeSeries ts = curEvent.getData();
+	
+				//end timestamp is set in ts.append()
+				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
+				//ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
+	
+				//insert the data into the librede repository
+				if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
+					repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
+				} else {
+					repo.insert(metric, unit, key.getEntity(), ts);
+				}
+			}
+			//check if we should poll again from the queue
+			if((curEvent==null) || (System.currentTimeMillis() > maxTimeStamp)){
+				//exit the while loop
+				pollNext = false;
 			}
 			//try to get more data from the queue
 		}
@@ -795,6 +824,116 @@ public class Librede {
 		}
 	}
 
+	public static void printSummary(LibredeResults results, PrintStream outputStream){
+		// Aggregate results
+				ResourceDemand[] variables = null;
+				List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(results.getApproaches());
+
+				Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
+				for (Class<? extends IEstimationApproach> approach : approaches) {
+					for (int i = 0; i < results.getNumberOfFolds(); i++) {
+						ResultTable curFold = results.getEstimates(approach, i);
+						if (variables == null) {
+							variables = curFold.getStateVariables();
+						} else {
+							if (!Arrays.equals(variables, curFold.getStateVariables())) {
+								throw new IllegalStateException();
+							}
+						}
+						validators.addAll(curFold.getValidators());
+					}
+				}
+				// Print approaches legend
+				outputStream.println("Approaches");
+				outputStream.println("==========");
+				for (int i = 0; i < approaches.size(); i++) {
+					outputStream.printf("[%d] %s\n", i + 1, Registry.INSTANCE.getDisplayName(approaches.get(i)));
+				}
+				outputStream.println();
+
+				Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
+				Map<Class<? extends IValidator>, MatrixBuilder> meanPredictions = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
+				Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
+				
+				if (variables != null) {
+					MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
+					for (Class<? extends IEstimationApproach> approach : approaches) {
+						MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
+						for (int i = 0; i < results.getNumberOfFolds(); i++) {
+							ResultTable curFold = results.getEstimates(approach, i);
+							lastEstimates.addRow(curFold.getLastEstimates());
+						}
+						Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
+						if (lastEstimatesMatrix.isEmpty()) {
+							log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
+						} else {
+							meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
+						}
+			
+						for (Class<? extends IValidator> validator : validators) {
+							MatrixBuilder errorsBuilder = null;
+							MatrixBuilder predictionsBuilder = null;
+							for (int i = 0; i < results.getNumberOfFolds(); i++) {
+								ResultTable curFold = results.getEstimates(approach, i);
+								Vector curErr = curFold.getValidationErrors(validator);
+								if (errorsBuilder == null) {
+									errorsBuilder = MatrixBuilder.create(curErr.rows());
+									validatedEntities.put(validator, curFold.getValidatedEntities(validator));
+								}
+								errorsBuilder.addRow(curErr);
+								Vector curPred = curFold.getValidationPredictions(validator);
+								if (predictionsBuilder == null) {
+									predictionsBuilder = MatrixBuilder.create(curPred.rows());
+								}
+								predictionsBuilder.addRow(curPred);
+							}
+			
+							Matrix errors = errorsBuilder.toMatrix();
+							Matrix predictions = predictionsBuilder.toMatrix();
+							if (!errors.isEmpty() && !predictions.isEmpty()) {
+								Vector curMeanErr = LinAlg.mean(errors);
+								Vector curMeanPred = LinAlg.mean(predictions);
+								if (!meanErrors.containsKey(validator)) {
+									meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
+									meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
+								}
+								meanErrors.get(validator).addRow(curMeanErr);
+								meanPredictions.get(validator).addRow(curMeanPred);
+							}
+						}
+			
+					}
+
+
+					// Estimates
+					outputStream.println("Estimates");
+					outputStream.println("=========");
+					printEstimatesTable(variables, approaches, meanEstimates.toMatrix(),outputStream);
+					outputStream.println();
+
+
+					if (validators.size() > 0) {
+						// Cross-Validation Results
+						outputStream.println("Cross-Validation Results:");
+						outputStream.println("=========================");
+			
+						for (Class<? extends IValidator> validator : validators) {
+							String name = Registry.INSTANCE.getDisplayName(validator);
+							outputStream.println(name + ":");
+							if (meanErrors.containsKey(validator)) {
+			
+								Matrix errors = meanErrors.get(validator).toMatrix();
+								Matrix predictions = meanPredictions.get(validator).toMatrix();
+								printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors, outputStream);
+								outputStream.println();
+							} else {
+								outputStream.println("No results.");
+							}
+						}
+					}
+				}
+	}
+	
 	public static void printSummary(LibredeResults results) {
 		// Aggregate results
 		ResourceDemand[] variables = null;
@@ -907,6 +1046,29 @@ public class Librede {
 	}
 
 	private static void printValidationResultsTable(List<ModelEntity> entities,
+			List<Class<? extends IEstimationApproach>> approaches, Matrix predictions, Matrix errors, PrintStream outputStream) {
+		outputStream.printf("%-80.80s | ", "Resource or service");
+		for (int i = 0; i < approaches.size(); i++) {
+			outputStream.printf("%-9.9s", "[" + (i + 1) + "]");
+		}
+		outputStream.println("|");
+
+		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
+			outputStream.print("-");
+		}
+		outputStream.println();
+
+		int idx = 0;
+		for (ModelEntity entity : entities) {
+			outputStream.printf("%-80.80s | ", limitOutput(entity.getName(), 80));
+			for (int i = 0; i < approaches.size(); i++) {
+				outputStream.printf("%.5e %.5f%% ", predictions.get(i, idx), errors.get(i, idx) * 100);
+			}
+			outputStream.println("|");
+			idx++;
+		}
+	}
+	private static void printValidationResultsTable(List<ModelEntity> entities,
 			List<Class<? extends IEstimationApproach>> approaches, Matrix predictions, Matrix errors) {
 		System.out.printf("%-80.80s | ", "Resource or service");
 		for (int i = 0; i < approaches.size(); i++) {
@@ -929,7 +1091,36 @@ public class Librede {
 			idx++;
 		}
 	}
+	private static void printEstimatesTable(ResourceDemand[] variables,
+			List<Class<? extends IEstimationApproach>> approaches, Matrix values, PrintStream outputStream) {
+		outputStream.printf("%-20.20s | ", "Resource");
+		outputStream.printf("%-60.60s | ", "Service");
+		for (int i = 0; i < approaches.size(); i++) {
+			outputStream.printf("%-9.9s", "[" + (i + 1) + "]");
+		}
+		outputStream.println("|");
 
+		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
+			outputStream.print("-");
+		}
+		outputStream.println();
+		Resource last = null;
+		int idx = 0;
+		for (ResourceDemand var : variables) {
+			if (var.getResource().equals(last)) {
+				outputStream.printf("%-20.20s | ", "");
+			} else {
+				outputStream.printf("%-20.20s | ", limitOutput(var.getResource().getName(), 20));
+			}
+			outputStream.printf("%-60.60s | ", limitOutput(var.getService().getName(), 60));
+			for (int i = 0; i < approaches.size(); i++) {
+				outputStream.printf("%.5fs ", values.get(i, idx));
+			}
+			outputStream.println("|");
+			last = var.getResource();
+			idx++;
+		}
+	}
 	private static void printEstimatesTable(ResourceDemand[] variables,
 			List<Class<? extends IEstimationApproach>> approaches, Matrix values) {
 		System.out.printf("%-20.20s | ", "Resource");

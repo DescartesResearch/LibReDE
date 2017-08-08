@@ -11,6 +11,7 @@ import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -35,6 +36,10 @@ public class KiekerWatchThread extends Thread {
 	 */
 	protected volatile boolean stop;	
 	/**
+	 * 
+	 */
+	private boolean isInitialized;
+	/**
 	 * A list of all the directories, that watchservice listens to
 	 * with the KiekerChannel, that deals with the informations
 	 * in the directory.
@@ -51,6 +56,7 @@ public class KiekerWatchThread extends Thread {
 	 */
 	public KiekerWatchThread() throws IOException {
 		watcher = FileSystems.getDefault().newWatchService();
+		this.isInitialized = false;
 	}
 	/**
 	 * Here we can ask for a channel, that deals with a given directory.
@@ -119,6 +125,12 @@ public class KiekerWatchThread extends Thread {
 	@Override
 	public void run() {
 		while (!stop) {
+			if(!isInitialized){
+				for (Entry<String, KiekerChannel> entry : watchList.entrySet()) {
+					readFromChannel(entry.getValue());
+				}
+				isInitialized = true;
+			}
 			WatchKey key = null;
 			try {
 				// Wait for file events from the operating system

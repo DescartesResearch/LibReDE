@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,8 +46,8 @@ public class KiekerDataSource extends AbstractDataSource {
 	@ParameterDefinition(name = "Corenumber", label = "Corenumber", required = false, defaultValue = "4")
 	private int corenumber;
 	
-	@ParameterDefinition(name = "Visitsinterval", label = "Visitsinterval", required = false, defaultValue = "10")
-	private int visitsinterval;
+	@ParameterDefinition(name = "Aggregationinterval", label = "Aggregationinterval", required = false, defaultValue = "10")
+	private int aggregationinterval;
 	/**
 	 * The logging instance
 	 */
@@ -58,11 +59,15 @@ public class KiekerDataSource extends AbstractDataSource {
 	/**
 	 * The libredeconfiguration to identify the services we deal with
 	 */
-	private Set<ModelEntity> services;
+	//private Set<ModelEntity> services;
 	/**
 	 * The libredeconfiguration to identify the resources we deal with
 	 */
-	private Set<ModelEntity> resources;
+	//private Set<ModelEntity> resources;
+	/**
+	 * Map that maps metric and entity name to entity and tracekey
+	 */
+	private Map<Metric<?>, Map<String, Entry<ModelEntity, TraceKey>>> tracekeymap;
 	/**
 	 * The constructor of the data source.
 	 * Here the KieckerWatchThread is initialized, but not started.
@@ -71,8 +76,9 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @throws IOException
 	 */
 	public KiekerDataSource() throws IOException {
-		this.services = new HashSet<>();
-		this.resources = new HashSet<>();
+		this.tracekeymap = new HashMap<>();
+		/*this.services = new HashSet<>();
+		this.resources = new HashSet<>();*/
 		this.watchThread = new KiekerWatchThread();
 		this.watchThread.setDaemon(true);
 	}
@@ -84,7 +90,10 @@ public class KiekerDataSource extends AbstractDataSource {
 	@Override
 	public void load() throws IOException {
 		//Read all the data that are currently available.
-		watchThread.poll();
+		//this is not needed anymore, because we always start a reading for all the channels
+		//we watch...therefore, the estimation process HAS TO BE be started
+		//after all the data classes are available
+		//watchThread.poll();
 		//Start the thread to notify, when new data came in.
 		watchThread.start();
 	}
@@ -98,29 +107,36 @@ public class KiekerDataSource extends AbstractDataSource {
 		if (watchThread == null) {
 			throw new IllegalStateException();
 		}
+
+		//get the tracekey off one configuration
+		List<TraceKey> keys = new LinkedList<TraceKey>();
+		
 		//THIS IS EXTRA LOGIC FOR GETTING ALL THE SERVICES AND RESOURCES
 		//FROM THE LIBREDE FILE INTO THE KIEKER DATA SOURCE
 		//WE THEREFOR ADD ALL SERVICES TO THE TRACE MAPPINGS
 		//AND EXTRACT THEM HERE.
 		//only do it when we have a mapping and when did not do it before.
-		if(configuration.getMetric().equals(StandardMetrics.RESPONSE_TIME)){
+		/*if(configuration.getMetric().equals(StandardMetrics.RESPONSE_TIME)){
 			if(!configuration.getMappings().isEmpty() && services.size()==0){
 				for (TraceToEntityMapping mapping : configuration.getMappings()) {
 					services.add(mapping.getEntity());
 				}
 			}
+			keys=addTraceKeys(configuration);
 		} else if(configuration.getMetric().equals(StandardMetrics.VISITS)){
 			if(!configuration.getMappings().isEmpty() && services.size()==0){
 				for (TraceToEntityMapping mapping : configuration.getMappings()) {
 					services.add(mapping.getEntity());
 				}
 			}
+			keys=addTraceKeys(configuration);
 		} else if(configuration.getMetric().equals(StandardMetrics.THROUGHPUT)){
 			if(!configuration.getMappings().isEmpty() && services.size()==0){
 				for (TraceToEntityMapping mapping : configuration.getMappings()) {
 					services.add(mapping.getEntity());
 				}
 			}
+			keys=addTraceKeys(configuration);
 		}
 		else if(configuration.getMetric().equals(StandardMetrics.UTILIZATION)){
 			if(!configuration.getMappings().isEmpty() && resources.size()==0){
@@ -128,6 +144,7 @@ public class KiekerDataSource extends AbstractDataSource {
 					resources.add(mapping.getEntity());
 				}
 			}
+			keys=addTraceKeys(configuration);
 		}
 		else if(configuration.getMetric().equals(StandardMetrics.BUSY_TIME)){
 			if(!configuration.getMappings().isEmpty() && resources.size()==0){
@@ -135,8 +152,9 @@ public class KiekerDataSource extends AbstractDataSource {
 					resources.add(mapping.getEntity());
 				}
 			}
-		}
-		
+			keys=addTraceKeys(configuration);
+		}*/
+		keys = addTraceKeys(configuration);
 		
 		//the new channel that deals with our directory
 		KiekerChannel channel;
@@ -160,19 +178,30 @@ public class KiekerDataSource extends AbstractDataSource {
 		}else{
 			throw new UnsupportedOperationException("You need a FileTraceConfiguration!");
 		}
-		//get the tracekey off this configuration
-		List<TraceKey> keys = new LinkedList<TraceKey>();
-		TraceKey k = new TraceKey(configuration.getMetric(), configuration.getUnit(), configuration.getInterval(),
-				configuration.getMappings().get(0).getEntity(), configuration.getAggregation(), configuration.getMappings().get(0).getFilters());
-		//notify the listeners
-		notifyListenersNewKey(k);
 		//map the metric to the kiekerId we need to observe
 		KiekerId kiekerId = mapKiekerId(configuration.getMetric());
 		//tell the channel to observe the metric of this tracekey and which kiekerid is necessary for that task
-		channel.addTrace(k,kiekerId);
-		//return the key
-		keys.add(k);
+		channel.addTrace(configuration.getMetric(),kiekerId);
 		return keys;
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private List<TraceKey> addTraceKeys(TraceConfiguration configuration) {
+		List<TraceKey> traceKeys = new ArrayList<>();
+		for (TraceToEntityMapping modelEntity : configuration.getMappings()) {
+			if(!tracekeymap.containsKey(configuration.getMetric())){
+				tracekeymap.put(configuration.getMetric(), new HashMap<String,Entry<ModelEntity, TraceKey>>());
+			}
+			Map<String, Entry<ModelEntity, TraceKey>> innermap = tracekeymap.get(configuration.getMetric());
+			if(!innermap.containsKey(modelEntity.getEntity().getName())){
+				TraceKey newTraceKey = new TraceKey(configuration.getMetric(), configuration.getUnit(), configuration.getInterval(), modelEntity.getEntity(), configuration.getAggregation());
+				Entry<ModelEntity, TraceKey> entry = new AbstractMap.SimpleEntry(modelEntity.getEntity(), newTraceKey);
+				innermap.put(modelEntity.getEntity().getName(), entry);
+				traceKeys.add(newTraceKey);
+				//notify the listeners
+				notifyListenersNewKey(newTraceKey);
+			}
+		}
+		return traceKeys;
 	}
 	/**
 	 * Maps the metric of the libede traceconfiguration to a kieker id enum.
@@ -188,6 +217,8 @@ public class KiekerDataSource extends AbstractDataSource {
 		} else if(metric.equals(StandardMetrics.RESPONSE_TIME)){
 			rc = KiekerId.OperationExecutionRecord;
 		} else if(metric.equals(StandardMetrics.VISITS)){
+			rc = KiekerId.OperationExecutionRecord;
+		} else if(metric.equals(StandardMetrics.DEPARTURES)){
 			rc = KiekerId.OperationExecutionRecord;
 		} else if(metric.equals(StandardMetrics.THROUGHPUT)){
 			rc = KiekerId.OperationExecutionRecord;
@@ -246,8 +277,8 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param strings
 	 * @return
 	 */
-	public double parseTimeStamp(String[] strings) {
-		return Double.valueOf(strings[1]);
+	public double parseTimeStamp(String[] line) {
+		return Double.valueOf(line[1]);
 	}
 	/**
 	 * This method gets the response time timestamp out of a kieker trace row.
@@ -256,8 +287,8 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param strings
 	 * @return
 	 */
-	public double parseOperationExecutionStartTimeStamp(String[] values) {
-		return Double.valueOf(values[5]);
+	public double parseOperationExecutionStartTimeStamp(String[] line) {
+		return Double.valueOf(line[5]);
 	}
 	
 	/**
@@ -267,10 +298,10 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param key
 	 * @return
 	 */
-	public double parseResponseTime(String[] values) {
+	public double parseOperationExecutionResponseTime(String[] line) {
 		Double rc = -1.0;
-		Double intime = Double.valueOf(values[5]);
-		Double outtime = Double.valueOf(values[6]);
+		Double intime = Double.valueOf(line[5]);
+		Double outtime = Double.valueOf(line[6]);
 		rc = outtime-intime;
 		return rc;
 	}
@@ -279,7 +310,7 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param methodname
 	 * @return
 	 */
-	private ModelEntity findResource(String resourcename) {
+	/*private ModelEntity findResource(String resourcename) {
 		ModelEntity rc = null;
 		for (ModelEntity resource : resources) {
 			if(resource.getName().equals(resourcename) || resource.getName().contains(resourcename)){
@@ -288,13 +319,14 @@ public class KiekerDataSource extends AbstractDataSource {
 			}
 		}
 		return rc;
-	}
+		
+	}*/
 	/**
 	 * This method finds the WC of the configuration file for a given method name.
 	 * @param methodname
 	 * @return
 	 */
-	private ModelEntity findService(String methodname) {
+	/*private ModelEntity findService(String methodname) {
 		ModelEntity rc = null;
 		for (ModelEntity service : services) {
 			if(service.getName().equals(methodname) || service.getName().contains(methodname)){
@@ -303,7 +335,7 @@ public class KiekerDataSource extends AbstractDataSource {
 			}
 		}
 		return rc;
-	}
+	}*/
 	/**
 	 * This method creates the trace key for a given method name out of another trace key.
 	 * The method name defines the Service/WC.
@@ -312,16 +344,24 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param key
 	 * @return
 	 */
-	public TraceKey mapServiceToTraceKey(String methodname, TraceKey key) {
+	public TraceKey mapEntityToTraceKey(String entityname, Metric<?> metric) {
+		if(!tracekeymap.containsKey(metric)){
+			return null;
+		}
+		if(!tracekeymap.get(metric).containsKey(entityname)){
+			return null;
+		}
+		TraceKey rc = tracekeymap.get(metric).get(entityname).getValue();
+		return rc;
 		//find the WC
-		ModelEntity entity = findService(methodname);
+		/*ModelEntity entity = findService(methodname);
 		if(entity== null){
 			log.error("The entity could not be matched. Care about your librede file");
 			throw new IllegalStateException("The entity could not be matched. Care about your librede file");
 		}
 		//create new key
 		TraceKey newKey = new TraceKey(key.getMetric(), key.getUnit(), key.getInterval(), entity, key.getAggregation());
-		return newKey;
+		return newKey;*/
 	}
 	/**
 	 * This method forwards the listener notification
@@ -335,8 +375,8 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param row
 	 * @return
 	 */
-	public String getOperationExecutionMethodName(String[] row) {
-		String[] tmp = row[2].split("\\(")[0].trim().split("\\s+");
+	public String getOperationExecutionMethodName(String[] line) {
+		String[] tmp = line[2].split("\\(")[0].trim().split("\\s+");
 		return tmp[tmp.length-1];
 	}
 	/**
@@ -345,16 +385,16 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param row
 	 * @return
 	 */
-	public Double parseTotalUtilizationOfCore(String[] row) {
-		return ((100.0)*Double.valueOf(row[row.length-2]));
+	public Double parseCpuTotalUtilizationOfCore(String[] line) {
+		return ((100.0)*Double.valueOf(line[line.length-2]));
 	}
 	/**
 	 * Parse the core id of a CPUUtilization record.
 	 * @param row
 	 * @return
 	 */
-	public Integer parseIdOfCore(String[] row) {
-		return Integer.valueOf(row[4]);
+	public Integer parseCpuIdOfCore(String[] line) {
+		return Integer.valueOf(line[4]);
 	}
 	/**
 	 * Aggregate the CPU values of the cores to one value.
@@ -362,7 +402,7 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param cpucorevalues
 	 * @return
 	 */
-	public Double aggregateTotalCpuValue(Map<Integer, Double> cpucorevalues) {
+	public Double aggregateCpuCoreValues(Map<Integer, Double> cpucorevalues) {
 		Double rc = null;
 		if(cpucorevalues.size()==corenumber){
 			rc = 0.0;
@@ -378,7 +418,7 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param cpucoretimestamps
 	 * @return
 	 */
-	public Double agregateCpuTimestamp(Map<Integer, Double> cpucoretimestamps) {
+	/*public Double agregateCpuTimestamp(Map<Integer, Double> cpucoretimestamps) {
 		Double rc = null;
 		if(cpucoretimestamps.size()==corenumber){
 			rc = 0.0;
@@ -388,7 +428,7 @@ public class KiekerDataSource extends AbstractDataSource {
 			rc=(rc/Double.valueOf((double)corenumber));
 		}
 		return rc;
-	}
+	}*
 	/**
 	 * This method adds a resource with the given name to the trace key.
 	 * 
@@ -396,9 +436,11 @@ public class KiekerDataSource extends AbstractDataSource {
 	 * @param resourcename
 	 * @return
 	 */
-	public TraceKey mapResourceToTraceKey(TraceKey key, String resourcename) {
+	/*public TraceKey mapResourceToTraceKey(TraceKey key, String resourcename) {
+		TraceKey rc = tracekeymap.get(key.getMetric()).get(resourcename).getValue();
+		return rc;
 		//find the resource
-		ModelEntity entity = findResource(resourcename);
+		/*ModelEntity entity = findResource(resourcename);
 		if(entity== null){
 			log.error("The resource could not be matched. Care about your librede file");
 			throw new IllegalStateException("The entity could not be matched. Care about your librede file");
@@ -406,57 +448,74 @@ public class KiekerDataSource extends AbstractDataSource {
 		//add it to the key
 		TraceKey newKey = new TraceKey(key.getMetric(), key.getUnit(), key.getInterval(), entity, key.getAggregation());
 		return newKey;
-	}
+	}*/
 	/**
 	 * Parse the resource name out of a CPUUtilization record.
 	 * @param row
 	 * @return
 	 */
-	public String parseResource(String[] row) {
-		return row[3];
+	public String parseCpuResourceName(String[] line) {
+		return line[3];
 	}
 	/**
 	 * Parse the timestamp out of a CPUUtilization record.
 	 * @param row
 	 * @return
 	 */
-	public Double parseCpuTimeStamp(String[] row) {
-		return Double.valueOf(row[2]);
+	public Double parseCpuTimeStamp(String[] line) {
+		return Double.valueOf(line[2]);
 	}
 	/**
 	 * Parse the busy timeout of a CPUUtilization record.
 	 * @param row
 	 * @return
 	 */
-	public Double parseBusyTimeOfCore(String[] row) {
-		return ((1.0)-Double.valueOf(row[row.length-1]));
+	public Double parseCpuCoreBusyTime(String[] line) {
+		return ((1.0)-Double.valueOf(line[line.length-1]));
 	}
-	public boolean isVisitsIntervalPassed(Double visitsLastTimeStampNanos, Double timestamp) {
+	public boolean isAggregationIntervalPassed(Double visitsLastTimeStampNanos, Double timestamp) {
 		boolean rc = false;
 		//get nanoseconds out of seconds interval
-		Double intervalnanos = visitsinterval * 1000000000.0;
+		Double intervalnanos = aggregationinterval * 1000000000.0;
 		//check if we are greater than the interval
-		if((timestamp-visitsLastTimeStampNanos)>visitsinterval){
+		if((timestamp-visitsLastTimeStampNanos)>intervalnanos){
 			rc = true;
 		}
 		return rc;
 	}
-	public Double increaseVisitsTimeStamp(Double visitsLastTimeStampNanos) {
+	public Double increaseAggregationTimeStamp(Double visitsLastTimeStampNanos) {
 
 		//get nanoseconds out of seconds interval
-		Double intervalnanos = visitsinterval * 1000000000.0;
+		Double intervalnanos = aggregationinterval * 1000000000.0;
 		return intervalnanos+visitsLastTimeStampNanos;
 	}
-	public Map<String, ArrayList<Double>> initializeVisitsMap() {
+	public Map<String, ArrayList<Double>> initializeEntityMap(Metric<?>metric) {
+		if(!tracekeymap.containsKey(metric)){
+			return null;
+		}
 		Map<String, ArrayList<Double>> rc = new HashMap<>();
+		for (Entry<String, Entry<ModelEntity, TraceKey>> entry : tracekeymap.get(metric).entrySet()) {
+			rc.put(entry.getKey(), new ArrayList<Double>());
+		}
+		return rc;
+		
+		/*Map<String, ArrayList<Double>> rc = new HashMap<>();
 		for (ModelEntity modelEntity : services) {
 			rc.put(modelEntity.getName(), new ArrayList<>());
 		}
-		return rc;
+		return rc;*/
 	}
-	public Double getInterval() {
+	public Double getAggregationInterval() {
 		// TODO Auto-generated method stub
-		return Double.valueOf(visitsinterval);
+		return Double.valueOf(aggregationinterval);
+	}
+	public boolean isEntityAvailable(String entityname, Metric<?> metric) {
+		if(tracekeymap.get(metric)!=null){
+			if(tracekeymap.get(metric).get(entityname)!=null){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

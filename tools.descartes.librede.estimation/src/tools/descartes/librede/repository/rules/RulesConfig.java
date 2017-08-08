@@ -43,8 +43,17 @@ import tools.descartes.librede.metrics.Metric;
 public class RulesConfig {
 	private static final Logger log = Logger.getLogger(RulesConfig.class);
 	
+	/**
+	 * Map from metric to agreggation (both as id) to the rules that are applicable for this combination
+	 */
 	private final Map<Metric<?>, EnumMap<Aggregation, List<Rule>>> derivationRulesByDependency = new HashMap<>();
+	/**
+	 * rules with no dependencies
+	 */
 	private final Set<Rule> derivationRules = new HashSet<>();
+	/**
+	 * Rules with dependencies
+	 */
 	private final List<Rule> defaultRules = new LinkedList<>();
 	
 	
@@ -54,8 +63,10 @@ public class RulesConfig {
 		}
 		
 		if (rule.getDependencies().isEmpty()) {
+			//add it to the rules without dependencies
 			defaultRules.add(rule);
 		} else {
+			//extract the dependencies
 			for (DataDependency<?> r : rule.getDependencies()) {
 				EnumMap<Aggregation, List<Rule>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry == null) {
@@ -69,12 +80,15 @@ public class RulesConfig {
 				}
 				aggregationEntry.add(rule);				
 			}
+			//add it to the dependency list
 			derivationRules.add(rule);
 		}
 	}
 	
 	public void removeRule(Rule rule) {
+		//if the rule is part of the dependency rules
 		if (derivationRules.contains(rule)) {
+			//remove the dependencies
 			for (DataDependency<?> r : rule.getDependencies()) {
 				EnumMap<Aggregation, List<Rule>> metricEntry = derivationRulesByDependency.get(r.getMetric());
 				if (metricEntry != null) {
@@ -82,25 +96,34 @@ public class RulesConfig {
 					aggregationEntry.remove(rule);
 				}
 			}
+			//remove the rule
 			derivationRules.remove(rule);
 		}
 	}
 	
 	public List<Rule> getDerivationRules(Metric<?> metric, Aggregation aggregation) {
+		//search for the metric in the mapping
 		EnumMap<Aggregation, List<Rule>> metricEntry = derivationRulesByDependency.get(metric);
 		if (metricEntry != null) {
+			//search for the aggregation
 			List<Rule> derivationEntry = metricEntry.get(aggregation);
+			//return the list
 			if (derivationEntry != null) {
 				return derivationEntry;
 			}
 		}
 		return Collections.emptyList();
 	}
-	
+	/**
+	 * Get the rules without dependencies
+	 * @return
+	 */
 	public List<Rule> getDefaultDerivationRules() {
 		return defaultRules;
 	}
-	
+	/**
+	 * log all the rules with and without dependencies
+	 */
 	public void logConfigDump() {
 		for (Rule d : defaultRules) {
 			log.info(d.toString());
