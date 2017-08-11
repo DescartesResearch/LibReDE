@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ import org.junit.Test;
 import tools.descartes.librede.Librede;
 import tools.descartes.librede.LibredeResults;
 import tools.descartes.librede.LibredeVariables;
+import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.bayesplusplus.BayesLibrary;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
@@ -67,65 +69,25 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 		BayesLibrary.init();
 	}
 	
+
 	@Test
-	public void test() {
-		loadConf("kieker.librede");
-		int counter = 0;
-		System.out.println("Ich starte zumindest2");
-		boolean stop = false;
-		Map<String, IDataSource> existingDatasources = new HashMap<>();
-		DataSourceSelector dataSourceListener = new DataSourceSelector();
-		conf.getEstimation().setWindow(60);
-		//IN ONLINE MODE SET THE START TIME HERE!!!
-		/*Quantity<Time> defaulttime = conf.getEstimation().getStartTimestamp();
-		Unit<Time> unit = defaulttime.getUnit();
-		double actualtime = System.nanoTime();
-		Unit<Time> nanotime = Time.NANOSECONDS;
-		nanotime.convertTo(actualtime, unit);
-		defaulttime.setValue(actualtime);
-		conf.getEstimation().setStartTimestamp(defaulttime);*/
-		LibredeVariables var = new LibredeVariables(conf);
-		Librede.initDataSources(var, existingDatasources, dataSourceListener);
-		//sleep some time to give the repo time to initialize
-		//more precise: give the watchthread time to push the initil data to the dataSourceListener
+	public void rabbitmqtest(){
+		//create the runner class
+		RunnerThread runner = new RunnerThread();
+		//start it
+		runner.start();
+		System.out.println("Type something to stop");
+		Scanner scanner = new Scanner(System.in);
+		scanner.next();
+		System.out.println("Terminating the calculation...");
+		runner.terminate();
 		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			System.out.println("Wait for the calculations to finish...");
+			runner.join();
+			System.out.println("Terminated!");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		while(!stop){
-			LibredeResults results = Librede.executeContinuousOnline(5000, var, existingDatasources, dataSourceListener);
-	
-			try {
-				System.out.println("Type anything within the next 5 seconds to stop.");
-				//Scanner scanner = new Scanner(System.in);
-				Thread.sleep(5000);
-				if(counter==0){
-					System.out.println("You gave a input, therefore we stop now");
-					stop = true;
-				}else{
-					counter--;
-					System.out.println("You gave no input, therefore we continue");
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		for (Entry<String, IDataSource> entry : existingDatasources.entrySet()) {
-			try {
-				entry.getValue().close();
-			} catch (IOException e) {
-				log.error("Error closing data source.", e);
-			}
-		}
-//		System.out.println("Saving Data to CSV");
-//		File outputFile = new File("");
-//		var.exportResultTimelineCSV(outputFile);
-
-		//checkLibredeResults(var.getResults());
-
 	}
 	
 	/**
@@ -147,25 +109,33 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 		public void run() {
 			System.out.println("Load configuration...");
 			loadConf("kieker_amqp.librede");
-			int counter = 0;
 			System.out.println("Create DataSourceListener / Selector ...");
 			Map<String, IDataSource> existingDatasources = new HashMap<>();
 			DataSourceSelector dataSourceListener = new DataSourceSelector();
 			System.out.println("Setting configuration values ...");
-			conf.getEstimation().setWindow(60);
+			conf.getEstimation().setWindow(1);
+			Quantity<Time> onesecond = UnitsFactory.eINSTANCE.createQuantity(60, Time.SECONDS);
+			conf.getEstimation().setStepSize(onesecond);
 			//IN ONLINE MODE SET THE START TIME HERE!!!
-			Quantity<Time> defaulttime = conf.getEstimation().getStartTimestamp();
-			Unit<Time> unit = defaulttime.getUnit();
+			//Quantity<Time> defaulttime = conf.getEstimation().getStartTimestamp();
+			//Unit<Time> unit = defaulttime.getUnit();
 			double actualtime = System.currentTimeMillis();
+			//actualtime = ((int)(actualtime/1000))*1000.0;
+			
 			//Unit<Time> nanotime = Time.NANOSECONDS;
 			//double actualtimeinunit = nanotime.convertTo(actualtime, unit);
-			defaulttime.setValue(actualtime);
-			conf.getEstimation().setStartTimestamp(defaulttime);
+			
+			//defaulttime.setValue(actualtime);
+			//conf.getEstimation().setStartTimestamp(defaulttime);
 			System.out.println("Loading Librede Variables...");
 			LibredeVariables var = new LibredeVariables(conf);
 			System.out.println("Initialize DataSources...");
 			Librede.initDataSources(var, existingDatasources, dataSourceListener);
-			
+			//the next time stamp when librede should calculate resource demands
+			long offsettime = 300000; //5mins
+			long nextexecutiontimestamp = (long)actualtime+offsettime;
+			long calculationinterval = 60000;
+			long pollinginteral = 20000;
 			while(!stop){
 				System.out.println("Wait until the next calcualtion...");
 				//sleep some time to give the repo time to initialize
@@ -174,20 +144,29 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 				//the time between two librede calculations
 				try {
 					isWaiting = true;
-					Thread.sleep(60000);
+					Thread.sleep(pollinginteral);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					//e1.printStackTrace();
 				}
 				isWaiting = false;
 				if(!stop){
+					System.out.println("Updating repository for some time...");
+					Librede.updateRepositoryOnline(5000, var, existingDatasources, dataSourceListener);
+					System.out.println("Stopped updating repository.");
+				}
+				if(!stop && System.currentTimeMillis() >= nextexecutiontimestamp){
 					System.out.println("Start the next calcualtion...");
 					//update the repo and calcualte the results
-					LibredeResults results = Librede.executeContinuousOnline(5000, var, existingDatasources, dataSourceListener);
+					LibredeResults results = Librede.executeOnline(var, existingDatasources, dataSourceListener);
+					/*for (Class<? extends IEstimationApproach> approach : results.getApproaches()) {
+						double responsetimeerror = results.getApproachResponseTimeError(approach);
+						double utilizationerror = results.getApproachUtilizationError(approach);
+					}*/
 					try {
 						System.out.println("Writing results...");
-						File outputfile = new File("/home/torsten/Schreibtisch/results.txt");
-						PrintStream outputStream = new PrintStream(outputfile);
+						File outputfile = new File("/home/torsten/Schreibtisch/jettytests/local/1l_600s_500t_ubuntu_visits/info/results.txt");
+						PrintStream outputStream = new PrintStream(new FileOutputStream(outputfile, true));
 						Librede.printSummary(results, outputStream);
 						outputStream.flush();
 						outputStream.close();
@@ -196,9 +175,10 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 						System.out.println("WARN: Cannot write output!");
 					}
 					System.out.println("Calcualtion done!");
+					nextexecutiontimestamp = nextexecutiontimestamp+calculationinterval;
 				}
 			}
-			System.out.println("Calculation stopped!");
+			System.out.println("Librede Process stopped!");
 			System.out.println("Start closing datasources...");
 			//close the databases
 			for (Entry<String, IDataSource> entry : existingDatasources.entrySet()) {
@@ -215,25 +195,6 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 		
 	}
 	
-	@Test
-	public void rabbitmqtest(){
-		//create the runner class
-		RunnerThread runner = new RunnerThread();
-		//start it
-		runner.start();
-		System.out.println("Type something to stop");
-		Scanner scanner = new Scanner(System.in);
-		scanner.next();
-		System.out.println("Terminating the calculation...");
-		runner.terminate();
-		try {
-			System.out.println("Wait for the calculations to finish...");
-			runner.join();
-			System.out.println("Terminated!");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	@Test
 	public void runEstimation(){
@@ -454,5 +415,69 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				
+				
+	}
+	@Test
+	public void test() {
+		loadConf("kieker.librede");
+		int counter = 0;
+		System.out.println("Ich starte zumindest2");
+		boolean stop = false;
+		Map<String, IDataSource> existingDatasources = new HashMap<>();
+		DataSourceSelector dataSourceListener = new DataSourceSelector();
+		conf.getEstimation().setWindow(60);
+		Quantity<Time> onesecond = UnitsFactory.eINSTANCE.createQuantity(60, Time.SECONDS);
+		conf.getEstimation().setStepSize(onesecond);
+		//IN ONLINE MODE SET THE START TIME HERE!!!
+		/*Quantity<Time> defaulttime = conf.getEstimation().getStartTimestamp();
+		Unit<Time> unit = defaulttime.getUnit();
+		double actualtime = System.nanoTime();
+		Unit<Time> nanotime = Time.NANOSECONDS;
+		nanotime.convertTo(actualtime, unit);
+		defaulttime.setValue(actualtime);
+		conf.getEstimation().setStartTimestamp(defaulttime);*/
+		LibredeVariables var = new LibredeVariables(conf);
+		Librede.initDataSources(var, existingDatasources, dataSourceListener);
+		//sleep some time to give the repo time to initialize
+		//more precise: give the watchthread time to push the initil data to the dataSourceListener
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		while(!stop){
+			LibredeResults results = Librede.executeContinuousOnline(5000, var, existingDatasources, dataSourceListener);
+	
+			try {
+				System.out.println("Type anything within the next 5 seconds to stop.");
+				//Scanner scanner = new Scanner(System.in);
+				Thread.sleep(5000);
+				if(counter==0){
+					System.out.println("You gave a input, therefore we stop now");
+					stop = true;
+				}else{
+					counter--;
+					System.out.println("You gave no input, therefore we continue");
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		for (Entry<String, IDataSource> entry : existingDatasources.entrySet()) {
+			try {
+				entry.getValue().close();
+			} catch (IOException e) {
+				log.error("Error closing data source.", e);
+			}
+		}
+//		System.out.println("Saving Data to CSV");
+//		File outputFile = new File("");
+//		var.exportResultTimelineCSV(outputFile);
+
+		//checkLibredeResults(var.getResults());
+
 	}
 }

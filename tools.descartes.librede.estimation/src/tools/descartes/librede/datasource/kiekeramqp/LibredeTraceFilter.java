@@ -33,7 +33,7 @@ import kieker.common.record.IMonitoringRecord;
 				description = "Sets the time after we definitly try to trigger something."),
 				@Property(name = LibredeTraceFilter.CONFIG_PROPERTY_NAME_EVENT_TRIGGER_COUNT_MINIMUM,
 				defaultValue = LibredeTraceFilter.CONFIG_PROPERTY_VALUE_EVENT_TRIGGER_COUNT_MINIMUM,
-				description = "Sets the minimum number of events we need to trigger something"),
+				description = "Sets the minimum number of events we need to trigger something")
 		})
 public class LibredeTraceFilter extends AbstractFilterPlugin{
 
@@ -184,7 +184,7 @@ public class LibredeTraceFilter extends AbstractFilterPlugin{
 				//since the last push
 				int size = queue.size();
 				//log.info("Actual queue size - "+size);
-				System.out.println("actual queue size:" + size);
+				//System.out.println("actual queue size:" + size);
 				long now = System.currentTimeMillis();
 				if((size>=triggercount)||((size>=mincount)&&(now-lastPushTimestamp>(maxtimesec*1000)))){
 					if(size>triggercount){
@@ -214,7 +214,7 @@ public class LibredeTraceFilter extends AbstractFilterPlugin{
 				}
 				records.add(record);
 			}
-			log.info("We will process "+size+" events");
+			//log.info("We will process "+size+" events");
 			//only process the data to traces, is we have a datassource
 			if(dataSource!=null){
 				//here we can use the datasource to get the data out of the record,

@@ -156,7 +156,7 @@
       <mappings entity="//@workloadDescription/@services.21" traceColumn="22"/>
       <mappings entity="//@workloadDescription/@services.22" traceColumn="23"/>
     </observations>
-    <observations xsi:type="librede:FileTraceConfiguration" aggregation="SUM" dataSource="//@input/@dataSources.0" file="/home/torsten/Schreibtisch/jettytests/10minsubuntu200t/all">
+    <observations xsi:type="librede:FileTraceConfiguration" aggregation="AVERAGE" dataSource="//@input/@dataSources.0" file="/home/torsten/Schreibtisch/jettytests/10minsubuntu200t/all">
       <metric href="librede:metrics#THROUGHPUT"/>
       <unit href="librede:units#REQUESTS_PER_SECOND"/>
       <interval value="10.0">
@@ -186,16 +186,46 @@
       <mappings entity="//@workloadDescription/@services.21" traceColumn="22"/>
       <mappings entity="//@workloadDescription/@services.22" traceColumn="23"/>
     </observations>
+    <observations xsi:type="librede:FileTraceConfiguration" aggregation="SUM" dataSource="//@input/@dataSources.0" file="/home/torsten/Schreibtisch/jettytests/10minsubuntu200t/all">
+      <metric href="librede:metrics#DEPARTURES"/>
+      <unit href="librede:units#REQUESTS"/>
+      <interval value="10.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+      <mappings entity="//@workloadDescription/@services.0"/>
+      <mappings entity="//@workloadDescription/@services.1" traceColumn="2"/>
+      <mappings entity="//@workloadDescription/@services.2" traceColumn="3"/>
+      <mappings entity="//@workloadDescription/@services.3" traceColumn="4"/>
+      <mappings entity="//@workloadDescription/@services.4" traceColumn="5"/>
+      <mappings entity="//@workloadDescription/@services.5" traceColumn="6"/>
+      <mappings entity="//@workloadDescription/@services.6" traceColumn="7"/>
+      <mappings entity="//@workloadDescription/@services.7" traceColumn="8"/>
+      <mappings entity="//@workloadDescription/@services.8" traceColumn="9"/>
+      <mappings entity="//@workloadDescription/@services.9" traceColumn="10"/>
+      <mappings entity="//@workloadDescription/@services.10" traceColumn="11"/>
+      <mappings entity="//@workloadDescription/@services.11" traceColumn="12"/>
+      <mappings entity="//@workloadDescription/@services.12" traceColumn="13"/>
+      <mappings entity="//@workloadDescription/@services.13" traceColumn="14"/>
+      <mappings entity="//@workloadDescription/@services.14" traceColumn="15"/>
+      <mappings entity="//@workloadDescription/@services.15" traceColumn="16"/>
+      <mappings entity="//@workloadDescription/@services.16" traceColumn="17"/>
+      <mappings entity="//@workloadDescription/@services.17" traceColumn="18"/>
+      <mappings entity="//@workloadDescription/@services.18" traceColumn="19"/>
+      <mappings entity="//@workloadDescription/@services.19" traceColumn="20"/>
+      <mappings entity="//@workloadDescription/@services.20" traceColumn="21"/>
+      <mappings entity="//@workloadDescription/@services.21" traceColumn="22"/>
+      <mappings entity="//@workloadDescription/@services.22" traceColumn="23"/>
+    </observations>
   </input>
-  <estimation window="60">
+  <estimation window="1">
     <approaches type="tools.descartes.librede.approach.ResponseTimeRegressionApproach"/>
     <approaches type="tools.descartes.librede.approach.WangKalmanFilterApproach"/>
-    <approaches type="tools.descartes.librede.approach.ServiceDemandLawApproach"/>
     <approaches type="tools.descartes.librede.approach.KumarKalmanFilterApproach"/>
     <approaches type="tools.descartes.librede.approach.MenasceOptimizationApproach"/>
     <approaches type="tools.descartes.librede.approach.UtilizationRegressionApproach"/>
-    <approaches type="tools.descartes.librede.approach.ResponseTimeApproximationApproach"/>
     <approaches type="tools.descartes.librede.approach.LiuOptimizationApproach"/>
+    <approaches type="tools.descartes.librede.approach.ResponseTimeApproximationApproach"/>
+    <approaches type="tools.descartes.librede.approach.ServiceDemandLawApproach"/>
     <algorithms type="tools.descartes.librede.bayesplusplus.ExtendedKalmanFilter"/>
     <algorithms type="tools.descartes.librede.nnls.LeastSquaresRegression"/>
     <algorithms type="tools.descartes.librede.ipopt.java.RecursiveOptimization"/>
@@ -203,7 +233,7 @@
     <stepSize value="60.0">
       <unit href="librede:units#SECONDS"/>
     </stepSize>
-    <startTimestamp value="1.5018422024166719E12">
+    <startTimestamp value="1.502285596228E12">
       <unit href="librede:units#MILLISECONDS"/>
     </startTimestamp>
     <endTimestamp value="1.520421688E12">

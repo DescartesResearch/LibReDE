@@ -19,9 +19,22 @@ public class KiekerAnalysisThread extends Thread {
 	 * The custom kieker filter, that handles the data for librede
 	 */
 	private LibredeTraceFilter libredeTraceFilter;
+	/**
+	 * The custom kieker filter, that handles the data for librede
+	 */
+	private KiekerFileFilter kiekerFileFilter;
+	
+	private boolean writefiles;
 	
 	public KiekerAnalysisThread(KiekerAmqpDataSource kiekerAmqpDataSource, String uri, String queueName, int triggercount,
-			int mincount, int maxtimesec, int wait) {
+			int mincount, int maxtimesec, int wait, String filedirectory) {
+		//check if file writing is desired
+		if(filedirectory!=null && !filedirectory.equals("")){
+			writefiles = true;
+		}else{
+			writefiles = false;
+		}
+		
 		//Create the kieker analysis controller
 		analysisInstance = new AnalysisController();
 		//Create and configure the KiekerAMQPReader
@@ -36,9 +49,18 @@ public class KiekerAnalysisThread extends Thread {
 		ltfConfiguration.setProperty(LibredeTraceFilter.CONFIG_PROPERTY_NAME_EVENT_TRIGGER_COUNT_MAX_TIME_SEC, ""+maxtimesec);
 		ltfConfiguration.setProperty(LibredeTraceFilter.CONFIG_PROPERTY_NAME_EVENT_TRIGGER_COUNT_WAIT_SEC, ""+wait);
 		libredeTraceFilter = new LibredeTraceFilter(ltfConfiguration, analysisInstance);
+		if(writefiles){
+			//Create and configure the KiekerFileFiler
+			final Configuration kffConfiguration = new Configuration();
+			kffConfiguration.setProperty(KiekerFileFilter.CONFIG_PROPERTY_NAME_EVENT_DIRECTORY, filedirectory);
+			kiekerFileFilter = new KiekerFileFilter(kffConfiguration, analysisInstance);
+		}
 		try {
 			libredeTraceFilter.setDataSource(kiekerAmqpDataSource);
 			analysisInstance.connect(KiekerAMQPReader, KiekerAMQPReader.OUTPUT_PORT_NAME_RECORDS, libredeTraceFilter, LibredeTraceFilter.INPUT_PORT_NAME_EVENTS);
+			if(writefiles){
+				analysisInstance.connect(KiekerAMQPReader, KiekerAMQPReader.OUTPUT_PORT_NAME_RECORDS, kiekerFileFilter, KiekerFileFilter.INPUT_PORT_NAME_EVENTS);
+			}
 		} catch (final AnalysisConfigurationException e) {
 			e.printStackTrace();
 		}

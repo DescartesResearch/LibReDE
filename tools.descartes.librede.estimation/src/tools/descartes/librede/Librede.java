@@ -83,6 +83,7 @@ import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.datasource.kieker.KiekerDataSource;
 import tools.descartes.librede.datasource.kiekeramqp.KiekerAmqpDataSource;
+import tools.descartes.librede.datasource.kiekeramqp.KiekerDataSourceOffline;
 import tools.descartes.librede.datasource.memory.InMemoryDataSource;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
@@ -170,6 +171,7 @@ public class Librede {
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerAmqpDataSource.class);
+		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerDataSourceOffline.class);
 
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, InMemoryDataSource.class);
 
@@ -227,9 +229,31 @@ public class Librede {
 		return var.getResults();
 //		return null;
 	}
+	public static LibredeVariables updateRepositoryOnline(long maxInsertionTimeMs, LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
+		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener, maxInsertionTimeMs);
+		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
+			// do not progress further than the configured end timestamp.
+			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
+		} else {		
+			var.getRepo().setCurrentTime(endTime);
+		}
+		return var;
+	}
+	public static LibredeResults executeOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
 
+		try {
+			runEstimation(var);
+		} catch (Exception e) {
+			log.error("Error running estimation.", e);
+		}
+		
+		// Now export the results.
+		//exportResults(var.getConf(), var.getResults());
+
+		return var.getResults();
+	}
 	public static LibredeResults executeContinuousOnline(int maxInsertionTimeMs, LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
-		Quantity<Time> endTime = updateRepositoryOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener, maxInsertionTimeMs);
+		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener, maxInsertionTimeMs);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
 			// do not progress further than the configured end timestamp.
 			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
@@ -408,8 +432,8 @@ public class Librede {
 	 * @param dataSourceListener 
 	 * @return
 	 */
-	public static Quantity<Time> updateRepositoryOnline(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener, int maxInsertionTimeMs){
+	private static Quantity<Time> updateRepository(LibredeConfiguration conf, IMonitoringRepository repo,
+			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener, long maxInsertionTimeMs){
 		//verify we have a valid listener.
 		if(!(iDataSourceListener instanceof DataSourceSelector)){
 			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
@@ -825,6 +849,7 @@ public class Librede {
 	}
 
 	public static void printSummary(LibredeResults results, PrintStream outputStream){
+		outputStream.println("New results at "+System.currentTimeMillis()+" (time in milliseconds)");
 		// Aggregate results
 				ResourceDemand[] variables = null;
 				List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(results.getApproaches());
