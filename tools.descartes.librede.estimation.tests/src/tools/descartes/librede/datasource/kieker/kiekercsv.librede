@@ -467,6 +467,22 @@
       </interval>
       <mappings entity="//@workloadDescription/@resources.0"/>
     </observations>
+    <observations xsi:type="librede:FileTraceConfiguration" aggregation="SUM" dataSource="//@input/@dataSources.0" file="/home/torsten/Schreibtisch/jettytests/local/1l_600s_500t_ubuntu_visits/csv/DEPARTURES_org.mybatis.jpetstore.persistence.LineItemMapper.insertLineItem.csv">
+      <metric href="librede:metrics#VISITS"/>
+      <unit href="librede:units#REQUESTS"/>
+      <interval value="10.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+      <mappings entity="//@workloadDescription/@services.22"/>
+    </observations>
+    <observations xsi:type="librede:FileTraceConfiguration" aggregation="AVERAGE" dataSource="//@input/@dataSources.0" file="/home/torsten/Schreibtisch/jettytests/local/1l_600s_500t_ubuntu_visits/csv/DEPARTURES_org.mybatis.jpetstore.persistence.LineItemMapper.insertLineItem.csv">
+      <metric href="librede:metrics#THROUGHPUT"/>
+      <unit href="librede:units#REQUESTS_PER_SECOND"/>
+      <interval value="10.0">
+        <unit href="librede:units#SECONDS"/>
+      </interval>
+      <mappings entity="//@workloadDescription/@services.22"/>
+    </observations>
   </input>
   <estimation>
     <approaches type="tools.descartes.librede.approach.ResponseTimeRegressionApproach"/>

@@ -120,6 +120,14 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 	 */
 	private Double visitsLastTimeStampNanos;
 	/**
+	 * Create a map that holds the different methods and the entry timestamp for arrivals
+	 */
+	private Map<String, ArrayList<Double>> arrivalsMethodToTimeStampList;
+	/**
+	 * The last timestamp, where we pushed the arrivals
+	 */
+	private Double arrivalsLastTimeStampNanos;
+	/**
 	 * Create a map that holds the different methods and the entry timestamp for visits
 	 */
 	private Map<String, ArrayList<Double>> departuresMethodToTimeStampList;
@@ -181,6 +189,9 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 				} else if(metric.equals(StandardMetrics.DEPARTURES)){
 					this.departuresMethodToTimeStampList = initializeEntityMap(StandardMetrics.DEPARTURES);
 					this.departuresLastTimeStampNanos = null;
+				} else if(metric.equals(StandardMetrics.ARRIVALS)){
+					this.arrivalsMethodToTimeStampList = initializeEntityMap(StandardMetrics.ARRIVALS);
+					this.arrivalsLastTimeStampNanos = null;
 				}
 			}
 		}
@@ -244,6 +255,8 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 			rc = OperationExecutionRecord.class;
 		} else if(metric.equals(StandardMetrics.BUSY_TIME)){
 			rc = CPUUtilizationRecord.class;
+		} else if(metric.equals(StandardMetrics.ARRIVALS)){
+			rc = OperationExecutionRecord.class;
 		}
 		return rc;
 	}
@@ -303,6 +316,9 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 				else if(metric.equals(StandardMetrics.UTILIZATION)){
 					return getUtilizationTimeSeries(recordtype, metric, records);
 				} 
+				else if(metric.equals(StandardMetrics.ARRIVALS)){
+					return getArrivalsTimeSeries(recordtype, metric, records);
+				}
 				//IF WE WANT TO CALCULATE OTHER METRICS DO IT HERE
 				else{
 					//other metrics
@@ -769,6 +785,95 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 		return finalSeries;
 	}
 
+	private Map<TraceKey, TimeSeries> getArrivalsTimeSeries(Class<?> recordtype, Metric<?> metric,
+			ArrayList<IMonitoringRecord> records) {
+		Map<TraceKey, TimeSeries> finalSeries = new HashMap<>();
+		//Create a map that holds the different methods and the visits for this method
+		Map<String, ArrayList<Double>> methodToValuesList = new HashMap<>();
+		//Create a map that holds the different methods and the timestamps for this method
+		Map<String, ArrayList<Double>> methodToTimeStampList = new HashMap<>();
+		//foreach line in the buffer
+		for (int i=0; i<records.size(); ++i) {
+			//check if we have to deal with this row due to id
+			if(records.get(i).getClass() == recordtype){
+				//get the actual row
+				OperationExecutionRecord operationExecutionRecord = (OperationExecutionRecord)records.get(i);
+				//get the method name which is the WC
+				String methodname = parseOperationExecutionMethodName(operationExecutionRecord.getOperationSignature());
+				//check if we have to deal with this WC
+				if(isEntityAvailable(methodname, metric)){
+					//get the response time and the timestamp
+					Double timestamp = Double.valueOf((double)operationExecutionRecord.getTin());
+					//check map entry is there for safety
+					if(!arrivalsMethodToTimeStampList.containsKey(methodname)){
+						//this map is initialized in the constructor to always have all the 
+						//WCs there to be able to report 0 visits.
+						throw new IllegalStateException("The WC does not exist, but has to exist");
+					}
+					//get the WC entry and add the visit timestamp from the class map
+					arrivalsMethodToTimeStampList.get(methodname).add(timestamp);
+					//set the first timestamp as start timestamp
+					if(arrivalsLastTimeStampNanos==null){
+						arrivalsLastTimeStampNanos = timestamp;
+					}
+					//check if we have a interval finished due to the class timestamp and the new timestamp
+					if(isAggregationIntervalPassed(arrivalsLastTimeStampNanos, timestamp)){
+						//get the visits values out of visitsMethodToTimeStampList
+						//for all the intervals, that have passed - perhaps two intervals have been passed.
+						while(timestamp>arrivalsLastTimeStampNanos){
+							//increase the last interval timestamp of the class value
+							arrivalsLastTimeStampNanos = increaseAggregationTimeStamp(arrivalsLastTimeStampNanos);
+							//foreach WC in the class map
+							for (Entry<String, ArrayList<Double>> wc : arrivalsMethodToTimeStampList.entrySet()) {
+								//get the visits of this wc until the new visitsLastTimeStampNanos timestamp
+								int visits = 0;
+								for (Double ts : wc.getValue()) {
+									//count
+									if(ts<arrivalsLastTimeStampNanos){
+										visits++;
+									}else{
+										//stop counting, because we are in the next interval here
+										break;
+									}
+								}
+								//remove the counted entries from list, because we don't want to count them twice
+								for (int j=0; j<visits; ++j) {
+									//remove visits times the first element, which is the smalest.
+									wc.getValue().remove(0);
+								}
+								//add the results to the local tmp lists
+								if(!methodToValuesList.containsKey(wc.getKey())){
+									methodToValuesList.put(wc.getKey(), new ArrayList<Double>());
+									methodToTimeStampList.put(wc.getKey(), new ArrayList<Double>());
+								}
+								methodToValuesList.get(wc.getKey()).add(Double.valueOf((double)visits));
+								methodToTimeStampList.get(wc.getKey()).add(arrivalsLastTimeStampNanos);
+								//check the next WC
+							}
+							//check if we have processed all data up to the actual time stamp of this new line
+						}
+					}//interval has not been passed, therefore do nothing
+				}//we do not have this entity
+			}//it was a wrong kiekerid goto next line
+		}//all lines passed
+		//for each WC that was handled within this buffer rows. traverse the local tmp lists
+		for (Entry<String, ArrayList<Double>> wc : methodToValuesList.entrySet()) {
+			//for debugging use save all the data to a csv file
+			saveToCsv(metric, wc.getKey(), wc.getValue(),methodToTimeStampList.get(wc.getKey()));
+			//find the corresponding service and create the key with the right entity
+			TraceKey traceKey = mapEntityToTraceKey(wc.getKey(), metric);
+			//check if the trace key exists, which means if the WC is important for us
+			if(traceKey!=null){
+				//create the time series
+				TimeSeries timeSeries = createTimeSeries(wc.getValue(), methodToTimeStampList.get(wc.getKey()));
+				//add it to the final set
+				finalSeries.put(traceKey, timeSeries);
+			}
+		}
+		//return this series.
+		return finalSeries;
+	}
+	
 	private String parseOperationExecutionMethodName(String operationSignature) {
 		String[] tmp = operationSignature.split("\\(")[0].trim().split("\\s+");
 		return tmp[tmp.length-1];
@@ -910,7 +1015,9 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 		//IF WE HAVE THE UTILIZATION TO CALCULATE
 		else if(metric.equals(StandardMetrics.UTILIZATION)){
 			filename = "UTILIZATION";
-		} 
+		} else if(metric.equals(StandardMetrics.ARRIVALS)){
+			filename = "ARRIVALS";
+		}
 		//IF WE WANT TO CALCULATE OTHER METRICS DO IT HERE
 		else{
 			//other metrics
