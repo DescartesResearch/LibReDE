@@ -1027,7 +1027,7 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 		//create file and folder 
 		long actualtime = System.currentTimeMillis();
 		//every x minutes a new folder
-		if(actualtime-lastCsvPrintTimeStamp>60000){
+		if(actualtime-lastCsvPrintTimeStamp>300000){
 			long lasttimetmp = lastCsvPrintTimeStamp;
 			//update timestamp
 			lastCsvPrintTimeStamp = actualtime;
