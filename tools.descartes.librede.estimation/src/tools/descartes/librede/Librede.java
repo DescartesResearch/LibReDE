@@ -81,6 +81,7 @@ import tools.descartes.librede.datasource.IDataSourceListener;
 import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
+import tools.descartes.librede.datasource.csv.CsvDataSourceOffline;
 import tools.descartes.librede.datasource.kieker.KiekerDataSource;
 import tools.descartes.librede.datasource.kiekeramqp.KiekerAmqpDataSource;
 import tools.descartes.librede.datasource.kiekeramqp.KiekerDataSourceOffline;
@@ -169,6 +170,7 @@ public class Librede {
 		Registry.INSTANCE.registerMetric(StandardMetrics.STEAL_TIME, new StealTimeAdapter());
 
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSource.class);
+		Registry.INSTANCE.registerImplementationType(IDataSource.class, CsvDataSourceOffline.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerAmqpDataSource.class);
 		Registry.INSTANCE.registerImplementationType(IDataSource.class, KiekerDataSourceOffline.class);
