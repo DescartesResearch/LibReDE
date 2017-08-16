@@ -59,6 +59,10 @@ public class LibredeResults {
 		approachResults.put(approach, appRes);
 	}
 	
+	public void clear() {
+		approachResults.clear();
+	}
+	
 	public void setSelectedApproaches(List<Class<? extends IEstimationApproach>> newSelection) {
 		selectedApproaches.clear();
 		selectedApproaches.addAll(newSelection);
