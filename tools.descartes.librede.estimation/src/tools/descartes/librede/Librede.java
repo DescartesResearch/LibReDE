@@ -135,6 +135,8 @@ import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
 
+//THIS IS TEST COMMENT
+
 public class Librede {
 
 	private static final Logger log = Logger.getLogger(Librede.class);
