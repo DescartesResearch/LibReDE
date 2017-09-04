@@ -1,6 +1,6 @@
 target "Librede Update Site"
 
-location "http://download.eclipse.org/releases/luna" {
+location "http://download.eclipse.org/releases/neon" {
 	org.eclipse.sdk.feature.group
 	org.eclipse.emf.sdk.feature.group
 	org.eclipse.emf.cdo.common
