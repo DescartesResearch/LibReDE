@@ -28,7 +28,6 @@ package tools.descartes.librede.datasource.kieker;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -36,41 +35,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Map.Entry;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.xml.crypto.Data;
+import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.URIConverter.Loadable;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import tools.descartes.librede.Librede;
 import tools.descartes.librede.LibredeResults;
 import tools.descartes.librede.LibredeVariables;
-import tools.descartes.librede.approach.IEstimationApproach;
-import tools.descartes.librede.bayesplusplus.BayesLibrary;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.configuration.TraceConfiguration;
-import tools.descartes.librede.continuous.AddContinuousDataToCSVTest;
-import tools.descartes.librede.continuous.DataReadWrite;
 import tools.descartes.librede.datasource.DataSourceSelector;
 import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.datasource.IDataSourceListener;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.ipopt.java.IpoptLibrary;
 import tools.descartes.librede.nnls.NNLSLibrary;
@@ -85,18 +73,19 @@ import tools.descartes.librede.units.UnitsFactory;
 public class ContinuousKiekerReadingTest extends LibredeTest{
 
 	private static final Logger log = Logger.getLogger(Librede.class);
-	private static LibredeConfiguration conf;
+	private static LibredeConfiguration conf;	
 	@BeforeClass
 	public static void initLibraries() {
 		System.out.println("Ich starte zumindest");
 		//Librede.init();
 		IpoptLibrary.init();
 		NNLSLibrary.init();
-		BayesLibrary.init();
+//		BayesLibrary.init();
 	}
 	
 
 	@Test
+	@Ignore
 	public void rabbitmqtest(){
 		//create the runner class
 		RunnerThread runner = new RunnerThread();
@@ -223,6 +212,7 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 	
 	
 	@Test
+	@Ignore
 	public void runEstimation(){
 		LibredeResults results = null;
 		conf = null;
@@ -445,6 +435,7 @@ public class ContinuousKiekerReadingTest extends LibredeTest{
 				
 	}
 	@Test
+	@Ignore
 	public void test() {
 		loadConf("kieker.librede");
 		int counter = 0;
