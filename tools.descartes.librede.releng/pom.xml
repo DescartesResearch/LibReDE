@@ -118,6 +118,7 @@
 						<exclude>**/*.target</exclude>
 						<exclude>**/*.FOR</exclude>
 						<exclude>**/*.F90</exclude>
+						<exclude>**/makefile</exclude>
 					</excludes>
 				</configuration>
 				<executions>
