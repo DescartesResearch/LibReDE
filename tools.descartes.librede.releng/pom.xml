@@ -113,6 +113,7 @@
 						<exclude>**/*.xml</exclude>
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.html</exclude>
+						<exclude>**/*.m</exclude>
 					</excludes>
 				</configuration>
 				<executions>
