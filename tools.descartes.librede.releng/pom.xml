@@ -115,6 +115,7 @@
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.html</exclude>
 						<exclude>**/*.m</exclude>
+						<exclude>**/*.target</exclude>
 					</excludes>
 				</configuration>
 				<executions>
