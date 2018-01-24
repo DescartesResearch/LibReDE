@@ -116,6 +116,8 @@
 						<exclude>**/*.html</exclude>
 						<exclude>**/*.m</exclude>
 						<exclude>**/*.target</exclude>
+						<exclude>**/*.FOR</exclude>
+						<exclude>**/*.F90</exclude>
 					</excludes>
 				</configuration>
 				<executions>
