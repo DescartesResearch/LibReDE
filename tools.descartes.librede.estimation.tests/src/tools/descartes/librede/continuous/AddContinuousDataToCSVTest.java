@@ -88,27 +88,27 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 
 	}
 
 	@Ignore
 	@Test
 	public void test() {
-		
 
 		LinkedList<DataReadWrite> drws = new LinkedList<DataReadWrite>();
 		File sourceDirectory = new File(SOURCE_PATH);
 		File destinationDirectory = new File(DESTINATION_PATH);
-		// receive all files to be read for analysis
-		for (File file : sourceDirectory.listFiles()) {
-			File sourceFile = new File(file.getPath());
-			File destinationFile = new File(destinationDirectory.getPath() + File.separator + file.getName());
-			DataReadWrite drw = new DataReadWrite(sourceFile, destinationFile);
-			drw.setLinesToCopy(LINES_TO_COPY);
-			drws.add(drw);
+		File[] filelist = sourceDirectory.listFiles();
+		if (filelist != null) {
+			// receive all files to be read for analysis
+			for (File file : filelist) {
+				File sourceFile = new File(file.getPath());
+				File destinationFile = new File(destinationDirectory.getPath() + File.separator + file.getName());
+				DataReadWrite drw = new DataReadWrite(sourceFile, destinationFile);
+				drw.setLinesToCopy(LINES_TO_COPY);
+				drws.add(drw);
+			}
 		}
-
 		// initialize ThreadPool and add all Threads
 		ScheduledThreadPoolExecutor tp = new ScheduledThreadPoolExecutor(10);
 		for (DataReadWrite drw : drws) {
@@ -120,7 +120,7 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 		}
 		LibredeVariables var = new LibredeVariables(conf);
 		Librede.initRepo(var);
-		
+
 		while (!(tp.isShutdown())) {
 			boolean runningTasks = false;
 			for (DataReadWrite drw : drws) {
@@ -137,12 +137,12 @@ public class AddContinuousDataToCSVTest extends LibredeTest {
 			} catch (InterruptedException e) {
 			}
 			System.err.println("Test running");
-			Librede.executeContinuous(var, Collections.<String, IDataSource> emptyMap());
+			Librede.executeContinuous(var, Collections.<String, IDataSource>emptyMap());
 		}
-		
-//		System.out.println("Saving Data to CSV");
-//		File outputFile = new File("");
-//		var.exportResultTimelineCSV(outputFile);
+
+		// System.out.println("Saving Data to CSV");
+		// File outputFile = new File("");
+		// var.exportResultTimelineCSV(outputFile);
 
 		checkLibredeResults(var.getResults());
 

@@ -95,10 +95,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 	@BeforeClass
 	public static void initLibraries() {
 		File file = new File(""); // Dummy file
-		SOURCE_PATH = file.getAbsolutePath() + File.separator + "resources"
-				+ File.separator + "source";
-		DESTINATION_PATH = file.getAbsolutePath() + File.separator
-				+ "resources" + File.separator + "destination";
+		SOURCE_PATH = file.getAbsolutePath() + File.separator + "resources" + File.separator + "source";
+		DESTINATION_PATH = file.getAbsolutePath() + File.separator + "resources" + File.separator + "destination";
 		IpoptLibrary.init();
 		NNLSLibrary.init();
 		BayesLibrary.init();
@@ -108,10 +106,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 
 		try {
 			ResourceSet resourceSet = Registry.INSTANCE.createResourceSet();
-			Resource resource = resourceSet.createResource(URI
-					.createURI("estimation2.librede"));
-			InputStream confStream = ContinuousCrossValidationTest.class
-					.getResourceAsStream("estimation2.librede");
+			Resource resource = resourceSet.createResource(URI.createURI("estimation2.librede"));
+			InputStream confStream = ContinuousCrossValidationTest.class.getResourceAsStream("estimation2.librede");
 			resource.load(confStream, new HashMap<Object, Object>());
 			EcoreUtil.resolveAll(resource);
 			conf = (LibredeConfiguration) resource.getContents().get(0);
@@ -119,8 +115,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 			// set first to source path
 			for (TraceConfiguration trace : conf.getInput().getObservations()) {
 				FileTraceConfiguration filetrace = (FileTraceConfiguration) trace;
-				filetrace.setFile(SOURCE_PATH + File.separator
-						+ new File(filetrace.getFile()).getName());
+				filetrace.setFile(SOURCE_PATH + File.separator + new File(filetrace.getFile()).getName());
 				// System.out.println(SOURCE_PATH + File.separator
 				// + new File(filetrace.getFile()).getName());
 			}
@@ -130,8 +125,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 			// now set to destination path
 			for (TraceConfiguration trace : conf.getInput().getObservations()) {
 				FileTraceConfiguration filetrace = (FileTraceConfiguration) trace;
-				filetrace.setFile(DESTINATION_PATH + File.separator
-						+ new File(filetrace.getFile()).getName());
+				filetrace.setFile(DESTINATION_PATH + File.separator + new File(filetrace.getFile()).getName());
 				// System.out.println(DESTINATION_PATH + File.separator
 				// + new File(filetrace.getFile()).getName());
 			}
@@ -157,14 +151,16 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		LinkedList<DataReadWrite> drws = new LinkedList<DataReadWrite>();
 		File sourceDirectory = new File(SOURCE_PATH);
 		File destinationDirectory = new File(DESTINATION_PATH);
-		// receive all files to be read for analysis
-		for (File file : sourceDirectory.listFiles()) {
-			File sourceFile = new File(file.getPath());
-			File destinationFile = new File(destinationDirectory.getPath()
-					+ File.separator + file.getName());
-			DataReadWrite drw = new DataReadWrite(sourceFile, destinationFile);
-			drw.setLinesToCopy(LINES_TO_COPY);
-			drws.add(drw);
+		File[] filelist = sourceDirectory.listFiles();
+		if (filelist != null) {
+			// receive all files to be read for analysis
+			for (File file : filelist) {
+				File sourceFile = new File(file.getPath());
+				File destinationFile = new File(destinationDirectory.getPath() + File.separator + file.getName());
+				DataReadWrite drw = new DataReadWrite(sourceFile, destinationFile);
+				drw.setLinesToCopy(LINES_TO_COPY);
+				drws.add(drw);
+			}
 		}
 
 		// initialize ThreadPool and add all Threads
@@ -184,9 +180,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 					runningTasks = true;
 				}
 			}
-			tp.schedule(
-					new Executor(new LibredeVariables(conf), Collections
-							.<String, IDataSource> emptyMap()), 0,
+			tp.schedule(new Executor(new LibredeVariables(conf), Collections.<String, IDataSource>emptyMap()), 0,
 					TimeUnit.MILLISECONDS);
 			if (!runningTasks) {
 				tp.shutdown();
@@ -204,8 +198,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 
 		LibredeVariables var = new LibredeVariables(conf);
 		tp = new ScheduledThreadPoolExecutor(10);
-		Executor ex = new Executor(var,
-				Collections.<String, IDataSource> emptyMap());
+		Executor ex = new Executor(var, Collections.<String, IDataSource>emptyMap());
 		tp.schedule(ex, 0, TimeUnit.MILLISECONDS);
 		try {
 			tp.awaitTermination(100000, TimeUnit.MILLISECONDS);
@@ -224,8 +217,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 
 		private Map<String, IDataSource> existingDatasources;
 
-		public Executor(LibredeVariables var,
-				Map<String, IDataSource> existingDatasources) {
+		public Executor(LibredeVariables var, Map<String, IDataSource> existingDatasources) {
 			super();
 			this.var = var;
 			this.existingDatasources = existingDatasources;
@@ -255,8 +247,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		Assert.assertNotNull(result.getApproaches());
 
 		Assert.assertEquals(5, result.getNumberOfFolds());
-		for (Class<? extends IEstimationApproach> approach : result
-				.getApproaches()) {
+		for (Class<? extends IEstimationApproach> approach : result.getApproaches()) {
 			for (int fold = 0; fold < result.getNumberOfFolds(); fold++) {
 				Assert.assertNotNull(result.getEstimates(approach, fold));
 			}
@@ -264,8 +255,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 
 		// Aggregate results
 		ResourceDemand[] variables = null;
-		List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(
-				result.getApproaches());
+		List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(result.getApproaches());
 
 		Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
 		for (Class<? extends IEstimationApproach> approach : approaches) {
@@ -288,16 +278,14 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 
 		MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
 		for (Class<? extends IEstimationApproach> approach : approaches) {
-			MatrixBuilder lastEstimates = MatrixBuilder
-					.create(variables.length);
+			MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
 			for (int i = 0; i < result.getNumberOfFolds(); i++) {
 				ResultTable curFold = result.getEstimates(approach, i);
 				lastEstimates.addRow(curFold.getLastEstimates());
 			}
 			Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
 			if (lastEstimatesMatrix.isEmpty()) {
-				fail("No estimates found for approach "
-						+ Registry.INSTANCE.getDisplayName(approach));
+				fail("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
 			} else {
 				meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
 			}
@@ -310,15 +298,12 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 					Vector curErr = curFold.getValidationErrors(validator);
 					if (errorsBuilder == null) {
 						errorsBuilder = MatrixBuilder.create(curErr.rows());
-						validatedEntities.put(validator,
-								curFold.getValidatedEntities(validator));
+						validatedEntities.put(validator, curFold.getValidatedEntities(validator));
 					}
 					errorsBuilder.addRow(curErr);
-					Vector curPred = curFold
-							.getValidationPredictions(validator);
+					Vector curPred = curFold.getValidationPredictions(validator);
 					if (predictionsBuilder == null) {
-						predictionsBuilder = MatrixBuilder.create(curPred
-								.rows());
+						predictionsBuilder = MatrixBuilder.create(curPred.rows());
 					}
 					predictionsBuilder.addRow(curPred);
 				}
@@ -329,10 +314,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 					Vector curMeanErr = LinAlg.mean(errors);
 					Vector curMeanPred = LinAlg.mean(predictions);
 					if (!meanErrors.containsKey(validator)) {
-						meanErrors.put(validator,
-								MatrixBuilder.create(curMeanErr.rows()));
-						meanPredictions.put(validator,
-								MatrixBuilder.create(curMeanPred.rows()));
+						meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
+						meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
 					}
 					meanErrors.get(validator).addRow(curMeanErr);
 					meanPredictions.get(validator).addRow(curMeanPred);
@@ -349,8 +332,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				for (int i = 0; i < approaches.size(); i++) {
 					tested = true;
 					if (!Double.isNaN(meanEstimates.toMatrix().get(i, idx))) {
-						Assert.assertEquals(0.025, meanEstimates.toMatrix()
-								.get(i, idx), 0.08);
+						Assert.assertEquals(0.025, meanEstimates.toMatrix().get(i, idx), 0.08);
 					} else {
 						fail("Value is NaN.");
 					}
@@ -361,8 +343,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				for (int i = 0; i < approaches.size(); i++) {
 					tested = true;
 					if (!Double.isNaN(meanEstimates.toMatrix().get(i, idx))) {
-						Assert.assertEquals(0.125, meanEstimates.toMatrix()
-								.get(i, idx), 0.9);
+						Assert.assertEquals(0.125, meanEstimates.toMatrix().get(i, idx), 0.9);
 					} else {
 						fail("Value is NaN.");
 					}
@@ -373,8 +354,7 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				for (int i = 0; i < approaches.size(); i++) {
 					tested = true;
 					if (!Double.isNaN(meanEstimates.toMatrix().get(i, idx))) {
-						Assert.assertEquals(0.075, meanEstimates.toMatrix()
-								.get(i, idx), 0.1);
+						Assert.assertEquals(0.075, meanEstimates.toMatrix().get(i, idx), 0.1);
 					} else {
 						fail("Value is NaN.");
 					}
@@ -399,19 +379,14 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 				FileTraceConfiguration fileTrace = (FileTraceConfiguration) trace;
 				File inputFile = new File(fileTrace.getFile());
 				if (inputFile.exists()) {
-					DataSourceConfiguration dataSourceConf = fileTrace
-							.getDataSource();
+					DataSourceConfiguration dataSourceConf = fileTrace.getDataSource();
 					if (dataSourceConf != null) {
-						IDataSource ds = dataSources.get(dataSourceConf
-								.getType());
+						IDataSource ds = dataSources.get(dataSourceConf.getType());
 
 						if (ds == null) {
 							try {
-								Class<?> cl = Registry.INSTANCE
-										.getInstanceClass(dataSourceConf
-												.getType());
-								ds = (IDataSource) Instantiator.newInstance(cl,
-										dataSourceConf.getParameters());
+								Class<?> cl = Registry.INSTANCE.getInstanceClass(dataSourceConf.getType());
+								ds = (IDataSource) Instantiator.newInstance(cl, dataSourceConf.getParameters());
 								dataSources.put(dataSourceConf.getType(), ds);
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -422,10 +397,8 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 						// have the same timestamps
 						if (fileTrace.getMappings().size() >= 1) {
 							try {
-								maxStart = Math.max(
-										loadFirst(inputFile, 0, ","), maxStart);
-								minEnd = Math.min(loadLast(inputFile, 0, ","),
-										minEnd);
+								maxStart = Math.max(loadFirst(inputFile, 0, ","), maxStart);
+								minEnd = Math.min(loadLast(inputFile, 0, ","), minEnd);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -492,12 +465,16 @@ public class ContinuousCrossValidationTest extends LibredeTest {
 		try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
 
 			String line = br.readLine();
+			if (line == null)
+				return stamp;
 			try {
 				String[] split = line.split(separator);
 				stamp = Double.parseDouble(split[col]);
 			} catch (Exception e) {
 				// parse next line
 				line = br.readLine();
+				if (line == null)
+					return stamp;
 				String[] split = line.split(separator);
 				stamp = Double.parseDouble(split[col]);
 			}

@@ -89,6 +89,7 @@ public class ApproachSelectionTest {
 				stream = Files.newDirectoryStream(path);
 			} catch (IOException e) {
 				e.printStackTrace();
+				return;
 			}
 			Iterator<Path> iter = stream.iterator();
 			// iterate over all files in this directory
@@ -218,6 +219,9 @@ public class ApproachSelectionTest {
 			case 6:
 				source = fs.getPath(basePath + "/config6.librede");
 				break;
+			default: 
+				System.out.println("No valid case.");
+				return;
 			}
 			// create config in target directory if not exist
 			Path target = fs.getPath(path + "/config.librede");

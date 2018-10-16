@@ -316,10 +316,10 @@ public class KiekerChannel implements Closeable {
 				rc = read();
 			}
 		}else{
-			//this is a read process triggeres by file change
-			if(!isMapFileRead){
-				throw new IllegalStateException("We want to read data, but have not read the kieker.map file yet.");
-			}
+//			//this is a read process triggeres by file change
+//			if(!isMapFileRead){
+//				throw new IllegalStateException("We want to read data, but have not read the kieker.map file yet.");
+//			}
 			//continue reading
 			rc = continueReading();
 		}

@@ -81,38 +81,38 @@ public class WorkloadDescriptionDerivation {
 		return mapping;
 	}
 	
-	public void updateWorkloadDescription(Deployment deployment) {
-		mapping.reset();
-		completeServices.clear();
-		deploymentMapping.clear();
-		
-		// Search for all resources in the data center and create a mapping	
-		TreeIterator<EObject> dcIterator = deployment.getTargetResourceLandscape().eAllContents();
-		while (dcIterator.hasNext()) {
-			EObject curObject = dcIterator.next();
-			if (curObject instanceof Container) {
-				Container curContainer = (Container) curObject;
-				for (ConfigurationSpecification curSpec : curContainer.getConfigSpec()) {
-					if (curSpec instanceof ProcessingResourceSpecification) {
-						mapping.mapResource(curContainer, ((ProcessingResourceSpecification) curSpec).getProcessingResourceType());
-					}
-				}
-			}
-		}
-		
-		deploymentMapping.putAll(DmlHelper.determineDeploymentMapping(deployment));
-
-		Deque<AssemblyContext> callStack = new ArrayDeque<>();
-		tools.descartes.dml.mm.applicationlevel.system.System system = deployment.getSystem();
-		for (AssemblyContext ctx : system.getAssemblyContexts()) {
-			callStack.push(ctx);
-			Container deploymentTarget = deploymentMapping.get(ctx);
-			visitAssemblyContext(callStack, deploymentTarget);
-			callStack.pop();
-		}
-		
-		mapping.removeUnmappedEntites();
-	}
+//	public void updateWorkloadDescription(Deployment deployment) {
+//		mapping.reset();
+//		completeServices.clear();
+//		deploymentMapping.clear();
+//		
+//		// Search for all resources in the data center and create a mapping	
+//		TreeIterator<EObject> dcIterator = deployment.getTargetResourceLandscape().eAllContents();
+//		while (dcIterator.hasNext()) {
+//			EObject curObject = dcIterator.next();
+//			if (curObject instanceof Container) {
+//				Container curContainer = (Container) curObject;
+//				for (ConfigurationSpecification curSpec : curContainer.getConfigSpec()) {
+//					if (curSpec instanceof ProcessingResourceSpecification) {
+//						mapping.mapResource(curContainer, ((ProcessingResourceSpecification) curSpec).getProcessingResourceType());
+//					}
+//				}
+//			}
+//		}
+//		
+//		deploymentMapping.putAll(DmlHelper.determineDeploymentMapping(deployment));
+//
+//		Deque<AssemblyContext> callStack = new ArrayDeque<>();
+//		tools.descartes.dml.mm.applicationlevel.system.System system = deployment.getSystem();
+//		for (AssemblyContext ctx : system.getAssemblyContexts()) {
+//			callStack.push(ctx);
+//			Container deploymentTarget = deploymentMapping.get(ctx);
+//			visitAssemblyContext(callStack, deploymentTarget);
+//			callStack.pop();
+//		}
+//		
+//		mapping.removeUnmappedEntites();
+//	}
 	
 
 	

@@ -116,22 +116,22 @@ public class DmlMapping {
 		return demands.inverse().get(libredeDemand);
 	}
 
-	public void removeUnmappedEntites() {
-		Set<String> servicesToUnmap = new HashSet<>(unmappedServices);
-		for (String serviceName : servicesToUnmap) {
-			ServiceMapping sm = services.get(serviceName);
-			if (sm != null) {
-				unmapService(sm.service);
-			}
-		}
-		Set<String> resourcesToUnmap = new HashSet<>(unmappedResources);
-		for (String resourceName : resourcesToUnmap) {
-			ResourceMapping rm = resources.get(resourceName);
-			if (rm != null) {
-				unmapResource(rm.resource);
-			}
-		}
-	}
+//	public void removeUnmappedEntites() {
+//		Set<String> servicesToUnmap = new HashSet<>(unmappedServices);
+//		for (String serviceName : servicesToUnmap) {
+//			ServiceMapping sm = services.get(serviceName);
+//			if (sm != null) {
+//				unmapService(sm.service);
+//			}
+//		}
+//		Set<String> resourcesToUnmap = new HashSet<>(unmappedResources);
+//		for (String resourceName : resourcesToUnmap) {
+//			ResourceMapping rm = resources.get(resourceName);
+//			if (rm != null) {
+//				unmapResource(rm.resource);
+//			}
+//		}
+//	}
 
 	public void unmapService(Service service) {
 		workload.getServices().remove(service);
@@ -148,12 +148,12 @@ public class DmlMapping {
 		}
 	}
 
-	public void unmapResource(Resource resource) {
-		workload.getResources().remove(resource);
-		resources.remove(resource);
-		newEntities.remove(resource);
-		unmappedResources.remove(resource);
-	}
+//	public void unmapResource(Resource resource) {
+//		workload.getResources().remove(resource);
+//		resources.remove(resource);
+//		newEntities.remove(resource);
+//		unmappedResources.remove(resource);
+//	}
 
 	public void unmapExternalCall(ExternalCall call) {
 		newEntities.remove(call);

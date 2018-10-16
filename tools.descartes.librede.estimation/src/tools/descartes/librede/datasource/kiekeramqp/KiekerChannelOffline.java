@@ -322,10 +322,10 @@ public class KiekerChannelOffline implements Closeable{
 				rc = read();
 			}
 		}else{
-			//this is a read process triggeres by file change
-			if(!isMapFileRead){
-				throw new IllegalStateException("We want to read data, but have not read the kieker.map file yet.");
-			}
+//			//this is a read process triggeres by file change
+//			if(!isMapFileRead){
+//				throw new IllegalStateException("We want to read data, but have not read the kieker.map file yet.");
+//			}
 			//continue reading
 			rc = continueReading();
 		}
@@ -1215,21 +1215,6 @@ public class KiekerChannelOffline implements Closeable{
 			return TimeSeries.EMPTY;
 		}
 		return new TimeSeries(ts, vs);
-	}
-
-	/**
-	 * TODO: is this method necessary?
-	 * @param filters
-	 * @param line
-	 * @return
-	 */
-	private boolean applyFilters(List<TraceFilter> filters, String[] line) {
-		for (TraceFilter f : filters) {
-			if (!f.getValue().equals(line[f.getTraceColumn()])) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**

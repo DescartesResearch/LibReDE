@@ -70,10 +70,6 @@ public class Polynomial {
 		return coef;
 	}
 
-	public boolean equal(Object object) {
-		return true;
-	}
-
 	public double getValue(int x) {
 		double y = 0;
 		for (int i = 0; i < this.degree; ++i) {

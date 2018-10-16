@@ -135,8 +135,6 @@ import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
 
-//THIS IS TEST COMMENT
-
 public class Librede {
 
 	private static final Logger log = Logger.getLogger(Librede.class);
@@ -765,29 +763,6 @@ public class Librede {
 			}
 		});
 
-		// TODO: Implement Exporter for this.
-		// Query<Vector, Ratio> util =
-		// QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResources(sortedResources).average().using(validatingCursor);
-		// Query<Vector, RequestRate> tput =
-		// QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(sortedServices).average().using(validatingCursor);
-		// Query<Vector, Time> resp =
-		// QueryBuilder.select(StandardMetrics.RESPONSE_TIME).in(Time.SECONDS).forServices(sortedServices).average().using(validatingCursor);
-		// File output = new
-		// File("C:\\Users\\Simon\\Workspaces\\specjent-model\\specjent-model2\\data.csv");
-		// try (PrintStream out = new PrintStream(output)) {
-		// out.print("#");
-		// for (Resource r : sortedResources) {
-		// out.print(", ");
-		// out.print(r.getName());
-		// }
-		// for (int i = 0; i < 2; i++) {
-		// for (Service s : sortedServices) {
-		// out.print(", ");
-		// out.print(s.getName());
-		// }
-		// }
-		// out.println();
-		//
 		log.info("Run validation...");
 		String[] validatorNames = new String[validators.size()];
 		for (int i = 0; i < validatorNames.length; i++) {

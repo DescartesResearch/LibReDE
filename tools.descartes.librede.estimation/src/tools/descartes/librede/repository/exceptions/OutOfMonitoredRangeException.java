@@ -43,7 +43,7 @@ public class OutOfMonitoredRangeException extends MonitoringRepositoryException 
 
 	private static final long serialVersionUID = 8959366514292578488L;
 	
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+	private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 	
 	private final Quantity<Time> requestedStartTime;
 	private final Quantity<Time> requestedEndTime;
@@ -102,7 +102,7 @@ public class OutOfMonitoredRangeException extends MonitoringRepositoryException 
 	}
 	
 	private void appendTimestamp(StringBuilder builder, Quantity<Time> timestamp) {
-		builder.append(dateFormat.format(new Date((long)timestamp.getValue(Time.MILLISECONDS))));
+		builder.append(new SimpleDateFormat(dateFormat).format(new Date((long)timestamp.getValue(Time.MILLISECONDS))));
 	}
 
 }
