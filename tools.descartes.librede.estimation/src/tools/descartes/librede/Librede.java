@@ -28,11 +28,8 @@ package tools.descartes.librede;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,10 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.crypto.Data;
-
-import javax.xml.crypto.Data;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -56,21 +49,18 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.approach.IEstimationApproach;
-import tools.descartes.librede.approach.ResponseTimeRegressionApproach;
+import tools.descartes.librede.approach.KumarKalmanFilterApproach;
 import tools.descartes.librede.approach.LiuOptimizationApproach;
 import tools.descartes.librede.approach.MenasceOptimizationApproach;
 import tools.descartes.librede.approach.ResponseTimeApproximationApproach;
-import tools.descartes.librede.approach.UtilizationRegressionApproach;
+import tools.descartes.librede.approach.ResponseTimeRegressionApproach;
 import tools.descartes.librede.approach.ServiceDemandLawApproach;
+import tools.descartes.librede.approach.UtilizationRegressionApproach;
 import tools.descartes.librede.approach.WangKalmanFilterApproach;
-import tools.descartes.librede.approach.KumarKalmanFilterApproach;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
-import tools.descartes.librede.configuration.ExporterConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.ValidatorConfiguration;
@@ -91,8 +81,6 @@ import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.export.IExporter;
 import tools.descartes.librede.export.csv.CsvExporter;
 import tools.descartes.librede.linalg.LinAlg;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
@@ -135,17 +123,29 @@ import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
 
+/**
+ * This is the main entry point of Librede. Used to start various kinds of
+ * estimations.
+ * 
+ * @author Simon Spinner, Johannes Grohmann, Torsten Krauss
+ *
+ */
 public class Librede {
 
 	private static final Logger log = Logger.getLogger(Librede.class);
 	private final static int selectionInterval = 1;
 	private static final Quantity<Time> ONE_FOLD_STEPSIZE = UnitsFactory.eINSTANCE.createQuantity();
 
-
+	/**
+	 * Initialize logging.
+	 */
 	public static void initLogging() {
 		BasicConfigurator.configure();
 	}
 
+	/**
+	 * Registers all options at the registry.
+	 */
 	public static void init() {
 		Registry.INSTANCE.registerDimension(Time.INSTANCE);
 		Registry.INSTANCE.registerDimension(RequestCount.INSTANCE);
@@ -194,15 +194,31 @@ public class Librede {
 		Registry.INSTANCE.registerImplementationType(IValidator.class, AbsoluteUtilizationValidator.class);
 
 		Registry.INSTANCE.registerImplementationType(IExporter.class, CsvExporter.class);
-		
+
 		ONE_FOLD_STEPSIZE.setValue(60);
 		ONE_FOLD_STEPSIZE.setUnit(Time.SECONDS);
 	}
 
+	/**
+	 * Executes the given {@link LibredeConfiguration}.
+	 * 
+	 * @param conf
+	 *            The configuration to execute.
+	 * @return A {@link LibredeResults} objects containing the results of the
+	 *         estimation.
+	 */
 	public static LibredeResults execute(LibredeConfiguration conf) {
-		return execute(conf, Collections.<String, IDataSource> emptyMap());
+		return execute(conf, Collections.<String, IDataSource>emptyMap());
 	}
 
+	/**
+	 * Executes the given {@link LibredeConfiguration}.
+	 * 
+	 * @param conf
+	 *            The configuration to execute.
+	 * @return A {@link LibredeResults} objects containing the results of the
+	 *         estimation.
+	 */
 	public static LibredeResults execute(LibredeConfiguration conf, Map<String, IDataSource> existingDatasources) {
 
 		LibredeVariables var = new LibredeVariables(conf);
@@ -210,12 +226,12 @@ public class Librede {
 		return executeContinuous(var, existingDatasources);
 	}
 
-	public static LibredeResults executeContinuous(LibredeVariables var, Map<String, IDataSource> existingDatasources) {		
+	public static LibredeResults executeContinuous(LibredeVariables var, Map<String, IDataSource> existingDatasources) {
 		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(), existingDatasources);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
 			// do not progress further than the configured end timestamp.
 			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
-		} else {		
+		} else {
 			var.getRepo().setCurrentTime(endTime);
 		}
 
@@ -224,42 +240,50 @@ public class Librede {
 		} catch (Exception e) {
 			log.error("Error running estimation.", e);
 		}
-		
+
 		// Now export the results.
-		exportResults(var.getConf(), var.getResults());
+		ResultPrinter.exportResults(var.getConf(), var.getResults());
 
 		return var.getResults();
-//		return null;
+		// return null;
 	}
-	public static LibredeVariables updateRepositoryOnline(long maxInsertionTimeMs, LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
-		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener, maxInsertionTimeMs);
+
+	public static LibredeVariables updateRepositoryOnline(long maxInsertionTimeMs, LibredeVariables var,
+			Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {
+		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources, dataSourceListener,
+				maxInsertionTimeMs);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
 			// do not progress further than the configured end timestamp.
 			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
-		} else {		
+		} else {
 			var.getRepo().setCurrentTime(endTime);
 		}
 		return var;
 	}
-	public static LibredeResults executeOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
+
+	public static LibredeResults executeOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources,
+			IDataSourceListener dataSourceListener) {
 
 		try {
 			runEstimation(var);
 		} catch (Exception e) {
 			log.error("Error running estimation.", e);
 		}
-		
+
 		// Now export the results.
-		//exportResults(var.getConf(), var.getResults());
+		// exportResults(var.getConf(), var.getResults());
 
 		return var.getResults();
 	}
-	public static LibredeResults executeContinuousOnline(int maxInsertionTimeMs, LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {		
-		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener, maxInsertionTimeMs);
+
+	public static LibredeResults executeContinuousOnline(int maxInsertionTimeMs, LibredeVariables var,
+			Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {
+		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources, dataSourceListener,
+				maxInsertionTimeMs);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
 			// do not progress further than the configured end timestamp.
 			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
-		} else {		
+		} else {
 			var.getRepo().setCurrentTime(endTime);
 		}
 
@@ -268,105 +292,112 @@ public class Librede {
 		} catch (Exception e) {
 			log.error("Error running estimation.", e);
 		}
-		
+
 		// Now export the results.
-		//exportResults(var.getConf(), var.getResults());
+		// exportResults(var.getConf(), var.getResults());
 
 		return var.getResults();
-//		return null;
+		// return null;
 	}
-	
-	public static void initDataSources(LibredeVariables var, Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener){
-		//set the current time of the repo to the start time of the librede file
+
+	public static void initDataSources(LibredeVariables var, Map<String, IDataSource> existingDatasources,
+			IDataSourceListener dataSourceListener) {
+		// set the current time of the repo to the start time of the librede
+		// file
 		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
-		//load data to the repo
-		Quantity<Time> endTime = initDataSourcesOnline(var.getConf(), var.getRepo(), existingDatasources,dataSourceListener);
-		//set the current time of the repo to the last observation timestamp of all the actual traces
+		// load data to the repo
+		Quantity<Time> endTime = initDataSourcesOnline(var.getConf(), var.getRepo(), existingDatasources,
+				dataSourceListener);
+		// set the current time of the repo to the last observation timestamp of
+		// all the actual traces
 		var.getRepo().setCurrentTime(endTime);
-		
-		//var.getConf().getEstimation().setStartTimestamp(((DataSourceSelector)dataSourceListener).getFirstObservationTime());
+
+		// var.getConf().getEstimation().setStartTimestamp(((DataSourceSelector)dataSourceListener).getFirstObservationTime());
 	}
-	
+
 	public static void initRepo(LibredeVariables var) {
 		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
 
-		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(), Collections.<String, IDataSource> emptyMap());
+		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(),
+				Collections.<String, IDataSource>emptyMap());
 		var.getRepo().setCurrentTime(endTime);
 	}
 
 	public static Quantity<Time> loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
-		return loadRepository(conf, repo, Collections.<String, IDataSource> emptyMap());
+		return loadRepository(conf, repo, Collections.<String, IDataSource>emptyMap());
 	}
 
 	/**
-	 * This method was created by Torsten Krauß to enable the online scenario and the kieker datasource.
+	 * This method was created by Torsten Krauss to enable the online scenario
+	 * and the kieker datasource.
+	 * 
 	 * @param conf
 	 * @param repo
 	 * @param existingDataSources
-	 * @param dataSourceListener 
+	 * @param dataSourceListener
 	 * @return
 	 */
 	public static Quantity<Time> initDataSourcesOnline(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener){
-		//verify we have a valid listener.
-		if(!(iDataSourceListener instanceof DataSourceSelector)){
+			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener) {
+		// verify we have a valid listener.
+		if (!(iDataSourceListener instanceof DataSourceSelector)) {
 			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
 		}
-		//cast it
+		// cast it
 		DataSourceSelector selector = (DataSourceSelector) iDataSourceListener;
-		//the map for all the data sources in use
+		// the map for all the data sources in use
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
-		//the actual last timestamp of the librede repo
+		// the actual last timestamp of the librede repo
 		Quantity<Time> endTime = repo.getCurrentTime();
 
 		log.info("Start loading traces");
-		//for each trace, which means for each of our metrics / folder combinations
+		// for each trace, which means for each of our metrics / folder
+		// combinations
 		for (TraceConfiguration trace : conf.getInput().getObservations()) {
-			//get the data source name
+			// get the data source name
 			String dataSourceName = trace.getDataSource().getName();
-			//check if we already deal with this data source
+			// check if we already deal with this data source
 			if (!dataSources.containsKey(dataSourceName)) {
-				//no we do not
-				//get it from elsewhere
+				// no we do not
+				// get it from elsewhere
 				IDataSource newSource;
-				//have we previously dealt with this data source
+				// have we previously dealt with this data source
 				if (existingDataSources.containsKey(dataSourceName)) {
-					//yes we have so get it
+					// yes we have so get it
 					newSource = existingDataSources.get(dataSourceName);
 				} else {
-					//no we have not
-					//create a new instance
+					// no we have not
+					// create a new instance
 					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
 					try {
-						//create it
-						newSource = (IDataSource) Instantiator.newInstance(cl,
-								trace.getDataSource().getParameters());
-						//set the name of the new data source
+						// create it
+						newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
+						// set the name of the new data source
 						newSource.setName(dataSourceName);
-						//add it to the overall data sources we ever used
+						// add it to the overall data sources we ever used
 						existingDataSources.put(dataSourceName, newSource);
-						//add a listener to the data source
+						// add a listener to the data source
 						selector.add(newSource);
 					} catch (Exception e) {
 						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
 						continue;
 					}
 				}
-				//add it to the data sources in use
+				// add it to the data sources in use
 				dataSources.put(dataSourceName, newSource);
-			}//yes we have already dealt with this data source
-			//get the data source from those in use
+			} // yes we have already dealt with this data source
+				// get the data source from those in use
 			IDataSource source = dataSources.get(dataSourceName);
-			//add the trace to the data source
+			// add the trace to the data source
 			try {
 				source.addTrace(trace);
 			} catch (IOException ex) {
 				log.error("Error loading data.", ex);
 			}
 		}
-		//start loading all the datasources.
-		//this initally loads all the available data
-		//and then listens for new data
+		// start loading all the datasources.
+		// this initally loads all the available data
+		// and then listens for new data
 		for (IDataSource ds : dataSources.values()) {
 			try {
 				ds.load();
@@ -374,141 +405,99 @@ public class Librede {
 				log.error("Error loading data initially.", e);
 			}
 		}
-		//THIS IS NOT NECESSARY ANYMORE, BECAUSE WE 
-		//NOW WAIT BEFORE WE ESTIMATE THE FIRST TIME AND THE 
-		//LISTENER WILL THEN BE POLLED
-		//create some set to log the traces we poll
-		/*Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
-		//variable to hold the actual event we polled from the listener
-		TraceEvent curEvent = null;
-		//poll events from the listener as long as the queue is empty
-		while ((curEvent = selector.poll()) != null) {
-			//the last time in the listener
-			endTime = selector.getLatestObservationTime();
-			//the trace key of the actual traceEvent
-			TraceKey key = curEvent.getKey();
-			//add for logging
-			loadedTraces.add(key);
-
-			@SuppressWarnings("unchecked")
-			Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
-			@SuppressWarnings("unchecked")
-			Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
-			
-			//get the data out of the actual traceEvent
-			TimeSeries ts = curEvent.getData();
-
-			//end timestamp is set in ts.append()
-			ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-			//ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-
-			//insert the data into the librede repository
-			if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
-				repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
-			} else {
-				repo.insert(metric, unit, key.getEntity(), ts);
-			}
-			//try to get more data from the queue
-		}
-		//log the traces we added during the last poll period
-		for (TraceKey t : loadedTraces) {
-			TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(),
-					t.getEntity(), t.getAggregation());
-			log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation()
-					+ " <- [length=" + ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start="
-					+ ts.getStartTime() + "s, end=" + ts.getEndTime() + "s]");
-		}
-		log.info("Successfully loaded monitoring data.");
-		//here we dump information from the repository.
-		//I think i can see all the data for all the resources, services and tasks.
-		//((MemoryObservationRepository) repo).logContentDump();
-		//return the last time in the listener.*/
 		return endTime;
 	}
+
 	/**
-	 * This method was created by Torsten Krauß to enable the online scenario and the kieker datasource.
+	 * This method was created by Torsten Krauß to enable the online scenario
+	 * and the kieker datasource.
+	 * 
 	 * @param conf
 	 * @param repo
 	 * @param existingDataSources
-	 * @param maxInsertionTimeMs 
-	 * @param dataSourceListener 
+	 * @param maxInsertionTimeMs
+	 * @param dataSourceListener
 	 * @return
 	 */
 	private static Quantity<Time> updateRepository(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener, long maxInsertionTimeMs){
-		//verify we have a valid listener.
-		if(!(iDataSourceListener instanceof DataSourceSelector)){
+			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener,
+			long maxInsertionTimeMs) {
+		// verify we have a valid listener.
+		if (!(iDataSourceListener instanceof DataSourceSelector)) {
 			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
 		}
-		//cast it
+		// cast it
 		DataSourceSelector selector = (DataSourceSelector) iDataSourceListener;
-		//the actual last timestamp of the librede repo
+		// the actual last timestamp of the librede repo
 		Quantity<Time> endTime = repo.getCurrentTime();
 
-		//remember the actual timestamp to not load longer then maxInsertionTimeMs
-		long maxTimeStamp = System.currentTimeMillis()+maxInsertionTimeMs;
+		// remember the actual timestamp to not load longer then
+		// maxInsertionTimeMs
+		long maxTimeStamp = System.currentTimeMillis() + maxInsertionTimeMs;
 		log.info("Start loading monitoring data for updating repo.");
-		//create some set to log the traces we poll
+		// create some set to log the traces we poll
 		Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
-		//variable to hold the actual event we polled from the listener
+		// variable to hold the actual event we polled from the listener
 		TraceEvent curEvent = null;
-		//flag to indicate if further polling is wanted
+		// flag to indicate if further polling is wanted
 		boolean pollNext = true;
-		//poll events from the listener until the queue is empty or the maxTimeStamp is reached
+		// poll events from the listener until the queue is empty or the
+		// maxTimeStamp is reached
 		while (pollNext) {
-			//poll the next event from the queue/listener
+			// poll the next event from the queue/listener
 			curEvent = selector.poll();
-			//check if we have polled something
-			if(curEvent!=null){
-				//the last time in the listener
+			// check if we have polled something
+			if (curEvent != null) {
+				// the last time in the listener
 				endTime = selector.getLatestObservationTime();
-				//the trace key of the actual traceEvent
+				// the trace key of the actual traceEvent
 				TraceKey key = curEvent.getKey();
-				//add for logging
+				// add for logging
 				loadedTraces.add(key);
-	
+
 				@SuppressWarnings("unchecked")
 				Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
 				@SuppressWarnings("unchecked")
 				Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
-				
-				//get the data out of the actual traceEvent
+
+				// get the data out of the actual traceEvent
 				TimeSeries ts = curEvent.getData();
-	
-				//end timestamp is set in ts.append()
+
+				// end timestamp is set in ts.append()
 				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-				//ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-	
-				//insert the data into the librede repository
+				// ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
+
+				// insert the data into the librede repository
 				if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
 					repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
 				} else {
 					repo.insert(metric, unit, key.getEntity(), ts);
 				}
 			}
-			//check if we should poll again from the queue
-			if((curEvent==null) || (System.currentTimeMillis() > maxTimeStamp)){
-				//exit the while loop
+			// check if we should poll again from the queue
+			if ((curEvent == null) || (System.currentTimeMillis() > maxTimeStamp)) {
+				// exit the while loop
 				pollNext = false;
 			}
-			//try to get more data from the queue
+			// try to get more data from the queue
 		}
-		//log the traces we added during the last poll period
+		// log the traces we added during the last poll period
 		for (TraceKey t : loadedTraces) {
-			TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(),
-					t.getEntity(), t.getAggregation());
-			log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation()
-					+ " <- [length=" + ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start="
-					+ ts.getStartTime() + "s, end=" + ts.getEndTime() + "s]");
+			TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(), t.getEntity(),
+					t.getAggregation());
+			log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation() + " <- [length="
+					+ ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start=" + ts.getStartTime()
+					+ "s, end=" + ts.getEndTime() + "s]");
 		}
 		log.info("Successfully loaded monitoring data for updating repo.");
-		//here we dump information from the repository.
-		//I think i can see all the data for all the resources, services and tasks.
-		//((MemoryObservationRepository) repo).logContentDump();
-		//return the last time in the listener.
+		// here we dump information from the repository.
+		// I think i can see all the data for all the resources, services and
+		// tasks.
+		// ((MemoryObservationRepository) repo).logContentDump();
+		// return the last time in the listener.
 		return endTime;
 	}
-	
+
 	public static Quantity<Time> loadRepository(LibredeConfiguration conf, IMonitoringRepository repo,
 			Map<String, IDataSource> existingDataSources) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
@@ -553,7 +542,7 @@ public class Librede {
 			TraceEvent curEvent = null;
 			while ((curEvent = selector.poll()) != null) {
 				endTime = selector.getLatestObservationTime();
-				
+
 				TraceKey key = curEvent.getKey();
 				loadedTraces.add(key);
 
@@ -564,9 +553,9 @@ public class Librede {
 
 				TimeSeries ts = curEvent.getData();
 
-				//end timestamp is set in ts.append()
+				// end timestamp is set in ts.append()
 				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-//				ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
+				// ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
 
 				if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
 					repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
@@ -596,35 +585,36 @@ public class Librede {
 			}
 		}
 		return endTime;
-		
+
 	}
 
 	public static LibredeResults runEstimation(LibredeVariables var) throws Exception {
-		
+
 		if (!var.getConf().getValidation().isValidateEstimates()) {
 			var.updateResults(runEstimationInternal(var));
-			printSummary(var.getResults());
+			ResultPrinter.printSummary(var.getResults());
 		} else {
 			if (var.getConf().getValidation().getValidationFolds() <= 1) {
 				var.updateResults(runEstimationWithValidation(var));
 			} else {
 				var.updateResults(runEstimationWithCrossValidation(var));
 			}
-			printSummary(var.getResults());
+			ResultPrinter.printSummary(var.getResults());
 		}
-		
-		if (var.getConf().getEstimation().isAutomaticApproachSelection() && var.getResults().getApproaches().size() > 0 ) {
+
+		if (var.getConf().getEstimation().isAutomaticApproachSelection()
+				&& var.getResults().getApproaches().size() > 0) {
 			ApproachSelector.selectApproach(var);
 			if (var.getRunNr() >= selectionInterval) {
 				var.resetRunNr();
 			}
 			var.incrementRunNr();
 		}
-		
+
 		return var.getResults();
-		
+
 	}
-	
+
 	private static LibredeResults runEstimationInternal(LibredeVariables var) throws Exception {
 		for (EstimationApproachConfiguration currentConf : var.getConf().getEstimation().getApproaches()) {
 
@@ -675,11 +665,12 @@ public class Librede {
 			Vector state = estimates.getLastEstimates();
 
 			// Attention: one-fold estimation always gets fixed step size
-			IRepositoryCursor validatingCursor = var.getRepo().getCursor(
-					var.getConf().getEstimation().getStartTimestamp(), ONE_FOLD_STEPSIZE);
+			IRepositoryCursor validatingCursor = var.getRepo()
+					.getCursor(var.getConf().getEstimation().getStartTimestamp(), ONE_FOLD_STEPSIZE);
 			// uncomment this for normal behavior
-//			IRepositoryCursor validatingCursor = var.getRepo().getCursor(
-//					var.getConf().getEstimation().getStartTimestamp(), var.getConf().getEstimation().getStepSize());
+			// IRepositoryCursor validatingCursor = var.getRepo().getCursor(
+			// var.getConf().getEstimation().getStartTimestamp(),
+			// var.getConf().getEstimation().getStepSize());
 
 			List<IValidator> validators = initValidators(var.getConf(), validatingCursor);
 
@@ -707,14 +698,14 @@ public class Librede {
 			List<IValidator> validators = initValidators(var.getConf(),
 					(ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()));
 
-
 			for (int i = 0; i < var.getConf().getValidation().getValidationFolds(); i++) {
 				log.info("Start repetition " + (i + 1));
 				((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType())).startTrainingPhase(i);
 
 				ResultTable estimates = initAndExecuteEstimation(currentApproach, var.getRepo().getWorkload(),
 						var.getConf().getEstimation().getWindow(), var.getConf().getEstimation().isRecursive(),
-						new CachingRepositoryCursor((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
+						new CachingRepositoryCursor(
+								(ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
 								var.getConf().getEstimation().getWindow()),
 						var.getAlgoFactory());
 				if (estimates.getEstimates().isEmpty()) {
@@ -724,8 +715,8 @@ public class Librede {
 
 				((ContinuousCrossValidationCursor) var.getCursor(currentConf.getType())).startValidationPhase(i);
 
-				runValidation(var.getConf(), validators, (ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()),
-						state, estimates);
+				runValidation(var.getConf(), validators,
+						(ContinuousCrossValidationCursor) var.getCursor(currentConf.getType()), state, estimates);
 
 				var.getResults().addEstimates(currentApproach.getClass(), i, estimates);
 
@@ -812,8 +803,7 @@ public class Librede {
 
 	private static ResultTable initAndExecuteEstimation(IEstimationApproach approach, WorkloadDescription workload,
 			int window, boolean iterative, IRepositoryCursor cursor, EstimationAlgorithmFactory algoFactory)
-					throws InstantiationException, IllegalAccessException, InitializationException,
-					EstimationException {
+			throws InstantiationException, IllegalAccessException, InitializationException, EstimationException {
 
 		if (approach != null) {
 
@@ -827,377 +817,10 @@ public class Librede {
 		}
 	}
 
-	public static void printSummary(LibredeResults results, PrintStream outputStream){
-		outputStream.println("New results at "+System.currentTimeMillis()+" (time in milliseconds)");
-		// Aggregate results
-				ResourceDemand[] variables = null;
-				List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(results.getApproaches());
-
-				Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
-				for (Class<? extends IEstimationApproach> approach : approaches) {
-					for (int i = 0; i < results.getNumberOfFolds(); i++) {
-						ResultTable curFold = results.getEstimates(approach, i);
-						if (variables == null) {
-							variables = curFold.getStateVariables();
-						} else {
-							if (!Arrays.equals(variables, curFold.getStateVariables())) {
-								throw new IllegalStateException();
-							}
-						}
-						validators.addAll(curFold.getValidators());
-					}
-				}
-				// Print approaches legend
-				outputStream.println("Approaches");
-				outputStream.println("==========");
-				for (int i = 0; i < approaches.size(); i++) {
-					outputStream.printf("[%d] %s\n", i + 1, Registry.INSTANCE.getDisplayName(approaches.get(i)));
-				}
-				outputStream.println();
-
-				Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
-				Map<Class<? extends IValidator>, MatrixBuilder> meanPredictions = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
-				Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
-				
-				if (variables != null) {
-					MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
-					for (Class<? extends IEstimationApproach> approach : approaches) {
-						MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
-						for (int i = 0; i < results.getNumberOfFolds(); i++) {
-							ResultTable curFold = results.getEstimates(approach, i);
-							lastEstimates.addRow(curFold.getLastEstimates());
-						}
-						Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
-						if (lastEstimatesMatrix.isEmpty()) {
-							log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
-						} else {
-							meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
-						}
-			
-						for (Class<? extends IValidator> validator : validators) {
-							MatrixBuilder errorsBuilder = null;
-							MatrixBuilder predictionsBuilder = null;
-							for (int i = 0; i < results.getNumberOfFolds(); i++) {
-								ResultTable curFold = results.getEstimates(approach, i);
-								Vector curErr = curFold.getValidationErrors(validator);
-								if (errorsBuilder == null) {
-									errorsBuilder = MatrixBuilder.create(curErr.rows());
-									validatedEntities.put(validator, curFold.getValidatedEntities(validator));
-								}
-								errorsBuilder.addRow(curErr);
-								Vector curPred = curFold.getValidationPredictions(validator);
-								if (predictionsBuilder == null) {
-									predictionsBuilder = MatrixBuilder.create(curPred.rows());
-								}
-								predictionsBuilder.addRow(curPred);
-							}
-			
-							Matrix errors = errorsBuilder.toMatrix();
-							Matrix predictions = predictionsBuilder.toMatrix();
-							if (!errors.isEmpty() && !predictions.isEmpty()) {
-								Vector curMeanErr = LinAlg.mean(errors);
-								Vector curMeanPred = LinAlg.mean(predictions);
-								if (!meanErrors.containsKey(validator)) {
-									meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
-									meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
-								}
-								meanErrors.get(validator).addRow(curMeanErr);
-								meanPredictions.get(validator).addRow(curMeanPred);
-							}
-						}
-			
-					}
-
-
-					// Estimates
-					outputStream.println("Estimates");
-					outputStream.println("=========");
-					printEstimatesTable(variables, approaches, meanEstimates.toMatrix(),outputStream);
-					outputStream.println();
-
-
-					if (validators.size() > 0) {
-						// Cross-Validation Results
-						outputStream.println("Cross-Validation Results:");
-						outputStream.println("=========================");
-			
-						for (Class<? extends IValidator> validator : validators) {
-							String name = Registry.INSTANCE.getDisplayName(validator);
-							outputStream.println(name + ":");
-							if (meanErrors.containsKey(validator)) {
-			
-								Matrix errors = meanErrors.get(validator).toMatrix();
-								Matrix predictions = meanPredictions.get(validator).toMatrix();
-								printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors, outputStream);
-								outputStream.println();
-							} else {
-								outputStream.println("No results.");
-							}
-						}
-					}
-				}
-	}
-	
-	public static void printSummary(LibredeResults results) {
-		// Aggregate results
-		ResourceDemand[] variables = null;
-		List<Class<? extends IEstimationApproach>> approaches = new ArrayList<>(results.getApproaches());
-
-		Set<Class<? extends IValidator>> validators = new HashSet<Class<? extends IValidator>>();
-		for (Class<? extends IEstimationApproach> approach : approaches) {
-			for (int i = 0; i < results.getNumberOfFolds(); i++) {
-				ResultTable curFold = results.getEstimates(approach, i);
-				if (variables == null) {
-					variables = curFold.getStateVariables();
-				} else {
-					if (!Arrays.equals(variables, curFold.getStateVariables())) {
-						throw new IllegalStateException();
-					}
-				}
-				validators.addAll(curFold.getValidators());
-			}
-		}
-
-		// Print approaches legend
-		System.out.println("Approaches");
-		System.out.println("==========");
-		for (int i = 0; i < approaches.size(); i++) {
-			System.out.printf("[%d] %s\n", i + 1, Registry.INSTANCE.getDisplayName(approaches.get(i)));
-		}
-		System.out.println();
-
-		Map<Class<? extends IValidator>, MatrixBuilder> meanErrors = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
-		Map<Class<? extends IValidator>, MatrixBuilder> meanPredictions = new HashMap<Class<? extends IValidator>, MatrixBuilder>();
-		Map<Class<? extends IValidator>, List<ModelEntity>> validatedEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
-		
-		if (variables != null) {
-			MatrixBuilder meanEstimates = MatrixBuilder.create(variables.length);
-			for (Class<? extends IEstimationApproach> approach : approaches) {
-				MatrixBuilder lastEstimates = MatrixBuilder.create(variables.length);
-				for (int i = 0; i < results.getNumberOfFolds(); i++) {
-					ResultTable curFold = results.getEstimates(approach, i);
-					lastEstimates.addRow(curFold.getLastEstimates());
-				}
-				Matrix lastEstimatesMatrix = lastEstimates.toMatrix();
-				if (lastEstimatesMatrix.isEmpty()) {
-					log.warn("No estimates found for approach " + Registry.INSTANCE.getDisplayName(approach));
-				} else {
-					meanEstimates.addRow(LinAlg.mean(lastEstimatesMatrix));
-				}
-	
-				for (Class<? extends IValidator> validator : validators) {
-					MatrixBuilder errorsBuilder = null;
-					MatrixBuilder predictionsBuilder = null;
-					for (int i = 0; i < results.getNumberOfFolds(); i++) {
-						ResultTable curFold = results.getEstimates(approach, i);
-						Vector curErr = curFold.getValidationErrors(validator);
-						if (errorsBuilder == null) {
-							errorsBuilder = MatrixBuilder.create(curErr.rows());
-							validatedEntities.put(validator, curFold.getValidatedEntities(validator));
-						}
-						errorsBuilder.addRow(curErr);
-						Vector curPred = curFold.getValidationPredictions(validator);
-						if (predictionsBuilder == null) {
-							predictionsBuilder = MatrixBuilder.create(curPred.rows());
-						}
-						predictionsBuilder.addRow(curPred);
-					}
-	
-					Matrix errors = errorsBuilder.toMatrix();
-					Matrix predictions = predictionsBuilder.toMatrix();
-					if (!errors.isEmpty() && !predictions.isEmpty()) {
-						Vector curMeanErr = LinAlg.mean(errors);
-						Vector curMeanPred = LinAlg.mean(predictions);
-						if (!meanErrors.containsKey(validator)) {
-							meanErrors.put(validator, MatrixBuilder.create(curMeanErr.rows()));
-							meanPredictions.put(validator, MatrixBuilder.create(curMeanPred.rows()));
-						}
-						meanErrors.get(validator).addRow(curMeanErr);
-						meanPredictions.get(validator).addRow(curMeanPred);
-					}
-				}
-	
-			}
-
-
-			// Estimates
-			System.out.println("Estimates");
-			System.out.println("=========");
-			printEstimatesTable(variables, approaches, meanEstimates.toMatrix());
-			System.out.println();
-
-
-			if (validators.size() > 0) {
-				// Cross-Validation Results
-				System.out.println("Cross-Validation Results:");
-				System.out.println("=========================");
-	
-				for (Class<? extends IValidator> validator : validators) {
-					String name = Registry.INSTANCE.getDisplayName(validator);
-					System.out.println(name + ":");
-					if (meanErrors.containsKey(validator)) {
-	
-						Matrix errors = meanErrors.get(validator).toMatrix();
-						Matrix predictions = meanPredictions.get(validator).toMatrix();
-						printValidationResultsTable(validatedEntities.get(validator), approaches, predictions, errors);
-						System.out.println();
-					} else {
-						System.out.println("No results.");
-					}
-				}
-			}
-		}
-	}
-
-	private static void printValidationResultsTable(List<ModelEntity> entities,
-			List<Class<? extends IEstimationApproach>> approaches, Matrix predictions, Matrix errors, PrintStream outputStream) {
-		outputStream.printf("%-80.80s | ", "Resource or service");
-		for (int i = 0; i < approaches.size(); i++) {
-			outputStream.printf("%-9.9s", "[" + (i + 1) + "]");
-		}
-		outputStream.println("|");
-
-		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
-			outputStream.print("-");
-		}
-		outputStream.println();
-
-		int idx = 0;
-		for (ModelEntity entity : entities) {
-			outputStream.printf("%-80.80s | ", limitOutput(entity.getName(), 80));
-			for (int i = 0; i < approaches.size(); i++) {
-				outputStream.printf("%.5e %.5f%% ", predictions.get(i, idx), errors.get(i, idx) * 100);
-			}
-			outputStream.println("|");
-			idx++;
-		}
-	}
-	private static void printValidationResultsTable(List<ModelEntity> entities,
-			List<Class<? extends IEstimationApproach>> approaches, Matrix predictions, Matrix errors) {
-		System.out.printf("%-80.80s | ", "Resource or service");
-		for (int i = 0; i < approaches.size(); i++) {
-			System.out.printf("%-9.9s", "[" + (i + 1) + "]");
-		}
-		System.out.println("|");
-
-		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
-			System.out.print("-");
-		}
-		System.out.println();
-
-		int idx = 0;
-		for (ModelEntity entity : entities) {
-			System.out.printf("%-80.80s | ", limitOutput(entity.getName(), 80));
-			for (int i = 0; i < approaches.size(); i++) {
-				System.out.printf("%.5e %.5f%% ", predictions.get(i, idx), errors.get(i, idx) * 100);
-			}
-			System.out.println("|");
-			idx++;
-		}
-	}
-	private static void printEstimatesTable(ResourceDemand[] variables,
-			List<Class<? extends IEstimationApproach>> approaches, Matrix values, PrintStream outputStream) {
-		outputStream.printf("%-20.20s | ", "Resource");
-		outputStream.printf("%-60.60s | ", "Service");
-		for (int i = 0; i < approaches.size(); i++) {
-			outputStream.printf("%-9.9s", "[" + (i + 1) + "]");
-		}
-		outputStream.println("|");
-
-		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
-			outputStream.print("-");
-		}
-		outputStream.println();
-		Resource last = null;
-		int idx = 0;
-		for (ResourceDemand var : variables) {
-			if (var.getResource().equals(last)) {
-				outputStream.printf("%-20.20s | ", "");
-			} else {
-				outputStream.printf("%-20.20s | ", limitOutput(var.getResource().getName(), 20));
-			}
-			outputStream.printf("%-60.60s | ", limitOutput(var.getService().getName(), 60));
-			for (int i = 0; i < approaches.size(); i++) {
-				outputStream.printf("%.5fs ", values.get(i, idx));
-			}
-			outputStream.println("|");
-			last = var.getResource();
-			idx++;
-		}
-	}
-	private static void printEstimatesTable(ResourceDemand[] variables,
-			List<Class<? extends IEstimationApproach>> approaches, Matrix values) {
-		System.out.printf("%-20.20s | ", "Resource");
-		System.out.printf("%-60.60s | ", "Service");
-		for (int i = 0; i < approaches.size(); i++) {
-			System.out.printf("%-9.9s", "[" + (i + 1) + "]");
-		}
-		System.out.println("|");
-
-		for (int i = 0; i < (87 + approaches.size() * 9); i++) {
-			System.out.print("-");
-		}
-		System.out.println();
-		Resource last = null;
-		int idx = 0;
-		for (ResourceDemand var : variables) {
-			if (var.getResource().equals(last)) {
-				System.out.printf("%-20.20s | ", "");
-			} else {
-				System.out.printf("%-20.20s | ", limitOutput(var.getResource().getName(), 20));
-			}
-			System.out.printf("%-60.60s | ", limitOutput(var.getService().getName(), 60));
-			for (int i = 0; i < approaches.size(); i++) {
-				System.out.printf("%.5fs ", values.get(i, idx));
-			}
-			System.out.println("|");
-			last = var.getResource();
-			idx++;
-		}
-	}
-
-	private static String limitOutput(String output, int max) {
-		if (output.length() > max) {
-			int third = (max - 5) / 3;
-			return output.substring(0, max - third - 5) + " ... " + output.substring(output.length() - third);
-		} else {
-			return output;
-		}
-	}
-
-	public static void exportResults(LibredeConfiguration conf, LibredeResults results) {
-		for (ExporterConfiguration exportConf : conf.getOutput().getExporters()) {
-			IExporter exporter;
-			try {
-				Class<?> cl = Registry.INSTANCE.getInstanceClass(exportConf.getType());
-				exporter = (IExporter) Instantiator.newInstance(cl, exportConf.getParameters());
-			} catch (Exception e) {
-				log.error("Could not instantiate exporter: " + exportConf.getName());
-				continue;
-			}
-			String exporterName = Registry.INSTANCE.getDisplayName(exporter.getClass());
-			log.info("Run exporter " + exporterName);
-			try {
-				exporter.writeResults(results);
-			} catch (Exception e) {
-				log.error("Error running exporter " + exporterName, e);
-			}
-		}
-	}
-
-	private static void checkWorkloadDescription(WorkloadDescription workload) {
-		for (Service curService : workload.getServices()) {
-			if (curService.getAccessedResources().isEmpty()) {
-				log.warn("Service " + curService.getName()
-						+ " does not access any resource. Please check that resource demands are defined for this service.");
-			}
-		}
-	}
-	
 	public static LibredeConfiguration loadConfiguration(Path path) {
 		ResourceSet resourceSet = Registry.INSTANCE.createResourceSet();
-		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put(
-				"librede", new XMIResourceFactoryImpl());
+		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("librede",
+				new XMIResourceFactoryImpl());
 		File configFile = new File(path.toString());
 		URI fileURI = URI.createFileURI(configFile.getAbsolutePath());
 		ConfigurationPackage confPackage = ConfigurationPackage.eINSTANCE;

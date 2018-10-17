@@ -36,6 +36,12 @@ import org.apache.log4j.Logger;
 
 import tools.descartes.librede.approach.IEstimationApproach;
 
+/**
+ * This class automatically selects an approach based on its error.
+ * 
+ * @author Simon Spinner.
+ *
+ */
 public class ApproachSelector {
 
 	private static final Logger log = Logger.getLogger(Librede.class);
@@ -60,9 +66,9 @@ public class ApproachSelector {
 		// previous selected approaches
 		// List<EstimationApproachConfiguration> selectedApproachesBackup =
 		// var.getSelectedApproaches();
-//		if ((var.getSelectedApproaches()).isEmpty()) {
-//			var.setSelectedApproaches(var.getConf().getEstimation().getApproaches());
-//		}
+		// if ((var.getSelectedApproaches()).isEmpty()) {
+		// var.setSelectedApproaches(var.getConf().getEstimation().getApproaches());
+		// }
 		// run execute with all approaches to get validation results of all
 		// approaches
 		//
@@ -94,8 +100,8 @@ public class ApproachSelector {
 		Class<? extends IEstimationApproach> selectedApproach = null;
 
 		for (int i = 0; i < errorTable.length; i++) {
-//			System.err.println("Approach Name: " + approachMap.get(i));
-//			System.err.println("Mean Error " + i + " : " + errorTable[i]);
+			// System.err.println("Approach Name: " + approachMap.get(i));
+			// System.err.println("Mean Error " + i + " : " + errorTable[i]);
 			if (errorTable[i] != 0 && minError > errorTable[i]) {
 				minError = errorTable[i];
 				selectedApproach = approachMap.get(i);
@@ -104,13 +110,14 @@ public class ApproachSelector {
 
 		if (selectedApproach != null) {
 			log.info("Selected approach: " + selectedApproach.getName() + " Mean Validation Error: " + minError);
-			var.getResults().setSelectedApproaches(Arrays.<Class<? extends IEstimationApproach>>asList(selectedApproach));
+			var.getResults()
+					.setSelectedApproaches(Arrays.<Class<? extends IEstimationApproach>>asList(selectedApproach));
 		}
 	}
-	
+
 	public static void selectApproach(LibredeVariables var) {
 		ApproachSelector s = new ApproachSelector(var);
-		//loads error table and calls intern method select approach
+		// loads error table and calls intern method select approach
 		s.loadErrorTable();
 	}
 

@@ -40,6 +40,13 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.validation.IValidator;
 
+/**
+ * This class describes the results of an execution of Librede. It stores
+ * estimates for each approach and their corresponding errors.
+ * 
+ * @author Simon Spinner
+ *
+ */
 public class LibredeResults {
 
 	private final Map<Class<? extends IEstimationApproach>, ApproachResult> approachResults = new HashMap<>();
@@ -58,16 +65,16 @@ public class LibredeResults {
 		appRes.addEstimate(fold, estimates);
 		approachResults.put(approach, appRes);
 	}
-	
+
 	public void clear() {
 		approachResults.clear();
 	}
-	
+
 	public void setSelectedApproaches(List<Class<? extends IEstimationApproach>> newSelection) {
 		selectedApproaches.clear();
 		selectedApproaches.addAll(newSelection);
 	}
-	
+
 	public List<Class<? extends IEstimationApproach>> getSelectedApproaches() {
 		return selectedApproaches;
 	}
@@ -85,7 +92,7 @@ public class LibredeResults {
 	public Set<Class<? extends IEstimationApproach>> getApproaches() {
 		return approachResults.keySet();
 	}
-	
+
 	public ApproachResult getApproachResults(Class<? extends IEstimationApproach> approach) {
 		return approachResults.get(approach);
 	}
@@ -124,16 +131,16 @@ public class LibredeResults {
 	// the values are meanErrors of every fold per entity
 	public Map<Class<? extends IEstimationApproach>, Matrix> getValidationErrors() {
 		Map<Class<? extends IEstimationApproach>, Matrix> validationErrors = new HashMap<>();
-		//iterate over all ApproachResults (entities)
+		// iterate over all ApproachResults (entities)
 		for (ApproachResult appRes : approachResults.values()) {
 			MatrixBuilder valiErrorsBuilder = MatrixBuilder.create(appRes.getResult().length);
 			double[] valiErrorsResp = new double[appRes.getResult().length];
 			double[] valiErrorsUtil = new double[appRes.getResult().length];
-			//iterate over all folds
+			// iterate over all folds
 			for (int j = 0; j < appRes.getResult().length; j++) {
 				ResultTable appResFold = appRes.getResultOfFold(j);
 				Set<Class<? extends IValidator>> appResFoldValis = appResFold.getValidators();
-				//iterate over all validators
+				// iterate over all validators
 				for (Class<? extends IValidator> vali : appResFoldValis) {
 					Vector errors = appResFold.getValidationErrors(vali);
 					double meanErrorsFold = 0.0;
@@ -149,7 +156,7 @@ public class LibredeResults {
 				}
 			}
 
-			//add values of array to a vector to add it to the matrix
+			// add values of array to a vector to add it to the matrix
 			VectorBuilder valiErrorsRespVect = VectorBuilder.create(appRes.getResult().length);
 			VectorBuilder valiErrorsUtilVect = VectorBuilder.create(appRes.getResult().length);
 			for (int i = 0; i < valiErrorsUtil.length; i++) {
@@ -166,8 +173,6 @@ public class LibredeResults {
 
 	}
 
-
-
 	public double getApproachUtilizationError(Class<? extends IEstimationApproach> approach) {
 		ApproachResult appRes = approachResults.get(approach);
 		return appRes.getUtilizationError();
@@ -183,17 +188,17 @@ public class LibredeResults {
 	// the values are meanPredictions of every fold per entity
 	public Map<Class<? extends IEstimationApproach>, Matrix> getValidationPredictions() {
 		Map<Class<? extends IEstimationApproach>, Matrix> validationPredictions = new HashMap<>();
-		//iterate over alll ApproachResults (every entity)
+		// iterate over alll ApproachResults (every entity)
 		for (ApproachResult appRes : approachResults.values()) {
 			MatrixBuilder valiPredBuilder = MatrixBuilder.create(appRes.getResult().length);
 			double[] valiPredResp = new double[appRes.getResult().length];
 			double[] valiPredUtil = new double[appRes.getResult().length];
-			//iterate over folds
+			// iterate over folds
 			for (int i = 0; i < appRes.getResult().length; i++) {
 				ResultTable appResFold = appRes.getResultOfFold(i);
 				Set<Class<? extends IValidator>> appResFoldValis = appResFold.getValidators();
-				//iterate over validators
-				for(Class<? extends IValidator> vali: appResFoldValis){
+				// iterate over validators
+				for (Class<? extends IValidator> vali : appResFoldValis) {
 					Vector preds = appResFold.getValidationPredictions(vali);
 					double meanPredsFold = 0.0;
 					for (int j = 0; j < preds.rows(); j++) {
@@ -207,8 +212,8 @@ public class LibredeResults {
 					}
 				}
 			}
-			
-			//add values of array to a vector to add it to the matrix
+
+			// add values of array to a vector to add it to the matrix
 			VectorBuilder valiPredRespVect = VectorBuilder.create(appRes.getResult().length);
 			VectorBuilder valiPredUtilVect = VectorBuilder.create(appRes.getResult().length);
 			for (int i = 0; i < valiPredUtil.length; i++) {

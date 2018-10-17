@@ -41,13 +41,19 @@ import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.validation.IValidator;
 
+/**
+ * This class stores the result of one approach. It contains the estimates
+ * together with the errors.
+ * 
+ * @author Simon Spinner
+ *
+ */
 public class ApproachResult {
 
 	private Class<? extends IEstimationApproach> approach;
 	private ResultTable[] result;
 
-	public ApproachResult(Class<? extends IEstimationApproach> approach,
-			int numFolds) {
+	public ApproachResult(Class<? extends IEstimationApproach> approach, int numFolds) {
 		this.approach = approach;
 		this.result = new ResultTable[numFolds];
 	}
@@ -70,8 +76,7 @@ public class ApproachResult {
 
 	// returns a Vector which contains the mean estimate of every entity
 	public Vector getMeanEstimates() {
-		MatrixBuilder lastEstimates = MatrixBuilder.create(result[0]
-				.getStateVariables().length);
+		MatrixBuilder lastEstimates = MatrixBuilder.create(result[0].getStateVariables().length);
 		// for all folds do
 		for (int i = 0; i < result.length; i++) {
 			lastEstimates.addRow(result[i].getLastEstimates());
@@ -143,10 +148,8 @@ public class ApproachResult {
 		for (Class<? extends IValidator> validator : result[0].getValidators()) {
 			for (int i = 0; i < result.length; i++) {
 				ResultTable curFold = result[i];
-				if (!validatedEntities.containsValue(curFold
-						.getValidatedEntities(validator))) {
-					validatedEntities.put(validator,
-							curFold.getValidatedEntities(validator));
+				if (!validatedEntities.containsValue(curFold.getValidatedEntities(validator))) {
+					validatedEntities.put(validator, curFold.getValidatedEntities(validator));
 				}
 			}
 		}
@@ -200,8 +203,7 @@ public class ApproachResult {
 		double meanError = 0.0;
 		Matrix approachResults = getValidationErrors().get(approach);
 		if (approachResults == null) {
-			Logger.getLogger(this.getClass()).warn(
-					"No results for approach " + approach);
+			Logger.getLogger(this.getClass()).warn("No results for approach " + approach);
 			return 0;
 		}
 		for (int i = 0; i < approachResults.rows(); i++) {
@@ -234,8 +236,7 @@ public class ApproachResult {
 			}
 		}
 		if (values < 1) {
-			Logger.getLogger(this.getClass()).warn(
-					"No validation results for approach " + approach);
+			Logger.getLogger(this.getClass()).warn("No validation results for approach " + approach);
 			return 0;
 		}
 		return errorSum / values;

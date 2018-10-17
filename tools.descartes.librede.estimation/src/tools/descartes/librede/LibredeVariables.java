@@ -45,6 +45,13 @@ import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 
+/**
+ * Object of this class contain all initialized Librede variables required for
+ * running an estimation.
+ * 
+ * @author Simon Spinner
+ *
+ */
 public class LibredeVariables {
 	private LibredeConfiguration conf;
 	private final IMonitoringRepository repo;
@@ -128,7 +135,9 @@ public class LibredeVariables {
 		IMonitoringRepository repo = new MemoryObservationRepository(conf.getWorkloadDescription());
 		// Load constant data points into repository
 		for (ConstantDataPoint curValue : conf.getInput().getConstantDataPoints()) {
-			DerivationRule<?> rule = DerivationRule.rule((Metric<Dimension>)curValue.getMetric(), curValue.getAggregation()).build(new ConstantHandler<Dimension>((Quantity<Dimension>)curValue.getValue()));
+			DerivationRule<?> rule = DerivationRule
+					.rule((Metric<Dimension>) curValue.getMetric(), curValue.getAggregation())
+					.build(new ConstantHandler<Dimension>((Quantity<Dimension>) curValue.getValue()));
 			for (ObservationToEntityMapping curMapping : curValue.getMappings()) {
 				repo.insertDerivation(rule, curMapping.getEntity());
 			}

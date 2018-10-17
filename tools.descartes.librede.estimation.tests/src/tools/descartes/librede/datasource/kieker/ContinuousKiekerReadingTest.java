@@ -52,6 +52,7 @@ import org.junit.Test;
 import tools.descartes.librede.Librede;
 import tools.descartes.librede.LibredeResults;
 import tools.descartes.librede.LibredeVariables;
+import tools.descartes.librede.ResultPrinter;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
@@ -169,8 +170,7 @@ public class ContinuousKiekerReadingTest extends LibredeTest {
 					isWaiting = true;
 					Thread.sleep(pollinginteral);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					// e1.printStackTrace();
+					e1.printStackTrace();
 				}
 				isWaiting = false;
 				if (!stop) {
@@ -193,7 +193,7 @@ public class ContinuousKiekerReadingTest extends LibredeTest {
 						System.out.println("Writing results...");
 						File outputfile = new File(resultsfile);
 						PrintStream outputStream = new PrintStream(new FileOutputStream(outputfile, true));
-						Librede.printSummary(results, outputStream);
+						ResultPrinter.printSummary(results, outputStream);
 						outputStream.flush();
 						outputStream.close();
 						System.out.println("Results written!");
@@ -469,7 +469,6 @@ public class ContinuousKiekerReadingTest extends LibredeTest {
 		try {
 			Thread.sleep(15000);
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		while (!stop) {
@@ -488,7 +487,6 @@ public class ContinuousKiekerReadingTest extends LibredeTest {
 					System.out.println("You gave no input, therefore we continue");
 				}
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
