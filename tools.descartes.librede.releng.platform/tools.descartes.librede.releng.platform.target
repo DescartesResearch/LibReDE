@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="Librede Update Site" sequenceNumber="1504529996">
+<target name="Librede Update Site" sequenceNumber="1539776085">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="false" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.sdk.feature.group" version="4.6.3.v20170301-0400"/>
@@ -36,6 +36,7 @@
       <unit id="cern.colt" version="1.2.0.v02"/>
       <unit id="org.apache.commons.math3" version="3.2.0"/>
       <unit id="com.sun.jna" version="3.0.0"/>
+      <unit id="org.jfreechart.core" version="1.0.19.v00"/>
       <repository location="https://se4.informatik.uni-wuerzburg.de/thirdparty/repository/"/>
     </location>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="false" includeConfigurePhase="false" type="InstallableUnit">
