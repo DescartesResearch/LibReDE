@@ -35,15 +35,12 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.datasource.Loggers;
-import tools.descartes.librede.datasource.Stream;
 
 /**
  * This class is a thread, that has a watchService, that

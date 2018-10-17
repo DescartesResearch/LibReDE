@@ -29,10 +29,6 @@ package tools.descartes.librede.models.state.initial;
 import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
-import java.util.List;
-
-import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.metrics.StandardMetrics;

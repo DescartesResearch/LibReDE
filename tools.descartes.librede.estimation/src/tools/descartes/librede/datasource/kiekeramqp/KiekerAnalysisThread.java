@@ -29,7 +29,6 @@ package tools.descartes.librede.datasource.kiekeramqp;
 import kieker.analysis.AnalysisController;
 import kieker.analysis.IAnalysisController;
 import kieker.analysis.exception.AnalysisConfigurationException;
-import kieker.analysis.plugin.reader.amqp.AMQPReader;
 import kieker.common.configuration.Configuration;
 
 public class KiekerAnalysisThread extends Thread {

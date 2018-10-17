@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.repository;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;

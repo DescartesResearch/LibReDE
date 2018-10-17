@@ -30,9 +30,7 @@ import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.datasource.memory.InMemoryDataSource;
 import tools.descartes.librede.exceptions.NonOverlappingRangeException;
-import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.TimeSeries;
-import tools.descartes.librede.units.Time;
 
 public class RepositoryUtil {
 

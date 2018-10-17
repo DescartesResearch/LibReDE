@@ -27,7 +27,6 @@
 package tools.descartes.librede.repository;
 
 import static tools.descartes.librede.linalg.LinAlg.empty;
-import static tools.descartes.librede.linalg.LinAlg.horzcat;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.row;

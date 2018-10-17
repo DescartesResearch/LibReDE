@@ -27,8 +27,8 @@
 package tools.descartes.librede.validation;
 
 import java.util.Arrays;
-import java.util.List;
 
+import cern.jet.random.sampling.RandomSampler;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
@@ -39,7 +39,6 @@ import tools.descartes.librede.units.Dimension;
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
-import cern.jet.random.sampling.RandomSampler;
 
 public class CrossValidationCursor implements IRepositoryCursor {
 	

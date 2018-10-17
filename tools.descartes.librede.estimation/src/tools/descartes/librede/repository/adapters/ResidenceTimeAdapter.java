@@ -44,9 +44,9 @@ import tools.descartes.librede.repository.handlers.DeriveDiffHandler;
 import tools.descartes.librede.repository.handlers.DeriveIdentityHandler;
 import tools.descartes.librede.repository.handlers.DeriveResidenceTimeFromExternalCalls;
 import tools.descartes.librede.repository.handlers.ThroughputWeightedAggregationHandler;
+import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.repository.rules.DerivationRule;
 import tools.descartes.librede.repository.rules.RulePrecondition;
-import tools.descartes.librede.repository.rules.DependencyScope;
 import tools.descartes.librede.units.Time;
 
 public class ResidenceTimeAdapter implements IMetricAdapter<Time> {

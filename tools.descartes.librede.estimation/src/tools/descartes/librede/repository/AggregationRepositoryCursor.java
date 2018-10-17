@@ -26,10 +26,6 @@
  */
 package tools.descartes.librede.repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;

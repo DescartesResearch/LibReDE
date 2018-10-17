@@ -29,23 +29,18 @@ package tools.descartes.librede.datasource.kieker;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import tools.descartes.librede.configuration.FileTraceConfiguration;
-import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.datasource.AbstractDataSource;
@@ -63,7 +58,7 @@ import tools.descartes.librede.units.Dimension;
  * This class is a datasource for kieker data files
  * Therefore, it has a KieckerWatchThread instance, that listens to a directory.
  * 
- * @author torsten
+ * @author Torsten Krauss
  *
  */
 @Component(displayName = "Kieker Data Source")

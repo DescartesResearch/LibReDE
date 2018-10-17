@@ -27,7 +27,6 @@
 package tools.descartes.librede.datasource.kiekeramqp;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -41,11 +40,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import kieker.analysis.AnalysisController;
-import kieker.analysis.IAnalysisController;
-import kieker.analysis.exception.AnalysisConfigurationException;
-import kieker.analysis.plugin.reader.amqp.AMQPReader;
-import kieker.common.configuration.Configuration;
 import kieker.common.record.IMonitoringRecord;
 import kieker.common.record.controlflow.OperationExecutionRecord;
 import kieker.common.record.system.CPUUtilizationRecord;
@@ -56,7 +50,6 @@ import tools.descartes.librede.datasource.AbstractDataSource;
 import tools.descartes.librede.datasource.Loggers;
 import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
-import tools.descartes.librede.datasource.kieker.KiekerId;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.metrics.Metric;

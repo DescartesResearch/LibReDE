@@ -26,8 +26,6 @@
  */
 package tools.descartes.librede.configuration.editor.util;
 
-import java.util.Date;
-
 import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.emf.common.notify.AdapterFactory;

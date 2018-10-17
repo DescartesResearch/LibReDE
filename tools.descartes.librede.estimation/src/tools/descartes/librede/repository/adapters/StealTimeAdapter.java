@@ -29,16 +29,12 @@ package tools.descartes.librede.repository.adapters;
 import java.util.Arrays;
 import java.util.List;
 
-import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.StandardMetrics;
 import tools.descartes.librede.repository.IMetricAdapter;
 import tools.descartes.librede.repository.TimeSeries.Interpolation;
-import tools.descartes.librede.repository.handlers.ConstantHandler;
 import tools.descartes.librede.repository.handlers.DefaultAggregationHandler;
 import tools.descartes.librede.repository.rules.DerivationRule;
-import tools.descartes.librede.repository.rules.RulePrecondition;
 import tools.descartes.librede.units.Time;
 
 public class StealTimeAdapter implements IMetricAdapter<Time> {
