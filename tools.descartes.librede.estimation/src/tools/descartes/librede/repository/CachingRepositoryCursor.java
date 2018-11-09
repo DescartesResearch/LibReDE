@@ -191,9 +191,9 @@ public class CachingRepositoryCursor implements IRepositoryCursor {
 			entry.moveTo(lastInterval);
 			if (!entry.contains(interval)) {
 				double value = delegate.getAggregatedValue(interval, metric, unit, entity, func);
-				if(Double.isNaN(value)){
-					System.out.println("We got not values for this combination. Fix the start timestamp perhaps...");
-				}
+//				if(Double.isNaN(value)){
+//					log.warn("We got no values for this combination. Fix the start timestamp perhaps...");
+//				}
 				entry.set(interval, value);
 				if (log.isTraceEnabled()) {
 					log.trace("Set cache entry (interval=" + interval + ", metric=" + metric.getName() + ", unit=" + unit.toString() + ", entity=" + entity.getName() + ", func=" + func.getName() + ", value=" + value + ")");
