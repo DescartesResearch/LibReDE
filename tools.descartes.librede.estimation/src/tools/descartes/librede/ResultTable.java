@@ -48,6 +48,7 @@ import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.validation.IValidator;
 
 /**
+ * A result table containing all result data in form of a table.
  * 
  * @author Simon Spinner
  *

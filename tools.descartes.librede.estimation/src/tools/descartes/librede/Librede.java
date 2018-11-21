@@ -57,7 +57,6 @@ import tools.descartes.librede.approach.ResponseTimeRegressionApproach;
 import tools.descartes.librede.approach.ServiceDemandLawApproach;
 import tools.descartes.librede.approach.UtilizationRegressionApproach;
 import tools.descartes.librede.approach.WangKalmanFilterApproach;
-import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.EstimationApproachConfiguration;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.Resource;
@@ -67,7 +66,6 @@ import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.datasource.DataSourceSelector;
 import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.datasource.IDataSourceListener;
 import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
@@ -116,7 +114,6 @@ import tools.descartes.librede.units.RequestRate;
 import tools.descartes.librede.units.Time;
 import tools.descartes.librede.units.Unit;
 import tools.descartes.librede.units.UnitsFactory;
-import tools.descartes.librede.units.UnitsPackage;
 import tools.descartes.librede.validation.AbsoluteUtilizationValidator;
 import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
@@ -200,7 +197,8 @@ public class Librede {
 	}
 
 	/**
-	 * Executes the given {@link LibredeConfiguration}.
+	 * Executes the given {@link LibredeConfiguration}. This is the main entry
+	 * point for execution.
 	 * 
 	 * @param conf
 	 *            The configuration to execute.
@@ -260,7 +258,13 @@ public class Librede {
 		// return null;
 	}
 
-
+	/**
+	 * Initializes the repository of the given {@link LibredeVariables} to use
+	 * it later on.
+	 * 
+	 * @param var
+	 *            The variables to initialize.
+	 */
 	public static void initRepo(LibredeVariables var) {
 		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
 
@@ -269,177 +273,17 @@ public class Librede {
 		var.getRepo().setCurrentTime(endTime);
 	}
 
-	
 	/**
-	 * This method was created by Torsten Krauss to enable the online scenario
-	 * and the kieker datasource.
+	 * Loads the repository data.
 	 * 
 	 * @param conf
+	 *            The Librede Configuration to load.
 	 * @param repo
+	 *            The monitoring repository to load the data into.
 	 * @param existingDataSources
-	 * @param dataSourceListener
-	 * @return
+	 *            The datasources to load from.
+	 * @return The latest observation time found in the data sources.
 	 */
-	public static Quantity<Time> initDataSourcesOnline(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener) {
-		// verify we have a valid listener.
-		if (!(iDataSourceListener instanceof DataSourceSelector)) {
-			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
-		}
-		// cast it
-		DataSourceSelector selector = (DataSourceSelector) iDataSourceListener;
-		// the map for all the data sources in use
-		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
-		// the actual last timestamp of the librede repo
-		Quantity<Time> endTime = repo.getCurrentTime();
-
-		log.info("Start loading traces");
-		// for each trace, which means for each of our metrics / folder
-		// combinations
-		for (TraceConfiguration trace : conf.getInput().getObservations()) {
-			// get the data source name
-			String dataSourceName = trace.getDataSource().getName();
-			// check if we already deal with this data source
-			if (!dataSources.containsKey(dataSourceName)) {
-				// no we do not
-				// get it from elsewhere
-				IDataSource newSource;
-				// have we previously dealt with this data source
-				if (existingDataSources.containsKey(dataSourceName)) {
-					// yes we have so get it
-					newSource = existingDataSources.get(dataSourceName);
-				} else {
-					// no we have not
-					// create a new instance
-					Class<?> cl = Registry.INSTANCE.getInstanceClass(trace.getDataSource().getType());
-					try {
-						// create it
-						newSource = (IDataSource) Instantiator.newInstance(cl, trace.getDataSource().getParameters());
-						// set the name of the new data source
-						newSource.setName(dataSourceName);
-						// add it to the overall data sources we ever used
-						existingDataSources.put(dataSourceName, newSource);
-						// add a listener to the data source
-						selector.add(newSource);
-					} catch (Exception e) {
-						log.error("Could not instantiate data source " + trace.getDataSource().getName(), e);
-						continue;
-					}
-				}
-				// add it to the data sources in use
-				dataSources.put(dataSourceName, newSource);
-			} // yes we have already dealt with this data source
-				// get the data source from those in use
-			IDataSource source = dataSources.get(dataSourceName);
-			// add the trace to the data source
-			try {
-				source.addTrace(trace);
-			} catch (IOException ex) {
-				log.error("Error loading data.", ex);
-			}
-		}
-		// start loading all the datasources.
-		// this initally loads all the available data
-		// and then listens for new data
-		for (IDataSource ds : dataSources.values()) {
-			try {
-				ds.load();
-			} catch (IOException e) {
-				log.error("Error loading data initially.", e);
-			}
-		}
-		return endTime;
-	}
-
-	/**
-	 * This method was created by Torsten Krauss to enable the online scenario.
-	 * 
-	 * @param conf
-	 * @param repo
-	 * @param existingDataSources
-	 * @param maxInsertionTimeMs The end time to be set in milliseconds from now.
-	 * @param dataSourceListener
-	 * @return
-	 */
-	private static Quantity<Time> updateRepository(LibredeConfiguration conf, IMonitoringRepository repo,
-			Map<String, IDataSource> existingDataSources, IDataSourceListener iDataSourceListener,
-			long maxInsertionTimeMs) {
-		// verify we have a valid listener.
-		if (!(iDataSourceListener instanceof DataSourceSelector)) {
-			throw new IllegalStateException("The datasourcelistener has to be a datasourceselector!");
-		}
-		// cast it
-		DataSourceSelector selector = (DataSourceSelector) iDataSourceListener;
-		// the actual last timestamp of the librede repo
-		Quantity<Time> endTime = repo.getCurrentTime();
-
-		// remember the actual timestamp to not load longer then
-		// maxInsertionTimeMs
-		long maxTimeStamp = System.currentTimeMillis() + maxInsertionTimeMs;
-		log.info("Start loading monitoring data for updating repo.");
-		// create some set to log the traces we poll
-		Set<TraceKey> loadedTraces = new HashSet<TraceKey>();
-		// variable to hold the actual event we polled from the listener
-		TraceEvent curEvent = null;
-		// flag to indicate if further polling is wanted
-		boolean pollNext = true;
-		// poll events from the listener until the queue is empty or the
-		// maxTimeStamp is reached
-		while (pollNext) {
-			// poll the next event from the queue/listener
-			curEvent = selector.poll();
-			// check if we have polled something
-			if (curEvent != null) {
-				// the last time in the listener
-				endTime = selector.getLatestObservationTime();
-				// the trace key of the actual traceEvent
-				TraceKey key = curEvent.getKey();
-				// add for logging
-				loadedTraces.add(key);
-
-				@SuppressWarnings("unchecked")
-				Metric<Dimension> metric = (Metric<Dimension>) key.getMetric();
-				@SuppressWarnings("unchecked")
-				Unit<Dimension> unit = (Unit<Dimension>) key.getUnit();
-
-				// get the data out of the actual traceEvent
-				TimeSeries ts = curEvent.getData();
-
-				// end timestamp is set in ts.append()
-				ts.setStartTime(conf.getEstimation().getStartTimestamp().getValue(Time.SECONDS));
-				// ts.setEndTime(conf.getEstimation().getEndTimestamp().getValue(Time.SECONDS));
-
-				// insert the data into the librede repository
-				if (curEvent.getKey().getAggregation() != Aggregation.NONE) {
-					repo.insert(metric, unit, key.getEntity(), ts, key.getAggregation(), key.getInterval());
-				} else {
-					repo.insert(metric, unit, key.getEntity(), ts);
-				}
-			}
-			// check if we should poll again from the queue
-			if ((curEvent == null) || (System.currentTimeMillis() > maxTimeStamp)) {
-				// exit the while loop
-				pollNext = false;
-			}
-			// try to get more data from the queue
-		}
-		// log the traces we added during the last poll period
-		for (TraceKey t : loadedTraces) {
-			TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(), t.getEntity(),
-					t.getAggregation());
-			log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation() + " <- [length="
-					+ ts.samples() + ", mean=" + LinAlg.nanmean(ts.getData()) + ", start=" + ts.getStartTime()
-					+ "s, end=" + ts.getEndTime() + "s]");
-		}
-		log.info("Successfully loaded monitoring data for updating repo.");
-		// here we dump information from the repository.
-		// I think i can see all the data for all the resources, services and
-		// tasks.
-		// ((MemoryObservationRepository) repo).logContentDump();
-		// return the last time in the listener.
-		return endTime;
-	}
-
 	public static Quantity<Time> loadRepository(LibredeConfiguration conf, IMonitoringRepository repo,
 			Map<String, IDataSource> existingDataSources) {
 		Map<String, IDataSource> dataSources = new HashMap<String, IDataSource>();
@@ -507,6 +351,7 @@ public class Librede {
 			}
 
 			for (TraceKey t : loadedTraces) {
+				@SuppressWarnings("unchecked")
 				TimeSeries ts = repo.select((Metric<Dimension>) t.getMetric(), (Unit<Dimension>) t.getUnit(),
 						t.getEntity(), t.getAggregation());
 				log.info("Loaded trace: " + t.getEntity() + "/" + t.getMetric() + "/" + t.getAggregation()
@@ -530,6 +375,17 @@ public class Librede {
 
 	}
 
+	/**
+	 * Execute one estimation run using the given {@link LibredeVariables}. The
+	 * results are additionally printed to the console. If the validation folds
+	 * ar less or equal than one,
+	 * 
+	 * @param var
+	 *            The variables to execute.
+	 * @return A results object containing all estimation data.
+	 * @throws Exception
+	 *             If an exception occurred during estimation.
+	 */
 	public static LibredeResults runEstimation(LibredeVariables var) throws Exception {
 
 		if (!var.getConf().getValidation().isValidateEstimates()) {
@@ -581,6 +437,16 @@ public class Librede {
 		return var.getResults();
 	}
 
+	/**
+	 * This executes an estimation and validates it on the estimation data
+	 * itself.
+	 * 
+	 * @param var
+	 *            The variables to execute and estimate.
+	 * @return A results object containing all estimation data.
+	 * @throws Exception
+	 *             If an exception occurred during estimation.
+	 */
 	public static LibredeResults runEstimationWithValidation(LibredeVariables var) throws Exception {
 
 		for (EstimationApproachConfiguration currentConf : var.getConf().getEstimation().getApproaches()) {
@@ -624,6 +490,15 @@ public class Librede {
 		return var.getResults();
 	}
 
+	/**
+	 * Executes the estimation validating with cross-validation.
+	 * 
+	 * @param var
+	 *            The variables to execute and estimate.
+	 * @return A results object containing all estimation data.
+	 * @throws Exception
+	 *             If an exception occurred during estimation.
+	 */
 	public static LibredeResults runEstimationWithCrossValidation(LibredeVariables var) throws Exception {
 		for (EstimationApproachConfiguration currentConf : var.getConf().getEstimation().getApproaches()) {
 			IEstimationApproach currentApproach;
@@ -759,14 +634,20 @@ public class Librede {
 		}
 	}
 
+	/**
+	 * Loads a Librede-file from the given {@link Path}.
+	 * 
+	 * @param path
+	 *            The path to the file to load. (File-ending should be
+	 *            ".librede")
+	 * @return The loaded {@link LibredeConfiguration}.
+	 */
 	public static LibredeConfiguration loadConfiguration(Path path) {
 		ResourceSet resourceSet = Registry.INSTANCE.createResourceSet();
 		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("librede",
 				new XMIResourceFactoryImpl());
 		File configFile = new File(path.toString());
 		URI fileURI = URI.createFileURI(configFile.getAbsolutePath());
-		ConfigurationPackage confPackage = ConfigurationPackage.eINSTANCE;
-		UnitsPackage unitsPackage = UnitsPackage.eINSTANCE;
 		org.eclipse.emf.ecore.resource.Resource resource = resourceSet.getResource(fileURI, true);
 		EcoreUtil.resolveAll(resource);
 		return (LibredeConfiguration) resource.getContents().get(0);
