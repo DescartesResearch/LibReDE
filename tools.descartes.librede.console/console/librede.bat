@@ -3,7 +3,8 @@
 @REM  LibReDE : Library for Resource Demand Estimation
 @REM ==============================================
 @REM
-@REM (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+@REM (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+@REM  and Contributors.
 @REM
 @REM Project Info:   http://www.descartes-research.net/
 @REM
