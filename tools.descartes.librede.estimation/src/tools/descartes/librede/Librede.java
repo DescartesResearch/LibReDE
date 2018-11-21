@@ -226,6 +226,18 @@ public class Librede {
 		return executeContinuous(var, existingDatasources);
 	}
 
+	/**
+	 * Initializes and starts a continuous execution using continuous online
+	 * data sources. It will terminate after the end timestamp in the configured
+	 * {@link LibredeVariables} is reached.
+	 * 
+	 * @param var
+	 *            The Librede variables.
+	 * @param existingDatasources
+	 *            The datasources to use.
+	 * @return A {@link LibredeResults} objects containing the results of the
+	 *         estimation.
+	 */
 	public static LibredeResults executeContinuous(LibredeVariables var, Map<String, IDataSource> existingDatasources) {
 		Quantity<Time> endTime = loadRepository(var.getConf(), var.getRepo(), existingDatasources);
 		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
@@ -248,72 +260,6 @@ public class Librede {
 		// return null;
 	}
 
-	public static LibredeVariables updateRepositoryOnline(long maxInsertionTimeMs, LibredeVariables var,
-			Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {
-		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources, dataSourceListener,
-				maxInsertionTimeMs);
-		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
-			// do not progress further than the configured end timestamp.
-			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
-		} else {
-			var.getRepo().setCurrentTime(endTime);
-		}
-		return var;
-	}
-
-	public static LibredeResults executeOnline(LibredeVariables var, Map<String, IDataSource> existingDatasources,
-			IDataSourceListener dataSourceListener) {
-
-		try {
-			runEstimation(var);
-		} catch (Exception e) {
-			log.error("Error running estimation.", e);
-		}
-
-		// Now export the results.
-		// exportResults(var.getConf(), var.getResults());
-
-		return var.getResults();
-	}
-
-	public static LibredeResults executeContinuousOnline(int maxInsertionTimeMs, LibredeVariables var,
-			Map<String, IDataSource> existingDatasources, IDataSourceListener dataSourceListener) {
-		Quantity<Time> endTime = updateRepository(var.getConf(), var.getRepo(), existingDatasources, dataSourceListener,
-				maxInsertionTimeMs);
-		if (var.getConf().getEstimation().getEndTimestamp().compareTo(endTime) <= 0) {
-			// do not progress further than the configured end timestamp.
-			var.getRepo().setCurrentTime(var.getConf().getEstimation().getEndTimestamp());
-		} else {
-			var.getRepo().setCurrentTime(endTime);
-		}
-
-		try {
-			runEstimation(var);
-		} catch (Exception e) {
-			log.error("Error running estimation.", e);
-		}
-
-		// Now export the results.
-		// exportResults(var.getConf(), var.getResults());
-
-		return var.getResults();
-		// return null;
-	}
-
-	public static void initDataSources(LibredeVariables var, Map<String, IDataSource> existingDatasources,
-			IDataSourceListener dataSourceListener) {
-		// set the current time of the repo to the start time of the librede
-		// file
-		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
-		// load data to the repo
-		Quantity<Time> endTime = initDataSourcesOnline(var.getConf(), var.getRepo(), existingDatasources,
-				dataSourceListener);
-		// set the current time of the repo to the last observation timestamp of
-		// all the actual traces
-		var.getRepo().setCurrentTime(endTime);
-
-		// var.getConf().getEstimation().setStartTimestamp(((DataSourceSelector)dataSourceListener).getFirstObservationTime());
-	}
 
 	public static void initRepo(LibredeVariables var) {
 		var.getRepo().setCurrentTime(var.getConf().getEstimation().getStartTimestamp());
@@ -323,10 +269,7 @@ public class Librede {
 		var.getRepo().setCurrentTime(endTime);
 	}
 
-	public static Quantity<Time> loadRepository(LibredeConfiguration conf, MemoryObservationRepository repo) {
-		return loadRepository(conf, repo, Collections.<String, IDataSource>emptyMap());
-	}
-
+	
 	/**
 	 * This method was created by Torsten Krauss to enable the online scenario
 	 * and the kieker datasource.
@@ -409,13 +352,12 @@ public class Librede {
 	}
 
 	/**
-	 * This method was created by Torsten Krauß to enable the online scenario
-	 * and the kieker datasource.
+	 * This method was created by Torsten Krauss to enable the online scenario.
 	 * 
 	 * @param conf
 	 * @param repo
 	 * @param existingDataSources
-	 * @param maxInsertionTimeMs
+	 * @param maxInsertionTimeMs The end time to be set in milliseconds from now.
 	 * @param dataSourceListener
 	 * @return
 	 */

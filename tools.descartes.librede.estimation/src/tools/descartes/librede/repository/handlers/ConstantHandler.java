@@ -53,6 +53,10 @@ public class ConstantHandler<D extends Dimension> extends BaseDerivationHandler<
 		if (log.isTraceEnabled()) {
 			log.trace("Derive constant " + metric.getName());
 		}
-		return constantValue.getValue(unit);
+		double val = constantValue.getValue(unit);
+		if(Double.isNaN(val)){
+			log.warn("Repository query resultet in NaN.");
+		}
+		return val;
 	}
 }
