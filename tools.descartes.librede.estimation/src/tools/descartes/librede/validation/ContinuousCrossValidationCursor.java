@@ -47,7 +47,7 @@ import tools.descartes.librede.units.Unit;
 /**
  * A cursor for cross-validation supporting continuous input streams.
  * 
- * @author JS
+ * @author Johannes Grohmann
  *
  */
 public class ContinuousCrossValidationCursor implements IRepositoryCursor {
