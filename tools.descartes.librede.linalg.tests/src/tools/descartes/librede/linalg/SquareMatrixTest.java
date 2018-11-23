@@ -41,9 +41,6 @@ import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.SquareMatrix;
-
 public class SquareMatrixTest {
 	
 	private static final double[][] SQUARE = new double[][] {{1,2,0}, {2,3,0}, {3,4,1}};

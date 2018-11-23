@@ -27,9 +27,9 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import cern.colt.matrix.DoubleMatrix2D;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
-import cern.colt.matrix.DoubleMatrix2D;
 
 public class ColtSquareMatrix extends ColtMatrix implements SquareMatrix {
 	

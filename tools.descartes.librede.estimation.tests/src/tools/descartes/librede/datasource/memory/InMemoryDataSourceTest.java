@@ -29,14 +29,9 @@ package tools.descartes.librede.datasource.memory;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
-import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Random;
 
 import org.junit.After;
@@ -44,16 +39,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
-import tools.descartes.librede.configuration.FileTraceConfiguration;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceConfiguration;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.datasource.DataSourceSelector;
 import tools.descartes.librede.datasource.TraceEvent;
-import tools.descartes.librede.datasource.csv.CsvDataSource;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
-import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.StandardMetrics;

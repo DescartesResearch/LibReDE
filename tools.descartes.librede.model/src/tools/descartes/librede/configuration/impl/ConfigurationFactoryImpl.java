@@ -36,7 +36,33 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
-import tools.descartes.librede.configuration.*;
+import tools.descartes.librede.configuration.CompositeService;
+import tools.descartes.librede.configuration.ConfigurationFactory;
+import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.ConstantDataPoint;
+import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.configuration.EstimationApproachConfiguration;
+import tools.descartes.librede.configuration.EstimationSpecification;
+import tools.descartes.librede.configuration.ExporterConfiguration;
+import tools.descartes.librede.configuration.ExternalCall;
+import tools.descartes.librede.configuration.FileTraceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
+import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.ObservationToEntityMapping;
+import tools.descartes.librede.configuration.OutputSpecification;
+import tools.descartes.librede.configuration.Parameter;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.SchedulingStrategy;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceFilter;
+import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.configuration.ValidationSpecification;
+import tools.descartes.librede.configuration.ValidatorConfiguration;
+import tools.descartes.librede.configuration.WorkloadDescription;
 
 /**
  * <!-- begin-user-doc -->

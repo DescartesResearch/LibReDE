@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
 
 import tools.descartes.dml.mm.applicationlevel.parameterdependencies.ComponentInstanceReference;
 import tools.descartes.dml.mm.applicationlevel.parameterdependencies.ModelVariableCharacterizationType;
@@ -60,9 +58,6 @@ import tools.descartes.dml.mm.applicationlevel.servicebehavior.ForkAction;
 import tools.descartes.dml.mm.applicationlevel.servicebehavior.InternalAction;
 import tools.descartes.dml.mm.applicationlevel.servicebehavior.LoopAction;
 import tools.descartes.dml.mm.applicationlevel.servicebehavior.ResourceDemand;
-import tools.descartes.dml.mm.deployment.Deployment;
-import tools.descartes.dml.mm.resourceconfiguration.ConfigurationSpecification;
-import tools.descartes.dml.mm.resourceconfiguration.ProcessingResourceSpecification;
 import tools.descartes.dml.mm.resourcelandscape.Container;
 import tools.descartes.dml.mm.resourcetype.ProcessingResourceType;
 import tools.descartes.librede.configuration.Resource;

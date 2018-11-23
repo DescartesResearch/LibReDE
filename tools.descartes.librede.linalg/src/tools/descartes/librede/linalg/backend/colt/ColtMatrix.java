@@ -29,7 +29,9 @@ package tools.descartes.librede.linalg.backend.colt;
 
 import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.vector;
-import static tools.descartes.librede.linalg.backend.colt.ColtHelper.*;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.solve;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtMatrix;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtVector;
 
 import java.util.Arrays;
 

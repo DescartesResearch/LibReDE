@@ -28,8 +28,15 @@
 package tools.descartes.librede.linalg.backend.colt;
 
 import static tools.descartes.librede.linalg.LinAlg.scalar;
-import static tools.descartes.librede.linalg.backend.colt.ColtHelper.*;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.solve;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtMatrix;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtVector;
 
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.colt.matrix.linalg.Algebra;
+import cern.jet.math.Functions;
 import tools.descartes.librede.linalg.AggregationFunction;
 import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
@@ -39,11 +46,6 @@ import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.linalg.backend.AbstractVector;
 import tools.descartes.librede.linalg.backend.IndicesImpl;
 import tools.descartes.librede.linalg.backend.RangeImpl;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.linalg.Algebra;
-import cern.jet.math.Functions;
 
 public class ColtVector extends AbstractVector {
 

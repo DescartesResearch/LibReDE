@@ -31,12 +31,12 @@ package tools.descartes.librede.metrics.util;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
-import tools.descartes.librede.metrics.*;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.MetricsPackage;
+import tools.descartes.librede.metrics.MetricsRepository;
 import tools.descartes.librede.units.Dimension;
 
 /**

@@ -32,6 +32,7 @@ package tools.descartes.librede.metrics.provider;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.ResourceLocator;
@@ -46,6 +47,7 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
+
 import tools.descartes.librede.configuration.provider.LibredeEditPlugin;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsPackage;

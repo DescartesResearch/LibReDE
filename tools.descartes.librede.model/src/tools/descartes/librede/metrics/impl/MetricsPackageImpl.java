@@ -36,22 +36,17 @@ import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
-
 import tools.descartes.librede.configuration.impl.ConfigurationPackageImpl;
-
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.metrics.MetricsFactory;
 import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.metrics.MetricsRepository;
-
 import tools.descartes.librede.units.UnitsPackage;
-
 import tools.descartes.librede.units.impl.UnitsPackageImpl;
 
 /**

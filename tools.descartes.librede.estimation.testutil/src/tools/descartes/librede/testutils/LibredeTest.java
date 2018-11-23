@@ -29,7 +29,7 @@ package tools.descartes.librede.testutils;
 
 import org.junit.BeforeClass;
 
-import tools.descartes.librede.*;
+import tools.descartes.librede.Librede;
 
 public class LibredeTest {
 

@@ -27,11 +27,11 @@
  */
 package tools.descartes.librede.nnls;
 
-import tools.descartes.librede.nnls.backend.NNLSLibrary;
-
 import com.sun.jna.Memory;
 import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
+
+import tools.descartes.librede.nnls.backend.NNLSLibrary;
 
 public class Example {
 

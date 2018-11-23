@@ -48,9 +48,6 @@ import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Vector;
-
 public class MatrixTest {
 	
 	private static final double[][] A = new double[][] {{1, 2, 3}, {4, 5, 6}};

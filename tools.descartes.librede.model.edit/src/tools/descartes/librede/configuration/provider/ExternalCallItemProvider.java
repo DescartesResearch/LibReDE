@@ -37,6 +37,7 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
+
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.ExternalCall;
 

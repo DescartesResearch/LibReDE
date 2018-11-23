@@ -30,8 +30,8 @@
 package tools.descartes.librede.configuration;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
+
 import tools.descartes.librede.units.Quantity;
 import tools.descartes.librede.units.Time;
 

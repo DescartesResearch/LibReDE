@@ -43,10 +43,6 @@ import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
-
 public class ScalarTest {
 	
 	private static final double A = 1;

@@ -30,7 +30,6 @@
 package tools.descartes.librede.configuration;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**

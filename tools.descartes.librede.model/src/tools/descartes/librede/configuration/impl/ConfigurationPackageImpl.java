@@ -29,6 +29,8 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import static tools.descartes.librede.configuration.ConfigurationPackage.RESOURCE;
+
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -36,6 +38,7 @@ import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
+
 import tools.descartes.librede.configuration.CompositeService;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;

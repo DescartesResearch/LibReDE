@@ -38,7 +38,11 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
-import tools.descartes.librede.metrics.*;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.MetricsFactory;
+import tools.descartes.librede.metrics.MetricsPackage;
+import tools.descartes.librede.metrics.MetricsRepository;
 import tools.descartes.librede.units.Dimension;
 
 /**

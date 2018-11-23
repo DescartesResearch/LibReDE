@@ -42,15 +42,11 @@ import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
-import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
 
 public class VectorTest {
 	

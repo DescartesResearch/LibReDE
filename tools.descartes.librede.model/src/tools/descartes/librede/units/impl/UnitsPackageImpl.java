@@ -29,7 +29,6 @@
  */
 package tools.descartes.librede.units.impl;
 
-import java.lang.Comparable;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EGenericType;
@@ -38,6 +37,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
+
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.impl.ConfigurationPackageImpl;
 import tools.descartes.librede.metrics.MetricsPackage;

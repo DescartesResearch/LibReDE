@@ -27,6 +27,8 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.MatrixFunction;
@@ -35,8 +37,6 @@ import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.linalg.backend.MatrixFactory;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
 
 public class ColtMatrixFactory implements MatrixFactory {
 	

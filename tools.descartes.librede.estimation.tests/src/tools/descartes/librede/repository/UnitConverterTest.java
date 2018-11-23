@@ -27,14 +27,12 @@
  */
 package tools.descartes.librede.repository;
 
-import static tools.descartes.librede.linalg.LinAlg.vector;
-import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Test;
 
-import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.units.Time;

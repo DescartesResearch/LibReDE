@@ -33,7 +33,6 @@ import org.eclipse.emf.ecore.EObject;
 
 import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.metrics.Metric;
-
 import tools.descartes.librede.units.Dimension;
 
 /**

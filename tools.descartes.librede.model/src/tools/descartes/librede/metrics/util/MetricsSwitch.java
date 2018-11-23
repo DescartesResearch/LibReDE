@@ -31,10 +31,11 @@ package tools.descartes.librede.metrics.util;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.util.Switch;
 
-import tools.descartes.librede.metrics.*;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.MetricsPackage;
+import tools.descartes.librede.metrics.MetricsRepository;
 import tools.descartes.librede.units.Dimension;
 
 /**
