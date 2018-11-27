@@ -164,6 +164,7 @@ public class DerivationRule<D extends Dimension> extends Rule implements Compara
 
 	@Override
 	public void deactivateRule(IMonitoringRepository repository, Rule.Status rule, ModelEntity entity) {
-		//TODO: implement someting for removal.		
+		// EMPTY
+		// If necessary, implement something for removal
 	}
 }

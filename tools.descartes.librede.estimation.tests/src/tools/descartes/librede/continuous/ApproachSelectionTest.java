@@ -275,7 +275,6 @@ public class ApproachSelectionTest {
 
 			// set outputFileDirectory
 			Node outputPara = configDoc.getElementsByTagName("parameters").item(0);
-			// TODO the next line is not working!
 			NamedNodeMap outputAttrs = outputPara.getAttributes();
 			Node outputFileAttr = outputAttrs.getNamedItem("value");
 			outputFileAttr.setTextContent(path.toString());

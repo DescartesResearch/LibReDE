@@ -247,7 +247,6 @@ public final class SimpleRegressionTest extends TestCase {
                 regression.getSlopeConfidenceInterval(),1E-8);
         //------------- End R-verified tests -------------------------------
         
-        //FIXME: get a real example to test against with alpha = .01
         assertTrue("tighter means wider",
                 regression.getSlopeConfidenceInterval() < regression.getSlopeConfidenceInterval(0.01));
      

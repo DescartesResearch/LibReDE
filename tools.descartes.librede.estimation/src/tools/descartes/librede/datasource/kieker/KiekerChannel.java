@@ -1197,20 +1197,6 @@ public class KiekerChannel implements Closeable {
 		return new TimeSeries(ts, vs);
 	}
 
-	/**
-	 * TODO: is this method necessary?
-	 * @param filters
-	 * @param line
-	 * @return
-	 */
-	private boolean applyFilters(List<TraceFilter> filters, String[] line) {
-		for (TraceFilter f : filters) {
-			if (!f.getValue().equals(line[f.getTraceColumn()])) {
-				return false;
-			}
-		}
-		return true;
-	}
 
 	/**
 	 * Close the input Stream.

@@ -234,7 +234,6 @@ public class ExternalCallImpl extends TaskImpl implements ExternalCall {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getName() + "(" + getService().getName() + ")";
 	}
 

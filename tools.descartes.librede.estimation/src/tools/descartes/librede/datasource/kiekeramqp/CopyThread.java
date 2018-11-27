@@ -50,13 +50,11 @@ public class CopyThread extends Thread {
 		try {
 			FileUtils.copyDirectoryToDirectory(srcDir, destDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			FileUtils.deleteDirectory(srcDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -97,10 +97,8 @@ public class KiekerAnalysisThread extends Thread {
 		try {
 			analysisInstance.run();
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (AnalysisConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -1004,7 +1004,6 @@ public class KiekerAmqpDataSource extends AbstractDataSource {
 		try {
 			analysisThread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

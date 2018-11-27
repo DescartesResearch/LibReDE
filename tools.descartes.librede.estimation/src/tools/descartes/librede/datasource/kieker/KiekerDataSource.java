@@ -528,7 +528,6 @@ public class KiekerDataSource extends AbstractDataSource {
 		return rc;*/
 	}
 	public Double getAggregationInterval() {
-		// TODO Auto-generated method stub
 		return Double.valueOf(aggregationinterval);
 	}
 	public boolean isEntityAvailable(String entityname, Metric<?> metric) {

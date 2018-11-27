@@ -117,7 +117,6 @@ public class KiekerFileFilter extends AbstractFilterPlugin{
 				writer.flush();
 			    writer.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -188,7 +187,6 @@ public class KiekerFileFilter extends AbstractFilterPlugin{
 			writer.append(sb.toString());
 			writer.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    

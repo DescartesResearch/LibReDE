@@ -173,7 +173,6 @@ public class KiekerWatchThread extends Thread {
 						Path directory = (Path) key.watchable();
 						//and the file that changed
 						Path filename = (Path) event.context();
-						//TODO check here if the file is important for us...
 						//actually we only trigger that something changed
 						//and then try to read more data. so the file that changed
 						//does not really matter.

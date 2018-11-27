@@ -68,7 +68,6 @@ public class DefaultAggregationHandler<D extends Dimension> extends BaseDerivati
 			case SUM:
 				return ts.sum(0);
 			case CUMULATIVE_SUM:
-				// TODO: implement cumsum for time series
 				return Double.NaN;
 			case NONE:
 				throw new IllegalArgumentException();

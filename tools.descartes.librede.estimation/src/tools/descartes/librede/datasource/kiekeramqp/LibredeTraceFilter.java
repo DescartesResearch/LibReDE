@@ -226,7 +226,6 @@ public class LibredeTraceFilter extends AbstractFilterPlugin{
 					try {
 						Thread.sleep(waitsec*1000);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -266,7 +265,6 @@ public class LibredeTraceFilter extends AbstractFilterPlugin{
 				try {
 					this.join();
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}

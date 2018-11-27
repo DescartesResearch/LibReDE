@@ -178,7 +178,7 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 	
 	@Override
 	public void pruneEstimationDefinitions() {
-		// TODO Remove this function from interface!		
+		// EMPTY. Think about removing this function from interface!		
 	}
 	
 	@Override
