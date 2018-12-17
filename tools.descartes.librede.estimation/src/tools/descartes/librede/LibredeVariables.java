@@ -55,7 +55,7 @@ import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
  */
 public class LibredeVariables {
 	private LibredeConfiguration conf;
-	private final IMonitoringRepository repo;
+	private IMonitoringRepository repo;
 	private EstimationAlgorithmFactory algoFactory;
 	private LibredeResults results;
 	private Map<String, IRepositoryCursor> cursors;
@@ -97,6 +97,10 @@ public class LibredeVariables {
 
 	public IMonitoringRepository getRepo() {
 		return repo;
+	}
+	
+	public void setRepo(IMonitoringRepository repo) {
+		this.repo = repo;
 	}
 
 	public EstimationAlgorithmFactory getAlgoFactory() {
