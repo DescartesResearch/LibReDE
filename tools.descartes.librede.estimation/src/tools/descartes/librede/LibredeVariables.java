@@ -67,6 +67,20 @@ public class LibredeVariables {
 		this.algoFactory = new EstimationAlgorithmFactory(conf.getEstimation().getAlgorithms());
 		this.cursors = new HashMap<String, IRepositoryCursor>();
 		this.runNr = 1;
+		setup();
+
+	}
+
+	public LibredeVariables(LibredeConfiguration conf, IMonitoringRepository repo) {
+		this.conf = conf;
+		this.repo = repo;
+		this.algoFactory = new EstimationAlgorithmFactory(conf.getEstimation().getAlgorithms());
+		this.cursors = new HashMap<String, IRepositoryCursor>();
+		this.runNr = 1;
+		setup();
+	}
+
+	private void setup() {
 		// case cross validation
 		if (conf.getValidation().isValidateEstimates() && conf.getValidation().getValidationFolds() > 1) {
 			this.results = new LibredeResults(conf.getEstimation().getApproaches().size(),
@@ -88,7 +102,6 @@ public class LibredeVariables {
 				this.cursors.put(currentConf.getType(), cursor);
 			}
 		}
-
 	}
 
 	public LibredeConfiguration getConf() {
@@ -98,7 +111,7 @@ public class LibredeVariables {
 	public IMonitoringRepository getRepo() {
 		return repo;
 	}
-	
+
 	public void setRepo(IMonitoringRepository repo) {
 		this.repo = repo;
 	}
