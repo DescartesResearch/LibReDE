@@ -112,6 +112,7 @@ public class UtilizationValidator implements IValidator {
 			if (Double.isNaN(actualUtil[i])) {
 				// replace NaN with MAX_VALUE
 				actualUtil[i] = Double.MAX_VALUE;
+				
 			}
 			relErr[i] = returnErrorValue(actualUtil[i], realUtil[i]);
 		}

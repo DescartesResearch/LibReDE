@@ -67,7 +67,6 @@ import tools.descartes.librede.configuration.ValidatorConfiguration;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.datasource.DataSourceSelector;
 import tools.descartes.librede.datasource.IDataSource;
-import tools.descartes.librede.datasource.IDataSourceListener;
 import tools.descartes.librede.datasource.TraceEvent;
 import tools.descartes.librede.datasource.TraceKey;
 import tools.descartes.librede.datasource.csv.CsvDataSource;
@@ -598,6 +597,7 @@ public class Librede {
 				} catch (MonitoringRepositoryException ex) {
 					if (!disabledValidators.contains(current)) {
 						log.warn("Failed to execute validator " + validatorNames[i] + ": " + ex.getMessage());
+						ex.printStackTrace();
 						disabledValidators.add(current);
 					}
 				}

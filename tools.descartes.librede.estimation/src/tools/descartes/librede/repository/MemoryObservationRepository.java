@@ -66,23 +66,25 @@ import tools.descartes.librede.units.UnitsFactory;
  * 
  */
 public class MemoryObservationRepository implements IMonitoringRepository {
-	
+
 	private static final Quantity<Time> ZERO_SECONDS = UnitsFactory.eINSTANCE.createQuantity(0.0, Time.SECONDS);
-	
-	private static final Quantity<Time> MAX_SECONDS = UnitsFactory.eINSTANCE.createQuantity(Double.MAX_VALUE, Time.SECONDS);
-	
-	private static final Quantity<Time> MIN_SECONDS = UnitsFactory.eINSTANCE.createQuantity(-Double.MAX_VALUE, Time.SECONDS);
-	
-	private static final Quantity<Time> NaN = UnitsFactory.eINSTANCE.createQuantity(Double.NaN, Time.SECONDS);	
-	
+
+	private static final Quantity<Time> MAX_SECONDS = UnitsFactory.eINSTANCE.createQuantity(Double.MAX_VALUE,
+			Time.SECONDS);
+
+	private static final Quantity<Time> MIN_SECONDS = UnitsFactory.eINSTANCE.createQuantity(-Double.MAX_VALUE,
+			Time.SECONDS);
+
+	private static final Quantity<Time> NaN = UnitsFactory.eINSTANCE.createQuantity(Double.NaN, Time.SECONDS);
+
 	private static final Logger log = Logger.getLogger(MemoryObservationRepository.class);
-	
+
 	private static class DataKey<D extends Dimension> {
-		
+
 		public final Metric<D> metric;
 		public final ModelEntity entity;
 		public final Aggregation aggregation;
-		
+
 		public DataKey(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 			this.metric = metric;
 			this.entity = entity;
@@ -121,9 +123,9 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			} else if (!metric.equals(other.metric))
 				return false;
 			return true;
-		}		
+		}
 	}
-	
+
 	private class DataEntry<D extends Dimension> {
 
 		private final DataKey<D> key;
@@ -135,40 +137,43 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		private Quantity<Time> aggregationInterval;
 		private Quantity<Time> startTime;
 		private Quantity<Time> endTime;
-		
+
 		public DataEntry(DataKey<D> key) {
 			this.key = key;
 		}
-		
+
 		public void addDependency(DataEntry<?> entry) {
 			dependentEntries.add(entry);
 		}
-		
+
 		public void removeDependency(DataEntry<?> entry) {
 			dependentEntries.remove(entry);
 		}
-		
+
 		public Quantity<Time> getAggregationInterval() {
 			return aggregationInterval;
 		}
-		
+
 		public Quantity<Time> getStartTime() {
 			return startTime;
 		}
-		
+
 		public Quantity<Time> getEndTime() {
 			return endTime;
 		}
-		
+
 		public DataKey<D> getKey() {
 			return key;
 		}
-		
-		public void setDerivationRule(DerivationRule<D> rule, IMetricDerivationHandler<D> handler, List<DataEntry<?>> requiredEntries) {
+
+		public void setDerivationRule(DerivationRule<D> rule, IMetricDerivationHandler<D> handler,
+				List<DataEntry<?>> requiredEntries) {
 			if ((rule.getAggregation() == Aggregation.NONE) && (data != null)) {
-				// Prevent the registration of a derivation rules for Aggregation.NONE
-				// if this entry already contains null. This rule would be redundant and
-				//can cause loops in the dependency graph.
+				// Prevent the registration of a derivation rules for
+				// Aggregation.NONE
+				// if this entry already contains null. This rule would be
+				// redundant and
+				// can cause loops in the dependency graph.
 				return;
 			}
 			if (derivationRule == null || derivationRule.getPriority() < rule.getPriority()) {
@@ -178,10 +183,11 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				update();
 			}
 		}
-		
+
 		public void setTimeSeries(TimeSeries data, Quantity<Time> aggregationInterval) {
 			if ((derivationRule != null) && (derivationRule.getAggregation() == Aggregation.NONE)) {
-				// Special case for Aggregation.NONE --> No derivation rule may be set if 
+				// Special case for Aggregation.NONE --> No derivation rule may
+				// be set if
 				// time series data is set.
 				this.derivationRule = null;
 				this.derivationHandler = null;
@@ -192,44 +198,49 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			this.endTime = UnitsFactory.eINSTANCE.createQuantity(data.getEndTime(), Time.SECONDS);
 			update();
 		}
-		
+
 		public TimeSeries getRawData() {
 			return data;
 		}
-		
-		public TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
+
+		public TimeSeries getTimeSeries(MemoryObservationRepository repository, Metric<D> metric, Unit<D> unit,
+				ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 			if (data != null) {
-				return UnitConverter.convertTo(data.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS)), unit.getDimension().getBaseUnit(), unit);
+				return UnitConverter.convertTo(data.subset(start.getValue(Time.SECONDS), end.getValue(Time.SECONDS)),
+						unit.getDimension().getBaseUnit(), unit);
 			}
 			if (derivationHandler != null) {
 				return derivationHandler.derive(repository, metric, unit, entity, aggregation, start, end);
 			}
 			return TimeSeries.EMPTY;
 		}
-		
+
 		private void update() {
 			if (data == null) {
 				deriveValuesFromDerivedEntries();
 			}
 			notifyDependentEntries();
 		}
-		
+
 		private void updateRequiredEntries(List<DataEntry<?>> newReqEntriesDerivation) {
 			for (DataEntry<?> e : requiredEntries) {
 				e.removeDependency(this);
 			}
 			for (DataEntry<?> e : newReqEntriesDerivation) {
-				// The entry may depend on itself (e.g., if aggregation is done on the contained timeseries)
-				// To prevent endless recursion on notification, exclude this from dependencies
+				// The entry may depend on itself (e.g., if aggregation is done
+				// on the contained timeseries)
+				// To prevent endless recursion on notification, exclude this
+				// from dependencies
 				if (!e.equals(this)) {
 					e.addDependency(this);
 				}
 			}
 			this.requiredEntries = newReqEntriesDerivation;
 		}
-		
+
 		private void deriveValuesFromDerivedEntries() {
-			// If this entry does not depend on others, we assume it can provide values
+			// If this entry does not depend on others, we assume it can provide
+			// values
 			// for all possible time values.
 			Quantity<Time> startTime = MIN_SECONDS;
 			Quantity<Time> endTime = MAX_SECONDS;
@@ -238,7 +249,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				// Find maximum start time
 				if (reqEntry.getStartTime().compareTo(startTime) > 0) {
 					startTime = reqEntry.getStartTime();
-				}					
+				}
 				// Find minimum end time
 				if (reqEntry.getEndTime().compareTo(endTime) < 0) {
 					endTime = reqEntry.getEndTime();
@@ -251,70 +262,71 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.aggregationInterval = aggregationInterval;
- 		}
-		
+		}
+
 		private void notifyDependentEntries() {
 			for (DataEntry<?> entry : dependentEntries) {
 				entry.update();
 			}
-		}		
+		}
 	}
-	
+
 	private final Map<DataKey<?>, DataEntry<?>> data = new HashMap<>();
 	private final RulesConfig rules = new RulesConfig();
 	private final WorkloadDescription workload;
 	private Quantity<Time> currentTime;
 	private final Set<IMonitoringRepositoryListener> listeners = new HashSet<>();
 	private final Set<ModelEntity> entities = new HashSet<>();
-	
+
 	public MemoryObservationRepository(WorkloadDescription workload) {
 		this.workload = workload;
 		collectEntities();
 		log.info("Set up in-memory observation repository");
 		for (Metric<?> m : Registry.INSTANCE.getMetrics()) {
-			registerRules(m);			
+			registerRules(m);
 		}
 		rules.logConfigDump();
 	}
-	
+
 	private void collectEntities() {
-		for (Iterator<?> it = EcoreUtil.getAllContents(workload, true); it.hasNext(); ) {
+		for (Iterator<?> it = EcoreUtil.getAllContents(workload, true); it.hasNext();) {
 			Object cur = it.next();
 			if (cur instanceof ModelEntity) {
 				entities.add((ModelEntity) cur);
 			}
 		}
 	}
-	
+
 	@Override
 	public void addListener(IMonitoringRepositoryListener listener) {
-		listeners.add(listener);		
+		listeners.add(listener);
 	}
-	
+
 	@Override
 	public void removeListener(IMonitoringRepositoryListener listener) {
-		listeners.remove(listener);		
+		listeners.remove(listener);
 	}
-	
+
 	@Override
 	public void addRule(Rule rule) {
 		rules.addRule(rule);
-		
+
 		// Check whether this rule can be directly activated
 		// (if all data dependencies are available)
 		checkRules(Collections.singletonList(rule), entities);
 	}
-	
+
 	@Override
 	public void removeRule(Rule rule) {
 		rules.removeRule(rule);
 	}
-	
+
 	public <D extends Dimension> void append(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
 		this.append(m, unit, entity, observations, Aggregation.NONE, ZERO_SECONDS);
 	}
-	
-	public <D extends Dimension> void append(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
+
+	public <D extends Dimension> void append(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations,
+			Aggregation aggregation, Quantity<Time> aggregationInterval) {
 		DataKey<D> key = new DataKey<D>(m, entity, aggregation);
 		DataEntry<D> entry = getEntry(key);
 		if (entry == null) {
@@ -329,16 +341,21 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			this.setData(m, unit, entity, newData, aggregation, aggregationInterval);
 		}
 	}
-	
+
 	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations) {
-		this.setData(m, unit, entity, UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit()), Aggregation.NONE, ZERO_SECONDS);
+		this.setData(m, unit, entity, UnitConverter.convertTo(observations, unit, m.getDimension().getBaseUnit()),
+				Aggregation.NONE, ZERO_SECONDS);
 	}
-	
-	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
-		this.setData(m, unit, entity, UnitConverter.convertTo(aggregatedObservations, unit, m.getDimension().getBaseUnit()), aggregation, aggregationInterval);
+
+	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity,
+			TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
+		this.setData(m, unit, entity,
+				UnitConverter.convertTo(aggregatedObservations, unit, m.getDimension().getBaseUnit()), aggregation,
+				aggregationInterval);
 	}
-	
-	private <D extends Dimension> void setData(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations, Aggregation aggregation, Quantity<Time> aggregationInterval) {
+
+	private <D extends Dimension> void setData(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations,
+			Aggregation aggregation, Quantity<Time> aggregationInterval) {
 		DataKey<D> key = new DataKey<D>(m, entity, aggregation);
 		DataEntry<D> entry = getEntry(key);
 		boolean existing = (entry != null);
@@ -354,29 +371,31 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			} else {
 				entry.setTimeSeries(observations, aggregationInterval);
 			}
-		}		
+		}
 
 		if (log.isDebugEnabled()) {
 			log.debug((existing ? "New" : "Replaced") + " time series entry " + entity + "/" + m + "/" + aggregation);
 		}
 	}
-	
+
 	private <D extends Dimension> void addEntry(DataKey<D> key, DataEntry<D> newEntry) {
-		data.put(key,  newEntry);
-		// This is the first time we add data for this metric, entity and aggregation combination
+		data.put(key, newEntry);
+		// This is the first time we add data for this metric, entity and
+		// aggregation combination
 		notifyNewEntry(key.metric, key.entity, key.aggregation);
+
 	}
-	
+
 	private <D extends Dimension> void notifyNewEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 		for (IMonitoringRepositoryListener curListener : listeners) {
 			curListener.entryAdded(metric, entity, aggregation);
-		}		
+		}
 		checkRules(rules.getDerivationRules(metric, aggregation), Collections.singleton(entity));
 	}
-	
+
 	private void checkRules(List<Rule> rules, Set<ModelEntity> entities) {
-		Set<ModelEntity> notificationSet = new HashSet<>();		
-		
+		Set<ModelEntity> notificationSet = new HashSet<>();
+
 		for (Rule r : rules) {
 			for (ModelEntity curEntity : entities) {
 				if (r.getDependencies().isEmpty()) {
@@ -386,7 +405,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				} else {
 					// First we determine the entities that may be affected
 					// by the new entry (e.g., new data for a service, may also
-					// enable new derivations for external calls to this service)
+					// enable new derivations for external calls to this
+					// service)
 					for (DataDependency<?> dep : r.getDependencies()) {
 						notificationSet.addAll(dep.getScope().getNotificationSet(curEntity));
 					}
@@ -398,12 +418,12 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			}
 		}
 	}
-	
+
 	private List<DataEntry<?>> getRequiredEntries(DerivationRule<?> rule, ModelEntity entity) {
 		List<DataEntry<?>> requiredEntries = new LinkedList<>();
 		for (DataDependency<?> dep : rule.getDependencies()) {
 			Set<? extends ModelEntity> scopeEntities = dep.getScope().getScopeSet(entity);
-			for (ModelEntity e : scopeEntities) {				
+			for (ModelEntity e : scopeEntities) {
 				DataEntry<?> reqEntry = getEntry(dep.getMetric(), e, dep.getAggregation());
 				if (reqEntry == null) {
 					throw new NoMonitoringDataException(dep.getMetric(), dep.getAggregation(), entity);
@@ -413,28 +433,29 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		return requiredEntries;
 	}
-	
+
 	public <D extends Dimension> void insertDerivation(DerivationRule<D> t, ModelEntity entity) {
 		Metric<D> metric = t.getMetric();
 		Aggregation aggregation = t.getAggregation();
 
 		DataKey<D> key = new DataKey<>(metric, entity, aggregation);
 		DataEntry<D> entry = getEntry(key);
-		boolean newEntry = (entry == null);		
+		boolean newEntry = (entry == null);
 		if (newEntry) {
 			entry = new DataEntry<D>(key);
 		}
-		
+
 		try {
 			List<DataEntry<?>> requiredEntries = getRequiredEntries(t, entity);
 			// self-referential rules are only allowed if the associated
 			// entry contains actual (non-derived) monitoring data.
-			// Otherwise, we may replace rules which triggered 
+			// Otherwise, we may replace rules which triggered
 			// the activation of this rule.
 			for (DataEntry<?> curEntry : requiredEntries) {
 				if (key.equals(curEntry.getKey()) && (curEntry.getRawData() == null)) {
 					if (log.isDebugEnabled()) {
-						log.debug("Derivation entry " + entity + "/" + metric + "/" + aggregation +" not updated due to self-referential check failure.");
+						log.debug("Derivation entry " + entity + "/" + metric + "/" + aggregation
+								+ " not updated due to self-referential check failure.");
 					}
 					return; // abort this insert operation
 				}
@@ -444,43 +465,44 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 				addEntry(key, entry);
 			}
 			if (log.isDebugEnabled()) {
-				log.debug((newEntry ? "New" : "Replaced") + " derivation entry " + entity + "/" + metric + "/" + aggregation);
+				log.debug((newEntry ? "New" : "Replaced") + " derivation entry " + entity + "/" + metric + "/"
+						+ aggregation);
 			}
-		} catch(NoMonitoringDataException ex) {
+		} catch (NoMonitoringDataException ex) {
 			log.warn("Could not initiliaze derivation entry.", ex);
 		}
 	}
-	
+
 	@Override
 	public List<Resource> listResources() {
 		return workload.getResources();
 	}
-	
+
 	@Override
 	public List<Service> listServices() {
 		return workload.getServices();
 	}
-	
+
 	@Override
 	public IRepositoryCursor getCursor(Quantity<Time> startTime, Quantity<Time> stepSize) {
 		return new AggregationRepositoryCursor(this, startTime, stepSize);
 	}
-	
+
 	@Override
 	public Quantity<Time> getCurrentTime() {
 		return currentTime;
 	}
-	
+
 	@Override
- 	public void setCurrentTime(Quantity<Time> currentTime) {
+	public void setCurrentTime(Quantity<Time> currentTime) {
 		this.currentTime = currentTime;
 	}
-	
+
 	@Override
-	public WorkloadDescription getWorkload()  {
+	public WorkloadDescription getWorkload() {
 		return workload;
 	}
-	
+
 	@Override
 	public <D extends Dimension> TimeSeries select(Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation aggregation) {
@@ -503,11 +525,12 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 		DataEntry<D> entry = getCheckedEntry(metric, entity, aggregation, start, end);
 		if (entry.derivationHandler == null) {
-			throw new IllegalStateException("No derivation handler for " + metric.getName() + " and " + aggregation.getLiteral() + " is available.");
+			throw new IllegalStateException("No derivation handler for " + metric.getName() + " and "
+					+ aggregation.getLiteral() + " is available.");
 		}
 		return entry.derivationHandler.aggregate(this, metric, unit, entity, aggregation, start, end);
 	}
-	
+
 	private <D extends Dimension> DataEntry<D> getCheckedEntry(Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation, Quantity<Time> start, Quantity<Time> end) {
 		DataEntry<D> entry = getEntry(metric, entity, aggregation);
@@ -515,7 +538,8 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			throw new NoMonitoringDataException(metric, aggregation, entity);
 		}
 		if ((entry.startTime.compareTo(start) > 0) || (entry.endTime.compareTo(end) < 0)) {
-			throw new OutOfMonitoredRangeException(metric, aggregation, entity, start, end, entry.startTime, entry.endTime);
+			throw new OutOfMonitoredRangeException(metric, aggregation, entity, start, end, entry.startTime,
+					entry.endTime);
 		}
 		return entry;
 	}
@@ -535,7 +559,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		return entry.getAggregationInterval();
 	}
-	
+
 	@Override
 	public <D extends Dimension> Quantity<Time> getMonitoringStartTime(Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation) {
@@ -545,7 +569,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		return entry.getStartTime();
 	}
-	
+
 	@Override
 	public <D extends Dimension> Quantity<Time> getMonitoringEndTime(Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation) {
@@ -555,23 +579,34 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 		}
 		return entry.getEndTime();
 	}
-	
+
 	private <D extends Dimension> DataEntry<D> getEntry(Metric<D> metric, ModelEntity entity, Aggregation aggregation) {
 		return getEntry(new DataKey<D>(metric, entity, aggregation));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private <D extends Dimension> DataEntry<D> getEntry(DataKey<D> key) {
-		return (DataEntry<D>)data.get(key);
+//		for (java.util.Map.Entry<DataKey<?>, DataEntry<?>> e : data.entrySet()) {
+//			if (e.getValue().data == null) {
+//				System.out.println(e);
+//				System.out.println(e.getKey().aggregation);
+//				System.out.println(e.getKey().entity);
+//				System.out.println(e.getKey().metric);
+//				System.out.println("Is null");
+//			} else {
+//				System.out.println("Kein problem");
+//			}
+//		}
+		return (DataEntry<D>) data.get(key);
 	}
-	
+
 	private <D extends Dimension> void registerRules(Metric<D> m) {
 		List<DerivationRule<D>> derivationRules = Registry.INSTANCE.getMetricHandler(m).getDerivationRules();
 		for (DerivationRule<D> r : derivationRules) {
 			addRule(r);
 		}
 	}
-	
+
 	public void logContentDump() {
 		for (Resource resource : workload.getResources()) {
 			logEntityContentDump(resource);
@@ -583,7 +618,7 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 			}
 		}
 	}
-	
+
 	private void logEntityContentDump(ModelEntity entity) {
 		StringBuilder dump = new StringBuilder(entity.toString());
 		dump.append(": ");
@@ -595,8 +630,10 @@ public class MemoryObservationRepository implements IMonitoringRepository {
 					empty = false;
 					dump.append(m).append("/").append(a);
 					if (entry.data != null) {
-						dump.append("(").append("length=").append(entry.data.samples()).append(", mean=").append(entry.data.mean(0));
-						dump.append(", start=").append(entry.data.getStartTime()).append("s, end=").append(entry.data.getEndTime()).append("s)");
+						dump.append("(").append("length=").append(entry.data.samples()).append(", mean=")
+								.append(entry.data.mean(0));
+						dump.append(", start=").append(entry.data.getStartTime()).append("s, end=")
+								.append(entry.data.getEndTime()).append("s)");
 					}
 					dump.append(", ");
 				}

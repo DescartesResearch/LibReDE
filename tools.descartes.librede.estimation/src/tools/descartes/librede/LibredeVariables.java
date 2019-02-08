@@ -163,4 +163,11 @@ public class LibredeVariables {
 		return repo;
 	}
 
+	public void reset() {
+		this.resetRunNr();
+		this.algoFactory = new EstimationAlgorithmFactory(conf.getEstimation().getAlgorithms());
+		this.cursors = new HashMap<String, IRepositoryCursor>();
+		setup();
+	}
+
 }
