@@ -575,7 +575,7 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 					key = watcher.take();
 				} catch (InterruptedException e) {
 					if (stop) {
-						return;
+						break;
 					}
 				}
 				if (key.isValid()) {
@@ -601,6 +601,11 @@ public abstract class AbstractFileDataSource extends AbstractDataSource {
 						key.reset();
 					}
 				}
+			}
+			try {
+				watcher.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
