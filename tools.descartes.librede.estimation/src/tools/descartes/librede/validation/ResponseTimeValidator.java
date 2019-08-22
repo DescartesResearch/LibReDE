@@ -34,7 +34,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import tools.descartes.librede.Librede;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
@@ -175,5 +174,61 @@ public class ResponseTimeValidator implements IValidator {
 	@Override
 	public List<DataDependency<?>> getDataDependencies() {
 		return dependencies;
+	}
+
+	protected List<ModelEntity> getServices() {
+		return services;
+	}
+
+	protected void setServices(List<ModelEntity> services) {
+		this.services = services;
+	}
+
+	protected List<ResponseTimeValue> getRespObservation() {
+		return respObservation;
+	}
+
+	protected void setRespObservation(List<ResponseTimeValue> respObservation) {
+		this.respObservation = respObservation;
+	}
+
+	protected List<ResponseTimeEquation> getRespEq() {
+		return respEq;
+	}
+
+	protected void setRespEq(List<ResponseTimeEquation> respEq) {
+		this.respEq = respEq;
+	}
+
+	protected MatrixBuilder getAllErrors() {
+		return allErrors;
+	}
+
+	protected void setAllErrors(MatrixBuilder allErrors) {
+		this.allErrors = allErrors;
+	}
+
+	protected MatrixBuilder getPredictedRespTimes() {
+		return predictedRespTimes;
+	}
+
+	protected void setPredictedRespTimes(MatrixBuilder predictedRespTimes) {
+		this.predictedRespTimes = predictedRespTimes;
+	}
+
+	protected MatrixBuilder getObservedRespTimes() {
+		return observedRespTimes;
+	}
+
+	protected void setObservedRespTimes(MatrixBuilder observedRespTimes) {
+		this.observedRespTimes = observedRespTimes;
+	}
+
+	protected List<DataDependency<?>> getDependencies() {
+		return dependencies;
+	}
+
+	protected void setStateModel(ConstantStateModel<Unconstrained> stateModel) {
+		this.stateModel = stateModel;
 	}
 }
