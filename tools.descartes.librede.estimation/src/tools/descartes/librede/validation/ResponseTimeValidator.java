@@ -32,6 +32,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
+import tools.descartes.librede.Librede;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.ResourceDemand;
@@ -55,6 +58,8 @@ import tools.descartes.librede.repository.rules.DataDependency;
 
 @Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
+	
+	private static final Logger log = Logger.getLogger(ResponseTimeValidator.class);
 
 	private List<ModelEntity> services;
 	private List<ResponseTimeValue> respObservation;
@@ -129,10 +134,11 @@ public class ResponseTimeValidator implements IValidator {
 				relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
 			} else {
 				relErr[i] = Math.abs(actual[i] - real[i]);
+				throw new IllegalArgumentException("Computed error was NaN, through division by zero!");
 			}
 			if (Double.isNaN(relErr[i]) || Double.isNaN(actual[i])
 					|| Double.isNaN(real[i])) {
-				System.out.println("NAN");
+				log.error("Computed error was NaN!");
 			}
 		}
 		allErrors.addRow(relErr);
