@@ -57,7 +57,7 @@ import tools.descartes.librede.repository.rules.DataDependency;
 
 @Component(displayName = "Response Time Validator")
 public class ResponseTimeValidator implements IValidator {
-	
+
 	private static final Logger log = Logger.getLogger(ResponseTimeValidator.class);
 
 	private List<ModelEntity> services;
@@ -70,10 +70,8 @@ public class ResponseTimeValidator implements IValidator {
 	private final List<DataDependency<?>> dependencies = new ArrayList<>();
 
 	@Override
-	public void initialize(WorkloadDescription workload,
-			IRepositoryCursor cursor) {
-		Builder<Unconstrained> builder = ConstantStateModel
-				.unconstrainedModelBuilder();
+	public void initialize(WorkloadDescription workload, IRepositoryCursor cursor) {
+		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		Set<Service> services = new HashSet<Service>();
 		for (Resource res : workload.getResources()) {
 			for (ResourceDemand demand : res.getDemands()) {
@@ -81,8 +79,7 @@ public class ResponseTimeValidator implements IValidator {
 				services.add(demand.getService());
 			}
 		}
-		builder.setInvocationGraph(new InvocationGraph(
-				new ArrayList<>(services), cursor, 1));
+		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
 		this.stateModel = builder.build();
 
 		this.respObservation = new ArrayList<>();
@@ -90,10 +87,8 @@ public class ResponseTimeValidator implements IValidator {
 		this.services = new ArrayList<ModelEntity>();
 		for (Service srv : stateModel.getUserServices()) {
 			if (srv.getIncomingCalls().isEmpty()) {
-				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel,
-						cursor, srv, 0);
-				ResponseTimeEquation rt = new ResponseTimeEquation(stateModel,
-						cursor, srv, false, 0);
+				ResponseTimeValue rtValue = new ResponseTimeValue(stateModel, cursor, srv, 0);
+				ResponseTimeEquation rt = new ResponseTimeEquation(stateModel, cursor, srv, false, 0);
 				dependencies.addAll(rt.getDataDependencies());
 				dependencies.addAll(rtValue.getDataDependencies());
 				respEq.add(rt);
@@ -119,30 +114,30 @@ public class ResponseTimeValidator implements IValidator {
 		double[] actual = new double[respEq.size()];
 		for (int i = 0; i < respEq.size(); i++) {
 			real[i] = respObservation.get(i).getConstantValue();
-			if (Double.isNaN(real[i])) {
-				// replace NaN with MAX_VALUE
-				real[i] = Double.MAX_VALUE;
-			}
 			actual[i] = respEq.get(i).getValue(x).getValue();
-			if (Double.isNaN(actual[i])) {
-				// replace NaN with MAX_VALUE
-				actual[i] = Double.MAX_VALUE;
-			}
-			if (real[i] != 0) {
-				// to avoid dividing by zero resulting in NaN
-				relErr[i] = Math.abs(actual[i] - real[i]) / real[i];
-			} else {
-				relErr[i] = Math.abs(actual[i] - real[i]);
-				throw new IllegalArgumentException("Computed error was NaN, through division by zero!");
-			}
-			if (Double.isNaN(relErr[i]) || Double.isNaN(actual[i])
-					|| Double.isNaN(real[i])) {
+			if (Double.isNaN(actual[i]) || Double.isNaN(real[i])) {
 				log.error("Computed error was NaN!");
+				relErr[i] = Double.MAX_VALUE;
+			} else {
+				relErr[i] = getRelativeError(real[i], actual[i], i);
+				if (Double.isNaN(relErr[i])) {
+					throw new IllegalArgumentException("Computed relative error was NaN for unknown reason.");
+				}
 			}
 		}
 		allErrors.addRow(relErr);
 		predictedRespTimes.addRow(actual);
 		observedRespTimes.addRow(real);
+	}
+
+	protected double getRelativeError(double real, double actual, int index) {
+		if (real != 0) {
+			// to avoid dividing by zero resulting in NaN
+			double relErr = Math.abs(actual - real) / real;
+			return relErr;
+		} else {
+			throw new IllegalArgumentException("Computed error was NaN, through division by zero!");
+		}
 	}
 
 	public Vector getPredictionError() {

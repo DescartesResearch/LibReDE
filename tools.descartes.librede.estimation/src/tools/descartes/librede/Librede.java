@@ -120,6 +120,7 @@ import tools.descartes.librede.validation.ContinuousCrossValidationCursor;
 import tools.descartes.librede.validation.IValidator;
 import tools.descartes.librede.validation.ResponseTimeValidator;
 import tools.descartes.librede.validation.UtilizationValidator;
+import tools.descartes.librede.validation.WeightedResponseTimeValidator;
 
 /**
  * This is the main entry point of Librede. Used to start various kinds of
@@ -190,6 +191,7 @@ public class Librede {
 		Registry.INSTANCE.registerImplementationType(IValidator.class, ResponseTimeValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, UtilizationValidator.class);
 		Registry.INSTANCE.registerImplementationType(IValidator.class, AbsoluteUtilizationValidator.class);
+		Registry.INSTANCE.registerImplementationType(IValidator.class, WeightedResponseTimeValidator.class);
 
 		Registry.INSTANCE.registerImplementationType(IExporter.class, CsvExporter.class);
 
