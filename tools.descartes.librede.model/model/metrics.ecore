@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="metrics" nsURI="http://www.descartes-research.net/librede/metrics/1.0"
+    nsPrefix="librede-metrics">
+  <eClassifiers xsi:type="ecore:EClass" name="Metric">
+    <eTypeParameters name="D">
+      <eBounds eClassifier="ecore:EClass units.ecore#//Dimension"/>
+    </eTypeParameters>
+    <eOperations name="isAggregationAllowed" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+      <eParameters name="aggregation" lowerBound="1" eType="#//Aggregation"/>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        changeable="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dimension" lowerBound="1"
+        changeable="false">
+      <eGenericType eTypeParameter="#//Metric/D"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="allowedAggregations" lowerBound="1"
+        upperBound="-1" eType="#//Aggregation"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Aggregation">
+    <eLiterals name="NONE" literal="NONE"/>
+    <eLiterals name="AVERAGE" value="1" literal="AVERAGE"/>
+    <eLiterals name="MAXIMUM" value="2"/>
+    <eLiterals name="MINIMUM" value="3" literal="MINIMUM"/>
+    <eLiterals name="SUM" value="4"/>
+    <eLiterals name="CUMULATIVE_SUM" value="5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MetricsRepository">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="metrics" upperBound="-1"
+        containment="true">
+      <eGenericType eClassifier="#//Metric">
+        <eTypeArguments/>
+      </eGenericType>
+    </eStructuralFeatures>
+  </eClassifiers>
+</ecore:EPackage>

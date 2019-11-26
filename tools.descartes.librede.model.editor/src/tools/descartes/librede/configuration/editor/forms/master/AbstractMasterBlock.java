@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,17 +28,17 @@
 package tools.descartes.librede.configuration.editor.forms.master;
 
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.MasterDetailsBlock;
 import org.eclipse.ui.forms.SectionPart;
@@ -48,7 +49,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.actions.RunEstimationAction;
 import tools.descartes.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
-import tools.descartes.librede.configuration.presentation.LibredeEditorPlugin;
 
 public abstract class AbstractMasterBlock extends MasterDetailsBlock implements ISelectionChangedListener {
 	
@@ -130,6 +130,16 @@ public abstract class AbstractMasterBlock extends MasterDetailsBlock implements 
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		managedForm.fireSelectionChanged(masterPart, event.getSelection());
+	}
+	
+	public void registerViewer(final StructuredViewer viewer) {
+		viewer.getControl().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				page.getConfigurationEditor().setCurrentViewer(viewer);
+			}
+		});
+		page.getConfigurationEditor().createContextMenuFor(viewer);
 	}
 	
 	protected abstract String getMasterSectionTitle();

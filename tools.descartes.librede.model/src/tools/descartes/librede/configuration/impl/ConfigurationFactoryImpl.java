@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -35,7 +36,33 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
-import tools.descartes.librede.configuration.*;
+import tools.descartes.librede.configuration.CompositeService;
+import tools.descartes.librede.configuration.ConfigurationFactory;
+import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.ConstantDataPoint;
+import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.configuration.EstimationApproachConfiguration;
+import tools.descartes.librede.configuration.EstimationSpecification;
+import tools.descartes.librede.configuration.ExporterConfiguration;
+import tools.descartes.librede.configuration.ExternalCall;
+import tools.descartes.librede.configuration.FileTraceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
+import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.ObservationToEntityMapping;
+import tools.descartes.librede.configuration.OutputSpecification;
+import tools.descartes.librede.configuration.Parameter;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.SchedulingStrategy;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceFilter;
+import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.configuration.ValidationSpecification;
+import tools.descartes.librede.configuration.ValidatorConfiguration;
+import tools.descartes.librede.configuration.WorkloadDescription;
 
 /**
  * <!-- begin-user-doc -->
@@ -99,6 +126,12 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING: return createTraceToEntityMapping();
 			case ConfigurationPackage.MODEL_ENTITY: return createModelEntity();
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION: return createEstimationAlgorithmConfiguration();
+			case ConfigurationPackage.TRACE_FILTER: return createTraceFilter();
+			case ConfigurationPackage.RESOURCE_DEMAND: return createResourceDemand();
+			case ConfigurationPackage.EXTERNAL_CALL: return createExternalCall();
+			case ConfigurationPackage.COMPOSITE_SERVICE: return createCompositeService();
+			case ConfigurationPackage.OBSERVATION_TO_ENTITY_MAPPING: return createObservationToEntityMapping();
+			case ConfigurationPackage.CONSTANT_DATA_POINT: return createConstantDataPoint();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -312,6 +345,66 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	public EstimationAlgorithmConfiguration createEstimationAlgorithmConfiguration() {
 		EstimationAlgorithmConfigurationImpl estimationAlgorithmConfiguration = new EstimationAlgorithmConfigurationImpl();
 		return estimationAlgorithmConfiguration;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TraceFilter createTraceFilter() {
+		TraceFilterImpl traceFilter = new TraceFilterImpl();
+		return traceFilter;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ResourceDemand createResourceDemand() {
+		ResourceDemandImpl resourceDemand = new ResourceDemandImpl();
+		return resourceDemand;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExternalCall createExternalCall() {
+		ExternalCallImpl externalCall = new ExternalCallImpl();
+		return externalCall;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public CompositeService createCompositeService() {
+		CompositeServiceImpl compositeService = new CompositeServiceImpl();
+		return compositeService;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ObservationToEntityMapping createObservationToEntityMapping() {
+		ObservationToEntityMappingImpl observationToEntityMapping = new ObservationToEntityMappingImpl();
+		return observationToEntityMapping;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ConstantDataPoint createConstantDataPoint() {
+		ConstantDataPointImpl constantDataPoint = new ConstantDataPointImpl();
+		return constantDataPoint;
 	}
 
 	/**

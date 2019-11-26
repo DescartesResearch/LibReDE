@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -68,10 +69,6 @@ public class Polynomial {
 
 	public double[] getCoef() {
 		return coef;
-	}
-
-	public boolean equal(Object object) {
-		return true;
 	}
 
 	public double getValue(int x) {

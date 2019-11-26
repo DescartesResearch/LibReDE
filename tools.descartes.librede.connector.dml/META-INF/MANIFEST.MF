@@ -1,0 +1,36 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DML Connector
+Bundle-SymbolicName: tools.descartes.librede.connector.dml
+Bundle-Version: 1.1.0.qualifier
+Bundle-Vendor: Descartes Research Group
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.apache.log4j,
+ org.eclipse.emf.cdo,
+ org.eclipse.emf.common.util,
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.ecore.resource,
+ org.eclipse.emf.ecore.resource.impl,
+ org.eclipse.emf.ecore.util,
+ org.eclipse.emf.ecore.xmi.impl,
+ tools.descartes.dml.core,
+ tools.descartes.dml.identifier,
+ tools.descartes.dml.mm.applicationlevel.functions,
+ tools.descartes.dml.mm.applicationlevel.parameterdependencies,
+ tools.descartes.dml.mm.applicationlevel.repository,
+ tools.descartes.dml.mm.applicationlevel.servicebehavior,
+ tools.descartes.dml.mm.applicationlevel.system,
+ tools.descartes.dml.mm.deployment,
+ tools.descartes.dml.mm.resourceconfiguration,
+ tools.descartes.dml.mm.resourcelandscape,
+ tools.descartes.dml.mm.resourcetype,
+ tools.descartes.dml.mm.usageprofile,
+ tools.descartes.librede,
+ tools.descartes.librede.approach,
+ tools.descartes.librede.configuration,
+ tools.descartes.librede.export,
+ tools.descartes.librede.linalg,
+ tools.descartes.librede.registry,
+ tools.descartes.librede.repository
+Require-Bundle: com.google.guava;bundle-version="12.0.0"
+Export-Package: tools.descartes.librede.connector.dml

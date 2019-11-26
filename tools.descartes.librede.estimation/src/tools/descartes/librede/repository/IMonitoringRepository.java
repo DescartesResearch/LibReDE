@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -32,24 +33,54 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 
 public interface IMonitoringRepository {
+	
+	public <D extends Dimension> TimeSeries select(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> TimeSeries select(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
 
-	public double getAggregationInterval(IMetric m, ModelEntity entity);
-	public TimeSeries getData(IMetric metric, ModelEntity entity);
-	public void setData(IMetric metric, ModelEntity entity, TimeSeries observations);
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations);
-	public void setAggregatedData(IMetric m, ModelEntity entity, TimeSeries aggregatedObservations, double aggregationInterval);
-	public boolean containsData(IMetric responseTime,
-			ModelEntity entity, double maximumAggregationInterval);
+	public <D extends Dimension> double aggregate(Metric<D> metric, Unit<D> unit, ModelEntity entity, Aggregation aggregation, Quantity<Time> start, Quantity<Time> end);
+	
+	public <D extends Dimension> boolean exists(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> Quantity<Time> getAggregationInterval(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> Quantity<Time> getMonitoringStartTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> Quantity<Time> getMonitoringEndTime(Metric<D> metric, ModelEntity entity, Aggregation aggregation);
+	
+	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries observations);
+	
+	public <D extends Dimension> void insert(Metric<D> m, Unit<D> unit, ModelEntity entity, TimeSeries aggregatedObservations, Aggregation aggregation, Quantity<Time> aggregationInterval);
+	
+	public <D extends Dimension> void insertDerivation(DerivationRule<D> t, ModelEntity entity);
+	
+	public void addListener(IMonitoringRepositoryListener listener);
+	
+	public void removeListener(IMonitoringRepositoryListener listener);
+	
+	public void addRule(Rule rule);
+	
+	public void removeRule(Rule rule);
 	
 	public List<Resource> listResources();
 	public List<Service> listServices();
 	
-	public IRepositoryCursor getCursor(double startTime, double stepSize);
+	public IRepositoryCursor getCursor(Quantity<Time> startTime, Quantity<Time> stepSize);
 	
-	public double getCurrentTime();
-	public void setCurrentTime(double currentTime);
+	public Quantity<Time> getCurrentTime();
+	public void setCurrentTime(Quantity<Time> currentTime);
 	public WorkloadDescription getWorkload();
+
+	public void accept(IMonitoringRepositoryVisitor visitor);
 }

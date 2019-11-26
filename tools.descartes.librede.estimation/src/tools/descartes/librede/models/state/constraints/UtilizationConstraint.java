@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,33 +27,33 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
-import static tools.descartes.librede.linalg.LinAlg.zeros;
-
-import java.util.List;
-
-import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.AbstractDependencyTarget;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.variables.ConstraintVariable;
+import tools.descartes.librede.models.variables.Variable;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.Query;
-import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 
-public class UtilizationConstraint implements ILinearStateConstraint, IDifferentiableFunction {
+public class UtilizationConstraint extends AbstractDependencyTarget implements ILinearStateConstraint {
 
-	private Resource res_i;
+	private final Resource res_i;
 	
-	private IStateModel<? extends IStateConstraint> stateModel;
+	private final IRepositoryCursor cursor;
 	
-	private Query<Vector> throughputQuery;
+	private final int historicInterval;
 	
-	public UtilizationConstraint(Resource resource, IRepositoryCursor repository) {
+	private UtilizationLawEquation utilLaw;
+	
+	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor) {
+		this(resource, cursor, 0);
+	}
+	
+	public UtilizationConstraint(Resource resource, IRepositoryCursor cursor, int historicInterval) {
 		this.res_i = resource;
-		
-		throughputQuery = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(repository);
+		this.cursor = cursor;
+		this.historicInterval = historicInterval;
 	}
 	
 	@Override
@@ -66,44 +67,17 @@ public class UtilizationConstraint implements ILinearStateConstraint, IDifferent
 	}
 
 	@Override
-	public double getValue(Vector state) {
-		if (stateModel == null) {
+	public Variable getValue(State state) {
+		if (utilLaw == null) {
 			throw new IllegalStateException();
 		}
-		Vector D_i = state.slice(stateModel.getStateVariableIndexRange(res_i));
-		Vector X = throughputQuery.execute();
-		return X.dot(D_i);
-	}
-
-	@Override
-	public Vector getFirstDerivatives(Vector x) {
-		return throughputQuery.execute();
-	}
-
-	@Override
-	public Matrix getSecondDerivatives(Vector x) {
-		return zeros(x.rows(), x.rows());
-	}
-	
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		if (!throughputQuery.hasData()) {
-			StringBuilder msg = new StringBuilder("DATA PRECONDITION: ");
-			msg.append("metric = ").append(throughputQuery.getMetric().toString()).append(" ");
-			msg.append("entities = { ");
-			for(ModelEntity entity : throughputQuery.getEntities()) {
-				msg.append(entity.getName()).append(" ");
-			}
-			msg.append(" } ");
-			messages.add(msg.toString());
-			return false;
-		}
-		return true;
+		return new ConstraintVariable(state, utilLaw.getValue(state));
 	}
 
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
-		this.stateModel = model;
+		this.utilLaw = new UtilizationLawEquation(model, cursor, res_i, historicInterval);
+		addDataDependencies(this.utilLaw);
 	}
 
 }

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -378,6 +379,68 @@ void get_x(BF::Covariance_scheme* scheme, double* x)
 	std::cout << "END FUNCTION CALL: get_x" << std::endl;
 #endif
 
+}
+
+void set_x(BF::Covariance_scheme* scheme, double* x, std::size_t x_size)
+{
+#ifdef TRACE
+	std::cout << "FUNCTION CALL: set_x(scheme, x, x_size=" << x_size << ")" << std::endl;
+	std::cout << "INPUT VECTOR: x="; print_vector(x, x_size); std::cout << std::endl;
+#endif
+
+	std::copy(x, x + x_size, scheme->x.begin());
+
+#ifdef TRACE
+	std::cout << "TRANSFORMED VECTOR: x="; print_vector(scheme->x, x_size); std::cout << std::endl;
+#endif
+#ifdef ASSERT
+	assert_transformed_vector(scheme->x, x);
+#endif
+#ifdef TRACE
+	std::cout << "END FUNCTION CALL: set_x" << std::endl;
+#endif
+}
+
+void get_X(BF::Covariance_scheme* scheme, double* X)
+{
+#ifdef TRACE
+	std::cout << "FUNCTION CALL: get_X(scheme)" << std::endl;
+#endif
+
+	FM::Matrix X_Mat = scheme->X.asRowMatrix();
+	std::copy(X_Mat.data().begin(), X_Mat.data().end(), X);
+
+#ifdef TRACE
+	std::cout << "OUTPUT MATRIX: X="; print_matrix(X_Mat, X_Mat.size1(), X_Mat.size2()); std::cout << std::endl;
+	std::cout << "TRANSFOMRED MATRIX: x="; print_matrix(X, X_Mat.size1(), X_Mat.size2()); std::cout << std::endl;
+#endif
+#ifdef ASSERT
+	assert_transformed_matrix(X_Mat, X);
+#endif
+#ifdef TRACE
+	std::cout << "END FUNCTION CALL: get_X" << std::endl;
+#endif
+
+}
+
+void set_X(BF::Covariance_scheme* scheme, double* X, std::size_t x_size)
+{
+#ifdef TRACE
+	std::cout << "FUNCTION CALL: set_X(scheme, X, x_size=" << x_size << ")" << std::endl;
+	std::cout << "INPUT MATRIX: X="; print_matrix(X, x_size, x_size); std::cout << std::endl;
+#endif
+
+	std::copy(X, X + (x_size * x_size), scheme->X.asRowMatrix().data().begin());
+
+#ifdef TRACE
+	std::cout << "TRANSFORMED MATRIX: X="; print_matrix(scheme->X, x_size, x_size); std::cout << std::endl;
+#endif
+#ifdef ASSERT
+	assert_transformed_matrix(scheme->X, X);
+#endif
+#ifdef TRACE
+	std::cout << "END FUNCTION CALL: set_X" << std::endl;
+#endif
 }
 
 const char* get_last_error()

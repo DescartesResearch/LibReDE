@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,9 +28,11 @@
 package tools.descartes.librede.linalg.backend;
 
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 
 public interface MatrixFactory {
@@ -39,6 +42,8 @@ public interface MatrixFactory {
 	Matrix createMatrix(int rows, int columns, double fill);
 
 	Matrix createMatrix(int rows, int columns, MatrixFunction init);
+	
+	MatrixBuilder createMatrixBuilder(int maxRows, int columns);
 	
 	SquareMatrix createSquareMatrix(double[][] values);
 
@@ -51,5 +56,7 @@ public interface MatrixFactory {
 	Vector createVector(int rows, double fill);
 
 	Vector createVector(int rows, VectorFunction init);
+	
+	VectorBuilder createVectorBuilder(int maxRows);
 
 }

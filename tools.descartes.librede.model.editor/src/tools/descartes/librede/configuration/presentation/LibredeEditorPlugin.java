@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -35,6 +36,7 @@ import org.osgi.framework.BundleContext;
 
 import tools.descartes.librede.Librede;
 import tools.descartes.librede.bayesplusplus.BayesLibrary;
+import tools.descartes.librede.connector.dml.DmlLibrary;
 import tools.descartes.librede.ipopt.java.IpoptLibrary;
 import tools.descartes.librede.nnls.NNLSLibrary;
 
@@ -123,10 +125,18 @@ public final class LibredeEditorPlugin extends EMFPlugin {
 		@Override
 		public void start(BundleContext context) throws Exception {
 			super.start(context);
+			Librede.initLogging();
 			Librede.init();
 			NNLSLibrary.init();
 			IpoptLibrary.init();
 			BayesLibrary.init();
+			
+			try {
+				// This is only optional.
+				DmlLibrary.init();
+			} catch(NoClassDefFoundError er) {
+				// Ignore it.
+			}
 		}
 	}
 

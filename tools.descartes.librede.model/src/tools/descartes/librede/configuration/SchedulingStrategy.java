@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -170,6 +171,8 @@ public enum SchedulingStrategy implements Enumerator {
 	 * Returns the '<em><b>Scheduling Strategy</b></em>' literal with the specified literal value.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @param literal the literal.
+	 * @return the matching enumerator or <code>null</code>.
 	 * @generated
 	 */
 	public static SchedulingStrategy get(String literal) {
@@ -186,6 +189,8 @@ public enum SchedulingStrategy implements Enumerator {
 	 * Returns the '<em><b>Scheduling Strategy</b></em>' literal with the specified name.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @param name the name.
+	 * @return the matching enumerator or <code>null</code>.
 	 * @generated
 	 */
 	public static SchedulingStrategy getByName(String name) {
@@ -202,6 +207,8 @@ public enum SchedulingStrategy implements Enumerator {
 	 * Returns the '<em><b>Scheduling Strategy</b></em>' literal with the specified integer value.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @param value the integer value.
+	 * @return the matching enumerator or <code>null</code>.
 	 * @generated
 	 */
 	public static SchedulingStrategy get(int value) {

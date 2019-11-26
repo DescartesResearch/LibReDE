@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,14 +27,16 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.DoubleMatrix2D;
 import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.MatrixFunction;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.linalg.VectorFunction;
 import tools.descartes.librede.linalg.backend.MatrixFactory;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
 
 public class ColtMatrixFactory implements MatrixFactory {
 	
@@ -92,5 +95,15 @@ public class ColtMatrixFactory implements MatrixFactory {
 	@Override
 	public SquareMatrix createSquareMatrix(int size, MatrixFunction init) {
 		return new ColtSquareMatrix(size, init);
+	}
+	
+	@Override
+	public VectorBuilder createVectorBuilder(int maxRows) {
+		return new ColtVectorBuilder(maxRows);
+	}
+	
+	@Override
+	public MatrixBuilder createMatrixBuilder(int maxRows, int columns) {
+		return new ColtMatrixBuilder(maxRows, columns);
 	}
 }

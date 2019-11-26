@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,74 +30,133 @@ package tools.descartes.librede.algorithm;
 import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.max;
-import static tools.descartes.librede.linalg.LinAlg.mean;
 import static tools.descartes.librede.linalg.LinAlg.min;
-import static tools.descartes.librede.linalg.LinAlg.sum;
+import static tools.descartes.librede.linalg.LinAlg.nanmean;
+import static tools.descartes.librede.linalg.LinAlg.nansum;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
-@Component(displayName="Simple Approximation")
+/**
+ * The simple approximation algorithm estimates the resource demands by
+ * approximating it with the aggregated result of the direct output of the
+ * observation model.
+ * 
+ * This estimation algorithm only works on observation models consisting of
+ * output functions of the type {@link IDirectOutputFunction}.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
+@Component(displayName = "Simple Approximation")
 public class SimpleApproximation extends AbstractEstimationAlgorithm {
-	
+
+	/*
+	 * The aggregation to be used on the output values in the buffer.
+	 */
 	private Aggregation aggregation;
+
+	/*
+	 * The output of the observation model of the last n intervals. (N x M
+	 * matrix, with N == estimationWindow, M == size of state model)
+	 */
 	private Matrix buffer;
-	
+
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @param aggregation
+	 *            The aggregation function to be used to obtain the estimates.
+	 */
 	public SimpleApproximation(Aggregation aggregation) {
 		this.aggregation = aggregation;
 	}
 
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
-		this.buffer = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
+	public void initialize(EstimationProblem problem, 
+			IRepositoryCursor cursor,
+			int estimationWindow)
+			throws InitializationException {
+		super.initialize(problem, cursor, estimationWindow);
+		
+		// Fill with NaN. NaN values are ignored by the aggregation function.
+		this.buffer = matrix(estimationWindow, problem.getStateModel().getStateSize(),
+				Double.NaN);
 	}
-	
+
 	@Override
 	public void update() throws EstimationException {
-		final Vector output = getObservationModel().getObservedOutput();		
+
+		getStateModel().step(null);
 		
-		Vector currentEstimate = vector(output.rows(), new VectorFunction() {			
+		final Vector output = getObservationModel().getObservedOutput();
+
+		// update the buffer with current output of the observation model
+		Vector currentEstimate = vector(output.rows(), new VectorFunction() {
 			@Override
 			public double cell(int row) {
-				return output.get(row) / getCastedObservationModel().getOutputFunction(row).getFactor();
+				double factor = getCastedObservationModel().getOutputFunction(row)
+						.getFactor();
+				if (factor != 0) {
+					return  output.get(row) / factor;
+				}
+				// If the factor is equals to 0.0, this usually
+				// means we did not observe any requests in this interval
+				// therefore ignore this estimate in the following so that
+				// the aggregation is not distorted towards zero.
+				return Double.NaN;
 			}
 		});
-		buffer = buffer.circshift(1).setRow(0, currentEstimate);		
+		buffer = buffer.circshift(1).setRow(0, currentEstimate);
 	}
 
 	@Override
 	public Vector estimate() throws EstimationException {
-		switch(aggregation) {
+		Vector estimate = empty();
+		switch (aggregation) {
 		case AVERAGE:
-			return mean(buffer, 0);
+			estimate = nanmean(buffer);
+			break;
 		case MAXIMUM:
-			return max(buffer, 0);
+			estimate = max(buffer);
+			break;
 		case MINIMUM:
-			return min(buffer, 0);
+			estimate = min(buffer);
+			break;
 		case SUM:
-			return sum(buffer, 0);
+			estimate = nansum(buffer);
+			break;
 		case NONE:
-			return buffer.row(0);				
+			estimate = buffer.row(0);
+			break;
+		default:
+			throw new IllegalStateException();	
 		}
-		return empty();
+
+		for (int i = 0; i < estimate.rows(); i++) {
+			double value = estimate.get(i);
+			if (value != value) {
+				// NaN --> no observations therefore assume zero as resource demand.
+				estimate = estimate.set(i, 0.0);
+			}
+		}
+		return estimate;
 	}
 
-	@Override
-	public void destroy() {
-	}
-	
+	/**
+	 * Helper function to cast the observation model to the expected type.
+	 */
 	@SuppressWarnings("unchecked")
-	private IObservationModel<IDirectOutputFunction, Vector> getCastedObservationModel() {
-		return (IObservationModel<IDirectOutputFunction, Vector>) getObservationModel();
+	private IObservationModel<Vector> getCastedObservationModel() {
+		return (IObservationModel<Vector>) getObservationModel();
 	}
 }

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -39,9 +40,6 @@ import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.SquareMatrix;
 
 public class SquareMatrixTest {
 	

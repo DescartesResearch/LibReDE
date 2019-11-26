@@ -1,0 +1,42 @@
+target "Librede Update Site"
+
+location "http://download.eclipse.org/releases/neon" {
+	org.eclipse.sdk.feature.group
+	org.eclipse.emf.sdk.feature.group
+	org.eclipse.emf.cdo.common
+	org.eclipse.emf.cdo
+	org.eclipse.emf.cdo.edit
+	org.eclipse.net4j.util
+	org.eclipse.ecf.core.feature.feature.group
+	org.eclipse.ecf.filetransfer.feature.feature.group
+}
+
+location "http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/" {
+	org.apache.commons.collections
+	com.google.guava
+	org.hamcrest
+	org.hamcrest.core
+	org.hamcrest.library
+	org.hamcrest.integration
+	org.hamcrest.text
+	org.mockito
+	org.objenesis
+	org.junit
+	org.kohsuke.args4j
+	org.apache.log4j
+}
+
+location "https://se4.informatik.uni-wuerzburg.de/thirdparty/repository/" {
+	org.fest.util
+	org.fest.assertions.core
+	edu.oswego.cs.dl.util.concurrent
+	cern.colt
+	org.apache.commons.math3
+	com.sun.jna
+	org.jfreechart.core
+	org.jfreechart.jcommon
+}
+
+location "https://se4.informatik.uni-wuerzburg.de/dml/downloads/snapshot/" {
+	tools.descartes.dml.mm.feature.feature.group lazy
+}

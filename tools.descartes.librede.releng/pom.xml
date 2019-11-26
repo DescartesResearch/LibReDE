@@ -8,8 +8,14 @@
 
 	<groupId>tools.descartes.librede</groupId>
 	<artifactId>tools.descartes.librede.releng</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	
+	<parent>
+		<groupId>tools.descartes</groupId>
+		<artifactId>tools.descartes.releng</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
 
 	<organization>
 		<url>https://bitbucket.org/librede/librede</url>
@@ -19,22 +25,12 @@
 	<properties>
 		<tycho-version>0.21.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+		<!-- Removed due to errors -->
+		<!-- <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    	<sonar.jacoco.reportPath>../tools.descartes.librede.releng/target/jacoco.exec</sonar.jacoco.reportPath>
+    	<sonar.jacoco.reportPath>../tools.descartes.librede.releng/target/jacoco.exec</sonar.jacoco.reportPath> -->
 	</properties>
-	<distributionManagement>
-		<repository>
-			<id>se-uw-nexus</id>
-			<name>Releases</name>
-			<url>https://se4.informatik.uni-wuerzburg.de/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>se-uw-nexus</id>
-			<name>Snapshots</name>
-			<url>https://se4.informatik.uni-wuerzburg.de/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
+	
 	<repositories>
 		<repository>
 			<id>se-uw-nexus</id>
@@ -48,25 +44,23 @@
 			</snapshots>
 		</repository>
 	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
 			</plugin>
 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
 				<configuration>
 					<target>
 						<artifact>
 							<groupId>tools.descartes.librede</groupId>
 							<artifactId>tools.descartes.librede.releng.platform</artifactId>
-							<version>1.0.0-SNAPSHOT</version>
+							<version>1.1.0-SNAPSHOT</version>
 						</artifact>
 					</target>
 					<!-- Fix resolution problem with mockito and hamcrest -->
@@ -96,11 +90,11 @@
 							<ws>win32</ws>
 							<arch>x86</arch>
 						</environment>
-						<environment>
+<!-- 						<environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>
 							<arch>x86</arch>
-						</environment>
+						</environment> -->
 					</environments>
 				</configuration>
 			</plugin>
@@ -120,6 +114,11 @@
 						<exclude>**/*.xml</exclude>
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.html</exclude>
+						<exclude>**/*.m</exclude>
+						<exclude>**/*.target</exclude>
+						<exclude>**/*.FOR</exclude>
+						<exclude>**/*.F90</exclude>
+						<exclude>**/makefile</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -132,7 +131,8 @@
 			</plugin>
 			
 			<!-- Report test coverage -->
-			<plugin>
+			<!-- Removed due to errors -->
+			<!-- <plugin>
         		<groupId>org.jacoco</groupId>
         		<artifactId>jacoco-maven-plugin</artifactId>
         		<version>0.6.4.201312101107</version>
@@ -149,8 +149,9 @@
 	            		</configuration>
 	          		</execution>
 	        	</executions>
-      		</plugin>
+      		</plugin> -->
       		
+      		<!-- Deactivated due to slow performance
       		<plugin>
    				<groupId>org.apache.maven.plugins</groupId>
    				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -169,6 +170,7 @@
      				</execution>
    				</executions>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
@@ -195,5 +197,7 @@
 		<module>../tools.descartes.librede.model.editor</module>
 		<module>../tools.descartes.librede.console</module>
 		<module>../tools.descartes.librede.releng.doc</module>
+		<module>../tools.descartes.librede.connector.dml</module>
+		<module>../tools.descartes.librede.connector.dml.feature</module>
 	</modules>
 </project>

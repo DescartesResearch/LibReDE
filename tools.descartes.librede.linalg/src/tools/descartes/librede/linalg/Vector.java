@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -30,15 +31,13 @@ public interface Vector extends Matrix {
 	
 	double get(int row);
 	
+	Vector get(Indices rows);
+	
 	Vector set(int row, double value);
 	
-	Vector set(Range rows, Vector values);
+	Vector set(Indices rows, Vector values);
 	
-	Vector slice(Range range);
-	
-	Vector subset(int...indeces);
-	
-	Vector rows(int start, int end);
+	Vector rows(Indices rows);
 	
 	Vector plus(Matrix a);
 

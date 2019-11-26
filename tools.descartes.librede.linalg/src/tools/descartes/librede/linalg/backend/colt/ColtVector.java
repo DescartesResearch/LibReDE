@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,18 +27,25 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
-import tools.descartes.librede.linalg.AggregationFunction;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Range;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.VectorFunction;
-import tools.descartes.librede.linalg.backend.AbstractVector;
+import static tools.descartes.librede.linalg.LinAlg.scalar;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.solve;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtMatrix;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtVector;
+
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
+import tools.descartes.librede.linalg.AggregationFunction;
+import tools.descartes.librede.linalg.Indices;
+import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.linalg.backend.AbstractVector;
+import tools.descartes.librede.linalg.backend.IndicesImpl;
+import tools.descartes.librede.linalg.backend.RangeImpl;
 
 public class ColtVector extends AbstractVector {
 
@@ -92,7 +100,7 @@ public class ColtVector extends AbstractVector {
 		if (b.rows() != delegate.size()) {
 			throw new IllegalArgumentException("A and B must have the same size.");
 		}
-		return delegate.zDotProduct(getColtVector(b).delegate);
+		return delegate.zDotProduct(toColtVector(b).delegate);
 	}
 
 	@Override
@@ -102,6 +110,11 @@ public class ColtVector extends AbstractVector {
 			result.setQuick(i, delegate.getQuick(i) * a);
 		}
 		return new ColtVector(result);
+	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		return solve(this, b);
 	}
 
 	@Override
@@ -114,21 +127,13 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public double aggregate(AggregationFunction func) {
+	public Scalar aggregate(AggregationFunction func, double initialValue) {
 		int n = delegate.size();
-		double aggr = Double.NaN;
+		double aggr = initialValue;
 		for (int i = 0; i < n; i++) {
 			aggr = func.apply(aggr, delegate.getQuick(i));
 		}
-		return aggr;
-	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		if (dimension > 0) {
-			throw new IllegalArgumentException();
-		}
-		return new Scalar(aggregate(func));
+		return scalar(aggr);
 	}
 	
 	@Override
@@ -151,7 +156,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);	
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.plus);
+		res.assign(toColtVector((Vector)a).delegate, Functions.plus);
 		return new ColtVector(res);
 	}
 	
@@ -160,7 +165,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.minus);
+		res.assign(toColtVector((Vector)a).delegate, Functions.minus);
 		return new ColtVector(res);
 	}
 
@@ -169,7 +174,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.mult);
+		res.assign(toColtVector((Vector)a).delegate, Functions.mult);
 		return new ColtVector(res);
 	}
 	
@@ -178,7 +183,7 @@ public class ColtVector extends AbstractVector {
 		checkOperandsSameSize(a);
 		
 		DoubleMatrix1D res = copyVector();
-		res.assign(getColtVector(a).delegate, Functions.div);
+		res.assign(toColtVector((Vector)a).delegate, Functions.div);
 		return new ColtVector(res);
 	}
 
@@ -189,26 +194,9 @@ public class ColtVector extends AbstractVector {
 		if (a.isScalar()) {
 			return times(((Scalar)a).getValue());
 		} else {
-			ColtVector vector = getColtVector(a);
-			// TODO buffer
-			DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate, null);
+			ColtMatrix vector = toColtMatrix(a);
+			DoubleMatrix2D result = ALG.multOuter(delegate, vector.delegate.viewRow(0), null);
 			return new ColtMatrix(result);
-		}
-	}
-	
-	private ColtVector getColtVector(Matrix a) {
-		if (a instanceof ColtVector) {
-			return (ColtVector)a;
-		} else {
-			return new ColtVector(a.toArray1D());
-		}
-	}
-	
-	private ColtMatrix getColtMatrix(Matrix a) {
-		if (a instanceof ColtMatrix) {
-			return (ColtMatrix)a;
-		} else {
-			return new ColtMatrix(a.toArray2D());
 		}
 	}
 	
@@ -220,7 +208,7 @@ public class ColtVector extends AbstractVector {
 		
 		DoubleMatrix2D combined = newMatrix(this.rows(), 1 + a.columns());
 		combined.viewPart(0, 0, this.rows(), 1).assign(toArray2D());
-		combined.viewPart(0, 1, a.rows(), a.columns()).assign(getColtMatrix(a).delegate);
+		combined.viewPart(0, 1, a.rows(), a.columns()).assign(toColtMatrix(a).delegate);
 		return new ColtMatrix(combined);
 	}
 	
@@ -231,7 +219,7 @@ public class ColtVector extends AbstractVector {
 		}
 		DoubleMatrix1D combined = newVector(delegate.size() + a.rows());
 		combined.viewPart(0, delegate.size()).assign(delegate);
-		combined.viewPart(delegate.size(), a.rows()).assign(getColtVector(a).delegate);		
+		combined.viewPart(delegate.size(), a.rows()).assign(toColtVector((Vector)a).delegate);		
 		return new ColtVector(combined);
 	}
 	
@@ -271,19 +259,16 @@ public class ColtVector extends AbstractVector {
 	}
 	
 	@Override
-	public ColtVector columns(int start, int end) {
-		if (start != 0 || end != 0) {
+	public ColtVector columns(Indices columns) {
+		if (columns.length() != 1 && columns.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
 	}
 	
 	@Override
-	public Vector rows(int start, int end) {
-		if (start == end) {
-			return row(start);
-		}
-		return new ColtVector(delegate.viewPart(start, (end - start + 1)));
+	public Vector rows(Indices rows) {
+		return get(rows);
 	}
 
 	@Override
@@ -296,17 +281,31 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public ColtVector sort(int column) {
+	public Indices sort(int column) {
 		if (column != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		return new ColtVector(delegate.viewSorted());
+		return ColtHelper.sort(delegate);
 	}
 
 	@Override
 	public double get(int row) {
 		return delegate.get(row);
+	}
+	
+	public Vector get(Indices rows) {
+		if (rows.length() == 1) {
+			return new Scalar(delegate.get(rows.get(0)));
+		} else {
+			if (rows.isContinuous()) {
+				RangeImpl range = (RangeImpl)rows;
+				DoubleMatrix1D part = delegate.viewPart(range.getStart(), range.getLength());
+				return new ColtVector(part);
+			} else {
+				return new ColtVector(delegate.viewSelection(((IndicesImpl)rows).getIndices()));
+			}
+		}
 	}
 
 	@Override
@@ -325,30 +324,19 @@ public class ColtVector extends AbstractVector {
 	}
 
 	@Override
-	public Vector set(Range rows, Vector values) {
+	public Vector set(Indices rows, Vector values) {
 		DoubleMatrix1D copy = copyVector();
-		copy.viewPart(rows.getStart(), rows.getLength()).assign(getColtVector(values).delegate);
-		return new ColtVector(copy);
+		if (rows.isContinuous()) {
+			RangeImpl range = (RangeImpl)rows;
+			copy.viewPart(range.getStart(), range.getLength()).assign(toColtVector(values).delegate);
+			return new ColtVector(copy);
+		} else {
+			IndicesImpl indices = (IndicesImpl)rows;
+			copy.viewSelection(indices.getIndices()).assign(toColtVector(values).delegate);
+			return new ColtVector(copy);
+		}			
 	}
 
-	@Override
-	public Vector slice(Range range) {
-		if (range.getLength() == 1) {
-			return new Scalar(delegate.get(range.getStart()));
-		}
-		DoubleMatrix1D part = delegate.viewPart(range.getStart(), range.getEnd() - range.getStart());
-		return new ColtVector(part);
-	}
-	
-	@Override
-	public Vector subset(int...indeces) {
-		if (indeces.length == 1) {
-			return new Scalar(delegate.get(indeces[0]));
-		} else {
-			return new ColtVector(delegate.viewSelection(indeces));
-		}
-	}
-	
 	@Override
 	public Vector row(int row) {
 		return new Scalar(delegate.get(row));

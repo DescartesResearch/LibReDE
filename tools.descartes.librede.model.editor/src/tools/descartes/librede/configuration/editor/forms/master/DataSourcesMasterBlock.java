@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -47,11 +48,11 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IDetailsPageProvider;
-import org.eclipse.ui.forms.IManagedForm;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.ParametersDetailsPage;
@@ -93,8 +94,10 @@ public class DataSourcesMasterBlock extends AbstractMasterBlockWithButtons imple
 		tableSourcesViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		
 		tableSourcesViewer.setInput(model.getInput());
-		tableSourcesViewer.addFilter(new ClassesViewerFilter(DataSourceConfiguration.class));
+		tableSourcesViewer.addFilter(new ClassesViewerFilter(InputSpecification.class, DataSourceConfiguration.class));
 		tableSourcesViewer.addSelectionChangedListener(this);
+		
+		registerViewer(tableSourcesViewer);
 		
 		return tableSources;
 	}

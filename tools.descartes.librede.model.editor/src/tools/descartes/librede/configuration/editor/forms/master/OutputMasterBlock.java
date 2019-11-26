@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -46,7 +47,6 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IDetailsPageProvider;
-import org.eclipse.ui.forms.IManagedForm;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
@@ -121,6 +121,8 @@ public class OutputMasterBlock extends AbstractMasterBlockWithButtons implements
 		tableExportersViewer.setLabelProvider(new AdapterFactoryLabelProvider(page.getAdapterFactory()));
 		tableExportersViewer.setInput(model.getOutput());
 		tableExportersViewer.addSelectionChangedListener(this);
+		
+		registerViewer(tableExportersViewer);
 		
 		return tableExporters;
 	}

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,10 +27,13 @@
  */
 package tools.descartes.librede.models.state.constraints;
 
+import java.util.Collections;
 import java.util.List;
 
-import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.variables.ConstraintVariable;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public final class Unconstrained implements IStateConstraint {
 	
@@ -48,17 +52,17 @@ public final class Unconstrained implements IStateConstraint {
 	}
 
 	@Override
-	public double getValue(Vector state) {
+	public ConstraintVariable getValue(State state) {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean isApplicable(List<String> messages) {
-		return true;
 	}
 
 	@Override
 	public void setStateModel(IStateModel<? extends IStateConstraint> model) {
 		// Do nothing		
+	}
+
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		return Collections.emptyList();
 	}
 }

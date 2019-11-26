@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -108,7 +109,7 @@ public interface Matrix {
 	 */
 	Vector row(int row);
 	
-	Matrix rows(int start, int end);
+	Matrix rows(Indices rows);
 
 	/**
 	 * Returns a column vector.
@@ -121,7 +122,7 @@ public interface Matrix {
 	 */
 	Vector column(int column);
 	
-	Matrix columns(int start, int end);
+	Matrix columns(Indices cols);
 
 	/**
 	 * @return true if matrix is a vector (n x 1), false otherwise.
@@ -155,6 +156,8 @@ public interface Matrix {
 	Matrix arrayDividedBy(Matrix a);
 
 	Matrix times(double a);
+	
+	Matrix mldivide(Matrix b);
 
 	double norm1();
 
@@ -164,9 +167,7 @@ public interface Matrix {
 
 	Matrix transpose();
 
-	Matrix subset(int... rows);
-
-	Matrix sort(int column);
+	Indices sort(int column);
 
 	Matrix insertRow(int row, Vector values);
 	
@@ -174,9 +175,7 @@ public interface Matrix {
 	
 	Matrix circshift(int rows);
 	
-	double aggregate(AggregationFunction func);
-	
-	Vector aggregate(AggregationFunction func, int dimension);
+	Vector aggregate(AggregationFunction func, double initialValue);
 
 	/*
 	 * Conversion functions

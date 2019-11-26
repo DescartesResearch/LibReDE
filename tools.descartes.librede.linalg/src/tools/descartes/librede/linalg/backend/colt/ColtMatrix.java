@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,21 +27,28 @@
  */
 package tools.descartes.librede.linalg.backend.colt;
 
+import static tools.descartes.librede.linalg.LinAlg.empty;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.solve;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtMatrix;
+import static tools.descartes.librede.linalg.backend.colt.ColtHelper.toColtVector;
 
 import java.util.Arrays;
 
-import tools.descartes.librede.linalg.AggregationFunction;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.MatrixFunction;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.linalg.backend.AbstractMatrix;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
 import cern.jet.math.Functions;
+import tools.descartes.librede.linalg.AggregationFunction;
+import tools.descartes.librede.linalg.Indices;
+import tools.descartes.librede.linalg.Matrix;
+import tools.descartes.librede.linalg.MatrixFunction;
+import tools.descartes.librede.linalg.Scalar;
+import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.backend.AbstractMatrix;
+import tools.descartes.librede.linalg.backend.IndicesImpl;
+import tools.descartes.librede.linalg.backend.RangeImpl;
 
 public class ColtMatrix extends AbstractMatrix {
 	
@@ -95,11 +103,13 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public Matrix rows(int start, int end) {
-		if (start == end) {
-			return row(start);
+	public Matrix rows(Indices indices) {
+		if (indices.isContinuous()) {
+			RangeImpl range = (RangeImpl)indices;
+			return new ColtMatrix(delegate.viewPart(range.getStart(), 0, range.getLength(), delegate.columns()));
+		} else {
+			return new ColtMatrix(delegate.viewSelection(((IndicesImpl)indices).getIndices(), null));
 		}
-		return new ColtMatrix(delegate.viewPart(start, 0, (end - start + 1), delegate.columns()));
 	}
 
 	@Override
@@ -111,13 +121,18 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public Matrix columns(int start, int end) {
-		if (start == end) {
-			return column(start);
+	public Matrix columns(Indices columns) {
+		if (columns.length() == 1) {
+			return column(columns.get(0));
 		}
-		return new ColtMatrix(delegate.viewPart(0, start, delegate.rows(), (end - start + 1)));
+		if (columns.isContinuous()) {
+			RangeImpl range = (RangeImpl)columns;
+			return new ColtMatrix(delegate.viewPart(0, range.getStart(), delegate.rows(), range.getLength()));
+		} else {
+			return new ColtMatrix(delegate.viewSelection(null, ((IndicesImpl)columns).getIndices()));
+		}
 	}
-
+	
 	@Override
 	public double[][] toArray2D() {
 		return delegate.toArray();
@@ -238,6 +253,11 @@ public class ColtMatrix extends AbstractMatrix {
 			return new ColtMatrix(result);
 		}
 	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		return solve(this, b);
+	}
 
 	@Override
 	public double[] toArray1D() {
@@ -250,22 +270,6 @@ public class ColtMatrix extends AbstractMatrix {
 			}
 		}
 		return ret;
-	}
-
-	protected ColtMatrix toColtMatrix(Matrix a) {
-		if (a instanceof ColtMatrix) {
-			return (ColtMatrix) a;
-		} else {
-			return new ColtMatrix(a.toArray2D());
-		}
-	}
-
-	protected ColtVector toColtVector(Vector a) {
-		if (a instanceof ColtVector) {
-			return (ColtVector) a;
-		} else {
-			return new ColtVector(a.toArray1D());
-		}
 	}
 
 	@Override
@@ -305,13 +309,8 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public ColtMatrix sort(int column) {
-		return new ColtMatrix(delegate.viewSorted(column));
-	}
-	
-	@Override
-	public Matrix subset(int... rows) {
-		return new ColtMatrix(delegate.viewSelection(rows, null));
+	public Indices sort(int column) {
+		return ColtHelper.sort(delegate, column);
 	}
 	
 	@Override
@@ -371,37 +370,20 @@ public class ColtMatrix extends AbstractMatrix {
 	}
 	
 	@Override
-	public double aggregate(AggregationFunction func) {
+	public Vector aggregate(AggregationFunction func, double initialValue) {
 		int n = delegate.rows();
 		int m = delegate.columns();
-		double aggr = Double.NaN;
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				aggr = func.apply(aggr, delegate.getQuick(i, j));
-			}
-		}
-		return aggr;
-	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		if (dimension < 0 || dimension > 1) {
-			throw new IllegalArgumentException();
-		}
-		int n = delegate.rows();
-		int m = delegate.columns();
-		double[] aggr = new double[(dimension == 0) ? m : n];
-		Arrays.fill(aggr, Double.NaN);
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				if (dimension == 1) {
-					aggr[i] = func.apply(aggr[i], delegate.getQuick(i, j));
-				} else {
+		if (n > 0) {
+			double[] aggr = new double[m];
+			Arrays.fill(aggr, initialValue);
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m; j++) {
 					aggr[j] = func.apply(aggr[j], delegate.getQuick(i, j));
 				}
 			}
+			return vector(aggr);
 		}
-		return vector(aggr);
+		return empty();
 	}
 	
 	protected DoubleMatrix1D newVector(int size) {

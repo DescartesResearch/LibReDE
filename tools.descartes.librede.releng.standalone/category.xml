@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/tools.descartes.librede.feature_1.0.0.qualifier.jar" id="tools.descartes.librede.feature" version="1.0.0.qualifier">
+   <feature id="tools.descartes.librede.feature">
       <category name="librede.standalone"/>
    </feature>
-   <feature url="features/org.eclipse.emf_2.10.0.v20140519-0339.jar" id="org.eclipse.emf" version="2.10.0.v20140519-0339">
+   <feature id="org.eclipse.emf">
       <category name="librede.standalone"/>
    </feature>
-   <bundle id="tools.descartes.librede.console" version="1.0.0.qualifier">
+   <bundle id="tools.descartes.librede.console">
       <category name="librede.standalone"/>
    </bundle>
-   <bundle id="tools.descartes.librede.releng.doc" version="1.0.0.qualifier">
+   <bundle id="tools.descartes.librede.releng.doc">
       <category name="librede.standalone"/>
    </bundle>
-   <bundle id="org.kohsuke.args4j" version="2.0.21.v201301150030">
+   <bundle id="org.kohsuke.args4j">
       <category name="librede.standalone"/>
    </bundle>
-   <bundle id="org.apache.log4j" version="1.2.15.v201012070815">
+   <bundle id="org.apache.log4j">
       <category name="librede.standalone"/>
    </bundle>
    <category-def name="librede.standalone" label="Standalone Distribution"/>

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,19 +30,14 @@ package tools.descartes.librede.configuration.editor.forms.master;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.databinding.observable.list.IObservableList;
-import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
@@ -53,6 +49,7 @@ import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.configuration.EstimationSpecification;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.ClassesViewerFilter;
 import tools.descartes.librede.configuration.editor.forms.details.ParametersDetailsPage;
@@ -114,8 +111,10 @@ public class EstimationApproachesMasterBlock extends AbstractMasterBlock
 			}
 		}
 		tableAlgorithmsViewer.setInput(model.getEstimation());
-		tableAlgorithmsViewer.addFilter(new ClassesViewerFilter(EstimationAlgorithmConfiguration.class));
+		tableAlgorithmsViewer.addFilter(new ClassesViewerFilter(EstimationSpecification.class, EstimationAlgorithmConfiguration.class));
 		tableAlgorithmsViewer.addSelectionChangedListener(this);
+		
+		registerViewer(tableAlgorithmsViewer);
 		
 		return tableAlgorithms;
 	}

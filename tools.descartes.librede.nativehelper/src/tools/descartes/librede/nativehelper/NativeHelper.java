@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,20 +27,15 @@
  */
 package tools.descartes.librede.nativehelper;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
+
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixFunction;
-import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
-import tools.descartes.librede.linalg.backend.colt.ColtMatrix;
 import tools.descartes.librede.linalg.backend.colt.ColtMatrixFactory;
-import tools.descartes.librede.linalg.backend.colt.ColtVector;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.DoubleMatrix2D;
-
-import com.sun.jna.Memory;
-import com.sun.jna.Pointer;
 
 public class NativeHelper {
 	

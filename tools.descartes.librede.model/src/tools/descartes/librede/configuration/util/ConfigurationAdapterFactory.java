@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -33,7 +34,34 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.ecore.EObject;
 
-import tools.descartes.librede.configuration.*;
+import tools.descartes.librede.configuration.CompositeService;
+import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.ConstantDataPoint;
+import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.configuration.EstimationApproachConfiguration;
+import tools.descartes.librede.configuration.EstimationSpecification;
+import tools.descartes.librede.configuration.ExporterConfiguration;
+import tools.descartes.librede.configuration.ExternalCall;
+import tools.descartes.librede.configuration.FileTraceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
+import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.NamedElement;
+import tools.descartes.librede.configuration.Observation;
+import tools.descartes.librede.configuration.ObservationToEntityMapping;
+import tools.descartes.librede.configuration.OutputSpecification;
+import tools.descartes.librede.configuration.Parameter;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.Task;
+import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceFilter;
+import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.configuration.ValidationSpecification;
+import tools.descartes.librede.configuration.ValidatorConfiguration;
+import tools.descartes.librede.configuration.WorkloadDescription;
 
 /**
  * <!-- begin-user-doc -->
@@ -166,6 +194,42 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseEstimationAlgorithmConfiguration(EstimationAlgorithmConfiguration object) {
 				return createEstimationAlgorithmConfigurationAdapter();
+			}
+			@Override
+			public Adapter caseTraceFilter(TraceFilter object) {
+				return createTraceFilterAdapter();
+			}
+			@Override
+			public Adapter caseResourceDemand(ResourceDemand object) {
+				return createResourceDemandAdapter();
+			}
+			@Override
+			public Adapter caseExternalCall(ExternalCall object) {
+				return createExternalCallAdapter();
+			}
+			@Override
+			public Adapter caseCompositeService(CompositeService object) {
+				return createCompositeServiceAdapter();
+			}
+			@Override
+			public Adapter caseTask(Task object) {
+				return createTaskAdapter();
+			}
+			@Override
+			public Adapter caseObservation(Observation object) {
+				return createObservationAdapter();
+			}
+			@Override
+			public Adapter caseObservationToEntityMapping(ObservationToEntityMapping object) {
+				return createObservationToEntityMappingAdapter();
+			}
+			@Override
+			public Adapter caseConstantDataPoint(ConstantDataPoint object) {
+				return createConstantDataPointAdapter();
+			}
+			@Override
+			public <T> Adapter caseComparable(Comparable<T> object) {
+				return createComparableAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -450,6 +514,132 @@ public class ConfigurationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEstimationAlgorithmConfigurationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.TraceFilter <em>Trace Filter</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.TraceFilter
+	 * @generated
+	 */
+	public Adapter createTraceFilterAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ResourceDemand <em>Resource Demand</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ResourceDemand
+	 * @generated
+	 */
+	public Adapter createResourceDemandAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ExternalCall <em>External Call</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ExternalCall
+	 * @generated
+	 */
+	public Adapter createExternalCallAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.CompositeService <em>Composite Service</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.CompositeService
+	 * @generated
+	 */
+	public Adapter createCompositeServiceAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.Task <em>Task</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.Task
+	 * @generated
+	 */
+	public Adapter createTaskAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.Observation <em>Observation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.Observation
+	 * @generated
+	 */
+	public Adapter createObservationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ObservationToEntityMapping <em>Observation To Entity Mapping</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ObservationToEntityMapping
+	 * @generated
+	 */
+	public Adapter createObservationToEntityMappingAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link tools.descartes.librede.configuration.ConstantDataPoint <em>Constant Data Point</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see tools.descartes.librede.configuration.ConstantDataPoint
+	 * @generated
+	 */
+	public Adapter createConstantDataPointAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.lang.Comparable <em>Comparable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.lang.Comparable
+	 * @generated
+	 */
+	public Adapter createComparableAdapter() {
 		return null;
 	}
 

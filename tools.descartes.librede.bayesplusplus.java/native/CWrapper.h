@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -73,6 +74,12 @@ int observe(BF::Covariance_scheme* scheme, BF::Linrz_uncorrelated_observe_model*
 int update(BF::Covariance_scheme* scheme);
 
 void get_x(BF::Covariance_scheme* scheme, double* x);
+
+void set_x(BF::Covariance_scheme* scheme, double* x, std::size_t x_size);
+
+void get_X(BF::Covariance_scheme* scheme, double* X);
+
+void set_X(BF::Covariance_scheme* scheme, double* X, std::size_t x_size);
 
 const char* get_last_error();
 

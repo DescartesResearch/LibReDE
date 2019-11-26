@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,34 +27,34 @@
  */
 package tools.descartes.librede.repository;
 
-import java.util.List;
-
 import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 public interface IRepositoryCursor {
 
 	boolean next();
 	
-	boolean seek(int interval);
+	void reset();
 	
-	boolean seek(double newTime);
+	int getLastInterval();
+	
+	Quantity<Time> getIntervalStart(int interval);
 
-	double getCurrentIntervalStart();
+	Quantity<Time> getIntervalEnd(int interval);
 
-	double getCurrentIntervalLength();
+	<D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity);
 
-	double getCurrentIntervalEnd();
-
-	TimeSeries getValues(IMetric metric, ModelEntity entity);
-
-	double getAggregatedValue(IMetric metric,
+	<D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit,
 			ModelEntity entity, Aggregation func);
 
 	IMonitoringRepository getRepository();
 
-	boolean hasData(IMetric metric,
-			List<ModelEntity> entities, Aggregation aggregation);
-
-	int getAvailableIntervals();
+	<D extends Dimension> boolean hasData(int interval, Metric<D> metric,
+			ModelEntity entity, Aggregation aggregation);
 
 }

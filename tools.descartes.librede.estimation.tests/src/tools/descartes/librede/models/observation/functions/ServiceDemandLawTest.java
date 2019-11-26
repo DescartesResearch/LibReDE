@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -31,43 +32,52 @@ import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.diff.DifferentiationUtils;
+import tools.descartes.librede.models.observation.equations.ServiceDemandLawEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
-import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class ServiceDemandLawTest {
+public class ServiceDemandLawTest extends LibredeTest {
 	
-	private final static int SERVICE_IDX = 2;
-	private final static int RESOURCE_IDX = 1;
+	private final static int STATE_IDX = 3;
 	
 	private ObservationDataGenerator generator;
-	private ServiceDemandLaw law;
+	private ServiceDemandLawEquation law;
 	private IRepositoryCursor cursor;
-	private Vector state;
+	private State state;
 	
 	private Resource resource;
 	private Service service;
-
+	
 	@Before
 	public void setUp() throws Exception {
-		generator = new ObservationDataGenerator(42, 5, 4);
+		/*
+		 * IMPORTANT: SDL is only accurate for the single resource case!
+		 */
+		generator = new ObservationDataGenerator(42, 5, 1);
 		generator.setRandomDemands();
 		
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
-		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
-		service = generator.getStateModel().getServices().get(SERVICE_IDX);
+		ResourceDemand demand = generator.getStateModel().getResourceDemand(STATE_IDX);
+		resource = demand.getResource();
+		service = demand.getService();
 		
-		law = new ServiceDemandLaw(generator.getStateModel(), cursor, resource, service);
+		law = new ServiceDemandLawEquation(generator.getStateModel(), cursor, resource, service);
 		state = generator.getDemands();	
 		
 		generator.nextObservation();
@@ -75,38 +85,27 @@ public class ServiceDemandLawTest {
 	}
 
 	@Test
-	public void testGetObservedOutput() {
-		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
-		Vector r = QueryBuilder.select(StandardMetric.RESPONSE_TIME).forAllServices().average().using(cursor).execute();
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
-		
-		assertThat(law.getObservedOutput()).isEqualTo(x.get(SERVICE_IDX) * r.get(SERVICE_IDX) * util / x.dot(r), offset(1e-9));
-	}
-
-	@Test
 	public void testGetCalculatedOutput() {
-		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
-		double expected = x * state.get(generator.getStateModel().getStateVariableIndex(resource, service));
+		double expected = state.getVariable(resource, service).getValue();
 		
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(expected, offset(1e-9));
+		assertThat(law.getValue(state).getValue()).isEqualTo(expected, offset(1e-9));
 	}
 	
 	@Test
 	public void testGetFactor() {
-		double x = QueryBuilder.select(StandardMetric.THROUGHPUT).forService(service).average().using(cursor).execute().getValue();
-		assertThat(law.getFactor()).isEqualTo(x, offset(1e-9));
+		double expected = state.getVariable(resource, service).getValue();
+		
+		assertThat(law.getConstantValue()).isEqualTo(expected, offset(1e-9));
 	}
-
+	
 	@Test
-	public void testGetFirstDerivatives() {
-		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
-	}
-
-	@Test
-	public void testGetSecondDerivatives() {
-		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e0));
+	public void testGetDerivatives() {
+		Vector diff1 = Differentiation.diff1(law, state);
+		Matrix diff2 = Differentiation.diff2(law, state);
+		
+		DerivativeStructure s = law.getValue(new State(state.getStateModel(), state.getVector(), 2));
+		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
+		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
 
 }

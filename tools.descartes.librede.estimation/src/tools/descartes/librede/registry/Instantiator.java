@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -69,7 +70,7 @@ public class Instantiator {
 			} else if (f.getType().equals(File.class)) {
 				f.set(obj, new File(value));
 			} else if (f.getType().equals(boolean.class)) {
-				f.setBoolean(obj, Boolean.parseBoolean(value));
+				f.setBoolean(obj, value.equalsIgnoreCase("true") || value.equalsIgnoreCase("on") || value.equalsIgnoreCase("yes"));
 			} else if (f.getType().equals(short.class)) {
 				f.setShort(obj, Short.parseShort(value));
 			} else if (f.getType().equals(int.class)) {

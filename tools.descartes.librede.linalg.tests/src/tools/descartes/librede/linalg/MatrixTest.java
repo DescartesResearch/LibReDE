@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -46,9 +47,6 @@ import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Vector;
 
 public class MatrixTest {
 	
@@ -247,8 +245,8 @@ public class MatrixTest {
 	
 	@Test
 	public void testSum() {
-		double c = sum(a);
-		assertThat(c).isEqualTo(A[0][0] + A[0][1] + A[0][2] + A[1][0] + A[1][1] + A[1][2], offset(1e-9));
+		Vector c = sum(a);
+		assertThat(c).isEqualTo(vector(A[0][0] + A[1][0], A[0][1] + A[1][1], A[0][2] + A[1][2]), offset(1e-9));
 		assertThat(a).isEqualTo(matrix(A), offset(1e-9));
 	}
 	
@@ -276,14 +274,14 @@ public class MatrixTest {
 	
 	@Test
 	public void testHorzCat() {
-		Matrix c = horzcat(a, b, v.slice(range(0,2)));
+		Matrix c = horzcat(a, b, v.get(range(0,2)));
 		assertThat(c).isEqualTo(
 						matrix(row(A[0][0], A[0][1], A[0][2], B[0][0], B[0][1], B[0][2], V[0]), 
 						row(A[1][0], A[1][1], A[1][2], B[1][0], B[1][1], B[1][2], V[1])), 
 						offset(1e-9)
 								);
 		
-		c = horzcat(v.slice(range(0,2)), a, b);
+		c = horzcat(v.get(range(0,2)), a, b);
 		assertThat(c).isEqualTo(
 						matrix(
 								row(V[0], A[0][0], A[0][1], A[0][2], B[0][0], B[0][1], B[0][2]), 

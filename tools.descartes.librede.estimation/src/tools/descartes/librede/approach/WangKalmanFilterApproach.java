@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -33,41 +34,54 @@ import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.IKalmanFilterAlgorithm;
 import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.equations.UtilizationValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.initial.TargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName="Kalman Filter using Utilization Law")
 public class WangKalmanFilterApproach extends AbstractEstimationApproach {
+	
+	/**
+	 * The initial demand is scaled to this utilization level, to avoid bad
+	 * starting points (e.g., demands that would result in a utilization value
+	 * above 100%)
+	 */
+	private static final double INITIAL_UTILIZATION = 0.5;
 
 	@Override
 	protected List<IStateModel<?>> deriveStateModels(
 			WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
 		for (Resource res : workload.getResources()) {
-			for (Service serv : workload.getServices()) {
-				builder.addVariable(res, serv);
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
 			}
 		}
+		builder.setStateInitializer(new TargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(
+	protected IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
+		VectorObservationModel observationModel = new VectorObservationModel();
 		for (Resource res : stateModel.getResources()) {
-			UtilizationLaw func = new UtilizationLaw(stateModel, cursor, res);
-			observationModel.addOutputFunction(func);
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				UtilizationLawEquation func = new UtilizationLawEquation(stateModel, cursor, res, 0);
+				observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, res, 0), func));
+			}
 		}
 		return observationModel;
 	}

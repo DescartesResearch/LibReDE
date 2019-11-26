@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -99,6 +100,7 @@ public class InputSpecificationItemProvider
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES);
 			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS);
+			childrenFeatures.add(ConfigurationPackage.Literals.INPUT_SPECIFICATION__CONSTANT_DATA_POINTS);
 		}
 		return childrenFeatures;
 	}
@@ -153,6 +155,7 @@ public class InputSpecificationItemProvider
 		switch (notification.getFeatureID(InputSpecification.class)) {
 			case ConfigurationPackage.INPUT_SPECIFICATION__DATA_SOURCES:
 			case ConfigurationPackage.INPUT_SPECIFICATION__OBSERVATIONS:
+			case ConfigurationPackage.INPUT_SPECIFICATION__CONSTANT_DATA_POINTS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -184,6 +187,11 @@ public class InputSpecificationItemProvider
 			(createChildParameter
 				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__OBSERVATIONS,
 				 ConfigurationFactory.eINSTANCE.createFileTraceConfiguration()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(ConfigurationPackage.Literals.INPUT_SPECIFICATION__CONSTANT_DATA_POINTS,
+				 ConfigurationFactory.eINSTANCE.createConstantDataPoint()));
 	}
 
 	/**

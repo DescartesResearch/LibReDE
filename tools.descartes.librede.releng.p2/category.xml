@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/tools.descartes.librede.feature_1.0.0.qualifier.jar" id="tools.descartes.librede.feature" version="1.0.0.qualifier">
+   <feature url="features/tools.descartes.librede.feature_1.1.0.qualifier.jar" id="tools.descartes.librede.feature" version="1.1.0.qualifier">
+      <category name="librede.category"/>
+   </feature>
+   <feature url="features/tools.descartes.librede.connector.dml.feature_1.1.0.qualifier.jar" id="tools.descartes.librede.connector.dml.feature" version="1.1.0.qualifier">
       <category name="librede.category"/>
    </feature>
    <category-def name="librede.category" label="LibReDE"/>

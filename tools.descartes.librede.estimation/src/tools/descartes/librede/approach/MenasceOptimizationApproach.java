@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,47 +27,70 @@
  */
 package tools.descartes.librede.approach;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IConstrainedNonLinearOptimizationAlgorithm;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.SchedulingStrategy;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.equations.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.equations.ResponseTimeValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
+import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Recursive Optimization using Response Times")
 public class MenasceOptimizationApproach extends AbstractEstimationApproach {
 	
+	/**
+	 * The initial demand is scaled to this utilization level, to avoid bad
+	 * starting points (e.g., demands that would result in a utilization value
+	 * above 100%)
+	 */
+	private static final double INITIAL_UTILIZATION = 0.5;
+	
 	protected List<IStateModel<?>> deriveStateModels(WorkloadDescription workload, IRepositoryCursor cursor) {
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
+		Set<Service> services = new HashSet<>();
 		for (Resource res : workload.getResources()) {
-			builder.addConstraint(new UtilizationConstraint(res, cursor));
-			for (Service service : workload.getServices()) {
-				builder.addVariable(res, service);
+			if (res.getSchedulingStrategy() != SchedulingStrategy.IS) {
+				builder.addConstraint(new UtilizationConstraint(res, cursor));
+			}
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
+				builder.addVariable(demand);
+				services.add(demand.getService());
 			}
 		}
+		builder.setInvocationGraph(new InvocationGraph(new ArrayList<>(services), cursor, 1));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(INITIAL_UTILIZATION, cursor));
 		return Arrays.<IStateModel<?>>asList(builder.build());
 	}
 	
-	protected IObservationModel<IOutputFunction,Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
-		VectorObservationModel<IOutputFunction> observationModel = new VectorObservationModel<IOutputFunction>();
-		for (Service service : stateModel.getServices()) {
-			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service);
-			observationModel.addOutputFunction(func);
+	protected IObservationModel<Vector> deriveObservationModel(IStateModel<?> stateModel, IRepositoryCursor cursor) {
+		VectorObservationModel observationModel = new VectorObservationModel();
+		for (Service service : stateModel.getUserServices()) {
+			ResponseTimeEquation func = new ResponseTimeEquation(stateModel, cursor, service, false, 0);
+			observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, service, 0), func));
 		}
 		return observationModel;
 	}

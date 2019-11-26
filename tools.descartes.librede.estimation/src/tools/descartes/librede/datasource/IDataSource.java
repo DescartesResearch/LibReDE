@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,12 +27,78 @@
  */
 package tools.descartes.librede.datasource;
 
-import java.io.InputStream;
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.List;
 
-import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.configuration.TraceConfiguration;
 
-public interface IDataSource {
-	
-	public TimeSeries load(InputStream in, int column) throws Exception;
+/**
+ * This interface provides common methods supported by all data source
+ * implementations.
+ * 
+ * A data source provides functionality to read measurement data from a source
+ * of a specific type and format (e.g., file, database, or interface provided by
+ * a monitoring tool). A data source is used to continuously load the newly
+ * available measurement data points into an instance of a
+ * {@link tools.descartes.librede.repository.IMonitoringRepository}.
+ * 
+ * The data source provides an asynchronous interface for reading the
+ * measurement data similar to the asynchronous file operations from the NIO
+ * packages in the java standard library.
+ * 
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ */
+public interface IDataSource extends Closeable {
+
+	/**
+	 * Adds the specified trace into this data source. The data source will
+	 * monitor for new data until this data source is closed.
+	 * 
+	 * @param configuration
+	 *            A TraceConfiguration containing the information where the data
+	 *            source can find the data for this trace.
+	 * @throws IOException
+	 *             thrown if the data source cannot read this trace.
+	 */
+	public List<TraceKey> addTrace(TraceConfiguration configuration) throws IOException;
+
+	/**
+	 * Starts loading the existing data in the data source and watches for new
+	 * data to become available until the data source is closed.
+	 * 
+	 * @throws IOException
+	 */
+	public void load() throws IOException;
+
+	/**
+	 * Add a data source listener.
+	 * 
+	 * @param listener
+	 */
+	public void addListener(IDataSourceListener listener);
+
+	/**
+	 * Remove a data source listener
+	 * 
+	 * @param listener
+	 */
+	public void removeListener(IDataSourceListener listener);
+
+	/**
+	 * Returns the name of this data source.
+	 * 
+	 * @return a String
+	 */
+	public String getName();
+
+	/**
+	 * Sets the name of the data source.
+	 * 
+	 * @param name
+	 *            a String
+	 */
+	public void setName(String name);
 
 }

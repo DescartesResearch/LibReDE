@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,16 +28,19 @@
 package tools.descartes.librede.models.observation;
 
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IObservationModel<E extends IOutputFunction, O extends Vector> extends Iterable<E> {
+public interface IObservationModel<O extends Vector> extends Iterable<OutputFunction>, IDependencyTarget {
 	
 	int getOutputSize();
 	
 	O getObservedOutput();
 	
-	O getCalculatedOutput(Vector state);
+	O getCalculatedOutput(State state);
 	
-	E getOutputFunction(int output);
+	OutputFunction getOutputFunction(int output);
+	
+	IOutputWeightingFunction getOutputWeightsFunction();
 	
 }

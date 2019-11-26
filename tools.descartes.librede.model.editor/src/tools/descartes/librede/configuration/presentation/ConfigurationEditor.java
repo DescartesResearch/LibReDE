@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -60,7 +61,6 @@ import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.ui.MarkerHelper;
-import org.eclipse.emf.common.ui.ViewerPane;
 import org.eclipse.emf.common.ui.editor.ProblemEditorPart;
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.common.util.BasicDiagnostic;
@@ -129,7 +129,6 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.PropertySheet;
 import org.eclipse.ui.views.properties.PropertySheetPage;
 
-import tools.descartes.librede.Librede;
 import tools.descartes.librede.configuration.LibredeConfiguration;
 import tools.descartes.librede.configuration.editor.forms.EstimationFormPage;
 import tools.descartes.librede.configuration.editor.forms.MasterDetailsFormPage;
@@ -141,6 +140,7 @@ import tools.descartes.librede.configuration.editor.forms.master.OutputMasterBlo
 import tools.descartes.librede.configuration.editor.forms.master.TracesMasterBlock;
 import tools.descartes.librede.configuration.editor.forms.master.ValidationMasterBlock;
 import tools.descartes.librede.configuration.provider.ConfigurationItemProviderAdapterFactory;
+import tools.descartes.librede.registry.Registry;
 
 
 /**
@@ -199,14 +199,6 @@ public class ConfigurationEditor
 	 * @generated
 	 */
 	protected List<PropertySheetPage> propertySheetPages = new ArrayList<PropertySheetPage>();
-
-	/**
-	 * This keeps track of the active viewer pane, in the book.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected ViewerPane currentViewerPane;
 
 	/**
 	 * This keeps track of the active content viewer, which may be either one of the viewers in the pages or the content outline viewer.
@@ -618,7 +610,6 @@ public class ConfigurationEditor
 	 */
 	public ConfigurationEditor() {
 		super();
-		Librede.init();
 		initializeEditingDomain();
 	}
 
@@ -673,7 +664,13 @@ public class ConfigurationEditor
 
 		// Create the editing domain with a special command stack.
 		//
-		editingDomain = new AdapterFactoryEditingDomain(adapterFactory, commandStack, new HashMap<Resource, Boolean>());
+		editingDomain = new AdapterFactoryEditingDomain(adapterFactory, commandStack, Registry.INSTANCE.createResourceSet());
+		
+		/*
+		 * IMPORTANT:
+		 * See https://www.eclipse.org/forums/index.php/t/521251/
+		 */
+		editingDomain.getResourceSet().eAdapters().add(new AdapterFactoryEditingDomain.EditingDomainProvider(editingDomain));
 	}
 
 	/**
@@ -704,7 +701,8 @@ public class ConfigurationEditor
 						// Try to select the items in the current content viewer of the editor.
 						//
 						if (currentViewer != null) {
-							currentViewer.setSelection(new StructuredSelection(theSelection.toArray()), true);
+							// Comment it out because it causes Issue #2
+							//currentViewer.setSelection(new StructuredSelection(theSelection.toArray()), true);
 						}
 					}
 				};
@@ -722,21 +720,6 @@ public class ConfigurationEditor
 	 */
 	public EditingDomain getEditingDomain() {
 		return editingDomain;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setCurrentViewerPane(ViewerPane viewerPane) {
-		if (currentViewerPane != viewerPane) {
-			if (currentViewerPane != null) {
-				currentViewerPane.showFocus(false);
-			}
-			currentViewerPane = viewerPane;
-		}
-		setCurrentViewer(currentViewerPane.getViewer());
 	}
 
 	/**
@@ -801,7 +784,7 @@ public class ConfigurationEditor
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void createContextMenuFor(StructuredViewer viewer) {
+	public void createContextMenuFor(StructuredViewer viewer) {
 		MenuManager contextMenu = new MenuManager("#PopUp");
 		contextMenu.add(new Separator("additions"));
 		contextMenu.setRemoveAllWhenShown(true);
@@ -830,6 +813,7 @@ public class ConfigurationEditor
 			// Load the resource through the editing domain.
 			//
 			resource = editingDomain.getResourceSet().getResource(resourceURI, true);
+			EcoreUtil.resolveAll(resource);
 		}
 		catch (Exception e) {
 			exception = e;
@@ -1027,7 +1011,7 @@ public class ConfigurationEditor
 	 * @generated
 	 */
 	public void handleContentOutlineSelection(ISelection selection) {
-		if (currentViewerPane != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+		if (currentViewer != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
 			Iterator<?> selectedElements = ((IStructuredSelection)selection).iterator();
 			if (selectedElements.hasNext()) {
 				// Get the first selected element.
@@ -1096,6 +1080,11 @@ public class ConfigurationEditor
 					//
 					boolean first = true;
 					for (Resource resource : editingDomain.getResourceSet().getResources()) {
+						// IMPORTANT: Do not save the librede units and metrics as they are in-memory only.
+						if (resource.getURI().scheme().equals(Registry.LIBREDE_URI_SCHEME)) {
+							continue;
+						}
+						
 						if ((first || !resource.getContents().isEmpty() || isPersisted(resource)) && !editingDomain.isReadOnly(resource)) {
 							try {
 								long timeStamp = resource.getTimeStamp();
@@ -1236,12 +1225,7 @@ public class ConfigurationEditor
 	 */
 	@Override
 	public void setFocus() {
-		if (currentViewerPane != null) {
-			currentViewerPane.setFocus();
-		}
-		else {
-			getControl(getActivePage()).setFocus();
-		}
+		getControl(getActivePage()).setFocus();
 	}
 
 	/**
@@ -1423,7 +1407,16 @@ public class ConfigurationEditor
 
 	@Override
 	protected void addPages() {
-		LibredeConfiguration conf = (LibredeConfiguration) editingDomain.getResourceSet().getResources().get(0).getContents().get(0);
+		LibredeConfiguration conf = null;
+		for (Resource res : editingDomain.getResourceSet().getResources()) {
+			if (res.getContents().get(0) instanceof LibredeConfiguration) {
+				conf = (LibredeConfiguration) res.getContents().get(0);
+				break;
+			}
+		}
+		if (conf == null) {
+			throw new IllegalStateException();
+		}		
 		
 		try {
 			addPage(new WorkloadDescriptionFormPage(this, "workloadmodel", "Workload Description", editingDomain, conf));

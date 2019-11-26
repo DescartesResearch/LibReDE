@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,30 +27,33 @@
  */
 package tools.descartes.librede.nnls.tests;
 
+import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.observation.ScalarObservationModel;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.observation.functions.UtilizationLaw;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.ConstantStateModel.Builder;
-import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.observation.OutputFunction;
+import tools.descartes.librede.models.observation.VectorObservationModel;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
+import tools.descartes.librede.models.observation.equations.UtilizationValue;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.nnls.LeastSquaresRegression;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class LeastSquaresRegressionTest {
+public class LeastSquaresRegressionTest extends LibredeTest {
 
 	private static final int ITERATIONS = 100;
 
-	private ScalarObservationModel<ILinearOutputFunction> observationModel;
-	private ConstantStateModel<Unconstrained> stateModel;
+	private VectorObservationModel observationModel;
 
 	@Before
 	public void setUp() throws Exception {
@@ -64,18 +68,15 @@ public class LeastSquaresRegressionTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
-		Vector initialEstimate = vector(0.01);
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
-		builder.setInitialState(initialEstimate);
-		stateModel = builder.build();
+		IStateModel<?> stateModel = generator.getStateModel();
+		observationModel = new VectorObservationModel();
+		UtilizationLawEquation law = new UtilizationLawEquation(stateModel, cursor, stateModel.getResources().get(0), 0);
+		observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, stateModel.getResources().get(0), 0), law));
 		
-		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, stateModel.getResources().get(0)));
-
 		LeastSquaresRegression optim = new LeastSquaresRegression();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -88,9 +89,9 @@ public class LeastSquaresRegressionTest {
 
 			Vector estimates = optim.estimate();
 
-			//assertThat(estimates).isEqualTo(demands, offset(0.001));
-			
-			System.out.println(estimates);
+			if (i > 1) {
+				assertThat(estimates).isEqualTo(demands, offset(0.001));
+			}
 		}
 
 		System.out.println("Duration: " + (System.nanoTime() - start) / 1000000);
@@ -103,26 +104,21 @@ public class LeastSquaresRegressionTest {
 	public void testFiveServicesOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
 
-		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
+		// IMPORTANT: test with zero demand!
+		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.0);
 		generator.setDemands(demands);
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 
-		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
+		IStateModel<?> stateModel = generator.getStateModel();
+		observationModel = new VectorObservationModel();
+		UtilizationLawEquation law = new UtilizationLawEquation(stateModel, cursor, stateModel.getResources().get(0), 0);
+		observationModel.addOutputFunction(new OutputFunction(new UtilizationValue(stateModel, cursor, stateModel.getResources().get(0), 0), law));
 
-		Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-		for (Service serv : workload.getServices()) {
-			builder.addVariable(workload.getResources().get(0), serv);
-		}
-		builder.setInitialState(initialEstimate);
-		stateModel = builder.build();
-
-		observationModel = new ScalarObservationModel<ILinearOutputFunction>(new UtilizationLaw(stateModel, cursor, workload.getResources().get(0)));
-		
 		LeastSquaresRegression optim = new LeastSquaresRegression();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -134,9 +130,9 @@ public class LeastSquaresRegressionTest {
 
 			Vector estimates = optim.estimate();
 			
-//			assertThat(estimates).isEqualTo(demands, offset(0.001));
-			
-//			System.out.println(i + ": " + estimates);
+			if (i > 5) {
+				assertThat(estimates).isEqualTo(demands, offset(0.001));
+			}
 		}
 
 		System.out.println("Duration: " + (System.nanoTime() - start) / 1000000);

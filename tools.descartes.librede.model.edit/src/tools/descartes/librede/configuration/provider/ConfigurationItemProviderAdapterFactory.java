@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -513,6 +514,144 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.TraceFilter} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TraceFilterItemProvider traceFilterItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.TraceFilter}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createTraceFilterAdapter() {
+		if (traceFilterItemProvider == null) {
+			traceFilterItemProvider = new TraceFilterItemProvider(this);
+		}
+
+		return traceFilterItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ResourceDemand} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ResourceDemandItemProvider resourceDemandItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ResourceDemand}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createResourceDemandAdapter() {
+		if (resourceDemandItemProvider == null) {
+			resourceDemandItemProvider = new ResourceDemandItemProvider(this);
+		}
+
+		return resourceDemandItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ExternalCall} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ExternalCallItemProvider externalCallItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ExternalCall}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createExternalCallAdapter() {
+		if (externalCallItemProvider == null) {
+			externalCallItemProvider = new ExternalCallItemProvider(this);
+		}
+
+		return externalCallItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.CompositeService} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected CompositeServiceItemProvider compositeServiceItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.CompositeService}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createCompositeServiceAdapter() {
+		if (compositeServiceItemProvider == null) {
+			compositeServiceItemProvider = new CompositeServiceItemProvider(this);
+		}
+
+		return compositeServiceItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ObservationToEntityMapping} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ObservationToEntityMappingItemProvider observationToEntityMappingItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ObservationToEntityMapping}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createObservationToEntityMappingAdapter() {
+		if (observationToEntityMappingItemProvider == null) {
+			observationToEntityMappingItemProvider = new ObservationToEntityMappingItemProvider(this);
+		}
+
+		return observationToEntityMappingItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link tools.descartes.librede.configuration.ConstantDataPoint} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ConstantDataPointItemProvider constantDataPointItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link tools.descartes.librede.configuration.ConstantDataPoint}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createConstantDataPointAdapter() {
+		if (constantDataPointItemProvider == null) {
+			constantDataPointItemProvider = new ConstantDataPointItemProvider(this);
+		}
+
+		return constantDataPointItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -629,6 +768,12 @@ public class ConfigurationItemProviderAdapterFactory extends ConfigurationAdapte
 		if (traceToEntityMappingItemProvider != null) traceToEntityMappingItemProvider.dispose();
 		if (modelEntityItemProvider != null) modelEntityItemProvider.dispose();
 		if (estimationAlgorithmConfigurationItemProvider != null) estimationAlgorithmConfigurationItemProvider.dispose();
+		if (traceFilterItemProvider != null) traceFilterItemProvider.dispose();
+		if (resourceDemandItemProvider != null) resourceDemandItemProvider.dispose();
+		if (externalCallItemProvider != null) externalCallItemProvider.dispose();
+		if (compositeServiceItemProvider != null) compositeServiceItemProvider.dispose();
+		if (observationToEntityMappingItemProvider != null) observationToEntityMappingItemProvider.dispose();
+		if (constantDataPointItemProvider != null) constantDataPointItemProvider.dispose();
 	}
 
 }

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,6 +27,7 @@
  */
 package tools.descartes.librede.models.state;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 
 import java.util.ArrayList;
@@ -39,29 +41,33 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.LinAlg;
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Range;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
+import tools.descartes.librede.models.state.initial.IStateInitializer;
+import tools.descartes.librede.models.state.initial.PredefinedStateInitializer;
+import tools.descartes.librede.repository.rules.DataDependency;
 
 public class ConstantStateModel<C extends IStateConstraint> implements IStateModel<C> {
 	
 	public static class Builder<C extends IStateConstraint> {
 		// The set is automatically sorted by resource names and service names
-		private Set<StateVariable> stateVariables = new TreeSet<StateVariable>();
+		private Set<ResourceDemand> stateVariables = new TreeSet<>();
 		private List<C> constraints = new ArrayList<C>();
-		private Vector initialState;
+		private IStateInitializer stateInitializer;
+		private InvocationGraph invocations;
 		
-		public void addVariable(Resource resource, Service service) {
-			stateVariables.add(new StateVariable(resource, service));
+		public void addVariable(ResourceDemand demand) {
+			stateVariables.add(demand);
 		}
 		
-		public void setInitialState(Vector initialState) {
-			this.initialState = initialState;
+		public void setStateInitializer(IStateInitializer stateInitializer) {
+			this.stateInitializer = stateInitializer;
 		}
 		
 		public void addConstraint(C constraint) {
@@ -71,11 +77,15 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			constraints.add(constraint);
 		}
 		
+		public void setInvocationGraph(InvocationGraph graph) {
+			this.invocations = graph;
+		}
+		
 		public ConstantStateModel<C> build() {
-			if (initialState == null) {
-				initialState = zeros(stateVariables.size());
+			if (stateInitializer == null) {
+				stateInitializer = new PredefinedStateInitializer(zeros(stateVariables.size()));
 			}
-			ConstantStateModel<C> model = new ConstantStateModel<C>(new ArrayList<StateVariable>(stateVariables), constraints, initialState);
+			ConstantStateModel<C> model = new ConstantStateModel<C>(new ArrayList<ResourceDemand>(stateVariables), constraints, stateInitializer, invocations);
 			for (IStateConstraint c : model.getConstraints()) {
 				c.setStateModel(model);
 			}
@@ -83,61 +93,50 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 		}
 	}
 	
-	private class ConstantFunction implements IDifferentiableFunction {
-		
-		private final Vector firstDev;
-		private final Vector secondDev;
-		
-		public ConstantFunction(int stateSize, int varIdx) {
-			firstDev = zeros(stateSize).set(varIdx, 1.0);
-			secondDev = zeros(stateSize);
-		}
-
-		@Override
-		public Vector getFirstDerivatives(Vector x) {
-			return firstDev;
-		}
-
-		@Override
-		public Matrix getSecondDerivatives(Vector x) {
-			return secondDev;
-		}
-		
-	}
-	
 	private final int stateSize;
+	private final List<Service> userServices;
+	private final List<Service> backgroundServices;
 	private final List<Service> services;
 	private final List<Resource> resources;
 	private final Map<Resource, Integer> resourcesToIdx;
 	private final Map<Service, Integer> servicesToIdx;
-	private final List<StateVariable> variables;
+	private final List<ResourceDemand> variables;
 	private final int[][] stateVarIdx;
-	private final List<Range> resourceRanges;
+	private final List<Indices> resStateVarIndices;
 	private final List<C> constraints;
-	private final Vector initialState;
-	private final List<IDifferentiableFunction> derivatives = new ArrayList<IDifferentiableFunction>();
+	private final IStateInitializer stateInitializer;
+	private final InvocationGraph invocationGraph;
 	
-	private ConstantStateModel(List<StateVariable> variables, List<C> constraints, Vector initialState) {
+	private ConstantStateModel(List<ResourceDemand> variables, List<C> constraints, IStateInitializer stateInitializer, InvocationGraph graph) {
 		this.stateSize = variables.size();	
 		this.constraints = Collections.unmodifiableList(constraints);
 		this.variables = Collections.unmodifiableList(variables);
+		this.invocationGraph = graph;
 		
 		// Determine all resources and services contained in this state model
 		resources = new ArrayList<Resource>();
 		services = new ArrayList<Service>();
+		userServices = new ArrayList<Service>();
+		backgroundServices = new ArrayList<Service>();
 		resourcesToIdx = new HashMap<Resource, Integer>();
 		servicesToIdx = new HashMap<Service, Integer>();
-		for (StateVariable v : variables) {
+		for (int i = 0; i < variables.size(); i++) {
+			ResourceDemand v = variables.get(i);
 			if (!resourcesToIdx.containsKey(v.getResource())) {
 				resources.add(v.getResource());
 				resourcesToIdx.put(v.getResource(), resources.size() - 1);
 			}
 			if (!servicesToIdx.containsKey(v.getService())) {
+				if (v.getService().isBackgroundService()) {
+					backgroundServices.add(v.getService());
+				} else {
+					userServices.add(v.getService());
+				}
 				services.add(v.getService());
 				servicesToIdx.put(v.getService(), services.size() - 1);
 			}
 		}
-		
+
 		// Determine a mapping between the 2-dimensional state vector and the resources and services
 		stateVarIdx = new int[resourcesToIdx.size()][servicesToIdx.size()];
 		// -1 means that this resource / service combination is not a state variable 
@@ -146,39 +145,35 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 			Arrays.fill(stateVarIdx[i], -1);
 		}		
 		int varIdx = 0;
-		for (StateVariable var : variables) {
+		for (ResourceDemand var : variables) {
 			int r = resourcesToIdx.get(var.getResource());
 			int s = servicesToIdx.get(var.getService());
 			stateVarIdx[r][s] = varIdx;
 			varIdx++;
 		}
 		
-		// determine the start and end indexes of all resources
-		resourceRanges = new ArrayList<Range>(resourcesToIdx.size());
-		int offset = 0;
-		for (int r = 0; r < stateVarIdx.length; r++) {
-			int newOffset = offset;
-			for (int s = 0; s < stateVarIdx[r].length; s++) {
-				if (stateVarIdx[r][s] >= 0) {
-					newOffset++;
-				}
+		resStateVarIndices = new ArrayList<>(resources.size());
+		final List<Integer> idx = new ArrayList<>(services.size());
+		for (int i = 0; i < stateVarIdx.length; i++) {
+			for (int j = 0; j < stateVarIdx[i].length; j++) {
+				if (stateVarIdx[i][j] > -1) {
+					idx.add(stateVarIdx[i][j]);
+				}				
 			}
-			resourceRanges.add(LinAlg.range(offset, newOffset));
-			offset = newOffset;
+			resStateVarIndices.add(indices(idx.size(), new VectorFunction() {				
+				@Override
+				public double cell(int row) {
+					return idx.get(row);
+				}
+			}));
+			idx.clear();
 		}
 
 		// initialize state of model		
-		if (initialState == null) {
-			throw new IllegalArgumentException("Initial state must not be null.");
+		if (stateInitializer == null) {
+			throw new IllegalArgumentException("State initializer must not be null.");
 		}
-		if (initialState.rows() != stateSize) {
-			throw new IllegalArgumentException("Size of initial state vector must be equal to the state size.");
-		}		
-		this.initialState = initialState;
-	
-		for (int a = 0; a < stateSize; a++) {
-			derivatives.add(new ConstantFunction(stateSize, a));
-		}
+		this.stateInitializer = stateInitializer;
 	}
 	
 	public static Builder<Unconstrained> unconstrainedModelBuilder() {
@@ -195,17 +190,30 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public Vector getNextState(Vector state) {
+	public State step(State state) {
+		if (invocationGraph != null) {
+			invocationGraph.step();
+		}		
 		return state;
 	}
 	
 	@Override
-	public Range getStateVariableIndexRange(Resource res) {
+	public Indices getStateVariableIndices(Resource res) {
 		Integer resIdx = resourcesToIdx.get(res);
 		if (resIdx == null) {
-			throw new NoSuchElementException("Resource is not contained in state model.");
+			throw new NoSuchElementException("There is no defined state variable for this resource.");
 		}
-		return resourceRanges.get(resIdx);
+		return resStateVarIndices.get(resIdx);
+	}
+	
+	@Override
+	public boolean containsStateVariable(Resource res, Service service) {
+		Integer resIdx = resourcesToIdx.get(res);
+		Integer serviceIdx = servicesToIdx.get(service);
+		if (resIdx == null || serviceIdx == null) {
+			return false;
+		}
+		return stateVarIdx[resIdx][serviceIdx] >= 0;
 	}
 	
 	@Override
@@ -226,15 +234,24 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	public List<C> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}
-
-	@Override
-	public List<IDifferentiableFunction> getStateDerivatives() {
-		return derivatives;
-	}
 	
 	@Override
 	public Vector getInitialState() {
+		Vector initialState = stateInitializer.getInitialValue(this);
+		if (!initialState.isEmpty() && initialState.rows() != stateSize) {
+			throw new IllegalStateException("Size of initial state vector must be equal to the state size.");
+		}
+		for (int i = 0; i < initialState.rows(); i++) {
+			if (Double.isNaN(initialState.get(i))) {
+				throw new IllegalStateException("State initializer returns an invalid value.");
+			}
+ 		}
 		return initialState;
+	}
+	
+	@Override
+	public InvocationGraph getInvocationGraph() {
+		return invocationGraph;
 	}
 
 	@Override
@@ -243,19 +260,49 @@ public class ConstantStateModel<C extends IStateConstraint> implements IStateMod
 	}
 
 	@Override
-	public List<Service> getServices() {
+	public List<Service> getAllServices() {
 		return services;
 	}
-
+	
 	@Override
-	public Resource getResource(int stateVariableIdx) {
-		return variables.get(stateVariableIdx).getResource();
+	public List<Service> getBackgroundServices() {
+		return backgroundServices;
 	}
 
 	@Override
-	public Service getService(int stateVariableIdx) {
-		return variables.get(stateVariableIdx).getService();
+	public List<Service> getUserServices() {
+		return userServices;
+	}
+	
+	@Override
+	public ResourceDemand getResourceDemand(int stateVariableIdx) {
+		return variables.get(stateVariableIdx);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder("Constant State Model { ");
+		Resource last = null;
+		for (ResourceDemand demand : variables) {
+			if (demand.getResource() != last) {
+				ret.append(demand.getResource().getName()).append(" -> ");
+				last = demand.getResource();
+			}
+			ret.append(demand.getService().getName()).append(" ");
+		}
+		ret.append("}");
+		return ret.toString();
 	}
 
-
+	@Override
+	public List<DataDependency<?>> getDataDependencies() {
+		ArrayList<DataDependency<?>> deps = new ArrayList<>();
+		for (IStateConstraint constr : constraints) {
+			deps.addAll(constr.getDataDependencies());
+		}
+		if (invocationGraph != null) {
+			deps.addAll(invocationGraph.getDataDependencies());
+		}
+		return Collections.unmodifiableList(deps);
+	}
 }

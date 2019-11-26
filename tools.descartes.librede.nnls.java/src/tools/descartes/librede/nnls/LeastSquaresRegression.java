@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,25 +28,28 @@
 package tools.descartes.librede.nnls;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
+import static tools.descartes.librede.linalg.LinAlg.range;
 import static tools.descartes.librede.linalg.LinAlg.vector;
+
+import com.sun.jna.Memory;
+import com.sun.jna.ptr.DoubleByReference;
+import com.sun.jna.ptr.IntByReference;
+
+import cern.colt.matrix.DoubleFactory2D;
+import cern.colt.matrix.DoubleMatrix2D;
+import cern.colt.matrix.linalg.Algebra;
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.LinAlg;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.ILinearOutputFunction;
-import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.nnls.backend.NNLSLibrary;
 import tools.descartes.librede.registry.Component;
-import cern.colt.matrix.DoubleFactory2D;
-import cern.colt.matrix.DoubleMatrix2D;
-import cern.colt.matrix.linalg.Algebra;
-
-import com.sun.jna.Memory;
-import com.sun.jna.ptr.DoubleByReference;
-import com.sun.jna.ptr.IntByReference;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
 /**
  * This class implements Least-Squares (NNLS) algorithm.
@@ -56,12 +60,11 @@ import com.sun.jna.ptr.IntByReference;
 @Component(displayName="Non-negative Least-Squares Regression")
 public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 
-	private ILinearOutputFunction outputFunction;
-
 	// contains current measurements
 	private Matrix independentVariables;
 	private Vector dependentVariables;
 	private int numObservations;
+	private int outputSize;
 
 	private final int SIZE_OF_DOUBLE = 8;
 	private final int SIZE_OF_INT = 8;
@@ -70,12 +73,15 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 
 
 	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?,?> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
+	public void initialize(EstimationProblem problem, 
+			IRepositoryCursor cursor,
+			int estimationWindow) throws InitializationException {
+		super.initialize(problem, cursor, estimationWindow);
 		
-		independentVariables = matrix(estimationWindow, stateModel.getStateSize(), Double.NaN);
-		dependentVariables = (Vector)matrix(estimationWindow, 1, Double.NaN);
+		outputSize = problem.getObservationModel().getOutputSize();
+		
+		independentVariables = matrix(estimationWindow * outputSize, problem.getStateModel().getStateSize(), Double.NaN);
+		dependentVariables = (Vector)matrix(estimationWindow * outputSize, 1, Double.NaN);
 		numObservations = 0;
 	}
 
@@ -165,12 +171,13 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	
 	@Override
 	public void update() throws EstimationException {
-		outputFunction = getCastedObservationModel().getOutputFunction(0);
+		getStateModel().step(null);
 		
-		numObservations++;
-		
-		dependentVariables = dependentVariables.circshift(1).set(0, outputFunction.getObservedOutput());
-		independentVariables = independentVariables.circshift(1).setRow(0, outputFunction.getIndependentVariables());
+		for (OutputFunction function : getCastedObservationModel()) {
+			dependentVariables = dependentVariables.circshift(1).set(0, function.getObservedOutput());
+			independentVariables = independentVariables.circshift(1).setRow(0, function.getIndependentVariables());
+		}		
+		numObservations++;		
 	}
 
 	@Override
@@ -178,8 +185,8 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 		// when the sample size is small
 		if (numObservations < MIN_SIZE_OF_ESTIMATION) {
 			return LinAlg.zeros(getStateModel().getStateSize());
-		} else if (numObservations < dependentVariables.rows()) {
-			return nnls(independentVariables.rows(0, numObservations - 1), dependentVariables.rows(0, numObservations - 1));
+		} else if ((numObservations * outputSize) < dependentVariables.rows()) {
+			return nnls(independentVariables.rows(range(0, numObservations * outputSize)), dependentVariables.rows(range(0, numObservations * outputSize)));
 		} else {
 			return nnls(independentVariables, dependentVariables);
 		}
@@ -191,7 +198,7 @@ public class LeastSquaresRegression extends AbstractEstimationAlgorithm {
 	}
 	
 	@SuppressWarnings("unchecked" )
-	private IObservationModel<ILinearOutputFunction, Vector> getCastedObservationModel() {
-		return (IObservationModel<ILinearOutputFunction, Vector>) getObservationModel();
+	private IObservationModel<Vector> getCastedObservationModel() {
+		return (IObservationModel<Vector>) getObservationModel();
 	}
 }

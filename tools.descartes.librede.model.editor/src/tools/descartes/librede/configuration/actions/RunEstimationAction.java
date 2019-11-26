@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,6 +30,8 @@ package tools.descartes.librede.configuration.actions;
 import java.io.PrintStream;
 
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -85,6 +88,7 @@ public class RunEstimationAction extends Action {
 	private void runEstimation(IProgressMonitor monitor) {
 		MessageConsole console = findConsole(CONSOLE_NAME);
 		revealConsole(console);
+		console.clearConsole();
 		MessageConsoleStream out = console.newMessageStream();
 		out.setActivateOnWrite(true);
 		PrintStream oldOut = System.out;
@@ -92,7 +96,9 @@ public class RunEstimationAction extends Action {
 		System.setOut(new PrintStream(out));
 		System.setErr(new PrintStream(out));
 
+		BasicConfigurator.resetConfiguration();
 		BasicConfigurator.configure();
+		Logger.getRootLogger().setLevel(Level.INFO);
 		
 		Librede.execute(conf);
 

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,7 +30,6 @@
 package tools.descartes.librede.configuration;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -39,11 +39,12 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getDataSources <em>Data Sources</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getObservations <em>Observations</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.InputSpecification#getConstantDataPoints <em>Constant Data Points</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getInputSpecification()
  * @model
@@ -81,5 +82,21 @@ public interface InputSpecification extends EObject {
 	 * @generated
 	 */
 	EList<TraceConfiguration> getObservations();
+
+	/**
+	 * Returns the value of the '<em><b>Constant Data Points</b></em>' containment reference list.
+	 * The list contents are of type {@link tools.descartes.librede.configuration.ConstantDataPoint}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Constant Data Points</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Constant Data Points</em>' containment reference list.
+	 * @see tools.descartes.librede.configuration.ConfigurationPackage#getInputSpecification_ConstantDataPoints()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<ConstantDataPoint> getConstantDataPoints();
 
 } // InputSpecification

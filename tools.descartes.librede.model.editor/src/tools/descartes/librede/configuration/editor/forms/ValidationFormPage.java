@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -39,7 +40,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.TableWrapData;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.LibredeConfiguration;
@@ -86,7 +86,7 @@ public class ValidationFormPage extends MasterDetailsFormPage {
 		
 		toolkit.createLabel(client, "Number of Folds k:");
 		spnFolds = new Spinner(client, SWT.BORDER);
-		spnFolds.setMinimum(2);
+		spnFolds.setMinimum(1);
 		spnFolds.setMaximum(Integer.MAX_VALUE);
 		toolkit.paintBordersFor(spnFolds);
 		

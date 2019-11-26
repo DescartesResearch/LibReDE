@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Redeem Native Helper
 Bundle-SymbolicName: tools.descartes.librede.nativehelper
-Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Version: 1.1.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: tools.descartes.librede.nativehelper
 Import-Package: cern.colt.matrix;version="1.2.0",
  com.sun.jna,

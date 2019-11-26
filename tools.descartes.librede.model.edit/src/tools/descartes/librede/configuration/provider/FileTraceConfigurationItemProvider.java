@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -42,8 +43,7 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.FileTraceConfiguration;
-import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.metrics.Metric;
 
 /**
  * This is the item provider adapter for a {@link tools.descartes.librede.configuration.FileTraceConfiguration} object.
@@ -127,11 +127,11 @@ public class FileTraceConfigurationItemProvider extends TraceConfigurationItemPr
 			label.append("No file");
 		}
 		label.append(" (");
-		IMetric metric = Registry.INSTANCE.getMetric(trace.getMetric());
+		Metric<?> metric = trace.getMetric();
 		if (metric != null) {
-			label.append(metric.getDisplayName());
+			label.append(metric.getName());
 		}
-		if (trace.getInterval() == 0) {
+		if (trace.getInterval() != null && trace.getInterval().getValue() == 0) {
 			label.append(", ").append("non-aggregated");
 		} else {
 			label.append(", ").append("aggregated");

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -32,7 +33,34 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
 
-import tools.descartes.librede.configuration.*;
+import tools.descartes.librede.configuration.CompositeService;
+import tools.descartes.librede.configuration.ConfigurationPackage;
+import tools.descartes.librede.configuration.ConstantDataPoint;
+import tools.descartes.librede.configuration.DataSourceConfiguration;
+import tools.descartes.librede.configuration.EstimationAlgorithmConfiguration;
+import tools.descartes.librede.configuration.EstimationApproachConfiguration;
+import tools.descartes.librede.configuration.EstimationSpecification;
+import tools.descartes.librede.configuration.ExporterConfiguration;
+import tools.descartes.librede.configuration.ExternalCall;
+import tools.descartes.librede.configuration.FileTraceConfiguration;
+import tools.descartes.librede.configuration.InputSpecification;
+import tools.descartes.librede.configuration.LibredeConfiguration;
+import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.NamedElement;
+import tools.descartes.librede.configuration.Observation;
+import tools.descartes.librede.configuration.ObservationToEntityMapping;
+import tools.descartes.librede.configuration.OutputSpecification;
+import tools.descartes.librede.configuration.Parameter;
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
+import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.Task;
+import tools.descartes.librede.configuration.TraceConfiguration;
+import tools.descartes.librede.configuration.TraceFilter;
+import tools.descartes.librede.configuration.TraceToEntityMapping;
+import tools.descartes.librede.configuration.ValidationSpecification;
+import tools.descartes.librede.configuration.ValidatorConfiguration;
+import tools.descartes.librede.configuration.WorkloadDescription;
 
 /**
  * <!-- begin-user-doc -->
@@ -47,7 +75,7 @@ import tools.descartes.librede.configuration.*;
  * @see tools.descartes.librede.configuration.ConfigurationPackage
  * @generated
  */
-public class ConfigurationSwitch<T> extends Switch<T> {
+public class ConfigurationSwitch<T1> extends Switch<T1> {
 	/**
 	 * The cached model package
 	 * <!-- begin-user-doc -->
@@ -72,7 +100,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * Checks whether this is a switch for the given package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @parameter ePackage the package in question.
+	 * @param ePackage the package in question.
 	 * @return whether this is a switch for the given package.
 	 * @generated
 	 */
@@ -89,48 +117,48 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	@Override
-	protected T doSwitch(int classifierID, EObject theEObject) {
+	protected T1 doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
 			case ConfigurationPackage.LIBREDE_CONFIGURATION: {
 				LibredeConfiguration libredeConfiguration = (LibredeConfiguration)theEObject;
-				T result = caseLibredeConfiguration(libredeConfiguration);
+				T1 result = caseLibredeConfiguration(libredeConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.DATA_SOURCE_CONFIGURATION: {
 				DataSourceConfiguration dataSourceConfiguration = (DataSourceConfiguration)theEObject;
-				T result = caseDataSourceConfiguration(dataSourceConfiguration);
+				T1 result = caseDataSourceConfiguration(dataSourceConfiguration);
 				if (result == null) result = caseNamedElement(dataSourceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.WORKLOAD_DESCRIPTION: {
 				WorkloadDescription workloadDescription = (WorkloadDescription)theEObject;
-				T result = caseWorkloadDescription(workloadDescription);
+				T1 result = caseWorkloadDescription(workloadDescription);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.INPUT_SPECIFICATION: {
 				InputSpecification inputSpecification = (InputSpecification)theEObject;
-				T result = caseInputSpecification(inputSpecification);
+				T1 result = caseInputSpecification(inputSpecification);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.ESTIMATION_APPROACH_CONFIGURATION: {
 				EstimationApproachConfiguration estimationApproachConfiguration = (EstimationApproachConfiguration)theEObject;
-				T result = caseEstimationApproachConfiguration(estimationApproachConfiguration);
+				T1 result = caseEstimationApproachConfiguration(estimationApproachConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.OUTPUT_SPECIFICATION: {
 				OutputSpecification outputSpecification = (OutputSpecification)theEObject;
-				T result = caseOutputSpecification(outputSpecification);
+				T1 result = caseOutputSpecification(outputSpecification);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.RESOURCE: {
 				Resource resource = (Resource)theEObject;
-				T result = caseResource(resource);
+				T1 result = caseResource(resource);
 				if (result == null) result = caseModelEntity(resource);
 				if (result == null) result = caseNamedElement(resource);
 				if (result == null) result = defaultCase(theEObject);
@@ -138,7 +166,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 			}
 			case ConfigurationPackage.SERVICE: {
 				Service service = (Service)theEObject;
-				T result = caseService(service);
+				T1 result = caseService(service);
 				if (result == null) result = caseModelEntity(service);
 				if (result == null) result = caseNamedElement(service);
 				if (result == null) result = defaultCase(theEObject);
@@ -146,70 +174,134 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 			}
 			case ConfigurationPackage.TRACE_CONFIGURATION: {
 				TraceConfiguration traceConfiguration = (TraceConfiguration)theEObject;
-				T result = caseTraceConfiguration(traceConfiguration);
+				T1 result = caseTraceConfiguration(traceConfiguration);
+				if (result == null) result = caseObservation(traceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.PARAMETER: {
 				Parameter parameter = (Parameter)theEObject;
-				T result = caseParameter(parameter);
+				T1 result = caseParameter(parameter);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.ESTIMATION_SPECIFICATION: {
 				EstimationSpecification estimationSpecification = (EstimationSpecification)theEObject;
-				T result = caseEstimationSpecification(estimationSpecification);
+				T1 result = caseEstimationSpecification(estimationSpecification);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.VALIDATION_SPECIFICATION: {
 				ValidationSpecification validationSpecification = (ValidationSpecification)theEObject;
-				T result = caseValidationSpecification(validationSpecification);
+				T1 result = caseValidationSpecification(validationSpecification);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.VALIDATOR_CONFIGURATION: {
 				ValidatorConfiguration validatorConfiguration = (ValidatorConfiguration)theEObject;
-				T result = caseValidatorConfiguration(validatorConfiguration);
+				T1 result = caseValidatorConfiguration(validatorConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.EXPORTER_CONFIGURATION: {
 				ExporterConfiguration exporterConfiguration = (ExporterConfiguration)theEObject;
-				T result = caseExporterConfiguration(exporterConfiguration);
+				T1 result = caseExporterConfiguration(exporterConfiguration);
 				if (result == null) result = caseNamedElement(exporterConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.FILE_TRACE_CONFIGURATION: {
 				FileTraceConfiguration fileTraceConfiguration = (FileTraceConfiguration)theEObject;
-				T result = caseFileTraceConfiguration(fileTraceConfiguration);
+				T1 result = caseFileTraceConfiguration(fileTraceConfiguration);
 				if (result == null) result = caseTraceConfiguration(fileTraceConfiguration);
+				if (result == null) result = caseObservation(fileTraceConfiguration);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.NAMED_ELEMENT: {
 				NamedElement namedElement = (NamedElement)theEObject;
-				T result = caseNamedElement(namedElement);
+				T1 result = caseNamedElement(namedElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING: {
 				TraceToEntityMapping traceToEntityMapping = (TraceToEntityMapping)theEObject;
-				T result = caseTraceToEntityMapping(traceToEntityMapping);
+				T1 result = caseTraceToEntityMapping(traceToEntityMapping);
+				if (result == null) result = caseObservationToEntityMapping(traceToEntityMapping);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.MODEL_ENTITY: {
 				ModelEntity modelEntity = (ModelEntity)theEObject;
-				T result = caseModelEntity(modelEntity);
+				T1 result = caseModelEntity(modelEntity);
 				if (result == null) result = caseNamedElement(modelEntity);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case ConfigurationPackage.ESTIMATION_ALGORITHM_CONFIGURATION: {
 				EstimationAlgorithmConfiguration estimationAlgorithmConfiguration = (EstimationAlgorithmConfiguration)theEObject;
-				T result = caseEstimationAlgorithmConfiguration(estimationAlgorithmConfiguration);
+				T1 result = caseEstimationAlgorithmConfiguration(estimationAlgorithmConfiguration);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.TRACE_FILTER: {
+				TraceFilter traceFilter = (TraceFilter)theEObject;
+				T1 result = caseTraceFilter(traceFilter);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.RESOURCE_DEMAND: {
+				ResourceDemand resourceDemand = (ResourceDemand)theEObject;
+				T1 result = caseResourceDemand(resourceDemand);
+				if (result == null) result = caseTask(resourceDemand);
+				if (result == null) result = caseComparable(resourceDemand);
+				if (result == null) result = caseModelEntity(resourceDemand);
+				if (result == null) result = caseNamedElement(resourceDemand);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.EXTERNAL_CALL: {
+				ExternalCall externalCall = (ExternalCall)theEObject;
+				T1 result = caseExternalCall(externalCall);
+				if (result == null) result = caseTask(externalCall);
+				if (result == null) result = caseModelEntity(externalCall);
+				if (result == null) result = caseNamedElement(externalCall);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.COMPOSITE_SERVICE: {
+				CompositeService compositeService = (CompositeService)theEObject;
+				T1 result = caseCompositeService(compositeService);
+				if (result == null) result = caseService(compositeService);
+				if (result == null) result = caseModelEntity(compositeService);
+				if (result == null) result = caseNamedElement(compositeService);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.TASK: {
+				Task task = (Task)theEObject;
+				T1 result = caseTask(task);
+				if (result == null) result = caseModelEntity(task);
+				if (result == null) result = caseNamedElement(task);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.OBSERVATION: {
+				Observation observation = (Observation)theEObject;
+				T1 result = caseObservation(observation);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.OBSERVATION_TO_ENTITY_MAPPING: {
+				ObservationToEntityMapping observationToEntityMapping = (ObservationToEntityMapping)theEObject;
+				T1 result = caseObservationToEntityMapping(observationToEntityMapping);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ConfigurationPackage.CONSTANT_DATA_POINT: {
+				ConstantDataPoint constantDataPoint = (ConstantDataPoint)theEObject;
+				T1 result = caseConstantDataPoint(constantDataPoint);
+				if (result == null) result = caseObservation(constantDataPoint);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -228,7 +320,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseLibredeConfiguration(LibredeConfiguration object) {
+	public T1 caseLibredeConfiguration(LibredeConfiguration object) {
 		return null;
 	}
 
@@ -243,7 +335,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseDataSourceConfiguration(DataSourceConfiguration object) {
+	public T1 caseDataSourceConfiguration(DataSourceConfiguration object) {
 		return null;
 	}
 
@@ -258,7 +350,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseWorkloadDescription(WorkloadDescription object) {
+	public T1 caseWorkloadDescription(WorkloadDescription object) {
 		return null;
 	}
 
@@ -273,7 +365,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInputSpecification(InputSpecification object) {
+	public T1 caseInputSpecification(InputSpecification object) {
 		return null;
 	}
 
@@ -288,7 +380,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseEstimationApproachConfiguration(EstimationApproachConfiguration object) {
+	public T1 caseEstimationApproachConfiguration(EstimationApproachConfiguration object) {
 		return null;
 	}
 
@@ -303,7 +395,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseOutputSpecification(OutputSpecification object) {
+	public T1 caseOutputSpecification(OutputSpecification object) {
 		return null;
 	}
 
@@ -318,7 +410,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseResource(Resource object) {
+	public T1 caseResource(Resource object) {
 		return null;
 	}
 
@@ -333,7 +425,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseService(Service object) {
+	public T1 caseService(Service object) {
 		return null;
 	}
 
@@ -348,7 +440,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTraceConfiguration(TraceConfiguration object) {
+	public T1 caseTraceConfiguration(TraceConfiguration object) {
 		return null;
 	}
 
@@ -363,7 +455,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseParameter(Parameter object) {
+	public T1 caseParameter(Parameter object) {
 		return null;
 	}
 
@@ -378,7 +470,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseEstimationSpecification(EstimationSpecification object) {
+	public T1 caseEstimationSpecification(EstimationSpecification object) {
 		return null;
 	}
 
@@ -393,7 +485,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseValidationSpecification(ValidationSpecification object) {
+	public T1 caseValidationSpecification(ValidationSpecification object) {
 		return null;
 	}
 
@@ -408,7 +500,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseValidatorConfiguration(ValidatorConfiguration object) {
+	public T1 caseValidatorConfiguration(ValidatorConfiguration object) {
 		return null;
 	}
 
@@ -423,7 +515,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExporterConfiguration(ExporterConfiguration object) {
+	public T1 caseExporterConfiguration(ExporterConfiguration object) {
 		return null;
 	}
 
@@ -438,7 +530,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseFileTraceConfiguration(FileTraceConfiguration object) {
+	public T1 caseFileTraceConfiguration(FileTraceConfiguration object) {
 		return null;
 	}
 
@@ -453,7 +545,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNamedElement(NamedElement object) {
+	public T1 caseNamedElement(NamedElement object) {
 		return null;
 	}
 
@@ -468,7 +560,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTraceToEntityMapping(TraceToEntityMapping object) {
+	public T1 caseTraceToEntityMapping(TraceToEntityMapping object) {
 		return null;
 	}
 
@@ -483,7 +575,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseModelEntity(ModelEntity object) {
+	public T1 caseModelEntity(ModelEntity object) {
 		return null;
 	}
 
@@ -498,7 +590,142 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseEstimationAlgorithmConfiguration(EstimationAlgorithmConfiguration object) {
+	public T1 caseEstimationAlgorithmConfiguration(EstimationAlgorithmConfiguration object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Trace Filter</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Trace Filter</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseTraceFilter(TraceFilter object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Resource Demand</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Resource Demand</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseResourceDemand(ResourceDemand object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>External Call</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>External Call</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseExternalCall(ExternalCall object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Composite Service</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Composite Service</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseCompositeService(CompositeService object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Task</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Task</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseTask(Task object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Observation</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Observation</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseObservation(Observation object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Observation To Entity Mapping</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Observation To Entity Mapping</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseObservationToEntityMapping(ObservationToEntityMapping object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Constant Data Point</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Constant Data Point</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseConstantDataPoint(ConstantDataPoint object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Comparable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Comparable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public <T> T1 caseComparable(Comparable<T> object) {
 		return null;
 	}
 
@@ -514,7 +741,7 @@ public class ConfigurationSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	@Override
-	public T defaultCase(EObject object) {
+	public T1 defaultCase(EObject object) {
 		return null;
 	}
 

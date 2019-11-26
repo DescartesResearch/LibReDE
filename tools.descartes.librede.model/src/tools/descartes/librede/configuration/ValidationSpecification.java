@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -38,12 +39,12 @@ import org.eclipse.emf.ecore.EObject;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link tools.descartes.librede.configuration.ValidationSpecification#getValidators <em>Validators</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.ValidationSpecification#getValidationFolds <em>Validation Folds</em>}</li>
  *   <li>{@link tools.descartes.librede.configuration.ValidationSpecification#isValidateEstimates <em>Validate Estimates</em>}</li>
  * </ul>
- * </p>
  *
  * @see tools.descartes.librede.configuration.ConfigurationPackage#getValidationSpecification()
  * @model

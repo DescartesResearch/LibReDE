@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -34,12 +35,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -61,39 +60,40 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import tools.descartes.librede.configuration.ConfigurationFactory;
-import tools.descartes.librede.configuration.ConfigurationPackage;
 import tools.descartes.librede.configuration.Parameter;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
 import tools.descartes.librede.registry.Registry;
 
 public class ParametersBlock {
-	
+
 	private abstract class ParameterEditor {
 		protected String name;
 		protected String label;
 		protected String defaultValue;
 		protected boolean required;
 		protected Parameter param;
-		
+
 		abstract Control createControl(FormToolkit toolkit, Composite parent);
-		
+
 		Label createLabel(FormToolkit toolkit, Composite parent) {
 			String labelText = label;
 			if (required) {
 				labelText = labelText + "*";
 			}
 			labelText = labelText + ":";
-			return toolkit.createLabel(parent,labelText);
+			return toolkit.createLabel(parent, labelText);
 		}
 
 		abstract void activate();
+
 		abstract void update(Parameter param);
+
 		abstract void reset();
 	}
-	
+
 	private class CheckboxParameterEditor extends ParameterEditor implements SelectionListener {
-		
+
 		private Button checkbox;
 
 		@Override
@@ -105,7 +105,7 @@ public class ParametersBlock {
 			checkbox = toolkit.createButton(parent, labelText, SWT.CHECK);
 			return checkbox;
 		}
-		
+
 		@Override
 		Label createLabel(FormToolkit toolkit, Composite parent) {
 			return toolkit.createLabel(parent, "");
@@ -126,7 +126,7 @@ public class ParametersBlock {
 		void reset() {
 			checkbox.removeSelectionListener(this);
 			param = null;
-			checkbox.setSelection(Boolean.parseBoolean(defaultValue));			
+			checkbox.setSelection(Boolean.parseBoolean(defaultValue));
 		}
 
 		@Override
@@ -145,14 +145,14 @@ public class ParametersBlock {
 
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
-			
+
 		}
-		
+
 	}
-	
+
 	private class TextParameterEditor extends ParameterEditor implements ModifyListener {
-		
-		private Text control;		
+
+		private Text control;
 
 		@Override
 		public Control createControl(FormToolkit toolkit, Composite parent) {
@@ -165,12 +165,12 @@ public class ParametersBlock {
 			this.param = param;
 			control.setText(param.getValue());
 		}
-		
+
 		@Override
 		public void activate() {
-			control.addModifyListener(this);			
+			control.addModifyListener(this);
 		}
-		
+
 		@Override
 		public void reset() {
 			control.removeModifyListener(this);
@@ -191,15 +191,15 @@ public class ParametersBlock {
 				removeParameter(param);
 				param = null;
 			}
-		}		
+		}
 	}
-	
+
 	private class FileParameterEditor extends ParameterEditor implements ModifyListener {
 		private Text path;
 		private Button browse;
 		private Dialog dialog;
 		private String subtype;
-		
+
 		public FileParameterEditor(String subtype) {
 			this.subtype = subtype;
 		}
@@ -222,15 +222,17 @@ public class ParametersBlock {
 							dialog = new DirectoryDialog(shell, SWT.NONE);
 						} else {
 							FileDialog newDialog = new FileDialog(shell, SWT.OPEN);
-							newDialog.setFilterExtensions(subtype.split("|"));
+							newDialog.setFilterExtensions(new String[] { subtype });
+							// comment this back in, if errors occurr
+							// newDialog.setFilterExtensions(subtype.split("|"));
 							dialog = newDialog;
 						}
 					}
 					String selPath;
 					if (subtype.isEmpty()) {
-						selPath = ((DirectoryDialog)dialog).open();
+						selPath = ((DirectoryDialog) dialog).open();
 					} else {
-						selPath = ((FileDialog)dialog).open();
+						selPath = ((FileDialog) dialog).open();
 					}
 					if (selPath != null) {
 						path.setText(selPath);
@@ -242,7 +244,7 @@ public class ParametersBlock {
 
 		@Override
 		void activate() {
-			path.addModifyListener(this);		
+			path.addModifyListener(this);
 		}
 
 		@Override
@@ -255,9 +257,9 @@ public class ParametersBlock {
 		void reset() {
 			path.removeModifyListener(this);
 			param = null;
-			path.setText(defaultValue);			
+			path.setText(defaultValue);
 		}
-		
+
 		@Override
 		public void modifyText(ModifyEvent e) {
 			if (!path.getText().isEmpty()) {
@@ -272,55 +274,57 @@ public class ParametersBlock {
 				param = null;
 			}
 		}
-		
+
 	}
-	
+
 	private List<ParameterEditor> editors = new ArrayList<>();
 	private Map<String, ParameterEditor> nameToEditor = new HashMap<>();
 	private Object input;
 	private Shell shell;
 	private EStructuralFeature parametersFeature;
 	private EditingDomain editingDomain;
-	
+
 	public ParametersBlock(EditingDomain domain, EStructuralFeature parametersFeature) {
 		this.editingDomain = domain;
 		this.parametersFeature = parametersFeature;
 	}
-	
+
 	public void setObjectType(String type) {
 		Class<?> cl = Registry.INSTANCE.getInstanceClass(type);
-		if (cl.isAnnotationPresent(Component.class)) {
-			for (Field curField : cl.getDeclaredFields()) {
-				ParameterDefinition param = curField.getAnnotation(ParameterDefinition.class);
-				if (param != null) {
-					ParameterEditor editor = createEditor(curField.getType(), param.subType());
-					editor.label = param.label();
-					editor.name = param.name();
-					editor.required = param.required();
-					editor.defaultValue = param.defaultValue();
-					editors.add(editor);
-					nameToEditor.put(param.name().toLowerCase(), editor);
+		if (cl != null) {
+			if (cl.isAnnotationPresent(Component.class)) {
+				for (Field curField : cl.getDeclaredFields()) {
+					ParameterDefinition param = curField.getAnnotation(ParameterDefinition.class);
+					if (param != null) {
+						ParameterEditor editor = createEditor(curField.getType(), param.subType());
+						editor.label = param.label();
+						editor.name = param.name();
+						editor.required = param.required();
+						editor.defaultValue = param.defaultValue();
+						editors.add(editor);
+						nameToEditor.put(param.name().toLowerCase(), editor);
+					}
 				}
 			}
 		}
 	}
-	
+
 	public void setInput(Object input) {
 		this.input = input;
 		update();
 	}
-	
+
 	public void createControl(FormToolkit toolkit, Shell shell, Composite parent) {
 		this.shell = shell;
 
 		for (ParameterEditor curEditor : editors) {
 			curEditor.createLabel(toolkit, parent);
-			
+
 			Control value = curEditor.createControl(toolkit, parent);
 			value.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		}
 	}
-	
+
 	private ParameterEditor createEditor(Class<?> type, String subType) {
 		if (type.equals(Boolean.TYPE)) {
 			return new CheckboxParameterEditor();
@@ -329,34 +333,34 @@ public class ParametersBlock {
 		}
 		return new TextParameterEditor();
 	}
-	
+
 	private void addParameter(Parameter param) {
 		Command cmd = AddCommand.create(editingDomain, input, parametersFeature, param);
 		editingDomain.getCommandStack().execute(cmd);
 	}
-	
+
 	private void removeParameter(Parameter param) {
 		Command cmd = RemoveCommand.create(editingDomain, param);
 		editingDomain.getCommandStack().execute(cmd);
 	}
-	
+
 	private void update() {
-		for (ParameterEditor editor: editors) {
+		for (ParameterEditor editor : editors) {
 			editor.reset();
 		}
-		
+
 		if (input instanceof EObject) {
-			List<?> content = (List<?>)((EObject)input).eGet(parametersFeature);
+			List<?> content = (List<?>) ((EObject) input).eGet(parametersFeature);
 			for (int i = 0; i < content.size(); i++) {
-				Parameter p = (Parameter)content.get(i);
+				Parameter p = (Parameter) content.get(i);
 				ParameterEditor editor = nameToEditor.get(p.getName().toLowerCase());
 				if (editor != null) {
 					editor.update(p);
 				}
 			}
 		}
-		
-		for (ParameterEditor editor: editors) {
+
+		for (ParameterEditor editor : editors) {
 			editor.activate();
 		}
 	}

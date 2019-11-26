@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,84 +28,88 @@
 package tools.descartes.librede.validation;
 
 import java.util.Arrays;
-import java.util.List;
 
+import cern.jet.random.sampling.RandomSampler;
 import tools.descartes.librede.configuration.ModelEntity;
-import tools.descartes.librede.repository.Aggregation;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
 import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.TimeSeries;
-import cern.jet.random.sampling.RandomSampler;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.Unit;
 
 public class CrossValidationCursor implements IRepositoryCursor {
 	
-	private int kfold;
+	private final int kfold;
 	
-	private int[] partitions;
+	private final int intervals;
 	
-	private int validationPartition = 0;
+	// this 2d array contains for each partition a list of indices
+	private int[][] partitions;
+	
+	private int[] curFold;
 	
 	private int curIdx = -1;
 	
 	private IRepositoryCursor delegate;
 	
-	private boolean validationMode;
-	
-	public CrossValidationCursor(IRepositoryCursor cursor, int kfold) {
+	public CrossValidationCursor(IRepositoryCursor cursor, int kfold, int intervals) {
 		this.kfold = kfold;
+		this.intervals = intervals;
 		this.delegate = cursor;
 	}
 	
 	public void startTrainingPhase(int validationPartition) {
-		this.validationMode = false;
-		this.validationPartition = validationPartition;
-		delegate.seek(0);
+		int count = intervals - partitions[validationPartition].length;
+		curFold = new int[count];
+		for (int i = 0, pos = 0; i < kfold; i++) {			
+			if (i != validationPartition) {
+				System.arraycopy(partitions[i], 0, curFold, pos, partitions[i].length);
+				pos += partitions[i].length;
+			}
+		}
+		Arrays.sort(curFold);
+		delegate.reset();
 		curIdx = -1;
 	}
 	
 	public void startValidationPhase(int validationPartition) {
-		this.validationMode = true;
-		this.validationPartition = validationPartition;
-		delegate.seek(0);
+		curFold = partitions[validationPartition];
+		delegate.reset();
 		curIdx = -1;
 	}
 	
 	@Override
 	public boolean next() {
-		while(delegate.next()) {
+		if (curIdx < (curFold.length - 1)) {
 			curIdx++;
-			if ((partitions[curIdx] == validationPartition) == validationMode) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public double getCurrentIntervalStart() {
-		return delegate.getCurrentIntervalStart();
+	public Quantity<Time> getIntervalStart(int interval) {
+		return delegate.getIntervalStart(curFold[interval]);
 	}
 
 	@Override
-	public double getCurrentIntervalLength() {
-		return delegate.getCurrentIntervalLength();
+	public Quantity<Time> getIntervalEnd(int interval) {
+		return delegate.getIntervalEnd(curFold[interval]);
 	}
 
 	@Override
-	public double getCurrentIntervalEnd() {
-		return delegate.getCurrentIntervalEnd();
+	public <D extends Dimension> TimeSeries getValues(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity) {
+		return delegate.getValues(curFold[interval], metric, unit, entity);
 	}
 
 	@Override
-	public TimeSeries getValues(IMetric metric, ModelEntity entity) {
-		return delegate.getValues(metric, entity);
-	}
-
-	@Override
-	public double getAggregatedValue(IMetric metric, ModelEntity entity,
+	public <D extends Dimension> double getAggregatedValue(int interval, Metric<D> metric, Unit<D> unit, ModelEntity entity,
 			Aggregation func) {
-		return delegate.getAggregatedValue(metric, entity, func);
+		return delegate.getAggregatedValue(curFold[interval], metric, unit, entity, func);
 	}
 
 	@Override
@@ -113,51 +118,51 @@ public class CrossValidationCursor implements IRepositoryCursor {
 	}
 
 	@Override
-	public boolean hasData(IMetric metric, List<ModelEntity> entities,
+	public <D extends Dimension> boolean hasData(int interval, Metric<D> metric, ModelEntity entity,
 			Aggregation aggregation) {
-		return delegate.hasData(metric, entities, aggregation);
+		return delegate.hasData(curFold[interval], metric, entity, aggregation);
 	}
 	
 	public void initPartitions() {
-		int intervals = delegate.getAvailableIntervals();
-		partitions = new int[intervals];
+		partitions = new int[kfold][];
 		int partitionSize = (int)Math.ceil(intervals / (double)kfold);
-		Arrays.fill(partitions, -1);
 		
+		int unassigned = intervals;
+		boolean[] notSelected = new boolean[intervals];
 		for (int i = 0; i < kfold - 1; i++) {
 			int[] subset = new int[intervals - partitionSize * i];
 			for (int p = 0, s = 0; p < intervals; p++) {
-				if (partitions[p] < 0) {
+				if (notSelected[p]) {
 					subset[s] = p;
 					s++;
 				}
 			}
 			long[] samples = new long[partitionSize];
 			RandomSampler.sample(partitionSize, subset.length, partitionSize, 0, samples, 0, null);
+			partitions[i] = new int[samples.length];
 			for (int s = 0; s < samples.length; s++) {
-				partitions[subset[(int)samples[s]]] = i;
+				partitions[i][s] = (int) samples[s];
+				notSelected[subset[(int)samples[s]]] = false;
+				unassigned--;
 			}
 		}
 		
-		for (int i = 0; i < intervals; i++) {
-			if (partitions[i] < 0) {
-				partitions[i] = kfold - 1;
+		partitions[kfold - 1] = new int[unassigned];
+		for (int i = 0, p = 0; i < intervals; i++) {
+			if (notSelected[i]) {
+				partitions[kfold - 1][p] = i;
+				p++;
 			}
 		}
 	}
 
 	@Override
-	public boolean seek(int interval) {
-		return delegate.seek(interval);
+	public void reset() {
+		delegate.reset();
 	}
-	
+
 	@Override
-	public boolean seek(double newTime) {
-		return delegate.seek(newTime);
-	}
-	
-	@Override
-	public int getAvailableIntervals() {
-		throw new UnsupportedOperationException();
+	public int getLastInterval() {
+		return curIdx;
 	}
 }

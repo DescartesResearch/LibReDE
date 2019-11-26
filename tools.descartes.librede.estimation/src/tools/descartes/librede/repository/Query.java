@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -36,63 +37,62 @@ import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.Vector;
 import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.units.Dimension;
+import tools.descartes.librede.units.Unit;
 
-public final class Query<T extends Vector> {
-	
-	public static enum Type {
-		SERVICE, ALL_SERVICES, RESOURCE, ALL_RESOURCES
-	}
+public final class Query<T extends Vector, D extends Dimension> {
 	
 	private Aggregation aggregation;
-	private Query.Type type;
-	private IMetric metric;
+	private Metric<D> metric;
+	private Unit<D> unit;
 	private List<ModelEntity> entities = new ArrayList<ModelEntity>();
 	private IRepositoryCursor repositoryCursor;
 	
-	protected Query(Aggregation aggregation, Type type, IMetric metric,
-			ModelEntity entity, IRepositoryCursor repositoryCursor) {
+	protected Query(Aggregation aggregation, Metric<D> metric, Unit<D> unit,
+			List<ModelEntity> entities, IRepositoryCursor repositoryCursor) {
 		super();
 		this.aggregation = aggregation;
-		this.type = type;
 		this.metric = metric;
+		this.unit = unit;
 		this.repositoryCursor = repositoryCursor;
-		if (entity != null) {
-			entities.add(entity);
-		}
+		this.entities = entities;
 	}
 
 	public Aggregation getAggregation() {
 		return aggregation;
 	}
 	
-	public Query.Type getType() {
-		return type;
-	}
-	
-	public IMetric getMetric() {
+	public Metric<D> getMetric() {
 		return metric;
 	}
 	
-	public T execute() {		
-		if (entities.isEmpty()) {
-			load();
-		}
-		
+	public Unit<D> getUnit() {
+		return unit;
+	}
+	
+	public T get(int historicInterval) {
+		final int interval = repositoryCursor.getLastInterval() - historicInterval;
 		if (entities.size() > 1) {
 			Vector result = vector(entities.size(), new VectorFunction() {				
 				@Override
 				public double cell(int row) {
-					return repositoryCursor.getAggregatedValue(metric, entities.get(row), aggregation);
+					return repositoryCursor.getAggregatedValue(interval, metric, unit, entities.get(row), aggregation);
 				}
 			});
 			return (T)result;
 		} else {
 			if (aggregation != Aggregation.NONE) {
-				return (T)new Scalar(repositoryCursor.getAggregatedValue(metric, entities.get(0), aggregation));
+				return (T)new Scalar(repositoryCursor.getAggregatedValue(interval, metric, unit, entities.get(0), aggregation));
 			} else {
-				return (T)repositoryCursor.getValues(metric, entities.get(0)).getData(0);
+				return (T)repositoryCursor.getValues(interval, metric, unit, entities.get(0)).getData(0);
 			}			
 		}
+	}
+	
+	public T execute() {		
+		return get(0);
 	}
 	
 	public int indexOf(ModelEntity entity) {
@@ -107,17 +107,30 @@ public final class Query<T extends Vector> {
 		return Collections.unmodifiableList(entities);
 	}
 	
+	public boolean isExecutable() {
+		for (ModelEntity entity : entities) {
+			if (!repositoryCursor.getRepository().exists(metric, entity, aggregation)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
-	
-	private void load() {
-		if (type == Type.ALL_RESOURCES) {
-			entities.addAll(repositoryCursor.getRepository().listResources());
-		} else if (type == Type.ALL_SERVICES) {
-			entities.addAll(repositoryCursor.getRepository().listServices());
-		}		
+	public boolean hasData() {
+		return hasData(0);
 	}
 
-	public boolean hasData() {
-		return repositoryCursor.hasData(metric, entities, aggregation);
+	public boolean hasData(int historicInterval) {
+		final int interval = repositoryCursor.getLastInterval() - historicInterval;
+		if (interval < 0) {
+			return false;
+		}
+		
+		for (ModelEntity entity : entities) {
+			if (!repositoryCursor.hasData(interval, metric, entity, aggregation)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

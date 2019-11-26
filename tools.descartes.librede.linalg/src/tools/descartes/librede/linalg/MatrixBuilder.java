@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,34 +27,22 @@
  */
 package tools.descartes.librede.linalg;
 
-import static tools.descartes.librede.linalg.LinAlg.matrix;
+public abstract class MatrixBuilder {
 
-import java.util.ArrayList;
-import java.util.List;
+	private static final int DEFAULT_SIZE = 10;
+	
+	public static MatrixBuilder create(int columns) {
+		return LinAlg.FACTORY.createMatrixBuilder(DEFAULT_SIZE, columns);
+	}
 
-public class MatrixBuilder {
-	
-	private int columns;
-	private List<double[]> buffer = new ArrayList<double[]>();
-	
-	public MatrixBuilder(int columns) {
-		this.columns = columns;
+	public static MatrixBuilder create(int capacity, int columns) {
+		return LinAlg.FACTORY.createMatrixBuilder(capacity, columns);
 	}
 	
-	public void addRow(Vector values) {
-		addRow(values.toArray1D());
-	}
+	public abstract void addRow(Vector values);
 	
-	public void addRow(double...values) {
-		if (values.length != columns) {
-			throw new IllegalArgumentException();
-		}
-		buffer.add(values);
-	}
+	public abstract void addRow(double...values);
 	
-	public Matrix toMatrix() {
-		double[][] values = buffer.toArray(new double[buffer.size()][]);
-		return matrix(values);
-	}
+	public abstract Matrix toMatrix();
 
 }

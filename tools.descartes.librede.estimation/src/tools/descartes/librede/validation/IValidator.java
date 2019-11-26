@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -31,11 +32,15 @@ import java.util.List;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IValidator {
+public interface IValidator extends IDependencyTarget {
 	
 	void initialize(WorkloadDescription workload, IRepositoryCursor cursor);
+	
+	IStateModel<?> getStateModel();
 
 	Vector getPredictionError();
 	
@@ -43,4 +48,7 @@ public interface IValidator {
 
 	void predict(Vector state);
 
+	Vector getPredictedValues();
+		
+	Vector getObservedValues();
 }

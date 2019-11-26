@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,10 +28,7 @@
 package tools.descartes.librede.ipopt.java;
 
 import static tools.descartes.librede.linalg.LinAlg.matrix;
-import static tools.descartes.librede.linalg.LinAlg.mean;
-import static tools.descartes.librede.linalg.LinAlg.norm2;
-import static tools.descartes.librede.linalg.LinAlg.transpose;
-import static tools.descartes.librede.linalg.LinAlg.vertcat;
+import static tools.descartes.librede.linalg.LinAlg.nanmean;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 import static tools.descartes.librede.nativehelper.NativeHelper.nativeVector;
 import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
@@ -38,7 +36,14 @@ import static tools.descartes.librede.nativehelper.NativeHelper.toNative;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.log4j.Logger;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.DoubleByReference;
+
 import tools.descartes.librede.algorithm.AbstractEstimationAlgorithm;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.ipopt.java.backend.Eval_F_CB;
@@ -51,25 +56,26 @@ import tools.descartes.librede.ipopt.java.backend.IpoptOptionKeyword;
 import tools.descartes.librede.ipopt.java.backend.IpoptOptionValue;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.HessianMatrixBuilder;
-import tools.descartes.librede.models.diff.JacobiMatrixBuilder;
+import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.diff.DifferentiationUtils;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.state.ConstantStateModel;
-import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.StateVariable;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.state.constraints.ILinearStateConstraint;
+import tools.descartes.librede.models.state.constraints.IStateBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
-import tools.descartes.librede.models.state.constraints.StateBoundsConstraint;
+import tools.descartes.librede.models.variables.OutputVariable;
 import tools.descartes.librede.nativehelper.NativeHelper;
 import tools.descartes.librede.registry.Component;
 import tools.descartes.librede.registry.ParameterDefinition;
-
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.DoubleByReference;
+import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.units.Quantity;
+import tools.descartes.librede.units.Time;
 
 @Component(displayName="Non-linear Constrained Optimization")
 public class RecursiveOptimization extends AbstractEstimationAlgorithm {
+	
+	private static final Logger log = Logger.getLogger(RecursiveOptimization.class);
 	
 	@ParameterDefinition(name = "SolutionTolerance", label = "Solution Tolerance", defaultValue = "1e-7")
 	private double solutionTolerance = 1e-7;
@@ -79,12 +85,15 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	
 	@ParameterDefinition(name = "LowerBoundsInfValue", label = "Lower Bounds Infinity Value", defaultValue = "-1e19")
 	private double lowerBoundsInfValue = -1e19;
+	
+	@ParameterDefinition(name = "PrintLevel", label = "The verbosity of log outputs", defaultValue = "5")
+	private int printLevel = 5;
 
 	// C-style; start counting of rows and column indices at 0
 	private final static int IPOPT_INDEX_STYLE = 0;
 	
 	/* Number of variables of the optimization problem. */
-	private int stateSize = -1;
+	protected int stateSize = -1;
 	/* Number of linear and nonlinear constraints. This does not include the bounds. */
 	private int constraintCount = -1;
 	
@@ -95,7 +104,7 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	 */
 	private List<IStateConstraint> nonlinearConstraints = new ArrayList<IStateConstraint>();
 	private List<ILinearStateConstraint> linearConstraints = new ArrayList<ILinearStateConstraint>();
-	private List<StateBoundsConstraint> boundsConstraints = new ArrayList<StateBoundsConstraint>();
+	private List<IStateBoundsConstraint> boundsConstraints = new ArrayList<IStateBoundsConstraint>();
 	
 	/*
 	 * Callback functions which are called from native code of IPOPT during optimization
@@ -108,12 +117,11 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	 * enclosing class. Therefore the class OptimizationState encapsulates the internal
 	 * optimization state that is shared between the callbacks.
 	 */
-	private OptimizationState sharedState = new OptimizationState();
-	private F evalf = new F(sharedState); /* objective function f(x): R^n --> R */
-	private G evalg = new G(sharedState); /* constraint functions g(x): R^n --> R^m */
-	private GradF evalgradf = new GradF(sharedState); /* first derivatives of the objective function */
-	private JacG evaljacg = new JacG(sharedState); /* Jacobi matrix of the constraint functions */
-	private H evalh = new H(sharedState); /* Hessian matrix of the Lagrangian */
+	private F evalf = new F(); /* objective function f(x): R^n --> R */
+	private G evalg = new G(); /* constraint functions g(x): R^n --> R^m */
+	private GradF evalgradf = new GradF(); /* first derivatives of the objective function */
+	private JacG evaljacg = new JacG(); /* Jacobi matrix of the constraint functions */
+	private H evalh = new H(); /* Hessian matrix of the Lagrangian */
 	
 	/* Number of nonzeros in the Jacobian of the constraints */
 	private int nele_jac;
@@ -128,124 +136,81 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private Pointer g_L; /* double[constraintCount] : g_L <= g(x) <= g_U */
 	private Pointer g_U; /* double[constraintCount] */
 	private Pointer x; /* double[stateSize] : initial and solution vector */
-	private DoubleByReference obj; /* current objective value of optimization */
+	private DoubleByReference objRef; /* current objective value of optimization */
+
+	private State currentState;
+	
+	// Caches the difference between observed and calculated response time
+	protected DerivativeStructure obj;
+	
+	protected DerivativeStructure lagrange;
+	
+	protected DerivativeStructure[] constraintValues;
 	
 	private Matrix estimationBuffer;
 	
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.models.algorithm.IEstimationAlgorithm#initialize(tools.descartes.librede.models.state.IStateModel, tools.descartes.librede.models.observation.IObservationModel, int)
-	 */
-	@Override
-	public void initialize(IStateModel<?> stateModel,
-			IObservationModel<?, ?> observationModel, int estimationWindow) throws InitializationException {
-		super.initialize(stateModel, observationModel, estimationWindow);
-		
-		initStateConstraints(stateModel.getConstraints());
-		
-		this.stateSize = stateModel.getStateSize(); // number of variables
-		this.constraintCount = nonlinearConstraints.size() + linearConstraints.size(); // number of constraints g(x)
-		
-		initOptimizationState(observationModel);
-		
-		allocateNativeMemory();
-		
-		// Set initial state
-		copy(stateModel.getInitialState(), x);	
-		
-		// Determine number of zeros in jacobi an hessian matrices.
-		nele_jac = stateSize * constraintCount;
-		nele_hess = 0;	
-		// NOTE: lower or upper triangular part only
-		for (int i = 1; i <= stateSize; i++) {
-			nele_hess += i;
-		}
-		
-		estimationBuffer = matrix(estimationWindow, stateSize, Double.NaN);
-	}
+	// Flag indicating whether this is the first iteration.
+	private boolean initialized = false;
 	
-
-	/* (non-Javadoc)
-	 * @see tools.descartes.librede.algorithm.IEstimationAlgorithm#update()
-	 */
-	@Override
-	public void update() {
-		if (stateSize < 0) {
-			throw new IllegalStateException("Method initialize() must be called before calling estimate().");
-		}		
-		
+	private Pointer nlp;
+	
+	protected Vector solve() {
 		setOptimizationBounds();
 		
 		setOptimizationConstraints();
 		
-		Pointer nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
-                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
-                evaljacg, evalh);
-		
-		setOptimizationOptions(nlp);	
+		if (nlp == null) {
+			nlp = IpoptLibrary.INSTANCE.IpOpt_CreateIpoptProblem(stateSize, x_L, x_U, constraintCount, g_L, g_U, nele_jac, nele_hess,
+	                IPOPT_INDEX_STYLE, evalf, evalg, evalgradf,
+	                evaljacg, evalh);
+			
+			setOptimizationOptions(nlp);
+		}			
 		
 		/* solve the problem */
-		int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, obj, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
+		int status = IpoptLibrary.INSTANCE.IpOpt_IpoptSolve(nlp, x, Pointer.NULL, objRef, Pointer.NULL, Pointer.NULL, Pointer.NULL, Pointer.NULL);
 		
-		Vector estimate = zeros(stateSize);		
+		Vector estimate = null;		
 		if (status == IpoptLibrary.IP_SOLVE_SUCCEEDED || status == IpoptLibrary.IP_ACCEPTABLE_LEVEL) {
 			estimate = nativeVector(stateSize, x);		
+		} else if (status == IpoptLibrary.IP_ITERATION_EXCEEDED || status == IpoptLibrary.IP_CPUTIME_EXCEEDED) {
+			estimate = nativeVector(stateSize, x);
+			System.out.println("\n\nWARNING: Inaccurate estimate.");
 		} else {
+			estimate = zeros(stateSize);
 			System.out.println("\n\nERROR OCCURRED DURING IPOPT OPTIMIZATION: " + status);
 		}
-		estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);
-		  
-		/* free allocated memory */
-		IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
+
+		return estimate;
 	}
 	
-	@Override
-	public Vector estimate() throws EstimationException {
-		return mean(estimationBuffer, 0);
+	protected void setState(Vector state) {
+		copy(state, x);
 	}
 	
-	private void initOptimizationState(IObservationModel<?, ?> observationModel) {
-		sharedState.observationModel = observationModel;
-		sharedState.nonlinearConstraints = nonlinearConstraints;
-		sharedState.linearConstraints = linearConstraints;
-		sharedState.stateSize = stateSize;			
-	}
-	
-	private void allocateNativeMemory() {
-		/* allocate space for the variable bounds */
-		x_L = NativeHelper.allocateDoubleArray(stateSize);
-		x_U = NativeHelper.allocateDoubleArray(stateSize);
-		
-		if (constraintCount > 0) {		
-			/* allocate space for the constraint bounds */
-			g_L = NativeHelper.allocateDoubleArray(constraintCount);
-			g_U = NativeHelper.allocateDoubleArray(constraintCount);
-		} else {
-			g_L = Pointer.NULL;
-			g_U = Pointer.NULL;
+	private void copy(Vector v, Pointer target) {
+		for (int i = 0; i < v.rows(); i++) {
+			NativeHelper.setDoubleArray(target, i, v.get(i));
 		}
+	}
+
+	private void initStateConstraints(List<? extends IStateConstraint> constraints) {
+		nonlinearConstraints.clear();
+		linearConstraints.clear();
+		boundsConstraints.clear();
 		
-		/* allocate space for the initial point and solution vector */
-	    x = NativeHelper.allocateDoubleArray(stateSize);
-
-		obj = new DoubleByReference(); // objective value
+		for (IStateConstraint c : constraints) {
+			if (c instanceof IStateBoundsConstraint) {
+				boundsConstraints.add((IStateBoundsConstraint)c);
+			} else if (c instanceof ILinearStateConstraint) {
+				linearConstraints.add((ILinearStateConstraint)c);
+			} else {
+				nonlinearConstraints.add(c);
+			}
+		}
+		constraintValues = new DerivativeStructure[linearConstraints.size() + nonlinearConstraints.size()];
 	}
-
-	private void setOptimizationOptions(Pointer nlp) {
-		IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.PRINT_LEVEL.toNativeString(), 1);
-		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.MU_STRATEGY.toNativeString(), 
-				IpoptOptionValue.ADAPTIVE.toNativeString());
-//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.CHECK_DERIVATIVES_FOR_NANINF.toNativeString(), 
-//				IpoptOptionValue.YES.toNativeString());
-//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "output_file", "ipopt.out");
-//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST.toNativeString(), 
-//				IpoptOptionValue.SECOND_ORDER.toNativeString());
-//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST_PRINT_ALL.toNativeString(), 
-//				IpoptOptionValue.YES.toNativeString());
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundsInfValue);
-	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);		
-	}
-
+	
 	private void setOptimizationConstraints() {
 		if (constraintCount > 0) {		
 			/* set the values of the constraint bounds to default value */			
@@ -266,183 +231,268 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 	private void setOptimizationBounds() {
 		/* set the values for the variable bounds to default value */
 		for (int i = 0; i < stateSize; i++) {
-			NativeHelper.setDoubleArray(x_L, i, 0);
+			NativeHelper.setDoubleArray(x_L, i, lowerBoundsInfValue);
 			NativeHelper.setDoubleArray(x_U, i, upperBoundsInfValue);
 		}
 		
-		for (StateBoundsConstraint c : boundsConstraints) {
-			StateVariable var = c.getStateVariable();
+		for (IStateBoundsConstraint c : boundsConstraints) {
+			ResourceDemand var = c.getStateVariable();			
 			NativeHelper.setDoubleArray(x_L, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getLowerBound());
 			NativeHelper.setDoubleArray(x_U, getStateModel().getStateVariableIndex(var.getResource(), var.getService()), c.getUpperBound());
 		}
 	}
 	
-	private void initStateConstraints(List<? extends IStateConstraint> constraints) {
-		nonlinearConstraints.clear();
-		linearConstraints.clear();
-		boundsConstraints.clear();
+	private void allocateNativeMemory() {
+		/* allocate space for the variable bounds */
+		x_L = NativeHelper.allocateDoubleArray(stateSize);
+		x_U = NativeHelper.allocateDoubleArray(stateSize);
 		
-		for (IStateConstraint c : constraints) {
-			if (c instanceof StateBoundsConstraint) {
-				boundsConstraints.add((StateBoundsConstraint)c);
-			} else if (c instanceof ILinearStateConstraint) {
-				linearConstraints.add((ILinearStateConstraint)c);
-			} else {
-				nonlinearConstraints.add(c);
+		if (constraintCount > 0) {		
+			/* allocate space for the constraint bounds */
+			g_L = NativeHelper.allocateDoubleArray(constraintCount);
+			g_U = NativeHelper.allocateDoubleArray(constraintCount);
+		} else {
+			g_L = Pointer.NULL;
+			g_U = Pointer.NULL;
+		}
+		
+		/* allocate space for the initial point and solution vector */
+	    x = NativeHelper.allocateDoubleArray(stateSize);
+
+		objRef = new DoubleByReference(); // objective value
+	}
+
+	private void setOptimizationOptions(Pointer nlp) {
+		IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.PRINT_LEVEL.toNativeString(),printLevel);
+		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.MU_STRATEGY.toNativeString(), 
+				IpoptOptionValue.ADAPTIVE.toNativeString());
+//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.CHECK_DERIVATIVES_FOR_NANINF.toNativeString(), 
+//				IpoptOptionValue.YES.toNativeString());
+//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, "output_file", "ipopt.out");
+//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST.toNativeString(), 
+//				IpoptOptionValue.SECOND_ORDER.toNativeString());
+//		IpoptLibrary.INSTANCE.IpOpt_AddIpoptStrOption(nlp, IpoptOptionKeyword.DERIVATIVE_TEST_PRINT_ALL.toNativeString(), 
+//				IpoptOptionValue.YES.toNativeString());
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.TOL.toNativeString(), solutionTolerance);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_LOWER_BOUND_INF.toNativeString(), lowerBoundsInfValue);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptNumOption(nlp, IpoptOptionKeyword.NLP_UPPER_BOUND_INF.toNativeString(), upperBoundsInfValue);
+	    IpoptLibrary.INSTANCE.IpOpt_AddIpoptIntOption(nlp, IpoptOptionKeyword.MAX_ITER.toNativeString(), 300);
+	}
+	
+	/* (non-Javadoc)
+	 * @see tools.descartes.librede.algorithm.AbstractEstimationAlgorithm#initialize(tools.descartes.librede.models.EstimationProblem, tools.descartes.librede.repository.IRepositoryCursor, int)
+	 */
+	@Override
+	public void initialize(EstimationProblem problem, 
+			IRepositoryCursor cursor,
+			int estimationWindow) throws InitializationException {
+		super.initialize(problem, cursor, estimationWindow);
+		initStateConstraints(problem.getStateModel().getConstraints());
+		
+		this.stateSize = problem.getStateModel().getStateSize(); // number of variables
+		this.constraintCount = nonlinearConstraints.size() + linearConstraints.size(); // number of constraints g(x)
+		
+		allocateNativeMemory();
+		
+		// Determine number of zeros in jacobi an hessian matrices.
+		nele_jac = stateSize * constraintCount;
+		nele_hess = 0;	
+		// NOTE: lower or upper triangular part only
+		for (int i = 1; i <= stateSize; i++) {
+			nele_hess += i;
+		}
+		estimationBuffer = matrix(estimationWindow, stateSize, Double.NaN);
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see tools.descartes.librede.algorithm.IEstimationAlgorithm#update()
+	 */
+	@Override
+	public void update() {
+		if (stateSize < 0) {
+			throw new IllegalStateException("Method initialize() must be called before calling estimate().");
+		}		
+		
+		if (!initialized) {
+			// Set initial state
+			Vector initialState = getStateModel().getInitialState();
+			if (!initialState.isEmpty()) {
+				setState(initialState);
+				initialized = true;
 			}
 		}
-	}
-	
-	private void copy(Vector v, Pointer target) {
-		for (int i = 0; i < v.rows(); i++) {
-			NativeHelper.setDoubleArray(target, i, v.get(i));
+		
+		if (initialized) {
+			getStateModel().step(null);
+			
+			Vector estimate = solve();
+			
+			estimationBuffer = estimationBuffer.circshift(1).setRow(0, estimate);		
 		}
 	}
 	
-	private static class F implements Eval_F_CB {
-		
-		private OptimizationState state;
-		
-		public F(OptimizationState state) {
-			super();
-			this.state = state;
+	@Override
+	public Vector estimate() throws EstimationException {
+		return nanmean(estimationBuffer);
+	}
+	
+	private DerivativeStructure calcObjectiveFunction(State state) {
+		IObservationModel<?> observationModel = getObservationModel();
+		int outputSize = observationModel.getOutputSize();
+		Vector outputWeights = observationModel.getOutputWeightsFunction().getOutputWheights();
+
+		// obj = sum((h_real - h_calc(x)) .^ 2)
+		DerivativeStructure obj = null;
+		for (int i = 0; i < outputSize; i++) {
+			OutputFunction func = observationModel.getOutputFunction(i);
+			if (func.hasData()) {
+				double o_real = func.getObservedOutput();
+				OutputVariable o_calc = func.getCalculatedOutput(state);
+				if (Double.isNaN(o_calc.getValue()) || Double.isNaN(o_real)){
+					Quantity<Time> pos = getCursor().getIntervalEnd(getCursor().getLastInterval());
+					//log.error("Blub: " + pos);
+				}
+				if (o_real > 0) {
+ 					DerivativeStructure summand = o_calc.getDerivativeStructure().subtract(o_real).divide(o_real).pow(2);
+					obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
+				} else {
+					DerivativeStructure summand = o_calc.getDerivativeStructure().pow(2);
+					obj = (obj == null) ? summand : obj.add(summand.multiply(outputWeights.get(i)));
+				}
+			}
 		}
+		if (obj == null) {
+			log.warn("No input data available for estimation.");
+			obj = new DerivativeStructure(state.getStateSize(), state.getDerivationOrder());
+		}
+		return obj;
+	}
+
+	public void updateObjectiveFunction(Vector x) {
+		currentState = new State(getStateModel(), x, 2);
+	
+		obj = calcObjectiveFunction(currentState);
 		
+		int i = 0;
+		for (; i < linearConstraints.size(); i++) {
+			ILinearStateConstraint c = linearConstraints.get(i);
+			constraintValues[i] = c.getValue(currentState).getDerivativeStructure();
+		}
+		for (int j = 0; j < nonlinearConstraints.size(); j++, i++) {
+			IStateConstraint c = linearConstraints.get(j);
+			constraintValues[i] = c.getValue(currentState).getDerivativeStructure();
+		}
+	}
+
+	public void updateLagrangeMatrix(double obj_factor, double[] lambda) {	
+		lagrange = obj.multiply(obj_factor);
+
+		// add portion for constraints
+		for (int i = 0; i < lambda.length; i++) {
+			lagrange = lagrange.add(constraintValues[i].multiply(lambda[i]));		
+		}
+	}
+
+	@Override
+	public void destroy() {
+		if (nlp != null) {
+			/* free allocated memory */
+			IpoptLibrary.INSTANCE.IpOpt_FreeIpoptProblem(nlp);
+			nlp = null;
+		}
+		g_L = null;
+		g_U = null;
+		x = null;
+		x_L = null;
+		x_U = null;
+	}
+	
+	private class F implements Eval_F_CB {
 		@Override
 		public boolean eval_f(int n, Pointer x, boolean new_x,
 				Pointer obj_value, Pointer user_data) {
-			
-			state.update(x, new_x);
-			
-			obj_value.setDouble(0, state.obj);
-			
+			if (new_x) {
+				updateObjectiveFunction(nativeVector(stateSize, x));
+			}			
+			obj_value.setDouble(0, obj.getValue());			
 			return true;
 		}
 	}
 	
-	private static class GradF implements Eval_Grad_F_CB {
-		
-		private OptimizationState state;
-		
-		public GradF(OptimizationState state) {
-			super();
-			this.state = state;
-		}
-		
+	private class GradF implements Eval_Grad_F_CB {
 		@Override
 		public boolean eval_grad_f(int n, Pointer x, boolean new_x, Pointer grad_f, Pointer user_data) {
-			
-			state.update(x, new_x);
-			
-			toNative(grad_f, state.objGrad);
-			
+			if (new_x) {
+				updateObjectiveFunction(nativeVector(stateSize, x));
+			}
+			toNative(grad_f, DifferentiationUtils.getFirstDerivatives(obj));			
 			return true;
 		}
 	}
 	
-	private static class G implements Eval_G_CB {
-		
-		private OptimizationState state;
-		
-		public G(OptimizationState state) {
-			super();
-			this.state = state;
-		}
-
+	private class G implements Eval_G_CB {
 		@Override
 		public boolean eval_g(int n, Pointer x, boolean new_x, int m, Pointer g, Pointer user_data) {
-			
-			state.update(x, new_x);
-			
-			int i = 0;
-			for (ILinearStateConstraint c : state.linearConstraints) {
-				g.setDouble(i, c.getValue(state.current));
-				i++;
-			}
-			for (IStateConstraint c : state.nonlinearConstraints) {
-				g.setDouble(i, c.getValue(state.current));
-				i++;
+			if (new_x) {
+				updateObjectiveFunction(nativeVector(stateSize, x));
 			}
 			
+			for (int i = 0; i < constraintValues.length; i++) {
+				g.setDouble(i, constraintValues[i].getValue());
+			}
 			return true;
 		}
 	}
 	
-	private static class JacG implements Eval_Jac_G_CB {
-		
-		private OptimizationState state;
-
-		public JacG(OptimizationState state) {
-			super();
-			this.state = state;
-		}
-
+	private class JacG implements Eval_Jac_G_CB {
 		@Override
 		public boolean eval_jac_g(int n, Pointer x, boolean new_x, int m, int nele_jac, Pointer iRow, Pointer jCol,
 				Pointer values, Pointer user_data) {
 			try {
-			
-			state.update(x, new_x);
-			
-			if (values == Pointer.NULL) {
-				/* return the structure of the jacobian */
-
-				/* this particular jacobian is dense */
-				int[] iRowArr = new int[n * m];
-				int[] jColArr = new int[n * m];
-
-				for (int i = 0; i < m; i++) {
-					for (int j = 0; j < n; j++) {
-						iRowArr[i * m + j] = i;
-						jColArr[i * m + j] = j;
-					}
+				if (new_x) {
+					updateObjectiveFunction(nativeVector(stateSize, x));
 				}
-
-				iRow.write(0, iRowArr, 0, iRowArr.length);
-				jCol.write(0, jColArr, 0, jColArr.length);
-			} else {
-				/* return the values of the jacobian of the constraints */
-				Matrix jacobi = null;
 				
-				if (state.linearConstraints.size() > 0) {
-					jacobi = JacobiMatrixBuilder.calculateOfConstraints(state.linearConstraints, state.current);
-				}
-				if (state.nonlinearConstraints.size() > 0) {
-					Matrix res = JacobiMatrixBuilder.calculateOfConstraints(state.nonlinearConstraints, state.current);
-					if (jacobi == null) {
-						jacobi = res;
-					} else {
-						jacobi = vertcat(jacobi, res);
+			
+				if (values == Pointer.NULL) {
+					/* return the structure of the jacobian */
+	
+					/* this particular jacobian is dense */
+					int[] iRowArr = new int[n * m];
+					int[] jColArr = new int[n * m];
+	
+					for (int i = 0; i < m; i++) {
+						for (int j = 0; j < n; j++) {
+							iRowArr[i * m + j] = i;
+							jColArr[i * m + j] = j;
+						}
+					}
+	
+					iRow.write(0, iRowArr, 0, iRowArr.length);
+					jCol.write(0, jColArr, 0, jColArr.length);
+				} else {
+					if (constraintValues.length > 0) {
+						toNative(values, DifferentiationUtils.getJacobiMatrix(constraintValues));
 					}
 				}
-				if (jacobi != null) {
-					toNative(values, jacobi);
+	
+				} catch(Throwable e) {
+					e.printStackTrace();
+					return false;
 				}
-			}
-
-			} catch(Throwable e) {
-				e.printStackTrace();
-				return false;
-			}
-			return true;
+				return true;
 		}
 	}
 	
-	private static class H implements Eval_H_CB {
-		
-		private OptimizationState state;
-
-		public H(OptimizationState state) {
-			super();
-			this.state = state;
-		}
-
+	private class H implements Eval_H_CB {
 		@Override
 		public boolean eval_h(int n, Pointer x, boolean new_x, double obj_factor, int m, Pointer lambda,
-				boolean new_lambda, int nele_hess, Pointer iRow, Pointer jCol, Pointer values, Pointer user_data) {
-			
-			state.update(x, new_x);
-			
+				boolean new_lambda, int nele_hess, Pointer iRow, Pointer jCol, Pointer values, Pointer user_data) {		
+			if (new_x) {
+				updateObjectiveFunction(nativeVector(stateSize, x));
+			}
+
 			int arraySize = 0;				
 			for (int i = 1; i <= n; i++) {
 				arraySize += i;
@@ -470,92 +520,30 @@ public class RecursiveOptimization extends AbstractEstimationAlgorithm {
 			else {
 				/* return the values. This is a symmetric matrix, fill the lower left
 				 * triangle only */
-				double[] lambdaArr = lambda.getDoubleArray(0, m);
-
-
-				double[] valuesArr = new double[arraySize];
-
-				Matrix lagrange = zeros(n, n);
 				
-				int outputIdx = 0;
-				for (IOutputFunction function : state.observationModel) {					
-					Matrix dev2 = HessianMatrixBuilder.calculateOfOutputFunction(function, state.current);
-					
-					Matrix u = dev2.times(state.error.get(outputIdx));
-					
-					
-					Vector jacobiRow = state.jacobi.row(outputIdx);
-					Matrix v = u.minus(jacobiRow.multipliedBy(transpose(jacobiRow)));
-					
-					lagrange = lagrange.plus(v.times(-2 * obj_factor));
-					
-					outputIdx++;
-				}
-
-
-				// add portion for constraints
-
-				for (int i = state.linearConstraints.size(); i < m; i++) {
-					Matrix dev2 = HessianMatrixBuilder.calculateOfConstraint(state.nonlinearConstraints.get(i), state.current);
-					
-					lagrange = lagrange.plus(dev2.times(lambdaArr[i]));
+				if (new_lambda) {
+					double[] lambdaArr = lambda.getDoubleArray(0, m);
+					updateLagrangeMatrix(obj_factor, lambdaArr);
 				}
 				
+				double[] valuesArr = new double[arraySize];				
 				int idx = 0;
+				int[] order = new int[n];
 				for (int row = 0; row < n; row++) {
+					order[row]++;
 					for (int col = 0; col <= row; col++) {
-						valuesArr[idx] = lagrange.get(row, col);
+						order[col] ++;
+						valuesArr[idx] = lagrange.getPartialDerivative(order);
 						idx++;
+						order[col]--;
 					}
+					order[row]--;
 				}
 				values.write(0, valuesArr, 0, valuesArr.length);
+				
 			}
 
 			return true;
 		}
 	}
-	
-	private static class OptimizationState {
-		
-		public int stateSize;
-		
-		public IObservationModel<?, ?> observationModel;
-		
-		public List<IStateConstraint> nonlinearConstraints;
-		public List<ILinearStateConstraint> linearConstraints;
-		
-		// Caches the current state vector
-		public Vector current;
-		
-		public Vector error;
-		
-		// Caches the difference between observed and calculated response time
-		public double obj;
-		
-		public Matrix jacobi;
-		
-		// Caches the first derivative of the observation model
-		public Vector objGrad;
-
-		public void update(Pointer x, boolean new_x) {
-			if (new_x) {
-				current = nativeVector(stateSize, x);
-			
-				Vector o_real = observationModel.getObservedOutput();
-				Vector o_calc = observationModel.getCalculatedOutput(current);
-				error = o_real.minus(o_calc);			
-				
-				obj = norm2(error);
-							
-				jacobi = JacobiMatrixBuilder.calculateOfObservationModel(observationModel, current);
-				
-				objGrad = (Vector)transpose(jacobi).multipliedBy(error).times(-2.0);
-			}
-		}		
-	}
-
-	@Override
-	public void destroy() {
-		
-	}	
 }

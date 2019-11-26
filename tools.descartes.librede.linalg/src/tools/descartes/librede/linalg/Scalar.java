@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -25,6 +26,8 @@
  * in the United States and other countries.]
  */
 package tools.descartes.librede.linalg;
+
+import static tools.descartes.librede.linalg.LinAlg.indices;
 
 import tools.descartes.librede.linalg.backend.colt.ColtVector;
 
@@ -65,13 +68,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public double aggregate(AggregationFunction func) {
-		return func.apply(Double.NaN, value);
-	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		return new Scalar(aggregate(func));
+	public Vector aggregate(AggregationFunction func, double initialValue) {
+		return new Scalar(func.apply(initialValue, value));
 	}
 
 	@Override
@@ -121,6 +119,14 @@ public class Scalar implements Vector, SquareMatrix {
 		}
 		return value;
 	}
+	
+	@Override
+	public Vector get(Indices rows) {
+		if (rows.length() != 1 || rows.get(0) != 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return this;
+	}
 
 	@Override
 	public int rows() {
@@ -141,8 +147,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public Scalar rows(int start, int end) {
-		if (start != 0 || end != 0) {
+	public Scalar rows(Indices rows) {
+		if (rows.length() != 1 || rows.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
@@ -158,8 +164,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public Scalar columns(int start, int end) {
-		if (start != 0 || end != 0) {
+	public Scalar columns(Indices columns) {
+		if (columns.length() != 1 || columns.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		return this;
@@ -216,6 +222,11 @@ public class Scalar implements Vector, SquareMatrix {
 	public Matrix multipliedBy(Matrix a) {
 		return a.times(value);
 	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		return b.times(1 / value);
+	}
 
 	@Override
 	public double[] toArray1D() {
@@ -228,14 +239,6 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Scalar slice(Range range) {
-		if (range.getStart() != 0 || range.getEnd() != 1) {
-			throw new IndexOutOfBoundsException();
-		}
-		return this;
-	}
-
-	@Override
 	public double dot(Vector b) {
 		if (!b.isScalar()) {
 			throw new IllegalArgumentException(
@@ -245,11 +248,11 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Scalar sort(int column) {
+	public Indices sort(int column) {
 		if (column != 0) {
 			throw new IndexOutOfBoundsException();
 		}
-		return this;
+		return indices(0);
 	}
 
 	@Override
@@ -277,8 +280,8 @@ public class Scalar implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Scalar set(Range rows, Vector values) {
-		if (rows.getStart() != 0 || rows.getEnd() != 1) {
+	public Scalar set(Indices rows, Vector values) {
+		if (rows.length() != 1 || rows.get(0) != 0) {
 			throw new IndexOutOfBoundsException();
 		}
 		if (values.rows() != 1) {
@@ -286,14 +289,6 @@ public class Scalar implements Vector, SquareMatrix {
 					"Size of values vector must match range specification.");
 		}
 		return new Scalar(values.get(0, 0));
-	}
-	
-	@Override
-	public Scalar subset(int...indeces) {
-		if (indeces.length != 1 || indeces[0] != 0) {
-			throw new IndexOutOfBoundsException();
-		}
-		return this;
 	}
 	
 	public Scalar subset(int start, int end) {

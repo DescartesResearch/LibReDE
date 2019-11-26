@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,8 +28,12 @@
 package tools.descartes.librede.approach;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -36,34 +41,99 @@ import org.apache.log4j.Logger;
 import tools.descartes.librede.ResultTable;
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
-import tools.descartes.librede.configuration.Resource;
-import tools.descartes.librede.configuration.Service;
+import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.exceptions.EstimationException;
 import tools.descartes.librede.exceptions.InitializationException;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
 import tools.descartes.librede.models.state.IStateModel;
-import tools.descartes.librede.models.state.constraints.IStateConstraint;
 import tools.descartes.librede.registry.Registry;
+import tools.descartes.librede.repository.IMonitoringRepository;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.repository.exceptions.OutOfMonitoredRangeException;
+import tools.descartes.librede.repository.rules.DataDependency;
+import tools.descartes.librede.repository.rules.IRuleActivationHandler;
+import tools.descartes.librede.repository.rules.Rule;
+import tools.descartes.librede.units.Time;
 
 public abstract class AbstractEstimationApproach implements IEstimationApproach {
 	
-	private static final Logger log = Logger.getLogger(AbstractEstimationApproach.class);
+	private class EstimationProblemActivator implements IRuleActivationHandler {
+		@Override
+		public void activateRule(IMonitoringRepository repository, Rule.Status ruleStatus, ModelEntity entity) {
+			if (!(ruleStatus.getRule() instanceof EstimationProblem)) {
+				throw new IllegalArgumentException();
+			}
+			EstimationProblem problem = (EstimationProblem)ruleStatus.getRule();
+			if (!algorithmInstances.containsKey(problem)) {
+				IEstimationAlgorithm algorithm = getEstimationAlgorithm(algorithmFactory);
+				try {
+					algorithm.initialize(problem, cursor, estimationWindow);
+					algorithmInstances.put(problem, algorithm);
+					log.info("Initialized estimation problem: " + problem.getStateModel());
+				} catch (InitializationException e) {
+					log.error("Error initializing estimation algorithm for estimation problem: " + problem.getStateModel(), e);
+				}
+			}
+			if (deactivatedProblems.contains(problem)) {				
+				log.info("Activated estimation problem: " + problem.getStateModel());
+				deactivatedProblems.remove(problem);
+			}
+		}
+		
+		@Override
+		public void deactivateRule(IMonitoringRepository repository, Rule.Status ruleStatus, ModelEntity entity) {
+			if (!(ruleStatus.getRule() instanceof EstimationProblem)) {
+				throw new IllegalArgumentException();
+			}
+			EstimationProblem problem = (EstimationProblem)ruleStatus.getRule();
+			if (!deactivatedProblems.contains(problem)) {
+				deactivatedProblems.add(problem);
+				
+				// Create analysis message for user
+				StringBuilder message = new StringBuilder("Deactivated estimation problem: ");
+				message.append(problem.getStateModel().toString());
+				message.append("\n    Reasons:");
+				for (DataDependency<?>.Status depStatus : ruleStatus.getDependenciesStatus()) {
+					if (!depStatus.isResolved()) {
+						message.append("\n    - Observation data of metric ");
+						message.append(depStatus.getDependency().getMetric().getName());
+						message.append("(").append(depStatus.getDependency().getAggregation()).append(")");
+						message.append(" is missing for entities ");
+						boolean first = true;
+						for (ModelEntity missing : depStatus.getMissingEntities()) {
+							if (first) {
+								first = false;
+							} else {
+								message.append(", ");
+							}
+							message.append(missing.getName());
+						}
+					}
+				}
+				log.info(message);
+			}
+		}
+	}
+	
+	private final Logger log = Logger.getLogger(getClass());
 
 	private boolean iterative;
 	private int estimationWindow;
 	private EstimationAlgorithmFactory algorithmFactory;
 	private WorkloadDescription workload;
-	private List<IEstimationAlgorithm> algorithms;
+	private List<EstimationProblem> problems;
+	private final Map<EstimationProblem, IEstimationAlgorithm> algorithmInstances = new HashMap<>();
+	private final Set<EstimationProblem> deactivatedProblems = new HashSet<>();
 	private IRepositoryCursor cursor;
+	private final EstimationProblemActivator activationListener = new EstimationProblemActivator();
 
 	protected abstract List<IStateModel<?>> deriveStateModels(
 			WorkloadDescription workload, IRepositoryCursor cursor);
 
-	protected abstract IObservationModel<?, ?> deriveObservationModel(
+	protected abstract IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor);
 
 	protected abstract IEstimationAlgorithm getEstimationAlgorithm(
@@ -85,117 +155,133 @@ public abstract class AbstractEstimationApproach implements IEstimationApproach 
 		if (workload == null || cursor == null) {
 			throw new IllegalStateException();
 		}
-		List<IStateModel<?>> stateModels = deriveStateModels(workload, cursor);
-		algorithms = new ArrayList<IEstimationAlgorithm>(
-				stateModels.size());		
+		List<IStateModel<?>> stateModels = new ArrayList<>(deriveStateModels(workload, cursor));
+		for(Iterator<IStateModel<?>> it = stateModels.iterator(); it.hasNext();) {
+			if(it.next().getStateSize() == 0) {
+				log.info("Prune empty state model.");
+				it.remove();
+			}
+		}
+		
+		problems = new LinkedList<>();		
 		
 		for (IStateModel<?> sm : stateModels) {
-			IObservationModel<?, ?> om = deriveObservationModel(sm, cursor);
-			IEstimationAlgorithm algo = getEstimationAlgorithm(algorithmFactory);
-			algo.initialize(sm, om, estimationWindow);
-			algorithms.add(algo);
+			IObservationModel<?> om = deriveObservationModel(sm, cursor);
+			EstimationProblem prob = new EstimationProblem(sm, om);
+			prob.setActivationHandler(activationListener);
+			problems.add(prob);
+			// register with the repository so that we are informed when
+			// new observation data gets available
+			cursor.getRepository().addRule(prob);
 		}
 	}
 	
 	@Override
 	public void pruneEstimationDefinitions() {
-		List<IEstimationAlgorithm> temp = new ArrayList<IEstimationAlgorithm>(algorithms);
-		
-		Set<Resource> ignoredResources = new HashSet<Resource>();
-		Set<Service> ignoredServices = new HashSet<Service>();
-		List<String> messages = new ArrayList<String>();
-		for (IEstimationAlgorithm a : temp) {
-			boolean isApplicable = true;
-			
-			for (IStateConstraint constr : a.getStateModel().getConstraints()) {
-				isApplicable = isApplicable && constr.isApplicable(messages);
-			}
-			for (IOutputFunction func : a.getObservationModel()) {
-				isApplicable = isApplicable && func.isApplicable(messages);
-			}
-			if (!isApplicable) {
-				ignoredResources.addAll(a.getStateModel().getResources());
-				ignoredServices.addAll(a.getStateModel().getServices());				
-				algorithms.remove(a);
-			}
-		}
-		if (messages.size() > 0) {
-			StringBuilder warning = new StringBuilder("State model pruned\n");
-			warning.append(" -- Approach \"").append(Registry.INSTANCE.getDisplayName(this.getClass())).append("\" cannot be applied.\n");
-			warning.append(" -- Ignored resources: ");
-			boolean first = true;
-			for(Resource r : ignoredResources) {
-				if (!first) {
-					warning.append(", ");
-				}
-				warning.append(r.getName());
-				first = false;
-			}
-			warning.append(" --\n");
-			warning.append(" -- Ignored services: ");
-			first = true;
-			for (Service s : ignoredServices) {
-				if (!first) {
-					warning.append(", ");
-				}
-				warning.append(s.getName());
-				first = false;
-			}
-			warning.append(" --\n");
-			warning.append(" -- Reason:\n");
-			for (String message : messages) {
-				warning.append("    -- ").append(message).append("\n");
-			}
-			log.warn(warning);			
-		}
+		// EMPTY. Think about removing this function from interface!		
 	}
-
+	
 	@Override
 	public ResultTable executeEstimation() throws EstimationException {
-		if (algorithms == null) {
-			throw new IllegalStateException();
-		}
-
 		try {
 			ResultTable.Builder builder = ResultTable.builder(
 					this.getClass(), workload);
-
+			int iterations = 0;
 			if (iterative) {
 				while (cursor.next()) {					
-					builder.next(cursor.getCurrentIntervalEnd());
+					builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
 					
-					for (IEstimationAlgorithm a : algorithms) {
-						a.update();
-						Vector curEstimates = a.estimate();
-						for (int i = 0; i < curEstimates.rows(); i++) {
-							builder.set(a.getStateModel().getResource(i), a.getStateModel().getService(i), curEstimates.get(i));
+					for (EstimationProblem currentProblem : problems) {
+						if (!deactivatedProblems.contains(currentProblem)) {
+							IEstimationAlgorithm a = algorithmInstances.get(currentProblem);
+							if (a == null) {
+								// should only happen if initilization logic is incorrect.
+								log.error("Could not initialize apporach");
+								throw new EstimationException("Could not initialize approach" + Registry.INSTANCE.getDisplayName(getClass()));
+							}
+							try {
+								a.update();
+								Vector curEstimates = a.estimate();
+								for (int j = 0; j < curEstimates.rows(); j++) {
+									builder.set(a.getStateModel().getResourceDemand(j), curEstimates.get(j));
+								}
+							} catch(OutOfMonitoredRangeException ex) {
+								if (!deactivatedProblems.contains(currentProblem)) {
+									StringBuilder message = new StringBuilder("Deactivated estimation problem: ");
+									message.append(currentProblem.getStateModel().toString());
+									message.append("\n    Reasons:");
+									message.append("\n    " + ex.getMessage());
+									log.warn(message);
+									deactivatedProblems.add(currentProblem);
+								}
+							}
 						}
 					}
-					
+					iterations++;
 					builder.save();
 				}
 			} else {
 				while(cursor.next()) {
-					for (IEstimationAlgorithm a : algorithms) {
-						a.update();
+					for (EstimationProblem currentProblem : problems) {
+						if (!deactivatedProblems.contains(currentProblem)) {
+							IEstimationAlgorithm a = algorithmInstances.get(currentProblem);
+							if (a == null) {
+								// should only happen if initilization logic is incorrect.
+								log.error("Could not initialize approach");
+								throw new EstimationException("Could not initialize approach" + Registry.INSTANCE.getDisplayName(getClass()));
+							}
+
+							try {
+								a.update();
+							} catch(OutOfMonitoredRangeException ex) {
+								if (!deactivatedProblems.contains(currentProblem)) {
+									StringBuilder message = new StringBuilder("Deactivated estimation problem: ");
+									message.append(currentProblem.getStateModel().toString());
+									message.append("\n    Reasons:");
+									message.append("\n    " + ex.getMessage());
+									log.warn(message);
+									deactivatedProblems.add(currentProblem);
+								}
+							}
+						}
 					}
+					iterations++;
 				}
 				
-				builder.next(cursor.getCurrentIntervalEnd());
-				for (IEstimationAlgorithm a : algorithms) {
-					Vector curEstimates = a.estimate();
-					for (int i = 0; i < curEstimates.rows(); i++) {
-						builder.set(a.getStateModel().getResource(i), a.getStateModel().getService(i), curEstimates.get(i));
+				builder.next(cursor.getIntervalEnd(cursor.getLastInterval()).getValue(Time.MILLISECONDS));
+				for (EstimationProblem currentProblem : problems) {
+					if (!deactivatedProblems.contains(currentProblem)) {
+						IEstimationAlgorithm a = algorithmInstances.get(currentProblem);
+						if (a == null) {
+							// should only happen if initilization logic is incorrect.
+							throw new IllegalStateException();
+						}
+						Vector curEstimates = a.estimate();
+						for (int i = 0; i < curEstimates.rows(); i++) {
+							builder.set(a.getStateModel().getResourceDemand(i), curEstimates.get(i));
+						}
 					}
 				}
 				builder.save();
 			}
+			
+			
+			if (iterations > 0) {
+				log.info("Number of iterations for estimation approach: " + iterations);
+			} else {
+				log.warn("Estimation was skipped (zero iterations): start time=" + cursor.getIntervalStart(0) + ", current time=" + cursor.getRepository().getCurrentTime() + ", step size=" + cursor.getIntervalEnd(0).minus(cursor.getIntervalStart(0)));
+			}
+			
 			return builder.build();
 		} finally {
-			for (IEstimationAlgorithm a: algorithms) {
+			for (IEstimationAlgorithm a : algorithmInstances.values()) {
 				a.destroy();
 			}
 		}
+	}
+	
+	protected int getEstimationWindow() {
+		return estimationWindow;
 	}
 
 }

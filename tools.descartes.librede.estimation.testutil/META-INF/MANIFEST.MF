@@ -2,14 +2,24 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Testutil
 Bundle-SymbolicName: tools.descartes.librede.estimation.testutil
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: tools.descartes.librede.testutils
-Import-Package: org.eclipse.emf.common.util,
- org.junit;version="4.11.0",
+Import-Package: org.apache.commons.math3.analysis.differentiation;version="3.2.0",
+ org.eclipse.emf.common.util,
+ org.eclipse.emf.ecore,
+ org.fest.assertions.api;version="2.0.0",
+ org.junit,
+ org.osgi.framework,
+ tools.descartes.librede,
  tools.descartes.librede.configuration,
  tools.descartes.librede.linalg,
- tools.descartes.librede.models.observation.functions,
+ tools.descartes.librede.linalg.testutil,
+ tools.descartes.librede.metrics,
+ tools.descartes.librede.models,
+ tools.descartes.librede.models.observation.equations,
  tools.descartes.librede.models.state,
  tools.descartes.librede.models.state.constraints,
- tools.descartes.librede.repository
+ tools.descartes.librede.models.variables,
+ tools.descartes.librede.repository,
+ tools.descartes.librede.units

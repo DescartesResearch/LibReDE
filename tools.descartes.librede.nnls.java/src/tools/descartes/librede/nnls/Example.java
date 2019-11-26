@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,11 +27,11 @@
  */
 package tools.descartes.librede.nnls;
 
-import tools.descartes.librede.nnls.backend.NNLSLibrary;
-
 import com.sun.jna.Memory;
 import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.IntByReference;
+
+import tools.descartes.librede.nnls.backend.NNLSLibrary;
 
 public class Example {
 

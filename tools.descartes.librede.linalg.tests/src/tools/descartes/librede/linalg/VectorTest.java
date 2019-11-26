@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,6 +30,7 @@ package tools.descartes.librede.linalg;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
 import static tools.descartes.librede.linalg.LinAlg.abs;
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.matrix;
 import static tools.descartes.librede.linalg.LinAlg.norm1;
 import static tools.descartes.librede.linalg.LinAlg.norm2;
@@ -40,15 +42,11 @@ import static tools.descartes.librede.linalg.LinAlg.sum;
 import static tools.descartes.librede.linalg.LinAlg.transpose;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
-import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
+import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
 
 public class VectorTest {
 	
@@ -117,7 +115,7 @@ public class VectorTest {
 	
 	@Test
 	public void testSum() {
-		assertThat(sum(a)).isEqualTo(A[0] + A[1] + A[2], offset(1e-9));
+		assertThat(sum(a).get(0)).isEqualTo(A[0] + A[1] + A[2], offset(1e-9));
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 	}
 	
@@ -132,7 +130,7 @@ public class VectorTest {
 	
 	@Test
 	public void testNorm1() {
-		assertThat(norm1(a)).isEqualTo(sum(abs(a)), offset(1e-9));
+		assertThat(norm1(a)).isEqualTo(sum(abs(a)).get(0), offset(1e-9));
 		assertThat(a).isEqualTo(vector(A), offset(1e-9));
 	}
 	
@@ -267,14 +265,14 @@ public class VectorTest {
 	}
 	
 	@Test
-	public void testSliceNormal() {
-		assertThat(a.slice(range(0, 2))).isEqualTo(vector(A[0], A[1]), offset(1e-9));
-		assertThat(a.slice(range(0, 1)).isScalar()).isTrue();
+	public void testGetRowsNormal() {
+		assertThat(a.get(range(0, 2))).isEqualTo(vector(A[0], A[1]), offset(1e-9));
+		assertThat(a.get(range(0, 1)).isScalar()).isTrue();
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
-	public void testSliceIllegal() {
-		a.slice(range(0, 4));
+	public void testGetIllegal() {
+		a.get(range(0, 4));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -283,17 +281,26 @@ public class VectorTest {
 	}
 	
 	@Test
-	public void testSubset() {
-		Vector v = a.subset(1);
+	public void testGetIndices() {
+		Vector v = a.get(indices(1));
 		assertThat(v.isScalar()).isTrue();
 		assertThat(((Scalar)v).getValue()).isEqualTo(A[1], offset(1e-9));
-		v = a.subset(0, 1);
+		v = a.get(indices(0, 1));
+		assertThat(v).isEqualTo(vector(A[0],  A[1]), offset(1e-9));
+	}
+
+	@Test
+	public void testGetRanges() {
+		Vector v = a.get(range(1, 2));
+		assertThat(v.isScalar()).isTrue();
+		assertThat(((Scalar)v).getValue()).isEqualTo(A[1], offset(1e-9));
+		v = a.get(range(0, 2));
 		assertThat(v).isEqualTo(vector(A[0],  A[1]), offset(1e-9));
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
-	public void testSubsetIllegal() {
-		a.subset(10, 11);
+	public void testGetIndicesIllegal() {
+		a.get(indices(10, 11));
 	}
 	
 	@Test

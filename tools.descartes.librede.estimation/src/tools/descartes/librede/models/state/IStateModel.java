@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,13 +30,15 @@ package tools.descartes.librede.models.state;
 import java.util.List;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
-import tools.descartes.librede.linalg.Range;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.diff.IDifferentiableFunction;
+import tools.descartes.librede.models.State;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.repository.rules.IDependencyTarget;
 
-public interface IStateModel<C extends IStateConstraint> {
+public interface IStateModel<C extends IStateConstraint> extends IDependencyTarget {
 	
 	// Information about the structure of the state model
 	
@@ -43,22 +46,26 @@ public interface IStateModel<C extends IStateConstraint> {
 	
 	List<Resource> getResources();
 	
-	List<Service> getServices();
-
-	Range getStateVariableIndexRange(Resource res);
+	List<Service> getAllServices();
 	
-	int getStateVariableIndex(Resource res, Service service);
+	List<Service> getBackgroundServices();
 	
-	Resource getResource(int stateVariableIdx);
+	List<Service> getUserServices();
 	
-	Service getService(int stateVariableIdx);
+	boolean containsStateVariable(Resource res, Service service);
+	
+	int getStateVariableIndex(Resource res, Service service);	
+	
+	Indices getStateVariableIndices(Resource res);
+	
+	ResourceDemand getResourceDemand(int stateVariableIdx);
 	
 	List<C> getConstraints();
 	
-	Vector getNextState(Vector currentState);
-	
-	List<IDifferentiableFunction> getStateDerivatives();
+	State step(State currentState);
 	
 	Vector getInitialState();
+	
+	InvocationGraph getInvocationGraph();
 
 }

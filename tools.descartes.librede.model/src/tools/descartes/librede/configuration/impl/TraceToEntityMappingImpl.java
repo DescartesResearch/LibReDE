@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -28,14 +29,19 @@
  */
 package tools.descartes.librede.configuration.impl;
 
+import java.util.Collection;
+
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 import tools.descartes.librede.configuration.ConfigurationPackage;
-import tools.descartes.librede.configuration.ModelEntity;
+import tools.descartes.librede.configuration.TraceFilter;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 
 /**
@@ -44,25 +50,15 @@ import tools.descartes.librede.configuration.TraceToEntityMapping;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * <ul>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl#getEntity <em>Entity</em>}</li>
- *   <li>{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl#getTraceColumn <em>Trace Column</em>}</li>
- * </ul>
  * </p>
+ * <ul>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl#getTraceColumn <em>Trace Column</em>}</li>
+ *   <li>{@link tools.descartes.librede.configuration.impl.TraceToEntityMappingImpl#getFilters <em>Filters</em>}</li>
+ * </ul>
  *
  * @generated
  */
-public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container implements TraceToEntityMapping {
-	/**
-	 * The cached value of the '{@link #getEntity() <em>Entity</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getEntity()
-	 * @generated
-	 * @ordered
-	 */
-	protected ModelEntity entity;
-
+public class TraceToEntityMappingImpl extends ObservationToEntityMappingImpl implements TraceToEntityMapping {
 	/**
 	 * The default value of the '{@link #getTraceColumn() <em>Trace Column</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -84,6 +80,16 @@ public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container imple
 	protected int traceColumn = TRACE_COLUMN_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #getFilters() <em>Filters</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFilters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<TraceFilter> filters;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -100,44 +106,6 @@ public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container imple
 	@Override
 	protected EClass eStaticClass() {
 		return ConfigurationPackage.Literals.TRACE_TO_ENTITY_MAPPING;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ModelEntity getEntity() {
-		if (entity != null && entity.eIsProxy()) {
-			InternalEObject oldEntity = (InternalEObject)entity;
-			entity = (ModelEntity)eResolveProxy(oldEntity);
-			if (entity != oldEntity) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY, oldEntity, entity));
-			}
-		}
-		return entity;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ModelEntity basicGetEntity() {
-		return entity;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setEntity(ModelEntity newEntity) {
-		ModelEntity oldEntity = entity;
-		entity = newEntity;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY, oldEntity, entity));
 	}
 
 	/**
@@ -166,14 +134,39 @@ public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container imple
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<TraceFilter> getFilters() {
+		if (filters == null) {
+			filters = new EObjectContainmentEList<TraceFilter>(TraceFilter.class, this, ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__FILTERS);
+		}
+		return filters;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__FILTERS:
+				return ((InternalEList<?>)getFilters()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY:
-				if (resolve) return getEntity();
-				return basicGetEntity();
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN:
 				return getTraceColumn();
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__FILTERS:
+				return getFilters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -183,14 +176,16 @@ public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container imple
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY:
-				setEntity((ModelEntity)newValue);
-				return;
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN:
 				setTraceColumn((Integer)newValue);
+				return;
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__FILTERS:
+				getFilters().clear();
+				getFilters().addAll((Collection<? extends TraceFilter>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -204,11 +199,11 @@ public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container imple
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY:
-				setEntity((ModelEntity)null);
-				return;
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN:
 				setTraceColumn(TRACE_COLUMN_EDEFAULT);
+				return;
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__FILTERS:
+				getFilters().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -222,10 +217,10 @@ public class TraceToEntityMappingImpl extends MinimalEObjectImpl.Container imple
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__ENTITY:
-				return entity != null;
 			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__TRACE_COLUMN:
 				return traceColumn != TRACE_COLUMN_EDEFAULT;
+			case ConfigurationPackage.TRACE_TO_ENTITY_MAPPING__FILTERS:
+				return filters != null && !filters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

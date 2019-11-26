@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -246,7 +247,6 @@ public final class SimpleRegressionTest extends TestCase {
                 regression.getSlopeConfidenceInterval(),1E-8);
         //------------- End R-verified tests -------------------------------
         
-        //FIXME: get a real example to test against with alpha = .01
         assertTrue("tighter means wider",
                 regression.getSlopeConfidenceInterval() < regression.getSlopeConfidenceInterval(0.01));
      

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -33,24 +34,34 @@ import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
+import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.models.EstimationProblem;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.equations.ResponseTimeEquation;
+import tools.descartes.librede.models.observation.equations.ResponseTimeValue;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
+import tools.descartes.librede.models.state.InvocationGraph;
 import tools.descartes.librede.models.state.constraints.IStateConstraint;
+import tools.descartes.librede.models.state.constraints.NoRequestsBoundsConstraint;
 import tools.descartes.librede.models.state.constraints.UtilizationConstraint;
+import tools.descartes.librede.models.state.initial.WeightedTargetUtilizationInitializer;
+import tools.descartes.librede.repository.CachingRepositoryCursor;
 import tools.descartes.librede.repository.IRepositoryCursor;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
 
-public class MenasceOptimizationTest {
+public class MenasceOptimizationTest extends LibredeTest {
 
 	private static final int ITERATIONS = 100;
 
-	private VectorObservationModel<IOutputFunction> observationModel;
+	private VectorObservationModel observationModel;
 	private ConstantStateModel<IStateConstraint> stateModel;
 
 	@Before
@@ -66,20 +77,26 @@ public class MenasceOptimizationTest {
 		generator.setUpperUtilizationBound(0.9);
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 1);
 
-		Vector initialEstimate = vector(0.01);
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
-		builder.addVariable(workload.getResources().get(0), workload.getServices().get(0));
-		builder.setInitialState(initialEstimate);
+		builder.addVariable(workload.getResources().get(0).getDemands().get(0));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));
 		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
+		for (Resource resource : workload.getResources()) {
+			for (ResourceDemand demand : resource.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
+			}
+		}
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 1));
 		stateModel = builder.build();
-		
-		observationModel = new VectorObservationModel<>();
-		observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0)));
+
+		observationModel = new VectorObservationModel();
+		ResponseTimeEquation funcRt = new ResponseTimeEquation(stateModel, cursor, workload.getServices().get(0), false, 0);
+		observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, workload.getServices().get(0), 0), funcRt));
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -107,30 +124,41 @@ public class MenasceOptimizationTest {
 	public void testFiveServicesOneResource() throws Exception {
 		final ObservationDataGenerator generator = new ObservationDataGenerator(42, 5, 1);
 
-		Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.07);
-		generator.setDemands(demands);
+		// IMPORTANT: test with zero demand!
+		//Vector demands = vector(0.03, 0.04, 0.05, 0.06, 0.0);
+		//generator.setDemands(demands);
+		generator.setRandomDemands();
 		generator.setUpperUtilizationBound(0.9);
+		State demands = generator.getDemands();
 		
 		WorkloadDescription workload = generator.getWorkloadDescription();
-		IRepositoryCursor cursor = generator.getRepository().getCursor(0, 1);
+		IRepositoryCursor cursor = new CachingRepositoryCursor(generator.getCursor(), 1);
 
-		Vector initialEstimate = vector(0.01, 0.01, 0.01, 0.01, 0.01);
 		Builder<IStateConstraint> builder = ConstantStateModel.constrainedModelBuilder();
-		for (Service service : workload.getServices()) {
-			builder.addVariable(workload.getResources().get(0), service);
+		for (Resource res : workload.getResources()) {
+			for (ResourceDemand demand : res.getDemands()) {
+				builder.addVariable(demand);
+			}
 		}
-		builder.setInitialState(initialEstimate);
-		builder.addConstraint(new UtilizationConstraint(workload.getResources().get(0), cursor));
+		builder.setStateInitializer(new WeightedTargetUtilizationInitializer(0.5, cursor));		
+		for (Resource resource : workload.getResources()) {
+			builder.addConstraint(new UtilizationConstraint(resource, cursor));
+			for (ResourceDemand demand : resource.getDemands()) {
+				builder.addConstraint(new NoRequestsBoundsConstraint(demand, cursor, 0, Double.POSITIVE_INFINITY));
+			}
+		}
+		builder.setInvocationGraph(new InvocationGraph(workload.getServices(), cursor, 1));
 		stateModel = builder.build();
 		
 
-		observationModel = new VectorObservationModel<>();
-		for (Service service : workload.getServices()) {		
-			observationModel.addOutputFunction(new ResponseTimeEquation(stateModel, cursor, service));
+		observationModel = new VectorObservationModel();
+		for (Service service : workload.getServices()) {
+			ResponseTimeEquation funcRt = new ResponseTimeEquation(stateModel, cursor, service, false, 0);
+			observationModel.addOutputFunction(new OutputFunction(new ResponseTimeValue(stateModel, cursor, service, 0), funcRt));
 		}
 
 		RecursiveOptimization optim = new RecursiveOptimization();
-		optim.initialize(stateModel, observationModel, 10);
+		optim.initialize(new EstimationProblem(stateModel, observationModel), cursor, 10);
 
 		long start = System.nanoTime();
 
@@ -142,7 +170,7 @@ public class MenasceOptimizationTest {
 
 			Vector estimates = optim.estimate();
 			
-			assertThat(estimates).isEqualTo(demands, offset(0.001));
+			assertThat(estimates).isEqualTo(demands.getVector(), offset(0.001));
 			
 //			System.out.println(i + ": " + estimates);
 		}

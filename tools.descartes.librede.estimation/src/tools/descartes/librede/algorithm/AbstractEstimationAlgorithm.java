@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,20 +27,34 @@
  */
 package tools.descartes.librede.algorithm;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.exceptions.InitializationException;
+import tools.descartes.librede.models.EstimationProblem;
 import tools.descartes.librede.models.observation.IObservationModel;
 import tools.descartes.librede.models.state.IStateModel;
+import tools.descartes.librede.repository.IRepositoryCursor;
 
+/**
+ * This abstract class provides standard implementations for some of the methods in {@link IEstimationAlgorithm}.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorithm {
 	
+	protected final Logger log = Logger.getLogger(getClass());
+	
 	private IStateModel<?> stateModel;
-	private IObservationModel<?, ?> observationModel;
+	private IObservationModel<?> observationModel;
+	private IRepositoryCursor cursor;
 	
 	@Override
-	public void initialize(IStateModel<?> stateModel, IObservationModel<?, ?> observationModel,
-			int estimationWindow) throws InitializationException {
-		this.stateModel = stateModel;
-		this.observationModel = observationModel;
+	public void initialize(EstimationProblem problem,
+			IRepositoryCursor cursor, int estimationWindow) throws InitializationException {
+		this.stateModel = problem.getStateModel();
+		this.observationModel = problem.getObservationModel();
+		this.cursor = cursor;
 	}
 
 	@Override
@@ -48,8 +63,15 @@ public abstract class AbstractEstimationAlgorithm implements IEstimationAlgorith
 	}
 
 	@Override
-	public IObservationModel<?, ?> getObservationModel() {
+	public IObservationModel<?> getObservationModel() {
 		return observationModel;
 	}
+	
+	public IRepositoryCursor getCursor() {
+		return cursor;
+	}
 
+	@Override
+	public void destroy() {
+	}	
 }

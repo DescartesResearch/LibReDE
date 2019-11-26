@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -41,10 +42,6 @@ import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Scalar;
-import tools.descartes.librede.linalg.Vector;
 
 public class ScalarTest {
 	
@@ -117,7 +114,7 @@ public class ScalarTest {
 	
 	@Test
 	public void testSum() {
-		assertThat(sum(a)).isEqualTo(A, offset(1e-9));
+		assertThat(sum(a).get(0)).isEqualTo(A, offset(1e-9));
 	}
 
 	@Test

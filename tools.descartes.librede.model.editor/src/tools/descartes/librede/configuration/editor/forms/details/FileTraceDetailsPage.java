@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,13 +30,11 @@ package tools.descartes.librede.configuration.editor.forms.details;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.conversion.Converter;
+import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.databinding.EMFDataBindingContext;
-import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 import org.eclipse.emf.databinding.FeaturePath;
 import org.eclipse.emf.databinding.edit.EMFEditProperties;
 import org.eclipse.emf.edit.command.AddCommand;
@@ -47,21 +46,19 @@ import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -87,25 +84,25 @@ import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.TraceToEntityMapping;
 import tools.descartes.librede.configuration.editor.forms.AbstractEstimationConfigurationFormPage;
-import tools.descartes.librede.configuration.editor.util.PrettyPrinter;
 import tools.descartes.librede.configuration.editor.util.TimeUnitSpinnerBuilder;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.Metric;
+import tools.descartes.librede.metrics.MetricsPackage;
 import tools.descartes.librede.registry.Registry;
-import tools.descartes.librede.repository.IMetric;
+import tools.descartes.librede.units.UnitsPackage;
 
 public class FileTraceDetailsPage extends AbstractDetailsPage {
 
 	private LibredeConfiguration model;
 	private FileTraceConfiguration input;
 	private Section sctnMeasurementTraceDetails;
-	private Label lblMetricValue;
 	private Spinner spnIntervalValue;
-	private Combo comboIntervalUnit;
+	private ComboViewer comboMetricViewer;
 	private ComboViewer comboIntervalUnitViewer;
-	private Combo comboUnit;
 	private ComboViewer comboUnitViewer;
+	private ComboViewer comboAggregationViewer;
 	private Table mappingTable;
 	private TableViewer mappingTableViewer;
-	private Combo comboDataSource;
 	private ComboViewer comboDataSourceViewer;
 	private Text txtFilePath;
 	private FileDialog fileDialog;
@@ -145,6 +142,24 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		composite.setLayout(new GridLayout(2, false));
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
+		Label lblMetric = toolkit.createLabel(composite, "Metric:", SWT.NONE);
+		IObservableList metrics = EMFEditProperties.list(domain, MetricsPackage.Literals.METRICS_REPOSITORY__METRICS).observe(Registry.INSTANCE.getMetricsRepository());
+		comboMetricViewer = createComboBoxViewer(composite, toolkit, metrics);
+		
+		// make this a post selection listener, as changes should only propagated to the 
+		// unit combo box if they are persistent
+		comboMetricViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
+			
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (!event.getSelection().isEmpty()) {
+					Metric<?> newMetric = (Metric<?>)((IStructuredSelection)event.getSelection()).getFirstElement();
+					if ((input.getUnit() == null) || (newMetric.getDimension() != input.getUnit().getDimension())) {
+						input.setUnit(newMetric.getDimension().getBaseUnit());
+					}
+				}
+			}
+		});
 
 		Label lblFile = toolkit.createLabel(composite, "File:");
 
@@ -180,43 +195,27 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 
 		Label lblDataSource = toolkit.createLabel(composite,
 				"Data Source:", SWT.NONE);
-
-		comboDataSourceViewer = new ComboViewer(composite, SWT.READ_ONLY);
-		comboDataSource = comboDataSourceViewer.getCombo();
-		comboDataSource.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		toolkit.paintBordersFor(comboDataSource);
-
-		comboDataSourceViewer
-				.setContentProvider(new ObservableListContentProvider());
-		comboDataSourceViewer
-				.setLabelProvider(new AdapterFactoryLabelProvider(page
-						.getAdapterFactory()));
-		comboDataSourceViewer
-				.setInput(EMFEditProperties
-						.list(domain,
-								FeaturePath
-										.fromList(
-												ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__INPUT,
-												ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES))
-						.observe(model));
-		Label lblMetric = toolkit.createLabel(composite, "Metric:", SWT.NONE);
-
-		lblMetricValue = toolkit.createLabel(composite, "", SWT.NONE);
-		lblMetricValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
+		comboDataSourceViewer = createComboBoxViewer(composite, 
+				toolkit, 
+				EMFEditProperties.list(domain,
+						FeaturePath
+								.fromList(
+										ConfigurationPackage.Literals.LIBREDE_CONFIGURATION__INPUT,
+										ConfigurationPackage.Literals.INPUT_SPECIFICATION__DATA_SOURCES))
+				.observe(model));
+		
+		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.READ_ONLY);
+		comboUnitViewer = createComboBoxViewer(composite, toolkit, new WritableList());
+		
+		Label lblAggregation = toolkit.createLabel(composite, "Aggregation:", SWT.READ_ONLY);
+		comboAggregationViewer = createComboBoxViewer(composite, toolkit, new WritableList(Aggregation.VALUES, Aggregation.class));
+		
 		Label lblInterval = toolkit.createLabel(composite, "Interval:",
 				SWT.NONE);
 
 		Composite intervalEditorComposite = TimeUnitSpinnerBuilder.createComposite(toolkit, composite);
 		spnIntervalValue = TimeUnitSpinnerBuilder.createSpinnerControl(toolkit, intervalEditorComposite);
-		comboIntervalUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, intervalEditorComposite, spnIntervalValue);
-
-//		Label lblUnit = toolkit.createLabel(composite, "Unit:", SWT.NONE);
-//
-//		comboUnitViewer = new ComboViewer(composite, SWT.NONE);
-//		comboUnit = comboUnitViewer.getCombo();
-//		comboUnit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		toolkit.paintBordersFor(comboUnit);
+		comboIntervalUnitViewer = TimeUnitSpinnerBuilder.createTimeUnitControl(toolkit, page.getAdapterFactory(), intervalEditorComposite);
 
 		Label lblMapping = toolkit.createLabel(composite, "Mapping:",
 				SWT.NONE);
@@ -248,7 +247,7 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		TableColumn entityColumn = entityViewerColumn.getColumn();
 		mappingTableLayout.setColumnData(entityColumn, new ColumnWeightData(10, 50, true));
 		entityColumn.setText("Entity");
-		entityViewerColumn.setEditingSupport(AbstractEstimationConfigurationFormPage.EObjectEditingSupport.create(mappingTableViewer, domain, ConfigurationPackage.Literals.TRACE_TO_ENTITY_MAPPING__ENTITY));
+		entityViewerColumn.setEditingSupport(AbstractEstimationConfigurationFormPage.EObjectEditingSupport.create(mappingTableViewer, domain, ConfigurationPackage.Literals.OBSERVATION_TO_ENTITY_MAPPING__ENTITY));
 
 		
 		TableViewerColumn indexViewerColumn = new TableViewerColumn(mappingTableViewer, SWT.NONE);
@@ -261,6 +260,14 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 				.setContentProvider(new AdapterFactoryContentProvider(page.getAdapterFactory()));
 		mappingTableViewer.setLabelProvider(new AdapterFactoryLabelProvider(
 				page.getAdapterFactory()));
+		
+		mappingTableViewer.getControl().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(MouseEvent e) {
+				page.getConfigurationEditor().setCurrentViewer(mappingTableViewer);
+			}
+		});
+		page.getConfigurationEditor().createContextMenuFor(mappingTableViewer);
 		
 		Button btnAddMapping = toolkit.createButton(mappingTableButtonComposite, "Add", SWT.PUSH);
 		GridData gd_btnAddMapping = new GridData();
@@ -286,6 +293,19 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 			}
 		});
 	}
+	
+	private ComboViewer createComboBoxViewer(Composite composite, FormToolkit toolkit, IObservableList content) {
+		ComboViewer viewer = new ComboViewer(composite, SWT.READ_ONLY);
+		Combo combo = viewer.getCombo();
+		combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		toolkit.paintBordersFor(combo);
+
+		viewer.setContentProvider(new ObservableListContentProvider());
+		viewer.setLabelProvider(new AdapterFactoryLabelProvider(page
+						.getAdapterFactory()));
+		viewer.setInput(content);
+		return viewer;
+	}
 
 	private void createBindings() {
 		detailBindingContext = new EMFDataBindingContext();
@@ -296,36 +316,46 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 								.value(domain,
 										ConfigurationPackage.Literals.FILE_TRACE_CONFIGURATION__FILE)
 								.observe(input));
-		
-		EMFUpdateValueStrategy metricConverter = new EMFUpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE);
-		metricConverter.setConverter(new Converter(String.class, String.class) {
-
-			@Override
-			public Object convert(Object fromObject) {
-				IMetric metric = Registry.INSTANCE.getMetric((String)fromObject);
-				if (metric != null) {
-					return PrettyPrinter.toCamelCase(metric.getDisplayName());
-				}
-				return "Unkown";
-			}
-			
-		});
 		detailBindingContext
 				.bindValue(
-						WidgetProperties.text().observe(lblMetricValue),
+						ViewerProperties.singleSelection().observe(comboMetricViewer),
 						EMFEditProperties
 								.value(domain,
-										ConfigurationPackage.Literals.TRACE_CONFIGURATION__METRIC)
-								.observe(input), null, metricConverter);
-
+										ConfigurationPackage.Literals.OBSERVATION__METRIC)
+								.observe(input));
+		detailBindingContext
+				.bindValue(
+						ViewerProperties.singleSelection().observe(comboUnitViewer),
+						EMFEditProperties
+								.value(domain,
+										ConfigurationPackage.Literals.TRACE_CONFIGURATION__UNIT)
+								.observe(input));		
+		detailBindingContext
+			.bindValue(
+					ViewerProperties.singleSelection().observe(comboAggregationViewer),
+					EMFEditProperties
+							.value(domain,
+									ConfigurationPackage.Literals.OBSERVATION__AGGREGATION)
+							.observe(input));
 		detailBindingContext
 				.bindValue(
 						WidgetProperties.selection().observe(spnIntervalValue),
 						EMFEditProperties
 								.value(domain,
-										ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL)
-								.observe(input), TimeUnitSpinnerBuilder.createTargetToModelStrategy(comboIntervalUnitViewer),
-								TimeUnitSpinnerBuilder.createModelToTargetStrategy(comboIntervalUnitViewer));
+										FeaturePath.fromList(
+												ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
+												UnitsPackage.Literals.QUANTITY__VALUE))
+								.observe(input), TimeUnitSpinnerBuilder.createTargetToModelConverter(),
+								TimeUnitSpinnerBuilder.createModelToTargetConverter());
+		detailBindingContext
+				.bindValue(
+						ViewerProperties.singleSelection().observe(comboIntervalUnitViewer),
+						EMFEditProperties
+								.value(domain,
+										FeaturePath.fromList(
+												ConfigurationPackage.Literals.TRACE_CONFIGURATION__INTERVAL,
+												UnitsPackage.Literals.QUANTITY__UNIT))
+								.observe(input));
 		detailBindingContext
 				.bindValue(
 						ViewerProperties.singleSelection().observe(
@@ -347,14 +377,21 @@ public class FileTraceDetailsPage extends AbstractDetailsPage {
 		if (structuredSelection.size() == 1) {
 			input = (FileTraceConfiguration) structuredSelection.getFirstElement();
 			mappingTableViewer.setInput(input);
+			IObservableList units = EMFEditProperties.list(domain, FeaturePath.fromList(
+					ConfigurationPackage.Literals.OBSERVATION__METRIC,
+					MetricsPackage.Literals.METRIC__DIMENSION,
+					UnitsPackage.Literals.DIMENSION__UNITS
+					)).observe(input);
+			comboUnitViewer.setInput(units);
 			createBindings();
 		} else {
 			input = null;
 			mappingTableViewer.setInput(null);
+			comboUnitViewer.setInput(null);
 		}
 		update();
 	}
-	
+
 	private void handleAddMapping() {
 		Set<ModelEntity> usedEntities = new HashSet<>();
 		int maxIndex = 0;

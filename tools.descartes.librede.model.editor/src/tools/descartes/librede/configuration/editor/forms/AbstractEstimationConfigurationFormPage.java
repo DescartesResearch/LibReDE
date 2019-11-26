@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,46 +27,37 @@
  */
 package tools.descartes.librede.configuration.editor.forms;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.databinding.EMFDataBindingContext;
-import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.command.DeleteCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
-import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
 
 import tools.descartes.librede.configuration.LibredeConfiguration;
@@ -75,27 +67,33 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 
 	public static abstract class EObjectEditingSupport extends
 			EditingSupport {
-		protected TableViewer viewer;
+		protected ColumnViewer viewer;
 		protected EStructuralFeature attribute;
 		protected AdapterFactoryEditingDomain domain;
 
-		public EObjectEditingSupport(TableViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+		public EObjectEditingSupport(ColumnViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			super(viewer);
 			this.attribute = attribute;
 			this.domain = domain;
 			this.viewer = viewer;
 		}
 		
-		public static EObjectEditingSupport create(TableViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
+		public static EObjectEditingSupport create(ColumnViewer viewer, AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			if (attribute instanceof EReference || attribute.getEType() instanceof EEnum) {
 				return new ChoiceEObjectEditingSupport(viewer, domain, attribute);
+			}
+			if (attribute.getEType() == EcorePackage.Literals.EBOOLEAN) {
+				return new BooleanEObjectEditingSupport(viewer, domain, attribute);
 			}
 			return new TextEObjectEditingSupport(viewer, domain, attribute);
 		}
 
 		@Override
 		protected boolean canEdit(Object element) {
-			return true;
+			if (element instanceof EObject) {
+				return ((EObject)element).eClass().getEAllStructuralFeatures().contains(attribute);
+			}
+			return false;
 		}
 		
 		@Override
@@ -114,27 +112,30 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		
 		private ComboBoxViewerCellEditor cellEditor;
 		
-		public ChoiceEObjectEditingSupport(TableViewer viewer,
+		public ChoiceEObjectEditingSupport(ColumnViewer viewer,
 				AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			super(viewer, domain, attribute);
 		}
 		
 		@Override
-		protected CellEditor getCellEditor(Object element) {
-			IItemPropertySource source = (IItemPropertySource)domain.getAdapterFactory().adapt(element, IItemPropertySource.class);
-			IItemPropertyDescriptor desc = source.getPropertyDescriptor(element, attribute);
-			
+		protected CellEditor getCellEditor(Object element) {			
 			if (cellEditor == null) {
-				ComboBoxViewerCellEditor comboBoxEditor = new ComboBoxViewerCellEditor(viewer.getTable());
+				ComboBoxViewerCellEditor comboBoxEditor = new ComboBoxViewerCellEditor((Composite)viewer.getControl());
 				comboBoxEditor.setContentProvider(new ArrayContentProvider());
 				comboBoxEditor.setLabelProvider(new AdapterFactoryLabelProvider(domain.getAdapterFactory()));
 				cellEditor = comboBoxEditor;
-			}
+			}		
 			
+			cellEditor.setInput(getAllowedValues(element));
+			return cellEditor;
+		}
+		
+		protected Collection<?> getAllowedValues(Object element) {
+			IItemPropertySource source = (IItemPropertySource)domain.getAdapterFactory().adapt(element, IItemPropertySource.class);
+			IItemPropertyDescriptor desc = source.getPropertyDescriptor(element, attribute);
 			Collection<?> d = desc.getChoiceOfValues(element);
 			d.remove(null);
-			cellEditor.setInput(d);
-			return cellEditor;
+			return d;
 		}
 
 		@Override
@@ -145,10 +146,10 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 	}
 	
 	protected static class TextEObjectEditingSupport extends EObjectEditingSupport {
-		
+	
 		private TextCellEditor cellEditor;
 
-		public TextEObjectEditingSupport(TableViewer viewer,
+		public TextEObjectEditingSupport(ColumnViewer viewer,
 				AdapterFactoryEditingDomain domain, EStructuralFeature attribute) {
 			super(viewer, domain, attribute);
 		}
@@ -156,7 +157,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		@Override
 		protected CellEditor getCellEditor(Object element) {
 			if (cellEditor == null) {
-				cellEditor = new TextCellEditor(viewer.getTable());
+				cellEditor = new TextCellEditor((Composite)viewer.getControl());
 			}
 			return cellEditor;
 		}
@@ -170,6 +171,39 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 		protected void setValue(Object element, Object value) {
 			Object objValue = EcoreUtil.createFromString((EDataType) attribute.getEType(), (String)value);
 			super.setValue(element, objValue);
+		}
+	}
+	
+	protected static class BooleanEObjectEditingSupport extends ChoiceEObjectEditingSupport {
+		private static final List<String> VALUES = Arrays.asList("Yes", "No");
+		
+		private CheckboxCellEditor cellEditor;
+		
+		public BooleanEObjectEditingSupport(ColumnViewer viewer, AdapterFactoryEditingDomain domain,
+				EStructuralFeature attribute) {
+			super(viewer, domain, attribute);
+		}
+
+		@Override
+		protected Collection<?> getAllowedValues(Object element) {
+			return VALUES;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			if ((boolean) ((EObject)element).eGet(attribute)) {
+				return VALUES.get(0);
+			}
+			return VALUES.get(1);
+		}
+		
+		@Override
+		protected void setValue(Object element, Object value) {
+			if (value.equals(VALUES.get(0))) {
+				super.setValue(element, true);
+			} else {
+				super.setValue(element, false);
+			}
 		}
 	}
 
@@ -187,7 +221,7 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 			IStructuredSelection selection = (IStructuredSelection) provider
 					.getSelection();
 			if (!selection.isEmpty()) {
-				Command remove = RemoveCommand.create(editingDomain,
+				Command remove = DeleteCommand.create(editingDomain,
 						selection.toList());
 				editingDomain.getCommandStack().execute(remove);
 			}
@@ -214,5 +248,9 @@ public abstract class AbstractEstimationConfigurationFormPage extends FormPage {
 	
 	public AdapterFactory getAdapterFactory() {
 		return ((ConfigurationEditor)getEditor()).getAdapterFactory();
+	}
+	
+	public ConfigurationEditor getConfigurationEditor() {
+		return (ConfigurationEditor)getEditor();
 	}
 }

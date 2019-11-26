@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -30,7 +31,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static tools.descartes.librede.linalg.LinAlg.vector;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Test;
 
@@ -38,11 +38,16 @@ import tools.descartes.librede.configuration.ConfigurationFactory;
 import tools.descartes.librede.configuration.Resource;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
-import tools.descartes.librede.repository.MemoryObservationRepository;
-import tools.descartes.librede.repository.StandardMetric;
-import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.metrics.Aggregation;
+import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.repository.exceptions.NoMonitoringDataException;
+import tools.descartes.librede.repository.rules.DerivationRule;
+import tools.descartes.librede.testutils.LibredeTest;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
 
-public class MemoryObservationRepositoryTest {
+public class MemoryObservationRepositoryTest extends LibredeTest {
 	
 	Resource[] resources = new Resource[] { WorkloadBuilder.newResource("CPU"), WorkloadBuilder.newResource("HardDisk1"), WorkloadBuilder.newResource("HardDisk2") };
 	Service[] services = new Service[] { WorkloadBuilder.newService("AddToCard"), WorkloadBuilder.newService("Payment") };
@@ -93,18 +98,33 @@ public class MemoryObservationRepositoryTest {
 
 	@Test
 	public void testSetAndGetData() {
-		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1);
-		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(5);
-		repo.setData(StandardMetric.UTILIZATION, resources[0], ts1.addSample(10.0, 1.0));
-		assertThat(repo.getData(StandardMetric.UTILIZATION, resources[0]).getData(0).rows()).isEqualTo(6);
+		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
+		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(5);
+		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts2);
+		assertThat(repo.select(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], Aggregation.NONE).getData(0).rows()).isEqualTo(10);
 	}
 	
-	@Test
+	@Test(expected = NoMonitoringDataException.class)
 	public void testGetDataEmpty() {
-		TimeSeries ts = repo.getData(StandardMetric.RESPONSE_TIME, resources[0]);
+		TimeSeries ts = repo.select(StandardMetrics.RESPONSE_TIME, Time.SECONDS, resources[0], Aggregation.AVERAGE);
 		assertThat(ts).isNotNull();
 		assertThat(ts.isEmpty()).isTrue();
 	}
 	
-
+	@Test
+	public void testInsertDerivationSelfReferential() {
+		DerivationRule<RequestRate> selfRef = DerivationRule.rule(StandardMetrics.THROUGHPUT, Aggregation.AVERAGE).requiring(StandardMetrics.THROUGHPUT, Aggregation.NONE);
+		repo.insertDerivation(selfRef, services[0]);
+		
+		assertThat(repo.exists(StandardMetrics.THROUGHPUT, services[0], Aggregation.AVERAGE)).isFalse();		
+	}
+	
+	@Test
+	public void testInsertDerivation() {
+		DerivationRule<Ratio> selfRef = DerivationRule.rule(StandardMetrics.UTILIZATION, Aggregation.AVERAGE).requiring(StandardMetrics.UTILIZATION, Aggregation.NONE);
+		repo.insert(StandardMetrics.UTILIZATION, Ratio.NONE, resources[0], ts1);
+		repo.insertDerivation(selfRef, resources[0]);
+		
+		assertThat(repo.exists(StandardMetrics.UTILIZATION, resources[0], Aggregation.AVERAGE)).isTrue();		
+	}
 }

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,9 +27,13 @@
  */
 package tools.descartes.librede.linalg.backend;
 
+import static tools.descartes.librede.linalg.LinAlg.indices;
+import static tools.descartes.librede.linalg.LinAlg.scalar;
+
 import tools.descartes.librede.linalg.AggregationFunction;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
-import tools.descartes.librede.linalg.Range;
+import tools.descartes.librede.linalg.Scalar;
 import tools.descartes.librede.linalg.SquareMatrix;
 import tools.descartes.librede.linalg.Vector;
 
@@ -44,20 +49,10 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Empty set(Range rows, Vector values) {
+	public Empty set(Indices rows, Vector values) {
 		throw new IndexOutOfBoundsException();
 	}
 
-	@Override
-	public Empty slice(Range range) {
-		return this;
-	}
-
-	@Override
-	public Empty subset(int...indeces) {
-		throw new IndexOutOfBoundsException();
-	}
-	
 	@Override
 	public Matrix set(int row, int col, double value) {
 		throw new IndexOutOfBoundsException();
@@ -127,6 +122,14 @@ public final class Empty implements Vector, SquareMatrix {
 	public Empty times(double a) {
 		return this;
 	}
+	
+	@Override
+	public Matrix mldivide(Matrix b) {
+		if (b.isEmpty()) {
+			return this;
+		}
+		throw new IllegalArgumentException("Incompatible dimensions.");
+	}
 
 	@Override
 	public Empty abs() {
@@ -142,6 +145,11 @@ public final class Empty implements Vector, SquareMatrix {
 	public double get(int row, int col) {
 		throw new IndexOutOfBoundsException();
 	}
+	
+	@Override
+	public Vector get(Indices rows) {
+		throw new IndexOutOfBoundsException();
+	}
 
 	@Override
 	public int rows() {
@@ -155,24 +163,24 @@ public final class Empty implements Vector, SquareMatrix {
 
 	@Override
 	public Vector row(int row) {
-		return this;
+		throw new IndexOutOfBoundsException();
 	}
 	
 	@Override
-	public Vector rows(int start, int end) {
-		return this;
+	public Vector rows(Indices rows) {
+		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
 	public Vector column(int column) {
-		return this;
+		return EMPTY;
 	}
 	
 	@Override
-	public Matrix columns(int start, int end) {
-		return this;
+	public Matrix columns(Indices columns) {
+		return EMPTY;
 	}
-
+	
 	@Override
 	public boolean isVector() {
 		return true;
@@ -199,8 +207,8 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 
 	@Override
-	public Empty sort(int column) {
-		return this;
+	public Indices sort(int column) {
+		return indices();
 	}
 
 	@Override
@@ -215,7 +223,7 @@ public final class Empty implements Vector, SquareMatrix {
 
 	@Override
 	public double get(int row) {
-		return Double.NaN;
+		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
@@ -270,13 +278,7 @@ public final class Empty implements Vector, SquareMatrix {
 	}
 	
 	@Override
-	public double aggregate(AggregationFunction func) {
-		return Double.NaN;
+	public Scalar aggregate(AggregationFunction func, double initialValue) {
+		return scalar(initialValue);
 	}
-	
-	@Override
-	public Vector aggregate(AggregationFunction func, int dimension) {
-		return this;
-	}
-
 }

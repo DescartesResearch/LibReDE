@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -27,6 +28,12 @@
 package tools.descartes.librede.algorithm;
 
 
+/**
+ * Marker interface for all Kalman Filter implementations.
+ * 
+ * @author Simon Spinner (simon.spinner@uni-wuerzburg.de)
+ *
+ */
 public interface IKalmanFilterAlgorithm extends IEstimationAlgorithm {
 
 }

@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -28,30 +29,42 @@ package tools.descartes.librede.models.observation.functions;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.offset;
+import static tools.descartes.librede.linalg.LinAlg.indices;
 import static tools.descartes.librede.linalg.LinAlg.zeros;
 import static tools.descartes.librede.linalg.testutil.MatrixAssert.assertThat;
 import static tools.descartes.librede.linalg.testutil.VectorAssert.assertThat;
 
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.junit.Before;
 import org.junit.Test;
 
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.linalg.Indices;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
+import tools.descartes.librede.linalg.VectorFunction;
+import tools.descartes.librede.metrics.StandardMetrics;
+import tools.descartes.librede.models.State;
+import tools.descartes.librede.models.diff.DifferentiationUtils;
+import tools.descartes.librede.models.observation.equations.UtilizationLawEquation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 import tools.descartes.librede.repository.QueryBuilder;
-import tools.descartes.librede.repository.StandardMetric;
 import tools.descartes.librede.testutils.Differentiation;
+import tools.descartes.librede.testutils.LibredeTest;
 import tools.descartes.librede.testutils.ObservationDataGenerator;
+import tools.descartes.librede.units.Ratio;
+import tools.descartes.librede.units.RequestRate;
+import tools.descartes.librede.units.Time;
+import tools.descartes.librede.units.UnitsFactory;
 
-public class UtilizationLawTest {
+public class UtilizationLawTest extends LibredeTest {
 		
 	private final static int RESOURCE_IDX = 2;
 	
 	private ObservationDataGenerator generator;
-	private UtilizationLaw law;
+	private UtilizationLawEquation law;
 	private IRepositoryCursor cursor;
-	private Vector state;
+	private State state;
 	private Resource resource;
 
 	@Before
@@ -59,10 +72,10 @@ public class UtilizationLawTest {
 		generator = new ObservationDataGenerator(42, 5, 4);
 		generator.setRandomDemands();
 
-		cursor = generator.getRepository().getCursor(0, 1);
+		cursor = generator.getRepository().getCursor(UnitsFactory.eINSTANCE.createQuantity(0, Time.SECONDS), UnitsFactory.eINSTANCE.createQuantity(1, Time.SECONDS));
 		
 		resource = generator.getStateModel().getResources().get(RESOURCE_IDX);
-		law = new UtilizationLaw(generator.getStateModel(), cursor, resource);
+		law = new UtilizationLawEquation(generator.getStateModel(), cursor, resource, 0);
 		state = generator.getDemands();		
 		
 		generator.nextObservation();
@@ -71,35 +84,34 @@ public class UtilizationLawTest {
 
 	@Test
 	public void testGetIndependentVariables() {
-		Vector x = QueryBuilder.select(StandardMetric.THROUGHPUT).forAllServices().average().using(cursor).execute();
-		Vector varVector = law.getIndependentVariables();		
-		Vector expectedVarVector = zeros(state.rows()).set(generator.getStateModel().getStateVariableIndexRange(resource), x);
+		Vector x = QueryBuilder.select(StandardMetrics.THROUGHPUT).in(RequestRate.REQ_PER_SECOND).forServices(generator.getStateModel().getUserServices()).average().using(cursor).execute();
+		Vector varVector = law.getFactors();
+		Indices idx = indices(generator.getStateModel().getUserServices().size(), new VectorFunction() {			
+			@Override
+			public double cell(int row) {
+				return generator.getStateModel().getStateVariableIndex(resource, generator.getStateModel().getUserServices().get(row));
+			}
+		});
+		Vector expectedVarVector = zeros(state.getStateSize()).set(idx, x);
 		
 		assertThat(varVector).isEqualTo(expectedVarVector, offset(1e-9));
 	}
 
-	@Test
-	public void testGetObservedOutput() {
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getObservedOutput()).isEqualTo(util, offset(1e-9));
-	}
 
 	@Test
 	public void testGetCalculatedOutput() {
-		double util = QueryBuilder.select(StandardMetric.UTILIZATION).forResource(resource).average().using(cursor).execute().getValue();
-		assertThat(law.getCalculatedOutput(state)).isEqualTo(util, offset(1e-9));
+		double util = QueryBuilder.select(StandardMetrics.UTILIZATION).in(Ratio.NONE).forResource(resource).average().using(cursor).execute().getValue();
+		assertThat(law.getValue(state).getValue()).isEqualTo(util, offset(1e-9));
 	}
 
 	@Test
-	public void testGetFirstDerivatives() {
-		Vector diff = Differentiation.diff1(law, state);
-		assertThat(law.getFirstDerivatives(state)).isEqualTo(diff, offset(1e-4));
-	}
-
-	@Test
-	public void testGetSecondDerivatives() {
-		Matrix diff = Differentiation.diff2(law, state);
-		assertThat(law.getSecondDerivatives(state)).isEqualTo(diff, offset(1e-4));
+	public void testGetDerivatives() {
+		Vector diff1 = Differentiation.diff1(law, state);
+		Matrix diff2 = Differentiation.diff2(law, state);
+		
+		DerivativeStructure s = law.getValue(new State(state.getStateModel(), state.getVector(), 2));
+		assertThat(DifferentiationUtils.getFirstDerivatives(s)).isEqualTo(diff1, offset(1e-4));
+		assertThat(DifferentiationUtils.getSecondDerivatives(s)).isEqualTo(diff2, offset(1e-4));
 	}
 
 }

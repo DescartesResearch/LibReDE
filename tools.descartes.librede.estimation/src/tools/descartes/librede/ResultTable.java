@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,133 +27,159 @@
  */
 package tools.descartes.librede;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import tools.descartes.librede.approach.IEstimationApproach;
 import tools.descartes.librede.configuration.ModelEntity;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.linalg.LinAlg;
+import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.MatrixBuilder;
 import tools.descartes.librede.linalg.Vector;
-import tools.descartes.librede.models.state.StateVariable;
+import tools.descartes.librede.linalg.VectorBuilder;
 import tools.descartes.librede.repository.TimeSeries;
 import tools.descartes.librede.validation.IValidator;
 
+/**
+ * A result table containing all result data in form of a table.
+ * 
+ * @author Simon Spinner
+ *
+ */
 public class ResultTable {
-	
+
 	public static class Builder {
 		private final Class<? extends IEstimationApproach> approach;
-		private MatrixBuilder estimateBuilder;		
-		private MatrixBuilder timestampBuilder;
+		private MatrixBuilder estimateBuilder;
+		private VectorBuilder timestampBuilder;
 		private double[] buffer;
-		private Map<StateVariable, Integer> entryToColumn;
-		
+		private Map<ResourceDemand, Integer> entryToColumn;
+
 		private Builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
-			int stateSize = workload.getResources().size() * workload.getServices().size();
 			this.approach = approach;
-			estimateBuilder = new MatrixBuilder(stateSize);		
-			timestampBuilder = new MatrixBuilder(1);
-			entryToColumn = new HashMap<StateVariable, Integer>(stateSize);
-			buffer = new double[stateSize];
-			
-			int i = 0;
+			TreeSet<ResourceDemand> variables = new TreeSet<ResourceDemand>();
 			for (Resource res : workload.getResources()) {
-				for (Service cls : workload.getServices()) {
-					entryToColumn.put(new StateVariable(res, cls), i);
-					i++;
+				for (ResourceDemand demand : res.getDemands()) {
+					variables.add(demand);
 				}
 			}
+			int stateSize = variables.size();
+			estimateBuilder = MatrixBuilder.create(stateSize);
+			timestampBuilder = VectorBuilder.create();
+			entryToColumn = new HashMap<ResourceDemand, Integer>(stateSize);
+			buffer = new double[stateSize];
+
+			int i = 0;
+			for (ResourceDemand var : variables) {
+				entryToColumn.put(var, i);
+				i++;
+			}
 		}
-		
+
 		public void next(double timestamp) {
-			timestampBuilder.addRow(timestamp);
+			timestampBuilder.add(timestamp);
 			Arrays.fill(buffer, 0);
 		}
-		
-		public void set(Resource resource, Service service, double value) {
-			buffer[entryToColumn.get(new StateVariable(resource, service))] = value;
+
+		public void set(ResourceDemand demand, double value) {
+			buffer[entryToColumn.get(demand)] = value;
 		}
-		
+
 		public void save() {
 			estimateBuilder.addRow(buffer);
 		}
-		
+
 		public ResultTable build() {
-			StateVariable[] columnToEntry = new StateVariable[entryToColumn.size()];
-			for (Map.Entry<StateVariable, Integer> e : entryToColumn.entrySet()) {
+			ResourceDemand[] columnToEntry = new ResourceDemand[entryToColumn.size()];
+			for (Map.Entry<ResourceDemand, Integer> e : entryToColumn.entrySet()) {
 				columnToEntry[e.getValue()] = e.getKey();
 			}
-			TimeSeries estimates = new TimeSeries((Vector)timestampBuilder.toMatrix(), estimateBuilder.toMatrix());
-			
+
+			Matrix estimatesMatrix = estimateBuilder.toMatrix();
+			TimeSeries estimates = TimeSeries.EMPTY;
+			if (!estimatesMatrix.isEmpty()) {
+				estimates = new TimeSeries(timestampBuilder.toVector(), estimateBuilder.toMatrix());
+			}
+
 			return new ResultTable(approach, columnToEntry, estimates);
 		}
 	}
-	
+
 	private final Class<? extends IEstimationApproach> approach;
-	private final StateVariable[] columnToEntry;
+	private final ResourceDemand[] columnToEntry;
 	private final TimeSeries estimates;
-	private Map<Class<? extends IValidator>, List<ModelEntity>> validationEntities;
-	private Map<Class<? extends IValidator>, Vector> validationResults;
-	
-	private ResultTable(Class<? extends IEstimationApproach> approach, StateVariable[] columnToEntry, TimeSeries estimates) {
+	private final Map<Class<? extends IValidator>, List<ModelEntity>> validationEntities = new HashMap<>();
+	private final Map<Class<? extends IValidator>, Vector> validationErrors = new HashMap<>();
+	private final Map<Class<? extends IValidator>, Vector> validationPredictions = new HashMap<>();
+
+	private ResultTable(Class<? extends IEstimationApproach> approach, ResourceDemand[] columnToEntry,
+			TimeSeries estimates) {
 		this.approach = approach;
 		this.columnToEntry = columnToEntry;
 		this.estimates = estimates;
-		this.validationEntities = new HashMap<Class<? extends IValidator>, List<ModelEntity>>();
-		this.validationResults = new HashMap<Class <? extends IValidator>, Vector>();
 	}
-	
+
 	public static Builder builder(Class<? extends IEstimationApproach> approach, WorkloadDescription workload) {
 		return new Builder(approach, workload);
 	}
-	
+
 	public TimeSeries getEstimates() {
 		return estimates;
 	}
-	
+
 	public Resource getResource(int column) {
 		return columnToEntry[column].getResource();
 	}
-	
+
 	public Service getService(int column) {
 		return columnToEntry[column].getService();
 	}
-	
+
 	public Class<? extends IEstimationApproach> getApproach() {
 		return approach;
 	}
-	
-	public void addValidationResults(Class <? extends IValidator> validator, Vector errors) {
-		validationResults.put(validator, errors);
+
+	public void addValidationResults(Class<? extends IValidator> validator, Vector prediction, Vector errors) {
+		validationPredictions.put(validator, prediction);
+		validationErrors.put(validator, errors);
 	}
-	
+
 	public Vector getLastEstimates() {
+		if (estimates.isEmpty()) {
+			return LinAlg.empty();
+		}
 		return estimates.getData().row(estimates.samples() - 1);
 	}
-	
-	public StateVariable[] getStateVariables() {
+
+	public ResourceDemand[] getStateVariables() {
 		return columnToEntry;
 	}
-	
-	public Set<Class <? extends IValidator>> getValidators() {
-		return validationResults.keySet();
+
+	public Set<Class<? extends IValidator>> getValidators() {
+		return validationErrors.keySet();
 	}
-	
+
 	public void setValidatedEntities(Class<? extends IValidator> validator, List<ModelEntity> entities) {
 		validationEntities.put(validator, entities);
 	}
-	
+
 	public List<ModelEntity> getValidatedEntities(Class<? extends IValidator> validator) {
 		return validationEntities.get(validator);
 	}
 
 	public Vector getValidationErrors(Class<? extends IValidator> validator) {
-		return validationResults.get(validator);
+		return validationErrors.get(validator);
+	}
+
+	public Vector getValidationPredictions(Class<? extends IValidator> validator) {
+		return validationPredictions.get(validator);
 	}
 }

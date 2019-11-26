@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,9 +27,19 @@
  */
 package tools.descartes.librede.export.csv;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 
+import tools.descartes.librede.ApproachResult;
+import tools.descartes.librede.LibredeResults;
+import tools.descartes.librede.ResultTable;
+import tools.descartes.librede.approach.IEstimationApproach;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.export.IExporter;
 import tools.descartes.librede.linalg.Matrix;
 import tools.descartes.librede.linalg.Vector;
@@ -45,7 +56,7 @@ public class CsvExporter implements IExporter {
 	@ParameterDefinition(name = "FileName", label = "File Name Prefix", required = true)
 	private String fileName;
 	
-	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception {
+	public void writeResults(String approach, int fold, ResourceDemand[] variables, TimeSeries estimates) throws Exception {		
 		File outputFile;
 		if (fileName != null && !fileName.isEmpty()) {
 			outputFile = new File(outputPath, fileName + "_" + approach + "_" + "fold_" + fold + ".csv");
@@ -57,6 +68,13 @@ public class CsvExporter implements IExporter {
 		Matrix demands = estimates.getData();
 
 		PrintWriter out = new PrintWriter(outputFile);
+		out.print("#timestamp");
+		for (ResourceDemand var : variables) {
+			out.print(", ");
+			out.print(var.getResource().getName() + "/" + var.getService().getName());			
+		}
+		out.println();
+		
 		try {
 			for (int j = 0; j < time.rows(); j++) {
 				out.print(time.get(j));
@@ -69,6 +87,80 @@ public class CsvExporter implements IExporter {
 		} finally {
 			out.close();
 		}
+	}
+
+	@Override
+	public void writeResults(LibredeResults results) throws Exception {
+		for (Class<? extends IEstimationApproach> approach : results.getApproaches()) {
+			int i = 0;
+			for (int f = 0; f < results.getNumberOfFolds(); f++) {
+				ResultTable curFold = results.getEstimates(approach, f);
+				writeResults(curFold.getApproach().getSimpleName(), i, curFold.getStateVariables(),
+							curFold.getEstimates());
+				i++;
+			}
+		}
+		
+		exportResultTimelineCSV(results);
+	}
+	
+	private void exportResultTimelineCSV(LibredeResults results) {
+		File outputFile = new File(outputPath, fileName + "_Selection.csv");
+		
+		try {
+			List<String> saveResult = new LinkedList<String>();
+			int idx = 0;
+			for (Class<? extends IEstimationApproach> curApproach : results.getSelectedApproaches()) {
+				ApproachResult approachResult = results.getApproachResults(curApproach);
+				ResultTable[] result = approachResult.getResult();
+
+				// get Timestamp and Approach Name
+				// timestamp is startTime
+				double startTimestamp = result[0].getEstimates().getStartTime();
+				double endTimestamp = result[0].getEstimates().getEndTime();
+				String approachName = approachResult.getApproach().getName();
+
+				double utilizationError = approachResult.getUtilizationError();
+				double responseTimeError = approachResult.getResponseTimeError();
+
+				String[] line = new String[4];
+				line[0] = Double.toString(startTimestamp);
+				line[1] = Double.toString(endTimestamp);
+				line[2] = approachName;
+				line[3] = Double.toString(approachResult.getMeanValidationError());
+				saveResult.add(implode(";", line));
+				idx++;
+			}
+
+			// open buffered writer
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile, false));
+			// write header
+			String[] head = new String[4];
+			head[0] = "Start Timestamp";
+			head[1] = "End Timestamp";
+			head[2] = "Approach Name";
+			head[3] = "Mean Error Validation";
+			saveResult.add(0, implode(";", head));
+			// write each line (timestamp + approach name + mean error
+			// validation)
+			for (String line : saveResult) {
+				bw.write(line);
+				bw.write("\n");
+			}
+			// close buffer
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String implode(String separator, String... line) {
+		StringBuilder sb = new StringBuilder();
+		for (String cell : line) {
+			sb.append(cell);
+			sb.append(separator);
+		}
+		return sb.toString();
 	}
 
 }

@@ -2,11 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
 Bundle-SymbolicName: tools.descartes.librede.bayesplusplus.java.tests
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.0.qualifier
 Fragment-Host: tools.descartes.librede.bayesplusplus.java
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: org.junit;bundle-version="4.11.0"
-Import-Package: org.eclipse.emf.common.util,
+Require-Bundle: org.junit
+Import-Package: org.apache.commons.math3.analysis.differentiation;version="3.2.0",
+ org.eclipse.emf.common.util,
+ org.eclipse.emf.ecore,
  tools.descartes.librede.configuration,
+ tools.descartes.librede.models.observation.equations,
+ tools.descartes.librede.models.state.initial,
  tools.descartes.librede.repository,
- tools.descartes.librede.testutils
+ tools.descartes.librede.testutils,
+ tools.descartes.librede.units

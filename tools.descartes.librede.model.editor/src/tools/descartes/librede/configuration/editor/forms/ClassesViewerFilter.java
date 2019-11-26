@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,24 +27,37 @@
  */
 package tools.descartes.librede.configuration.editor.forms;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
+import org.eclipse.emf.edit.provider.DelegatingWrapperItemProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 public class ClassesViewerFilter extends ViewerFilter {
 	
 	private Class<?> cl;
+	private Class<?> parentCl;
 	
-	public ClassesViewerFilter(Class<?> cl) {
+	public ClassesViewerFilter(Class<?> parentCl, Class<?> cl) {
 		this.cl = cl;
+		this.parentCl = parentCl;
 	}
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		return cl.isAssignableFrom(element.getClass());
+		/*
+		 * If an element has a DelegatingWrapperItemProvider we need to first get the right object.
+		 */
+		Object unwrapped = parentElement;
+		if (parentElement instanceof DelegatingWrapperItemProvider) {
+			unwrapped = ((DelegatingWrapperItemProvider)parentElement).getValue();
+		}		
+		
+		if (parentCl.isAssignableFrom(unwrapped.getClass())) {
+			if (element instanceof DelegatingWrapperItemProvider) {
+				return cl.isAssignableFrom(((DelegatingWrapperItemProvider)element).getValue().getClass());
+			}
+			return cl.isAssignableFrom(element.getClass());
+		}
+		return true;
 	}
 
 }

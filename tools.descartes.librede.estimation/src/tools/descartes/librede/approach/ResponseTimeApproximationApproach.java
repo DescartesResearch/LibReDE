@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -29,26 +30,32 @@ package tools.descartes.librede.approach;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import tools.descartes.librede.algorithm.EstimationAlgorithmFactory;
 import tools.descartes.librede.algorithm.IEstimationAlgorithm;
 import tools.descartes.librede.algorithm.SimpleApproximation;
 import tools.descartes.librede.configuration.Resource;
+import tools.descartes.librede.configuration.ResourceDemand;
 import tools.descartes.librede.configuration.Service;
 import tools.descartes.librede.configuration.WorkloadDescription;
+import tools.descartes.librede.metrics.Aggregation;
 import tools.descartes.librede.models.observation.IObservationModel;
+import tools.descartes.librede.models.observation.OutputFunction;
 import tools.descartes.librede.models.observation.VectorObservationModel;
-import tools.descartes.librede.models.observation.functions.IDirectOutputFunction;
-import tools.descartes.librede.models.observation.functions.ResponseTimeApproximation;
+import tools.descartes.librede.models.observation.equations.ConstantValue;
+import tools.descartes.librede.models.observation.equations.ResponseTimeApproximationEquation;
 import tools.descartes.librede.models.state.ConstantStateModel;
 import tools.descartes.librede.models.state.ConstantStateModel.Builder;
 import tools.descartes.librede.models.state.IStateModel;
 import tools.descartes.librede.models.state.constraints.Unconstrained;
 import tools.descartes.librede.registry.Component;
-import tools.descartes.librede.repository.Aggregation;
 import tools.descartes.librede.repository.IRepositoryCursor;
 
 @Component(displayName = "Approximation with Response Times")
 public class ResponseTimeApproximationApproach extends AbstractEstimationApproach {
+	
+	private static final Logger log = Logger.getLogger(ResponseTimeApproximationApproach.class);
 	
 	public static final String NAME = "ResponseTimeApproximation";
 	
@@ -58,8 +65,12 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 		List<IStateModel<?>> stateModels = new ArrayList<IStateModel<?>>();
 		for (Resource res : workload.getResources()) {
 			Builder<Unconstrained> builder = ConstantStateModel.unconstrainedModelBuilder();
-			for (Service service : workload.getServices()) {
-				builder.addVariable(res, service);
+			for (ResourceDemand demand : res.getDemands()) {
+				if (!demand.getService().isBackgroundService()) {
+					builder.addVariable(demand);
+				} else {
+					log.warn("Background services are not supported by Approximation with Response Times approach. Service \"" + demand.getService().getName() + "\" will be ignored at resource \"" + res.getName() + "\".");
+				}
 			}
 			stateModels.add(builder.build());
 		}		
@@ -67,13 +78,13 @@ public class ResponseTimeApproximationApproach extends AbstractEstimationApproac
 	}
 	
 	@Override
-	protected IObservationModel<?, ?> deriveObservationModel(
+	protected IObservationModel<?> deriveObservationModel(
 			IStateModel<?> stateModel, IRepositoryCursor cursor) {
 		Resource resource = stateModel.getResources().toArray(new Resource[1])[0];
-		VectorObservationModel<IDirectOutputFunction> observationModel = new VectorObservationModel<IDirectOutputFunction>();
-		for (Service service : stateModel.getServices()) {
-			ResponseTimeApproximation func = new ResponseTimeApproximation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
-			observationModel.addOutputFunction(func);
+		VectorObservationModel observationModel = new VectorObservationModel();
+		for (Service service : stateModel.getUserServices()) {
+			ResponseTimeApproximationEquation func = new ResponseTimeApproximationEquation(stateModel, cursor, resource, service, Aggregation.AVERAGE);
+			observationModel.addOutputFunction(new OutputFunction(func, new ConstantValue(stateModel, 1.0)));
 		}
 		return observationModel;
 	}

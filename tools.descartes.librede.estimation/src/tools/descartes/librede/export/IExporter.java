@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -26,10 +27,10 @@
  */
 package tools.descartes.librede.export;
 
-import tools.descartes.librede.repository.TimeSeries;
+import tools.descartes.librede.LibredeResults;
 
 public interface IExporter {
 	
-	public void writeResults(String approach, int fold, TimeSeries estimates) throws Exception;
+	public void writeResults(LibredeResults results) throws Exception;
 
 }

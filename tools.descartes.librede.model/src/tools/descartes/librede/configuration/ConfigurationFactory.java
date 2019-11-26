@@ -3,7 +3,8 @@
  *  LibReDE : Library for Resource Demand Estimation
  * ==============================================
  *
- * (c) Copyright 2013-2014, by Simon Spinner and Contributors.
+ * (c) Copyright 2013-2018, by Simon Spinner, Johannes Grohmann
+ *  and Contributors.
  *
  * Project Info:   http://www.descartes-research.net/
  *
@@ -208,6 +209,60 @@ public interface ConfigurationFactory extends EFactory {
 	 * @generated
 	 */
 	EstimationAlgorithmConfiguration createEstimationAlgorithmConfiguration();
+
+	/**
+	 * Returns a new object of class '<em>Trace Filter</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Trace Filter</em>'.
+	 * @generated
+	 */
+	TraceFilter createTraceFilter();
+
+	/**
+	 * Returns a new object of class '<em>Resource Demand</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Resource Demand</em>'.
+	 * @generated
+	 */
+	ResourceDemand createResourceDemand();
+
+	/**
+	 * Returns a new object of class '<em>External Call</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>External Call</em>'.
+	 * @generated
+	 */
+	ExternalCall createExternalCall();
+
+	/**
+	 * Returns a new object of class '<em>Composite Service</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Composite Service</em>'.
+	 * @generated
+	 */
+	CompositeService createCompositeService();
+
+	/**
+	 * Returns a new object of class '<em>Observation To Entity Mapping</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Observation To Entity Mapping</em>'.
+	 * @generated
+	 */
+	ObservationToEntityMapping createObservationToEntityMapping();
+
+	/**
+	 * Returns a new object of class '<em>Constant Data Point</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Constant Data Point</em>'.
+	 * @generated
+	 */
+	ConstantDataPoint createConstantDataPoint();
 
 	/**
 	 * Returns the package supported by this factory.
