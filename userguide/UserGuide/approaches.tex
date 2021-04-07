@@ -1,1 +1,56 @@
+\section{Approaches to Resource Demand Estimation}
 
+An \emph{estimation approach} in Librede consists of the following three separate building blocks: \emph{state model}, \emph{observation model}, and \emph{estimation alogrithm}. In the following we describe these components in more detail and document the currently available implementations.
+
+\subsection{Estimation Approaches}
+Table~\ref{tbl:Approaches} shows for each estimation approach currently implemented by Librede which implementations of the state model, observation model and estimation algorithm are used. Details on the implementations can be found in the following sections.
+
+\begin{table}[h!]
+\centering
+\scriptsize
+\label{tbl:Approaches}
+\caption{The table shows which implementations of state model, observation model and estimation algorithm are used by an estimation approach.}
+\begin{tabular}{p{4cm}p{2cm}p{2cm}p{3cm}}
+\hline \textbf{Estimation Approach} & \textbf{State Model} & \textbf{Observation Model} & \textbf{Estimation \newline Algorithm} \\ 
+\hline Service Demand Law  & Constant & Service Demand Law & Simple approximation \\ 
+\hline Approximation with Response Times & Constant & Response time approximation & Simple approximation \\
+\hline Least-squares Regression using Utilization Law & Constant & Utilization Law & Nonneg. least  squares regression\\
+\hline Least-squares Regression using Queue Lengths and Response Times & Constant & Response time equation & Nonneg. least  squares regression\\
+\hline Kalman Filter using Utilization law & Constant & Utilization Law & Kalman Filter \\ 
+\hline Kalman Filter using Response times and Utilization & Constant & Response time equation, Utilization Law & Kalman Filter \\
+\hline Recursive Optimization using Response Times & Constant & Response time equation & Interior-point,\newline non-linear, constrained optimization\\
+\hline Recursive Optimization using Response Times and Utilization & Constant & Response time equation, Utilization Law & Interior-point,\newline non-linear, constrained optimization\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{State Models}
+The state model contains information about the hidden state vector $\mathbf{x}$ that should be estimated. In our case the hidden state are the resource demands. The state model contains the following information:
+\begin{itemize}
+\item The size of the vector of resource demands to be estimated. The size is usually set to $M \cdot N$ where $M$ denotes the number of resources and $N$ the number of services.
+\item A set of constraints encoding additional knowledge of the value of certain resource demands. For example, it is possible to specify certain upper and lower bounds on the resource demands.
+\item Initial values for the resource demand estimates. This is used by Kalman filter techniques and nonlinear optimization technique as starting point.
+\item A function $\mathbf{x}_{n+1} = f(\mathbf{x}_n)$ that returns the expected next state vector $\mathbf{x}_{n+1}$ based on the current estimated state vector $\mathbf{x}_n$. This can be used to encode additional knowledge about changes in the resource demands. Currently, only the Kalman filter techniques can exploit such knowledge.
+\end{itemize}
+
+Librede currently provides one implementation of a \emph{Constant State Model}, where $x_{n+1}=x_n$ is assumed.
+
+\subsection{Observation Models}
+
+The observation model describes the function $\mathbf{y}_n = h(\mathbf{x}_n)$ between the current state vector $\mathbf{x}_n$ and the current observations vector $\mathbf{y}_n$. The observations vector $\mathbf{y}_n$ consists of values observed at the system of interest (e.g., average response time or CPU utilization). The function $h$ is is the combination of different output functions. The following output equations are currently provided by Librede:
+\begin{itemize}
+\item \emph{Response time approximation:} approximates the resource demand  $D_{i,c}$ of workload class $c$ at resource $i$ with the observed response time $R_{i,c}$ of workload class $c$ at resource $i$. This is only valid if queueing delays are insignificant.
+\item \emph{Service Demand Law:} the resource demand $D_{i,c}$ of workload class $c$ at resource $i$) is $D_{i,c} = \frac{U_{i,c}}{X_{i,c}}$ ($U_{i,c}$: utilization due to workload class $i$, and $X_{i,c}$ is the throughput of workload class $c$ at resource $i$). The utilization $U_{i,c}$ is derived from the aggregate utilization $U_i$ using the apportionment scheme used in~\cite{Brosig_Huber_Kounev_2011}.
+\item \emph{Utilization Law:} the relationship between the average utilization $U_i$ of resource $i$ and the resource demands is $U_{i} = \sum_{c=1}^{C} X_{i,c} \cdot D_{i,c}$ ($C$: is the number of workload classes, $X_{i,c}$ is the throughput of workload class $c$ at resource $i$, and $D_{i,c}$: resource demand of workload class $c$ at resource $i$).
+\item \emph{Response time equation:} the relationship between the end-to-end response time $R_c$ of workload class $c$ and the resource demands is $R_c = \sum_{j=1}^{I} \frac{D_{j,c}}{1-\sum_{k=1}^{C} \lambda_{i,k} \cdot D_{i,k}}$ ($I$: number of resources, $C$: number of workload classes, $\lambda{i,c}$: arrival rate of workload class $c$ at resource $i$, and $D_{i,c}$: resource demand of workload class $c$ at resource $i$).
+\end{itemize}
+
+\subsection{Estimation Algorithms}
+The estimation algorithm takes the state model and the observation models and then estimates the resource demands using statistical techniques. Librede currently provides the following estimation algorithms:
+\begin{itemize}
+\item \emph{Simple approximation:} approximates the resource demand with the average, maximum, minimum or sum of the output of the observation model.
+\item \emph{Nonnegative least squares regression:} only applicable to observation models with a single output.
+\item \emph{Kalman filter:} applicable to all non-linear observation models with no state constraints. Uses the Bayes++ library.
+\item \emph{Interior-point, non-linear, constrained optimization:} applicable to all kinds of state and observation models. Uses the Ipopt library.
+\end{itemize}
