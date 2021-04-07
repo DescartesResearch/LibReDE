@@ -8,6 +8,6 @@ More information can be found on the following pages:
 
 * [Project Website](http://descartes.tools/librede)
 
-* [Download](http://se.informatik.uni-wuerzburg.de/tools/librede/download/)
+* [Download](https://se.informatik.uni-wuerzburg.de/software-engineering-group/tools/librede/download/)
 
 * [User Guide](http://se.informatik.uni-wuerzburg.de/fileadmin/10030200/user_upload/librede/LibReDE_UserGuide.pdf)
