@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="LibRedeLogo.svg"
+   inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+   inkscape:export-xdpi="87.761932"
+   inkscape:export-ydpi="87.761932">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3799">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3801" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3803" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3807">
+      <stop
+         style="stop-color:#ff0800;stop-opacity:1;"
+         offset="0"
+         id="stop3809" />
+      <stop
+         id="stop3815"
+         offset="0.39719656"
+         style="stop-color:#ff8400;stop-opacity:1;" />
+      <stop
+         style="stop-color:#e8ff3d;stop-opacity:1;"
+         offset="0.69999999"
+         id="stop3817" />
+      <stop
+         style="stop-color:#41ed25;stop-opacity:1;"
+         offset="1"
+         id="stop3811" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3807"
+       id="linearGradient3813"
+       x1="175.59802"
+       y1="180.84552"
+       x2="175.56598"
+       y2="207.21347"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.58243862,0,0,0.9649072,29.771806,22.136023)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3799"
+       id="linearGradient3805"
+       x1="181.11333"
+       y1="128.80353"
+       x2="195.62624"
+       y2="128.20711"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.72581951,0,31.848927)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="4.39"
+     inkscape:cx="187.70386"
+     inkscape:cy="880.60456"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1137"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4025" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect4027"
+       width="159.45331"
+       height="61.047832"
+       x="74.259682"
+       y="94.959"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147"
+       inkscape:export-ydpi="147" />
+    <g
+       id="g4054"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147"
+       inkscape:export-ydpi="147">
+      <path
+         style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#c51818;stroke-width:2.48099971;stroke-miterlimit:4;stroke-opacity:1"
+         d="m 222.95812,127.01428 c 0,12.41142 -10.62405,22.47287 -23.72948,22.47287 -13.10542,0 -23.72947,-10.06145 -23.72947,-22.47287 0,-12.41142 10.62405,-22.47287 23.72947,-22.47287 13.10543,0 23.72948,10.06145 23.72948,22.47287 z"
+         id="path3819"
+         inkscape:connector-curvature="0" />
+      <g
+         style="fill:#c51818;fill-opacity:1;stroke:#c51818;stroke-opacity:1"
+         transform="matrix(1.1588276,0,0,1.0974614,-28.389989,-87.761277)"
+         id="g3841">
+        <path
+           style="fill:#c51818;fill-rule:nonzero;stroke:#c51818;stroke-width:1.46230543"
+           d="m 169.61485,192.45418 6.29714,0 0,6.49594 -6.29714,0 z"
+           id="rect3821"
+           inkscape:connector-curvature="0" />
+        <path
+           style="fill:#c51818;fill-rule:nonzero;stroke:#c51818;stroke-width:1.46230543"
+           d="m 216.93095,192.45418 6.29714,0 0,6.49594 -6.29714,0 z"
+           id="rect3821-3"
+           inkscape:connector-curvature="0" />
+      </g>
+      <path
+         inkscape:connector-curvature="0"
+         id="rect3821-6"
+         d="m 202.99512,97.59534 -6.2e-4,6.91087 -7.52768,-6.1e-4 6.2e-4,-6.910864 z"
+         style="fill:#c51818;fill-opacity:1;fill-rule:nonzero;stroke:#c51818;stroke-width:1.64908159;stroke-opacity:1" />
+      <g
+         style="fill:#c51818;fill-opacity:1;stroke:#c51818;stroke-opacity:1"
+         id="g3841-7"
+         transform="matrix(0.81941485,-0.7760224,0.81941485,0.7760224,-50.203708,157.68177)">
+        <path
+           style="fill:#c51818;fill-rule:nonzero;stroke:#c51818;stroke-width:1.46230543"
+           d="m 145.1543,129.19412 6.29713,0 0,6.49595 -6.29713,0 z"
+           id="rect3821-1"
+           inkscape:connector-curvature="0" />
+        <path
+           style="fill:#c51818;fill-rule:nonzero;stroke:#c51818;stroke-width:1.46230543"
+           d="m 192.4704,129.19412 6.29714,0 0,6.49595 -6.29714,0 z"
+           id="rect3821-3-2"
+           inkscape:connector-curvature="0" />
+      </g>
+      <g
+         style="fill:#c51818;fill-opacity:1;stroke:#c51818;stroke-opacity:1"
+         id="g3841-7-6"
+         transform="matrix(0.81941485,0.7760224,-0.81941485,0.7760224,166.84633,-109.20928)">
+        <path
+           style="fill:#c51818;fill-rule:nonzero;stroke:#c51818;stroke-width:1.46230543"
+           d="m 145.1543,129.19412 6.29713,0 0,6.49595 -6.29713,0 z"
+           id="rect3821-1-0"
+           inkscape:connector-curvature="0" />
+        <path
+           style="fill:#c51818;fill-rule:nonzero;stroke:#c51818;stroke-width:1.46230543"
+           d="m 192.4704,129.19412 6.29714,0 0,6.49595 -6.29714,0 z"
+           id="rect3821-3-2-4"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <rect
+       style="fill:url(#linearGradient3805);fill-opacity:1;stroke:none"
+       id="rect3797"
+       width="42.544731"
+       height="57.28635"
+       x="153.08151"
+       y="96.260971"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="74.919693"
+       y="138.6564"
+       id="text3004"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553"><tspan
+         sodipodi:role="line"
+         id="tspan3006"
+         x="74.919693"
+         y="138.6564"
+         style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Tahoma;-inkscape-font-specification:Tahoma Bold">LibReDE</tspan></text>
+    <rect
+       style="fill:#fffbff;fill-opacity:1;stroke:#000000;stroke-width:1.43201423;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3960"
+       width="12.476229"
+       height="87.760391"
+       x="139.85376"
+       y="-211.40404"
+       transform="matrix(-0.00481955,0.99998839,-0.99999904,-0.00138636,0,0)"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838"
+       width="0.39761415"
+       height="2.3856859"
+       x="128.23265"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-7"
+       width="0.39761415"
+       height="2.3856859"
+       x="136.42081"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-4"
+       width="0.39761415"
+       height="2.3856859"
+       x="133.69142"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-0"
+       width="0.39761415"
+       height="2.3856859"
+       x="130.96204"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9"
+       width="0.39761415"
+       height="4.1749501"
+       x="125.50326"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9-4"
+       width="0.39761415"
+       height="4.1749501"
+       x="139.15019"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-8"
+       width="0.39761415"
+       height="2.3856859"
+       x="141.87958"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-7-8"
+       width="0.39761415"
+       height="2.3856859"
+       x="150.06773"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-4-2"
+       width="0.39761415"
+       height="2.3856859"
+       x="147.33835"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-0-4"
+       width="0.39761415"
+       height="2.3856859"
+       x="144.60896"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9-4-5"
+       width="0.39761415"
+       height="4.1749501"
+       x="152.79712"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-1"
+       width="0.39761415"
+       height="2.3856859"
+       x="155.5265"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-7-7"
+       width="0.39761415"
+       height="2.3856859"
+       x="163.71466"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-4-1"
+       width="0.39761415"
+       height="2.3856859"
+       x="160.98528"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-0-1"
+       width="0.39761415"
+       height="2.3856859"
+       x="158.25589"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9-4-2"
+       width="0.39761415"
+       height="4.1749501"
+       x="166.44405"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-76"
+       width="0.39761415"
+       height="2.3856859"
+       x="169.17343"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-7-1"
+       width="0.39761415"
+       height="2.3856859"
+       x="177.36159"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-4-4"
+       width="0.39761415"
+       height="2.3856859"
+       x="174.6322"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-0-2"
+       width="0.39761415"
+       height="2.3856859"
+       x="171.90282"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9-4-22"
+       width="0.39761415"
+       height="4.1749501"
+       x="180.09097"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-16"
+       width="0.39761415"
+       height="2.3856859"
+       x="182.82036"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-7-85"
+       width="0.39761415"
+       height="2.3856859"
+       x="191.00853"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-4-7"
+       width="0.39761415"
+       height="2.3856859"
+       x="188.27914"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-0-6"
+       width="0.39761415"
+       height="2.3856859"
+       x="185.54976"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9-4-8"
+       width="0.39761415"
+       height="4.1749501"
+       x="193.73792"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-92"
+       width="0.39761415"
+       height="2.3856859"
+       x="196.4673"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-7-79"
+       width="0.39761415"
+       height="2.3856859"
+       x="204.65546"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-4-5"
+       width="0.39761415"
+       height="2.3856859"
+       x="201.92607"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-0-43"
+       width="0.39761415"
+       height="2.3856859"
+       x="199.19669"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       id="rect3838-9-4-23"
+       width="0.39761415"
+       height="4.1749501"
+       x="207.38484"
+       y="140.53316"
+       inkscape:export-filename="D:\Dateien\Documents\LibReDE\LibRedeLogo.png"
+       inkscape:export-xdpi="147.57553"
+       inkscape:export-ydpi="147.57553" />
+  </g>
+</svg>
