@@ -1,0 +1,256 @@
+\section{Configuration}
+This section describes all configuration parameters that can be changed with
+the editor. 
+The editor (and the corresponding configuration file) consists of multiple pages. 
+In total there are six  configuration pages: 
+\begin{enumerate}
+    \item Workload Description
+    \item Data Sources
+    \item Traces
+    \item Estimation
+    \item Validation
+    \item Output
+\end{enumerate}
+
+In the following, we will elaborate on each of those.
+
+\subsection{Workload Description}
+The workload description contains information about the workload that is estimated here.
+This includes information about which services exist, how these service are connected, what resources exist (type and number of servers), and which services are executed on which resources.
+Parameters are listed in the following table.
+
+
+     \begin{tabularx}{\textwidth}{lX}
+   % Definition des Tabellenkopfes auf der ersten Seite
+   %\label{tab:e}    
+   %\caption{Table containing estimation parameters.}
+   \toprule
+   \textbf{Parameter} & \textbf{Description} \\
+   \midrule
+   \endfirsthead % Erster Kopf zu Ende
+   % Definition des Tabellenkopfes auf den folgenden Seiten
+   \toprule
+   \textbf{Parameter} & \textbf{Description} \\
+   \midrule
+   \endhead % Zweiter Kopf ist zu Ende
+   \bottomrule
+   \endfoot
+    \textit{Services} \\
+    Name & A human-readable identifier for the service. \\
+    Background Service & Whether or not this service runs in the background. \\
+    \midrule 
+    \textit{Resources} \\
+    Name & A human-readable identifier for the resource. \\
+    Number of Servers & The number of servers processing requests in parallel
+    (e.g., number of cores of a CPU). \\
+    Scheduling Strategy & A scheduling strategy that best models the processing
+    at the resource. This information may be
+    exploited by some of the estimation approaches. If
+    set to \textit{unkown}, the estimation approaches do not
+    make any assumptions on the scheduling. \\
+    \end{tabularx}
+
+\subsection{Data Sources}
+The data sources describe the type of data source that will be used for this estimation.
+Detailed configuration parameters for each data source are listed in the following table.
+
+   \begin{tabularx}{\textwidth}{lX}
+                % Definition des Tabellenkopfes auf der ersten Seite
+        %\label{tab:e}    
+        %\caption{Table containing estimation parameters.}
+        \toprule
+        \textbf{Parameter} & \textbf{Description} \\
+        \midrule
+        \endfirsthead % Erster Kopf zu Ende
+        % Definition des Tabellenkopfes auf den folgenden Seiten
+        \toprule
+        \textbf{Parameter} & \textbf{Description} \\
+        \midrule
+        \endhead % Zweiter Kopf ist zu Ende
+        \bottomrule
+        \endfoot
+        \textit{CSV Data Source} \\
+        Name & A human-readable identifier for the data source.
+        Only for the display on the user interface. \\
+       Separators & A Java regular expression for matching the separator
+       chars in the CSV file. \\
+       Skip First Line & Determines whether the first non-comment line in
+       the CSV file is interpreted as data values. Comments
+       are expected to start with ``\#''.\\
+       Timestamp Format & The format of the timestamp of all traces of this data source. The timestamp format can be either a pattern as expected by java.util.SimpleDataFormat, or if it is a numerical timestamp, a specifier of the form [xx] where xx specifies the time unit, e.g., [ms]. \\
+       Number Locale & The locale of the number as to be interpreted by Java. Default value is ``en\_US''.\\
+    \end{tabularx}
+
+Other (custom) data source types might support more and/or different parameter sets.
+
+\subsection{Traces}
+This page describes single data source instances (e.g., files), what data types and aggregations each trace contains as well as which service or resource (as specified in the workload description) it is referring to.
+For each trace, you have to specify different parameters as defined in the following table.
+
+     \begin{tabularx}{\textwidth}{lX}
+        % Definition des Tabellenkopfes auf der ersten Seite
+        %\label{tab:e}    
+        %\caption{Table containing estimation parameters.}
+        \toprule
+        \textbf{Parameter} & \textbf{Description} \\
+        \midrule
+        \endfirsthead % Erster Kopf zu Ende
+        % Definition des Tabellenkopfes auf den folgenden Seiten
+        \toprule
+        \textbf{Parameter} & \textbf{Description} \\
+        \midrule
+        \endhead % Zweiter Kopf ist zu Ende
+        \bottomrule
+        \endfoot
+        \textit{Measurement Trace} \\
+        Metric &  Specifies the metric of the measurements in the
+        trace.\\
+        File &  A path to a file containing measurement data.
+        Only for the display on the user interface. \\
+        Data Source &  Reference to a data source that is used to load the contents of the file. \\
+        Unit & The unit of the data of the trace. Available options are usually dependent on the chosen metric.\\
+        Aggregation & The measurement data is often provided as aggregated
+        values over a fixed sampling interval. The
+        interval specifies the time duration over which the
+        data in the file is aggregated. If set to \textit{NONE}, the data
+        is assumed to be non-aggregated, i.e., the values
+        represent measurements of individual requests (e.g.,
+        in the case of response time).\\
+        Interval & The time interval of one aggregated and reported metric (amount and unit). This is ignored, if Aggregation is set to \textit{NONE}.\\
+        Mapping & The mapping specifies the associated entity of the
+        workload description (service or resource) for each
+        column in the trace. A mapping indicates that the observations in the measurement trace
+        correspond to the specified resource or service.\\
+    \end{tabularx}
+
+\subsection{Estimation}
+This page is for specifying the actual estimation. Here you can specify several parameters concerning the estimation approaches, next to selecting which approaches to execute.
+Some settings apply for all algorithms, while some parameters are specific to certain estimation algorithm types.
+The description of all available parameters can be found in the following table.
+
+    \begin{tabularx}{\textwidth}{lX}
+        
+        % Definition des Tabellenkopfes auf der ersten Seite
+        %\label{tab:e}    
+        %\caption{Table containing estimation parameters.}
+        \toprule
+        \textbf{Parameter} & \textbf{Description} \\
+        \midrule
+        \endfirsthead % Erster Kopf zu Ende
+        % Definition des Tabellenkopfes auf den folgenden Seiten
+        \toprule
+        \textbf{Parameter} & \textbf{Description} \\
+        \midrule
+        \endhead % Zweiter Kopf ist zu Ende
+        \bottomrule
+        \endfoot
+        \textit{Interval Settings} \\
+        Step Size &  The step size specifies the time interval in which
+        the estimates are updated. If an estimation approach
+        is based on time-aggregated measurements,
+        this parameter also determines the aggregation interval
+        of its input data. This aggregation interval
+        can be changed independently from the aggregation
+        interval of the input measurement traces. If
+        both intervals are different, the input data will be
+        converted accordingly. However, the step size must
+        be greater or equal to the aggregation interval of
+        the input measurements and should ideally be a
+        multiple of it in order to avoid inaccuracies.\\
+        Start Date &  Any measurements before that date will not be
+        included in the estimation. The time here refers
+        to the timestamps in the input time series.
+        There exists a button to automatically detect the  start time from the input files.\\
+        End Time & Any measurements after that date will not be included
+        in the estimation. The time here refers
+        to the timestamps in the input time series.
+        There exists a button to automatically detect the  start time from the input files. You can also configure the end time to be in the future. This is especially important, when online and continuous execution is targeted.\\
+        Recursive Estimation & If this flag is set, all transient resource demands
+        estimates will be output. Otherwise only the end
+        result will be given. \\
+        Approach Selection & Enables automatic approach selection. If set to true, all estimation approaches will be executed and the best one chosen based on cross-validation. \\
+        Window Size &  Defines the size of the sliding window on the input
+        measurements for recursive estimation. The
+        size is specified in number of step (i.e., the product
+        of window size and step size gives the actual sliding
+        time window). Smaller values will improve the
+        adaptivity of the estimator if the resource demands
+        change over time. However, it may result in lower
+        accuracy, if the window is too small.\\
+        \textit{Kalman Filter} \\
+        State Noise Covariance & A constant value used to fill the state noise covariance
+        vector $q_k$. This is an internal parameter
+        of Bayes++ for the prediction of the next state $ x_{k| k-1} = x_{k-1| k-2} + G_kw_k$. The vector $q_k$ is the
+        covariance of $w_k$.\\
+        State Noise Coupling &  A constant value used to fill the state noise coupling
+        matrix $G_k$. This is an internal parameter
+        of Bayes++ for the prediction of the next state
+        $x_{k|k-1} = x_{k-1|k-2} + G_kw_k$.\\
+        Observe Noise Covariance & A constant value used to fill the diagonal of the
+        observe noise covariance matrix. This is an internal
+        parameter of Bayes++. \\
+        \textit{Recursive Optimization}\\
+        Solution Tolerance & Desired convergence tolerance of the solution.\\
+        Upper Bounds Infinity Value & Values greater than this value are considered as infinity. \\
+        Lower Bounds Infinity Value & Values smaller than this value are considered as negative infinity.\\
+        Log verbosity & Sets the default verbosity level for console output. The larger this value the more detailed is the output. The valid range for this integer option is $ 0 \le {\tt print\_level } \le 12$ and its default value is $5$. \\
+    \end{tabularx}
+
+\subsection{Validation}
+On the validation page, different options for validating the acquired estimates are configurable.
+Next to selecting the different validators to apply, the following options are possible.
+
+\begin{tabularx}{\textwidth}{lX}
+    % Definition des Tabellenkopfes auf der ersten Seite
+    %\label{tab:e}    
+    %\caption{Table containing estimation parameters.}
+    \toprule
+    \textbf{Parameter} & \textbf{Description} \\
+    \midrule
+    \endfirsthead % Erster Kopf zu Ende
+    % Definition des Tabellenkopfes auf den folgenden Seiten
+    \toprule
+    \textbf{Parameter} & \textbf{Description} \\
+    \midrule
+    \endhead % Zweiter Kopf ist zu Ende
+    \bottomrule
+    \endfoot
+    \textit{Cross-Validation Settings} \\
+    $k$-fold Cross-Validation &  If enabled, a $k$-fold cross validation is executed after
+    estimation.\\
+    Number of Folds &  Specifies $k$, the number of folds for the cross-validation.
+    The cross-validation splits the input
+    time series into k randomly chosen, equally sized
+    folds and uses each fold once for validation.
+\end{tabularx}
+
+Additional (custom) validators might offer further parameter settings.
+
+\subsection{Output}
+In the last section, you can specify type and location of the output (apart from logging to console).
+\begin{tabularx}{\textwidth}{lX}
+    % Definition des Tabellenkopfes auf der ersten Seite
+    %\label{tab:e}    
+    %\caption{Table containing estimation parameters.}
+    \toprule
+    \textbf{Parameter} & \textbf{Description} \\
+    \midrule
+    \endfirsthead % Erster Kopf zu Ende
+    % Definition des Tabellenkopfes auf den folgenden Seiten
+    \toprule
+    \textbf{Parameter} & \textbf{Description} \\
+    \midrule
+    \endhead % Zweiter Kopf ist zu Ende
+    \bottomrule
+    \endfoot
+    \textit{CSV Export} \\
+    Name & A human-readable identifier for the exporter. This
+    is only relevant for the user interface. \\
+    Output Directory & The directory where the output files should be
+    stored. \\
+    File Name Prefix & A prefix that is prepended to the name of all generated
+    files.\\
+\end{tabularx}
+
+Other (custom) exporters might offer further parameter settings.
+

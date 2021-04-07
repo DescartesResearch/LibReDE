@@ -1,0 +1,32 @@
+\section{Extension Points}
+\label{sec:Design}
+Librede provides a set of interfaces that can be implemented to extend its functionality. The following extensions are currently supported:
+\begin{itemize}
+\item \texttt{tools.descartes.librede.repository.IMetric}: Provide additional metrics that are supported as input data.
+\item \texttt{tools.descartes.librede.datasource.IDataSource}: Support additional file formats for the input measurement traces. 
+\item \texttt{tools.descartes.librede.approaches.IEstimationApproach}: Create new estimation approaches.
+\item \texttt{tools.descartes.librede.validation.IValidator}: Create new validators to evaluate the accuracy of the resource demand estimates.
+\item \texttt{tools.descartes.librede.export.IExporter}: Support additional file formats for the output.
+\end{itemize}
+
+The class \texttt{tools.descartes.librede.registry.Registry} can be used to register new extensions. For more details see source code and javadocs.
+
+%Figure~\ref{fig:comp} shows the major components of LibReDE. The \emph{estimation approach} instantiates concrete instances of an estimation algorithm, an observation model, and a state model. It then triggers and coordinates the estimation procedure. The \emph{estimation algorithm} component implements the underlying statistical technique of an estimation approach (e.g., non-negative least squares regression or nonlinear optimization). The \emph{state model} component encodes apriori knowledge about the resource demands as state constraints and contains functions to determine initial estimates. The \emph{observation model} component defines the relationship between the observed system metrics and the hidden resource demands. The state model and the observation model both access the \emph{monitoring repository} and the \emph{workload description} components. The monitoring repository stores the user-provided monitoring data and provides functions to query and aggregate this data. The workload description component provides information about the system services and resources (including scheduling strategies and number of CPU cores). Finally, the \emph{approach selector} instantiates all available estimation approaches and executes a subset verified to be applicable to a given estimation problem.
+
+
+%In this section, we describe the main concepts which are the foundation for the library design. Then we describe how these concepts can be used to adapt existing estimation approaches or implement new ones. In order to estimate resource demands we require certain structural information of the system of interest and the actual measurement data. The \emph{workload description} provides information about which services and resources of a system are considered during resource demand estimation. It also contains information about individual resources, e.g., which scheduling strategy it uses or how many server it has. The workload description is provided by the user.
+
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.4\textwidth]{ComponentDiagram}
+%\caption{UML component diagram}
+%\vspace{-0.4cm}
+%\label{fig:comp}
+%\end{figure}
+
+%The \emph{monitoring data repository} encapsulates the logic for processing and storing the observation data provided by the user. It provides functions to derive the observations with different aggregation intervals and to derive certain metrics (e.g., throughput from departures traces).
+
+%The workload description and the monitoring data repository are the input for an \emph{estimation approach}. An estimation approach is a specific combination of a \emph{state model}, an \emph{observation model} and an \emph{estimation algorithm}. The state model encapsulates the knowledge about the values of the resource demands we have before the estimation. This includes any constraints on the values of the resource demands, e.g., the estimated resource demands may not result in an aggregated resource utilization above 100\%. Furthermore, the state model defines how initial estimates are determined if an estimation approach requires them. The observation model describes the function $z=h(x)$ which describes how the unknown resource demand vector $x$ relates to the vector $z$ of observations at the system. The library provides different implementations of observation models based on standard equations from queueing theory. An estimation algorithm uses a mathematical method to find estimates for the resource demands that fulfill the constraints specified in the state model and minimizes the difference between the calculated outputs from the observation model and the actually observed outputs from the system. The estimation algorithms currently supported by the library are based on an approximation method, non-negative least-squares regression, a Kalman filter and non-linear constrained optimization.
+
+%The chosen design enables a high level of reuse between the different estimation approaches. For instance, the estimation approaches based on least-squares regression proposed by Rolia and Vetland~\cite{Rolia_Vetland_1995} and the Kalman filter design proposed by Wang et al.~\cite{Wang_Huang_Qin_Zhang_Wei_Zhong_2012} both share the same state model and the same observation model based on the Utilization Law. They only use different estimation algorithms. At the same time, the two different Kalman filter designs contained in the library can share the same state model and estimation algorithm. They only use different observation models. This modular structure can also facilitate the implementation of new estimation approaches significantly as existing estimation algorithms or observations models may be reused.
+%The library design enables a high level of reuse between different estimation approaches. The same estimation algorithms, observation models or state models can be shared between different estimation approaches. Thus the component-based structure facilitates the implementation of new estimation approaches.

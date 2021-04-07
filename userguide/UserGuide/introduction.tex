@@ -1,0 +1,67 @@
+\section{Introduction}
+
+Librede is a library that provides a set of ready-to-use implementations of approaches to resource demand estimation. In the following, we describe the motivation behind Librede and give an overview on how to use it.
+
+\paragraph{What are resource demands?}
+Our definition is based on classic queueing theory~\cite{Lazowska_Zahorjan_Graham_Sevcik_1984}: a resource demand (aka. service demand) is the time a unit of work (e.g., request or transaction) spends obtaining service from a resource (e.g., CPU or hard disk) in a system over all visits. Resource demands are input parameters of widely used stochastic performance formalisms (e.g., Queueing Networks or Queueing Petri Nets) and of architecture-level performance models (e.g., Descartes Modeling Language (DML)~\cite{DML_report_2014} or Palladio Component Model (PCM)~\cite{becker2008a}). Resource demands are random variables and as such follow a certain probability distribution. In the following, when talking of resource demands we implicitly refer to the mean of the random variable if not explicitly noted otherwise.
+
+\paragraph{Why would you use estimation approaches?}
+In order to obtain accurate performance predictions for a system, a performance engineer needs to determine representative values for the resource demands during performance model construction. State-of-the-art monitoring tools can only provide aggregate resource usage statistics on a system- or per-process-level. However, in many applications one process may serve requests of different types with varying resource requirements (due to different computations, caching, etc.). A very fine-grained instrumentation of the system would be necessary to monitor resource demands directly. For many real-world applications this fine-grained monitoring is not feasible as they lack the required instrumentation capabilities or as the instrumentation would incur too high overheads. Instead, we can use statistical estimation techniques to estimate resource demands based on the readily available aggregate monitoring data (e.g., CPU utilization as measured by the operating system, or average response time). Different approaches to resource demand estimation using statistical techniques, e.g., linear regression~\cite{Rolia_Vetland_1995}, Kalman filtering~\cite{Zheng_Woodside_Litoiu_2008,Wang_Huang_Qin_Zhang_Wei_Zhong_2012}, or non-linear optimization~\cite{Menasce_2008,Liu_Wynter_Xia_Zhang_2006}, have been proposed in the literature.
+
+\paragraph{Why should you use Librede?}
+Existing approaches to resource demand estimation differ in their expected input measurements, their resulting outputs and their robustness to data anomalies. As shown in~\cite{Spinner2011a}, the applicability of certain approaches and the expected accuracy depends heavily on the system under study. For instance, in~\cite{Spinner2011a} we show that the relative error of the estimated resource demand can vary between less than 5\% and over 100\% between different estimation approaches. Therefore, the selection of a suitable estimation approach is very important to obtain reliable performance predictions from a performance model. However, there were no publicly available implementations of the proposed estimation approaches, making comparisons between them difficult as one would have to first implement the different estimation approaches. 
+
+Librede provides a library of ready-to-use implementations of different estimation approaches, based on Kalman filtering, linear regression, and non-linear optimization techniques. Performance engineers are  relieved from the time-consuming and error-prone implementation of estimation approaches. Thus, Librede simplifies the selection and application of approaches to resource demand estimation for a given system under study. Furthermore, it provides a framework reducing the effort to implement additional, novel estimation approaches through reuse of common functionality.
+
+
+%Furthermore, the approaches need to be parameterized correctly to yield good results. The selection of a suitable estimation approach and the optimization of its parameters usually requires experiments to validate the resulting resource demands.
+
+\paragraph{What are the main features of Librede?} Librede supports performance engineers with the following features:
+\begin{itemize}
+\item It contains ready-to-use implementations of 8 estimation approaches (namely response time approximation, service demand law~\cite{Brosig_Huber_Kounev_2011}, 2 variants of linear regression~\cite{Rolia_Vetland_1995, Kraft2009}, 2 variants of Kalman filter~\cite{Wang_Huang_Qin_Zhang_Wei_Zhong_2012,Zheng_Woodside_Litoiu_2008}, and 2 variants of nonlinear optimization~\cite{Menasce_2008, Liu2006}). Additional estimation approaches can be added through extension points.
+\item The measurement data which is the input of the estimation is read from standard CSV files. It also offers an extension point to implement additional importers for custom file formats.
+\item Using cross-validation, the accuracy of the estimated resource demands can be evaluated enabling the comparison of different approaches.
+\item The resulting resource demands can be exported to CSV files. Additional output formats can be added through an extension point.
+\item It offers configuration parameters to customize and optimize the estimation (e.g., step size, window size, recursive optimization, approach-specific parameters, etc.).
+\item An Eclipse-based editor can be used for configuring the estimation (describe workload, configure input data, select estimation approaches, adapt configuration parameters, etc.). The configuration can be saved in a file for later reuse.
+\item It provides a Java API that allows the integration of resource demand estimation into custom applications. The configuration is provided by an EMF model.
+
+\end{itemize}
+
+
+
+
+%Given that there are no publicly available implementations of estimation approaches, a performance engineer is currently forced to implement estimation approaches on his own. This is a time-consuming and error-prone task. In this paper, we present LibReDE, a library supporting performance engineers to determine resource demands by providing a set of ready-to-use implementations of estimation approaches. Based on the actual system and the available monitoring data, the estimation library can automatically determine a set of candidate estimation approaches and execute them. A performance engineer can then validate the resulting resource demand estimates and select the approach that yields the best results. Furthermore, the library also provides a framework that can be used as a basis by developers of estimation approaches. Through reuse, the effort for adapting existing estimation approaches or for implementing new ones, can be significantly reduced.
+
+\paragraph{How can you execute Librede?}
+There are different modes in which you can execute Librede:
+\begin{itemize}
+\item The Eclipse editor provides a convenient way to create the estimation configuration and execute the estimation approaches. This mode is targeted at offline analysis, when manually for, e.g., design-time analysis or offline capacity planning purposes. The input measurement data needs to be obtained beforehand by running experiments in a dedicated test environment or using monitoring traces from a production system.
+\item The standalone console interface enables the execution of Librede outside of Eclipse assuming an existing estimation configuration, created using the Eclipse editor.
+%\item A MATLAB interface allows to execute the estimators from inside MATLAB scripts. The results can be directly used for further analysis or visualization.
+\item The Java API enables the integration of resource demand estimation in custom programs. In this mode, Librede can be used for online analysis, i.e., new measurements are continuously coming in and the resource demands are updated recursively in a certain interval. For instance, this mode can be used to build autonomic and self-aware systems~\cite{KoBrHuRe2010-SCC-Towards} using performance models to evaluate the impact of changes in the environment on the system performance and automatically adapt their resource allocation.
+\end{itemize}
+
+\paragraph{What are the license terms?}
+
+All Librede source code files are copyright by the contributors. Librede is distributed as open-source software under the terms of the Eclipse Public License (EPL) 1.0 (see \url{https://www.eclipse.org/legal/epl-v10.html}).
+
+The library uses open-source third-party libraries. We especially acknowledge the creators of these libraries:
+\begin{itemize}
+\item CERN - European Organization for Nuclear Research, Colt library (\url{http://acs.lbl.gov/ACSSoftware/colt/}).
+\item Bayes++ (\url{http://bayesclasses.sourceforge.net/Bayes++.html}).
+\item COIN-OR Ipopt~\cite{ipopt2006} (\url{https://projects.coin-or.org/Ipopt}).
+\item NNLS (\url{http://www.netlib.org/lawson-hanson/all})
+\end{itemize}
+
+% Limitations of current monitoring tools
+% Different estimation approaches? Differences in required inputs and robustness
+
+
+
+
+%The paper is structured as following: Section~\ref{sec:Usage} describes the major features of LibReDE and its usage. Section~\ref{sec:Design} explains the major ideas the design of the library is based on and how the library can be extended. Section~\ref{sec:Conclusion} concludes the paper and presents the plans for the future development of the library.
+
+% Implementations are not publicly available
+
+% 
